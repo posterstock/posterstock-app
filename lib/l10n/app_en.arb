@@ -1,0 +1,10 @@
+{
+    "welcome": "Welcome to Posterstock",
+    "enterEmail": "Enter you email address...",
+    "emailError": "Incorrect email",
+    "contWithEmail": "Continue with email",
+    "or": "Or",
+    "contWithApple": "Continue with Apple",
+    "contWithGoogle": "Continue with Google",
+    "privacyPolicy": "By clicking “Continue with Google/Email/SAML” above, you acknowledge that you have read and understood, and agree to Posterstock’s Terms & Contitions and Privacy Polis"
+}
