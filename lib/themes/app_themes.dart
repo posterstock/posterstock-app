@@ -11,10 +11,7 @@ class AppThemes {
 
   static final lightThemeData = ThemeData.light().copyWith(
     scaffoldBackgroundColor: _appLightColors.backgroundsPrimary,
-    hoverColor: Colors.transparent,
-    focusColor: Colors.transparent,
-    splashColor: Colors.transparent,
-    highlightColor: Colors.transparent,
+      splashColor: Colors.transparent,
     extensions: [
       _appLightColors,
       _appLightTextStyles,
@@ -23,10 +20,7 @@ class AppThemes {
 
   static final darkThemeData = ThemeData.light().copyWith(
       scaffoldBackgroundColor: _appDarkColors.backgroundsPrimary,
-      hoverColor: Colors.transparent,
-      focusColor: Colors.transparent,
       splashColor: Colors.transparent,
-      highlightColor: Colors.transparent,
       extensions: [
         _appDarkColors,
         _appDarkTextStyles,

@@ -23,7 +23,7 @@ class ProgressBorder extends BoxBorder {
 
   factory ProgressBorder.all({
     Color color = const Color(0xFF000000),
-    double width = 1.0,
+    double width = 1.5,
     double? progressStart,
     double? progressEnd,
   }) {
@@ -111,7 +111,7 @@ class ProgressBorder extends BoxBorder {
     } else {
       paint
         ..style = PaintingStyle.stroke
-        ..strokeWidth = side.width;
+        ..strokeWidth = side.width + 0.5;
       _paint(
           canvas,
           Path()

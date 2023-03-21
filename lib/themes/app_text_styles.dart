@@ -5,7 +5,7 @@ class AppAllTextStyles extends AppTextStyles {
   AppAllTextStyles(AppColors colors)
       : super(
           title2: TextStyle(
-            fontFamily: 'SF Pro Display',
+            fontFamily: 'SF-Pro-Display',
             fontWeight: FontWeight.w700,
             fontSize: 22,
             height: 28 / 22,
@@ -13,7 +13,7 @@ class AppAllTextStyles extends AppTextStyles {
             color: colors.textsPrimary,
           ),
           calloutBold: TextStyle(
-            fontFamily: 'SF Pro Text',
+            fontFamily: 'SF-Pro-Text',
             fontWeight: FontWeight.w600,
             fontSize: 16,
             height: 21 / 16,
@@ -21,7 +21,7 @@ class AppAllTextStyles extends AppTextStyles {
             color: colors.textsPrimary,
           ),
           callout: TextStyle(
-            fontFamily: 'SF Pro Text',
+            fontFamily: 'SF-Pro-Text',
             fontWeight: FontWeight.w400,
             fontSize: 16,
             height: 21 / 16,
@@ -29,7 +29,7 @@ class AppAllTextStyles extends AppTextStyles {
             color: colors.textsDisabled,
           ),
           caption2: TextStyle(
-            fontFamily: 'SF Pro Text',
+            fontFamily: 'SF-Pro-Text',
             fontWeight: FontWeight.w400,
             fontSize: 11,
             height: 13 / 11,
@@ -44,7 +44,7 @@ class AppAllTextStyles extends AppTextStyles {
             color: colors.textsError,
           ),
           bodyRegular: TextStyle(
-            fontFamily: 'SF Pro Text',
+            fontFamily: 'SF-Pro-Text',
             fontWeight: FontWeight.w400,
             fontSize: 17,
             height: 22 / 17,

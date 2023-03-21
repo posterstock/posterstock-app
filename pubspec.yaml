@@ -37,3 +37,38 @@ flutter:
   assets:
     - assets/
     - assets/icons/
+
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: fonts/Montserrat/Montserrat-Black.ttf
+        - asset: fonts/Montserrat/Montserrat-Bold.ttf
+        - asset: fonts/Montserrat/Montserrat-ExtraBold.ttf
+        - asset: fonts/Montserrat/Montserrat-ExtraLight.ttf
+        - asset: fonts/Montserrat/Montserrat-Light.ttf
+        - asset: fonts/Montserrat/Montserrat-Medium.ttf
+        - asset: fonts/Montserrat/Montserrat-Regular.ttf
+        - asset: fonts/Montserrat/Montserrat-SemiBold.ttf
+        - asset: fonts/Montserrat/Montserrat-Thin.ttf
+    - family: SF-Pro-Text
+      fonts:
+        - asset: fonts/SFProText/SF-Pro-Text-Black.otf
+        - asset: fonts/SFProText/SF-Pro-Text-Bold.otf
+        - asset: fonts/SFProText/SF-Pro-Text-Heavy.otf
+        - asset: fonts/SFProText/SF-Pro-Text-Light.otf
+        - asset: fonts/SFProText/SF-Pro-Text-Medium.otf
+        - asset: fonts/SFProText/SF-Pro-Text-Regular.otf
+        - asset: fonts/SFProText/SF-Pro-Text-SemiBold.otf
+        - asset: fonts/SFProText/SF-Pro-Text-Thin.otf
+        - asset: fonts/SFProText/SF-Pro-Text-Ultralight.otf
+    - family: SF-Pro-Display
+      fonts:
+        - asset: fonts/SFProDisplay/SF-Pro-Display-Black.otf
+        - asset: fonts/SFProDisplay/SF-Pro-Display-Bold.otf
+        - asset: fonts/SFProDisplay/SF-Pro-Display-Heavy.otf
+        - asset: fonts/SFProDisplay/SF-Pro-Display-Light.otf
+        - asset: fonts/SFProDisplay/SF-Pro-Display-Medium.otf
+        - asset: fonts/SFProDisplay/SF-Pro-Display-Regular.otf
+        - asset: fonts/SFProDisplay/SF-Pro-Display-SemiBold.otf
+        - asset: fonts/SFProDisplay/SF-Pro-Display-Thin.otf
+        - asset: fonts/SFProDisplay/SF-Pro-Display-Ultralight.otf

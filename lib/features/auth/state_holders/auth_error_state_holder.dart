@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final authErrorStateHolderProvider = StateNotifierProvider(
+final authErrorStateHolderProvider =
+    StateNotifierProvider<AuthErrorStateHolder, String?>(
   (ref) => AuthErrorStateHolder(null),
 );
 

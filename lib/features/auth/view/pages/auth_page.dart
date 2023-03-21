@@ -5,6 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/features/auth/controllers/auth_controller.dart';
+import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_error_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_loading_state_holder.dart';
 import 'package:poster_stock/features/auth/view/widgets/auth_button.dart';
@@ -28,20 +29,20 @@ class AuthPage extends ConsumerWidget {
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
         ),
-        child: SingleChildScrollView(
-          child: Stack(
-            children: [
-              Image.asset(
-                'assets/header.png',
-                fit: BoxFit.fitWidth,
-              ),
-              Padding(
+        child: Stack(
+          children: [
+            Image.asset(
+              'assets/header.png',
+              fit: BoxFit.fitWidth,
+            ),
+            SafeArea(
+              child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
                   children: [
                     SizedBox(
                       height:
-                          MediaQuery.of(context).size.width / 375 * 220 - 72,
+                          MediaQuery.of(context).size.width / 375 * 220 - 72 - MediaQuery.of(context).padding.top,
                       width: double.infinity,
                     ),
                     Container(
@@ -97,8 +98,17 @@ class AuthPage extends ConsumerWidget {
                     ),
                     const SizedBox(height: 20),
                     AuthButton(
-                      onTap: () {
+                      onTap: () async {
                         ref.read(authControllerProvider).loadApple();
+                        Future.delayed(Duration(seconds: 2), () {
+                          AutoRouter.of(context).push(const LoginRoute()).then((value) {
+                            ref.read(signUpControllerProvider)
+                              ..setName('')
+                              ..setUsername('')
+                              ..removeUsernameError();
+                          });
+                          ref.read(authControllerProvider).stopLoading();
+                        });
                       },
                       loading: loadingState.loadingApple,
                       child: Row(
@@ -138,18 +148,18 @@ class AuthPage extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 28),
+                    const Spacer(),
                     Text(
                       AppLocalizations.of(context)!.privacyPolicy,
                       style: context.textStyles.caption2,
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 60),
+                    const SizedBox(height: 26),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -163,7 +173,13 @@ class AuthPage extends ConsumerWidget {
       ref.read(authControllerProvider).setError();
     } else {
       ref.read(authControllerProvider).removeError();
-      AutoRouter.of(context).push(SignUpRoute());
+      ref.read(authControllerProvider).setEmail(value);
+      AutoRouter.of(context).push(const SignUpRoute()).then((value) {
+        ref.read(signUpControllerProvider)
+          ..setName('')
+          ..setUsername('')
+          ..removeUsernameError();
+      });
     }
   }
 }
