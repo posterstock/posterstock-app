@@ -10,12 +10,14 @@ class ProgressBorder extends BoxBorder {
     this.left = BorderSide.none,
     this.progressStart,
     this.progressEnd,
+    this.bgStrokeColor,
   });
 
   const ProgressBorder.fromBorderSide(
     BorderSide side, [
     this.progressStart,
     this.progressEnd,
+    this.bgStrokeColor,
   ])  : top = side,
         right = side,
         bottom = side,
@@ -23,6 +25,7 @@ class ProgressBorder extends BoxBorder {
 
   factory ProgressBorder.all({
     Color color = const Color(0xFF000000),
+    Color bgStrokeColor = const Color(0x00000000),
     double width = 1.5,
     double? progressStart,
     double? progressEnd,
@@ -36,6 +39,7 @@ class ProgressBorder extends BoxBorder {
       side,
       progressStart,
       progressEnd,
+      bgStrokeColor,
     );
   }
 
@@ -52,6 +56,8 @@ class ProgressBorder extends BoxBorder {
   final double? progressStart;
 
   final double? progressEnd;
+
+  final Color? bgStrokeColor;
 
   @override
   EdgeInsetsGeometry get dimensions => EdgeInsets.fromLTRB(
@@ -76,6 +82,7 @@ class ProgressBorder extends BoxBorder {
       borderRadius ?? BorderRadius.circular(16.0),
       progressStart ?? 0,
       progressEnd ?? 1,
+      bgStrokeColor: bgStrokeColor,
     );
   }
 
@@ -97,8 +104,9 @@ class ProgressBorder extends BoxBorder {
     BorderSide side,
     BorderRadius borderRadius,
     double progressStart,
-    double progressEnd,
-  ) {
+    double progressEnd, {
+    Color? bgStrokeColor,
+  }) {
     assert(side.style != BorderStyle.none);
     final Paint paint = Paint()..color = side.color;
     final RRect outer = borderRadius.toRRect(rect);
@@ -113,21 +121,23 @@ class ProgressBorder extends BoxBorder {
         ..style = PaintingStyle.stroke
         ..strokeWidth = side.width + 0.5;
       _paint(
-          canvas,
-          Path()
-            ..addRRect(
-              RRect.fromLTRBR(
-                rect.left + 0.5,
-                rect.top + 0.5,
-                rect.right - 0.5,
-                rect.bottom - 0.5,
-                borderRadius.topRight,
-              ),
-            )
-            ..close(),
-          paint,
-          progressStart,
-          progressEnd);
+        canvas,
+        Path()
+          ..addRRect(
+            RRect.fromLTRBR(
+              rect.left + 0.5,
+              rect.top + 0.5,
+              rect.right - 0.5,
+              rect.bottom - 0.5,
+              borderRadius.topRight,
+            ),
+          )
+          ..close(),
+        paint,
+        progressStart,
+        progressEnd,
+        bgStrokeColor: bgStrokeColor,
+      );
     }
   }
 
@@ -136,10 +146,20 @@ class ProgressBorder extends BoxBorder {
     Path path,
     Paint paint,
     double progressStart,
-    double progressEnd,
-  ) {
+    double progressEnd, {
+    int loadType = 0,
+    Color? bgStrokeColor,
+  }) {
     final metrics = path.computeMetrics(forceClosed: true).toList();
-    _paintMetrics(canvas, metrics, paint, progressStart, progressEnd);
+    _paintMetrics(
+      canvas,
+      metrics,
+      paint,
+      progressStart,
+      progressEnd,
+      loadType: loadType,
+      bgStrokeColor: bgStrokeColor,
+    );
   }
 
   static void _paintMetrics(
@@ -147,17 +167,31 @@ class ProgressBorder extends BoxBorder {
     List<ui.PathMetric> metrics,
     Paint paint,
     double progressStart,
-    double progressEnd,
-  ) {
-    final total = metrics.fold<double>(0, (v, e) => v + e.length);
+    double progressEnd, {
+    int loadType = 0,
+    Color? bgStrokeColor,
+  }) {
+    List<ui.PathMetric> newMetr;
+
+    newMetr = metrics;
+
+    var total = newMetr.fold<double>(0, (v, e) => v + e.length);
 
     double targetStart = total * progressStart;
     double targetEnd = total * progressEnd;
     paint.strokeJoin = ui.StrokeJoin.miter;
     paint.strokeCap = ui.StrokeCap.round;
 
-    final iterator = metrics.toList();
+    final iterator = newMetr.toList();
     for (final m in iterator) {
+      canvas.drawPath(
+        m.extractPath(0, total),
+        Paint()
+          ..strokeWidth = paint.strokeWidth
+          ..color = bgStrokeColor ?? const Color(0x00000000)
+          ..style = PaintingStyle.stroke,
+      );
+
       canvas.drawPath(m.extractPath(targetStart, targetEnd), paint);
       if (targetEnd > total) {
         canvas.drawPath(m.extractPath(0, targetEnd - total), paint);

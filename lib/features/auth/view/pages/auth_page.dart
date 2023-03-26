@@ -9,7 +9,10 @@ import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_error_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_loading_state_holder.dart';
 import 'package:poster_stock/features/auth/view/widgets/auth_button.dart';
+import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
+import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
+import 'package:poster_stock/themes/app_themes.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../../../common/widgets/app_text_field.dart';
@@ -41,20 +44,31 @@ class AuthPage extends ConsumerWidget {
                 child: Column(
                   children: [
                     SizedBox(
-                      height:
-                          MediaQuery.of(context).size.width / 375 * 220 - 72 - MediaQuery.of(context).padding.top,
+                      height: MediaQuery.of(context).size.width / 375 * 220 -
+                          72 -
+                          MediaQuery.of(context).padding.top,
                       width: double.infinity,
                     ),
-                    Container(
-                      width: 144,
-                      height: 144,
-                      decoration: BoxDecoration(
-                        color: context.colors.backgroundsPrimary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(36),
-                        child: SvgPicture.asset('assets/icons/logo.svg'),
+                    GestureDetector(
+                      onTap: () {
+                        final theme = ref.watch(themeStateHolderProvider);
+                        if (theme.brightness == Brightness.light) {
+                          ref.read(themeControllerProvider).updateTheme(AppThemes.darkThemeData);
+                        } else {
+                          ref.read(themeControllerProvider).updateTheme(AppThemes.lightThemeData);
+                        }
+                      },
+                      child: Container(
+                        width: 144,
+                        height: 144,
+                        decoration: BoxDecoration(
+                          color: context.colors.backgroundsPrimary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(36),
+                          child: SvgPicture.asset('assets/icons/logo.svg'),
+                        ),
                       ),
                     ),
                     Text(
@@ -76,7 +90,7 @@ class AuthPage extends ConsumerWidget {
                       child: errorState != null
                           ? Text(
                               AppLocalizations.of(context)!.emailError,
-                              style: context.textStyles.caption!,
+                              style: context.textStyles.caption1!,
                             )
                           : null,
                     ),
@@ -100,11 +114,13 @@ class AuthPage extends ConsumerWidget {
                     AuthButton(
                       onTap: () async {
                         ref.read(authControllerProvider).loadApple();
-                        Future.delayed(Duration(seconds: 2), () {
-                          AutoRouter.of(context).push(const LoginRoute()).then((value) {
+                        Future.delayed(Duration(seconds: 5), () {
+                          AutoRouter.of(context)
+                              .push(const LoginRoute())
+                              .then((value) {
                             ref.read(signUpControllerProvider)
                               ..setName('')
-                              ..setUsername('')
+                              ..setUsername('')..removeCode()
                               ..removeUsernameError();
                           });
                           ref.read(authControllerProvider).stopLoading();
@@ -131,6 +147,17 @@ class AuthPage extends ConsumerWidget {
                     AuthButton(
                       onTap: () {
                         ref.read(authControllerProvider).loadGoogle();
+                        Future.delayed(Duration(seconds: 5), () {
+                          AutoRouter.of(context).push(NavigationRoute()).then(
+                            (value) {
+                              ref.read(signUpControllerProvider)
+                                ..setName('')
+                                ..setUsername('')..removeCode()
+                                ..removeUsernameError();
+                            },
+                          );
+                          ref.read(authControllerProvider).stopLoading();
+                        });
                       },
                       loading: loadingState.loadingGoogle,
                       child: Row(
@@ -178,6 +205,7 @@ class AuthPage extends ConsumerWidget {
         ref.read(signUpControllerProvider)
           ..setName('')
           ..setUsername('')
+          ..removeCode()
           ..removeUsernameError();
       });
     }

@@ -36,7 +36,7 @@ class AppAllTextStyles extends AppTextStyles {
             letterSpacing: 0.07,
             color: colors.textsDisabled,
           ),
-          caption: TextStyle(
+          caption1: TextStyle(
             fontFamily: 'Montserrat',
             fontWeight: FontWeight.w400,
             fontSize: 12,
@@ -51,6 +51,30 @@ class AppAllTextStyles extends AppTextStyles {
             letterSpacing: -0.41,
             color: colors.textsPrimary,
           ),
+          footNote: TextStyle(
+            fontFamily: 'SF-Pro-Text',
+            fontWeight: FontWeight.w400,
+            fontSize: 13,
+            height: 18 / 13,
+            letterSpacing: -0.08,
+            color: colors.textsPrimary,
+          ),
+          subheadlineBold: TextStyle(
+            fontFamily: 'SF-Pro-Text',
+            fontWeight: FontWeight.w500,
+            fontSize: 15,
+            height: 20 / 15,
+            letterSpacing: -0.5,
+            color: colors.textsPrimary,
+          ),
+          subheadline: TextStyle(
+            fontFamily: 'SF-Pro-Text',
+            fontWeight: FontWeight.w400,
+            fontSize: 15,
+            height: 20 / 15,
+            letterSpacing: -0.24,
+            color: colors.textsPrimary,
+          ),
         );
 }
 
@@ -60,16 +84,22 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
     required this.callout,
     required this.calloutBold,
     required this.caption2,
-    required this.caption,
+    required this.caption1,
     required this.bodyRegular,
+    required this.footNote,
+    required this.subheadlineBold,
+    required this.subheadline,
   });
 
   final TextStyle? title2;
   final TextStyle? callout;
   final TextStyle? calloutBold;
   final TextStyle? caption2;
-  final TextStyle? caption;
+  final TextStyle? caption1;
   final TextStyle? bodyRegular;
+  final TextStyle? footNote;
+  final TextStyle? subheadlineBold;
+  final TextStyle? subheadline;
 
   @override
   ThemeExtension<AppTextStyles> copyWith({
@@ -77,16 +107,22 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
     final TextStyle? callout,
     final TextStyle? calloutBold,
     final TextStyle? caption2,
-    final TextStyle? caption,
+    final TextStyle? caption1,
     final TextStyle? bodyRegular,
+    final TextStyle? footNote,
+    final TextStyle? subheadlineBold,
+    final TextStyle? subheadline,
   }) {
     return AppTextStyles(
       title2: title2 ?? this.title2,
       callout: callout ?? this.callout,
       calloutBold: calloutBold ?? this.calloutBold,
       caption2: caption2 ?? this.caption2,
-      caption: caption ?? this.caption,
+      caption1: caption1 ?? this.caption1,
       bodyRegular: bodyRegular ?? this.bodyRegular,
+      footNote: footNote ?? this.footNote,
+      subheadlineBold: subheadlineBold ?? this.subheadlineBold,
+      subheadline: subheadline ?? this.subheadline,
     );
   }
 
@@ -101,8 +137,12 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
       callout: TextStyle.lerp(callout, other.callout, t),
       calloutBold: TextStyle.lerp(calloutBold, other.calloutBold, t),
       caption2: TextStyle.lerp(caption2, other.caption2, t),
-      caption: TextStyle.lerp(caption, other.caption, t),
+      caption1: TextStyle.lerp(caption1, other.caption1, t),
       bodyRegular: TextStyle.lerp(bodyRegular, other.bodyRegular, t),
+      footNote: TextStyle.lerp(footNote, other.footNote, t),
+      subheadlineBold:
+          TextStyle.lerp(subheadlineBold, other.subheadlineBold, t),
+      subheadline: TextStyle.lerp(subheadline, other.subheadline, t),
     );
   }
 }

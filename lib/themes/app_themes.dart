@@ -10,21 +10,20 @@ class AppThemes {
   static final _appDarkTextStyles = AppAllTextStyles(_appDarkColors);
 
   static final lightThemeData = ThemeData.light().copyWith(
-    scaffoldBackgroundColor: _appLightColors.backgroundsPrimary,
+      scaffoldBackgroundColor: _appLightColors.backgroundsPrimary,
       splashColor: Colors.transparent,
-    extensions: [
-      _appLightColors,
-      _appLightTextStyles,
-    ]
-  );
+      highlightColor: _appLightColors.backgroundsSecondary,
+      extensions: [
+        _appLightColors,
+        _appLightTextStyles,
+      ]);
 
-  static final darkThemeData = ThemeData.light().copyWith(
+  static final darkThemeData = ThemeData.dark().copyWith(
       scaffoldBackgroundColor: _appDarkColors.backgroundsPrimary,
       splashColor: Colors.transparent,
+      highlightColor: _appDarkColors.backgroundsSecondary,
       extensions: [
         _appDarkColors,
         _appDarkTextStyles,
-      ]
-  );
-
+      ]);
 }

@@ -50,13 +50,14 @@ class _AuthButtonState extends State<AuthButton>
 
   @override
   void initState() {
+    print(1);
     controller = AnimationController(vsync: this);
     super.initState();
   }
 
   @override
   void didUpdateWidget(covariant AuthButton oldWidget) {
-    if (oldWidget.disabled) {
+    if (oldWidget.disabled || widget.fillColor == null) {
       borderColor = null;
       textStyle = null;
     }
@@ -69,7 +70,7 @@ class _AuthButtonState extends State<AuthButton>
       controller.repeat(
         min: 0,
         max: 1,
-        period: const Duration(milliseconds: 2000),
+        period: Duration(milliseconds: 2000),
       );
     }
     if (widget.disabled) {
@@ -125,6 +126,8 @@ class _AuthButtonState extends State<AuthButton>
                           width: 1.5,
                           progressStart: controller.value,
                           progressEnd: controller.value + 0.5,
+                          bgStrokeColor: widget.disabledBorderColor ??
+                              context.colors.fieldsDefault!,
                         )
                       : Border.all(
                           color: borderColor!,

@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
+import 'package:poster_stock/features/auth/state_holders/email_code_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/email_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/name_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/sign_up_username_error_state_holder.dart';
@@ -20,15 +21,16 @@ class SignUpPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final emailState = ref.watch(emailStateHolderProvider);
     final nameState = ref.watch(nameStateHolderProvider);
+    final codeState = ref.watch(emailCodeStateHolderProvider);
     final usernameState = ref.watch(usernameStateHolderProvider);
     final usernameErrorState =
         ref.watch(signUpUsernameErrorStateHolderProvider);
     return Scaffold(
       body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
+        value: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
+          statusBarBrightness: Theme.of(context).brightness,
         ),
         child: SafeArea(
           child: Column(
@@ -68,7 +70,7 @@ class SignUpPage extends ConsumerWidget {
                         height: 24,
                       ),
                       AppTextField(
-                        hint: '@Username',
+                        hint: 'Username',
                         removableWhenNotEmpty: true,
                         tickOnSuccess: true,
                         hasError: usernameErrorState != null,
@@ -94,32 +96,8 @@ class SignUpPage extends ConsumerWidget {
                               .removeUsernameError();
                           ref.read(signUpControllerProvider).setUsername('');
                         },
-                        inputFormatters: [
-                          TextInputFormatter.withFunction(
-                            (oldValue, newValue) {
-                              final int newTextLength = newValue.text.length;
-                              int selectionIndex = newValue.selection.end;
-                              int usedSubstringIndex = 0;
-                              final StringBuffer newText = StringBuffer();
-                              if (newTextLength >= 1 &&
-                                  newValue.text[0] != '@') {
-                                newText.write('@');
-                                if (newValue.selection.end >= 1) {
-                                  selectionIndex++;
-                                }
-                              }
-                              if (newTextLength >= usedSubstringIndex) {
-                                newText.write(newValue.text
-                                    .substring(usedSubstringIndex));
-                              }
-                              return TextEditingValue(
-                                text: newText.toString(),
-                                selection: TextSelection.collapsed(
-                                    offset: selectionIndex),
-                              );
-                            },
-                          ),
-                        ],
+                        isUsername: true,
+
                       ),
                       const SizedBox(
                         height: 6,
@@ -146,9 +124,19 @@ class SignUpPage extends ConsumerWidget {
                       const SizedBox(
                         height: 8,
                       ),
-                      const AppTextField(
+                      AppTextField(
                         hint: 'Paste login code',
-                        removable: true,
+                        removableWhenNotEmpty: true,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        onChanged: (value) {
+                          ref.read(signUpControllerProvider).setCode(value);
+                        },
+                        onRemoved: () {
+                          ref.read(signUpControllerProvider).removeCode();
+                        },
                       ),
                       const SizedBox(
                         height: 24,
@@ -157,7 +145,7 @@ class SignUpPage extends ConsumerWidget {
                         text: 'Create new account',
                         disabled: usernameErrorState != null ||
                             usernameState.length < 2 ||
-                            nameState.isEmpty,
+                            nameState.isEmpty || codeState.isEmpty,
                         fillColor: context.colors.buttonsDisabled,
                         borderColor: context.colors.fieldsActive!,
                         pressedBorderColor: context.colors.fieldsActive!,

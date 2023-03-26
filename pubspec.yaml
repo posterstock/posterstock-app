@@ -19,6 +19,7 @@ dependencies:
   flutter_svg: ^2.0.2
   flutter_riverpod: ^2.3.2
   auto_route: ^5.0.4
+  shimmer: ^2.0.0
 
 dev_dependencies:
   flutter_test:

@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../../../common/widgets/app_text_field.dart';
+import '../../controllers/sign_up_controller.dart';
+import '../../state_holders/email_code_state_holder.dart';
 import '../../state_holders/email_state_holder.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/custom_app_bar.dart';
@@ -15,12 +17,13 @@ class LoginPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final emailState = ref.watch(emailStateHolderProvider);
+    final codeState = ref.watch(emailCodeStateHolderProvider);
     return Scaffold(
       body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
+        value: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
+          statusBarBrightness: Theme.of(context).brightness,
         ),
         child: SafeArea(
           child: Column(
@@ -35,7 +38,7 @@ class LoginPage extends ConsumerWidget {
                         height: 30,
                       ),
                       Text(
-                        'Sign up code',
+                        'Login code',
                         style: context.textStyles.title2,
                       ),
                       const SizedBox(
@@ -62,15 +65,26 @@ class LoginPage extends ConsumerWidget {
                       const SizedBox(
                         height: 12,
                       ),
-                      const AppTextField(
+                      AppTextField(
                         hint: 'Paste login code',
-                        removable: true,
+                        removableWhenNotEmpty: true,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        onChanged: (value) {
+                          ref.read(signUpControllerProvider).setCode(value);
+                        },
+                        onRemoved: () {
+                          ref.read(signUpControllerProvider).removeCode();
+                        },
                       ),
                       const SizedBox(
                         height: 24,
                       ),
                       AuthButton(
                         text: 'Continue with login code',
+                        disabled: codeState.isEmpty,
                         fillColor: context.colors.buttonsDisabled,
                         borderColor: context.colors.fieldsActive!,
                         pressedBorderColor: context.colors.fieldsActive!,
