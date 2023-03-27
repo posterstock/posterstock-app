@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final emailStateHolderProvider = StateNotifierProvider<EmailStateHolder, String?>(
-      (ref) => EmailStateHolder(null),
+final emailStateHolderProvider =
+    StateNotifierProvider<EmailStateHolder, String?>(
+  (ref) => EmailStateHolder(null),
 );
 
 class EmailStateHolder extends StateNotifier<String?> {

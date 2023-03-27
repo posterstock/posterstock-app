@@ -1,18 +1,16 @@
 import 'package:poster_stock/features/home/models/user_model.dart';
 
-class PostMovieModel {
+class MultiplePostModel {
   final String name;
-  final int year;
   final UserModel author;
-  final String imagePath;
+  final List<String> imagePath;
   final String time;
   final int likes;
   final int comments;
   final String? description;
 
-  PostMovieModel({
+  MultiplePostModel({
     required this.name,
-    required this.year,
     required this.imagePath,
     required this.author,
     required this.time,

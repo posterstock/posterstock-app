@@ -16,9 +16,13 @@ import '../features/auth/view/pages/auth_page.dart';
     ),
     AutoRoute(page: SignUpPage, path: 'sign_up'),
     AutoRoute(page: LoginPage, path: 'login'),
-    AutoRoute(page: NavigationPage, path: 'navigation', children: [
-      AutoRoute(page: HomePage, path: 'home'),
-    ]),
+    AutoRoute(
+      page: NavigationPage,
+      path: 'navigation',
+      children: [
+        AutoRoute(page: HomePage, path: 'home'),
+      ],
+    ),
   ],
 )
 class $AppRouter {}

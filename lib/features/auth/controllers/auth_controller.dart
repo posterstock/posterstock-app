@@ -2,8 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_error_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_loading_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/email_state_holder.dart';
-import 'package:poster_stock/features/auth/state_holders/name_state_holder.dart';
-import 'package:poster_stock/features/auth/state_holders/username_state_holder.dart';
 
 final authControllerProvider = Provider(
   (ref) => AuthController(
@@ -35,7 +33,7 @@ class AuthController {
   void stopLoading() {
     loadingState.stopLoading();
   }
-  
+
   void setError() {
     errorState.updateState('Wrong email');
   }

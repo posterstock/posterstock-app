@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/menu_state_holder.dart';
-import 'package:poster_stock/features/navigation_page/view/bottom_nav_bar.dart';
+import 'package:poster_stock/features/navigation_page/view/widgets/bottom_nav_bar.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -26,9 +27,9 @@ class NavigationPage extends StatelessWidget {
       builder: (context, child, _) {
         return Stack(
           children: [
-            Scaffold(
-              bottomNavigationBar: const SafeArea(child: AppNavigationBar()),
-              body: AnnotatedRegion<SystemUiOverlayStyle>(
+            CustomScaffold(
+              bottomNavBar: const SafeArea(child: AppNavigationBar()),
+              child: AnnotatedRegion<SystemUiOverlayStyle>(
                 value: SystemUiOverlayStyle(
                   statusBarColor: Colors.transparent,
                   statusBarIconBrightness:
@@ -106,7 +107,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                         .withOpacity(controller.value),
                   ],
                   begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+                  end: Alignment(0.5, 0.3),
                 ),
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final usernameStateHolderProvider = StateNotifierProvider<UsernameStateHolder, String>(
+final usernameStateHolderProvider =
+    StateNotifierProvider<UsernameStateHolder, String>(
   (ref) => UsernameStateHolder(),
 );
 

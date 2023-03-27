@@ -50,7 +50,6 @@ class _AuthButtonState extends State<AuthButton>
 
   @override
   void initState() {
-    print(1);
     controller = AnimationController(vsync: this);
     super.initState();
   }
@@ -70,7 +69,7 @@ class _AuthButtonState extends State<AuthButton>
       controller.repeat(
         min: 0,
         max: 1,
-        period: Duration(milliseconds: 2000),
+        period: const Duration(milliseconds: 2000),
       );
     }
     if (widget.disabled) {

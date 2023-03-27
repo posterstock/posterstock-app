@@ -3,10 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:poster_stock/features/auth/view/pages/auth_page.dart';
-import 'package:poster_stock/features/auth/view/pages/sign_up_page.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
-import 'package:poster_stock/themes/app_themes.dart';
 
 import 'navigation/app_router.gr.dart';
 

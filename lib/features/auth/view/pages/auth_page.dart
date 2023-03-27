@@ -26,11 +26,16 @@ class AuthPage extends ConsumerWidget {
     final loadingState = ref.watch(authLoadingStateHolderProvider);
     final errorState = ref.watch(authErrorStateHolderProvider);
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
+        value: SystemUiOverlayStyle(
           statusBarBrightness: Brightness.dark,
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
+          systemNavigationBarColor: context.colors.backgroundsPrimary,
+          systemNavigationBarIconBrightness: Theme.of(context).brightness == Brightness.light
+              ? Brightness.dark
+              : Brightness.light,
         ),
         child: Stack(
           children: [
@@ -51,12 +56,7 @@ class AuthPage extends ConsumerWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        final theme = ref.watch(themeStateHolderProvider);
-                        if (theme.brightness == Brightness.light) {
-                          ref.read(themeControllerProvider).updateTheme(AppThemes.darkThemeData);
-                        } else {
-                          ref.read(themeControllerProvider).updateTheme(AppThemes.lightThemeData);
-                        }
+                        changeTheme(ref);
                       },
                       child: Container(
                         width: 144,
@@ -112,19 +112,8 @@ class AuthPage extends ConsumerWidget {
                     ),
                     const SizedBox(height: 20),
                     AuthButton(
-                      onTap: () async {
-                        ref.read(authControllerProvider).loadApple();
-                        Future.delayed(Duration(seconds: 5), () {
-                          AutoRouter.of(context)
-                              .push(const LoginRoute())
-                              .then((value) {
-                            ref.read(signUpControllerProvider)
-                              ..setName('')
-                              ..setUsername('')..removeCode()
-                              ..removeUsernameError();
-                          });
-                          ref.read(authControllerProvider).stopLoading();
-                        });
+                      onTap: () {
+                        loadApple(ref, context);
                       },
                       loading: loadingState.loadingApple,
                       child: Row(
@@ -146,18 +135,7 @@ class AuthPage extends ConsumerWidget {
                     const SizedBox(height: 20),
                     AuthButton(
                       onTap: () {
-                        ref.read(authControllerProvider).loadGoogle();
-                        Future.delayed(Duration(seconds: 5), () {
-                          AutoRouter.of(context).push(NavigationRoute()).then(
-                            (value) {
-                              ref.read(signUpControllerProvider)
-                                ..setName('')
-                                ..setUsername('')..removeCode()
-                                ..removeUsernameError();
-                            },
-                          );
-                          ref.read(authControllerProvider).stopLoading();
-                        });
+                        loadGoogle(ref, context);
                       },
                       loading: loadingState.loadingGoogle,
                       child: Row(
@@ -190,6 +168,45 @@ class AuthPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  void changeTheme(WidgetRef ref) {
+    final theme = ref.watch(themeStateHolderProvider);
+    if (theme.brightness == Brightness.light) {
+      ref.read(themeControllerProvider).updateTheme(AppThemes.darkThemeData);
+    } else {
+      ref.read(themeControllerProvider).updateTheme(AppThemes.lightThemeData);
+    }
+  }
+
+  void loadApple(WidgetRef ref, BuildContext context) {
+    ref.read(authControllerProvider).loadApple();
+    Future.delayed(const Duration(seconds: 5), () {
+      AutoRouter.of(context).push(const LoginRoute()).then((value) {
+        ref.read(signUpControllerProvider)
+          ..setName('')
+          ..setUsername('')
+          ..removeCode()
+          ..removeUsernameError();
+      });
+      ref.read(authControllerProvider).stopLoading();
+    });
+  }
+
+  void loadGoogle(WidgetRef ref, BuildContext context) {
+    ref.read(authControllerProvider).loadGoogle();
+    Future.delayed(const Duration(seconds: 5), () {
+      AutoRouter.of(context).push(const NavigationRoute()).then(
+        (value) {
+          ref.read(signUpControllerProvider)
+            ..setName('')
+            ..setUsername('')
+            ..removeCode()
+            ..removeUsernameError();
+        },
+      );
+      ref.read(authControllerProvider).stopLoading();
+    });
   }
 
   void checkEmail(WidgetRef ref, String value, BuildContext context) {

@@ -72,7 +72,7 @@ class _AppTextFieldState extends State<AppTextField> {
       child: Stack(
         children: [
           TextField(
-            keyboardType: widget.keyboardType ?? null,
+            keyboardType: widget.keyboardType,
             focusNode: focus,
             cursorColor: context.colors.textsPrimary!,
             inputFormatters: widget.inputFormatters,
@@ -81,7 +81,7 @@ class _AppTextFieldState extends State<AppTextField> {
             onSubmitted: widget.onSubmitted,
             controller: widget.controller ?? nullController,
             decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(horizontal: 18),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 18),
               isDense: true,
               prefix: Text(
                 widget.isUsername ? '@' : '',
