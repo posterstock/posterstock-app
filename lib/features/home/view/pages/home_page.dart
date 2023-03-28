@@ -36,7 +36,8 @@ class HomePage extends StatelessWidget {
         ), //TODO remove if not loading
         NotificationListener<ScrollUpdateNotification>(
           onNotification: (n) {
-            if (n.metrics.pixels < -120) {
+            print(n.metrics.axis);
+            if (n.metrics.pixels < -120 && n.metrics.axis == Axis.vertical) {
               controller.animateTo(
                 -50,
                 duration: const Duration(milliseconds: 300),
@@ -89,7 +90,7 @@ class HomePage extends StatelessWidget {
                             return PostBase(
                               multPost: MultiplePostModel(
                                 name: 'Most Popular Movies',
-                                imagePath: [
+                                posters: [
                                   'https://i.pinimg.com/originals/44/62/5b/44625b9914eb369e69f29a2be6ec4c96.jpg',
                                   'https://cdn11.bigcommerce.com/s-ydriczk/images/stencil/1280x1280/products/89058/93685/Joker-2019-Final-Style-steps-Poster-buy-original-movie-posters-at-starstills__62518.1669120603.jpg?c=2',
                                   'https://www.vintagemovieposters.co.uk/wp-content/uploads/2020/11/IMG_5878-scaled.jpeg',

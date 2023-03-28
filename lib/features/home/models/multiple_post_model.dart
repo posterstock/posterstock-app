@@ -3,19 +3,19 @@ import 'package:poster_stock/features/home/models/user_model.dart';
 class MultiplePostModel {
   final String name;
   final UserModel author;
-  final List<String> imagePath;
+  final List<String> posters;
   final String time;
-  final int likes;
-  final int comments;
+  final List<UserModel> likes;
+  final List<UserModel> comments;
   final String? description;
 
   MultiplePostModel({
     required this.name,
-    required this.imagePath,
+    required this.posters,
     required this.author,
     required this.time,
-    this.likes = 0,
-    this.comments = 0,
+    this.likes = const [],
+    this.comments = const [],
     this.description,
   });
 }

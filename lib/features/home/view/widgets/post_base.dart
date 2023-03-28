@@ -173,9 +173,6 @@ class PostBase extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 16,
-              ),
               if (post == null && multPost == null || post != null)
                 MovieCard(
                   movie: post,
@@ -184,9 +181,6 @@ class PostBase extends StatelessWidget {
                 MultipleMovieCard(
                   post: multPost!,
                 ),
-              const SizedBox(
-                height: 16,
-              ),
             ],
           ),
         ),

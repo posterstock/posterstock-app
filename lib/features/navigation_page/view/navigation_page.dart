@@ -77,7 +77,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
   void initState() {
     controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 300),
+      duration: Duration(milliseconds: 250),
     );
     super.initState();
   }

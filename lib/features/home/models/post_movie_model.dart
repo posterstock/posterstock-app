@@ -6,8 +6,8 @@ class PostMovieModel {
   final UserModel author;
   final String imagePath;
   final String time;
-  final int likes;
-  final int comments;
+  final List<UserModel> likes;
+  final List<UserModel> comments;
   final String? description;
 
   PostMovieModel({
@@ -16,8 +16,8 @@ class PostMovieModel {
     required this.imagePath,
     required this.author,
     required this.time,
-    this.likes = 0,
-    this.comments = 0,
+    this.likes = const [],
+    this.comments = const [],
     this.description,
   });
 }

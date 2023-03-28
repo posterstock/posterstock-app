@@ -10,7 +10,7 @@ class CustomBouncePhysic extends BouncingScrollPhysics {
 
   @override
   double frictionFactor(double overscrollFraction) {
-    return 1.0 * math.pow(1 - overscrollFraction, 2);
+    return 2.0 * math.pow(1 - overscrollFraction, 2);
   }
 
   @override

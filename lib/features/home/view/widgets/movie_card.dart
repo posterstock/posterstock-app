@@ -28,7 +28,6 @@ class _MovieCardState extends State<MovieCard>
   PageController? pageController;
   int currentPage = 0;
   double? textHeight;
-  double? height;
   String description = '';
 
   @override
@@ -56,14 +55,13 @@ class _MovieCardState extends State<MovieCard>
 
   @override
   void didChangeDependencies() {
-    description =
-    (widget.movie?[currentPage].description ?? '').length > 280
+    description = (widget.movie?[currentPage].description ?? '').length > 280
         ? (widget.movie?[currentPage].description ?? '').substring(0, 280)
         : (widget.movie?[currentPage].description ?? '');
     textHeight =
-        _textSize(description, context.textStyles.subheadline!)
-            .height;
-    height = textHeight! + 51 > 193 ? textHeight! + 51 : 193;
+        _textSize(description, context.textStyles.subheadline!).height < 100
+            ? 100
+            : _textSize(description, context.textStyles.subheadline!).height;
     setState(() {});
     super.didChangeDependencies();
   }
@@ -78,15 +76,15 @@ class _MovieCardState extends State<MovieCard>
 
   @override
   Widget build(BuildContext context) {
-    description =
-        (widget.movie?[currentPage].description ?? '').length > 280
-            ? (widget.movie?[currentPage].description ?? '').substring(0, 280)
-            : (widget.movie?[currentPage].description ?? '');
+    description = (widget.movie?[currentPage].description ?? '').length > 280
+        ? (widget.movie?[currentPage].description ?? '').substring(0, 280)
+        : (widget.movie?[currentPage].description ?? '');
     textHeight ??=
-        _textSize(description, context.textStyles.subheadline!).height;
-    height ??= textHeight! + 51 > 193 ? textHeight! + 51 : 193;
+        _textSize(description, context.textStyles.subheadline!).height < 100
+            ? 100
+            : _textSize(description, context.textStyles.subheadline!).height;
     return SizedBox(
-      height: height != 193 ? height! + 74 : height! + 45,
+      height: (textHeight ?? 0) + 58 + 31 + 20,
       child: AnimatedBuilder(
         animation: controller,
         builder: (context, child) {
@@ -100,9 +98,7 @@ class _MovieCardState extends State<MovieCard>
                       ? (widget.movie?[currentPage].description ?? '').substring(0, 280)
                       : (widget.movie?[currentPage].description ?? '');
                   textHeight =
-                      _textSize(description, context.textStyles.subheadline!)
-                          .height;
-                  height = textHeight! + 51 > 193 ? textHeight! + 51 : 193;
+                  _textSize(description, context.textStyles.subheadline!).height < 100 ? 100 : _textSize(description, context.textStyles.subheadline!).height;
                   setState(() {});
                 },
                 physics: const CustomBouncePhysic(
@@ -139,7 +135,7 @@ class _MovieCardState extends State<MovieCard>
                 ),
               if (widget.movie != null && widget.movie!.length > 1)
                 Positioned(
-                  bottom: 18,
+                  bottom: 27,
                   left: 68,
                   child: CurrentPostShower(
                     length: widget.movie!.length,
@@ -206,17 +202,20 @@ class _MovieCardState extends State<MovieCard>
                   emptyHeight: 12,
                 ),
                 SizedBox(
-                  height: widget.movie != null ? 5 : 8,
+                  height: widget.movie != null ? 10 : 8,
                 ),
                 if (widget.movie != null)
                   SizedBox(
-                    height: textHeight! <= 100 ? 119 : textHeight! + 14,
+                    height: textHeight,
                     width: MediaQuery.of(context).size.width - 84,
                     child: Text(
                       description,
                       style: context.textStyles.subheadline!,
                     ),
                   ),
+                const SizedBox(
+                  height: 14,
+                ),
                 if (widget.movie != null)
                   SizedBox(
                     width: MediaQuery.of(context).size.width - 84,

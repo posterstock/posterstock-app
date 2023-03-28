@@ -22,12 +22,12 @@ class MultipleMovieCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.0),
             child: Row(
               children: List.generate(
-                post.imagePath.length,
+                post.posters.length,
                 (index) => Expanded(
                   child: SizedBox(
                     height: 163,
                     child: Image.network(
-                      post.imagePath[index],
+                      post.posters[index],
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -63,7 +63,7 @@ class MultipleMovieCard extends StatelessWidget {
               ReactionButton(
                 iconPath: 'assets/icons/ic_heart.svg',
                 iconColor: context.colors.iconsDisabled!,
-                amount: post.likes,
+                amount: post.likes.length,
               ),
               const SizedBox(
                 width: 12,
@@ -71,9 +71,12 @@ class MultipleMovieCard extends StatelessWidget {
               ReactionButton(
                 iconPath: 'assets/icons/ic_comment2.svg',
                 iconColor: context.colors.iconsDisabled!,
-                amount: post.comments,
+                amount: post.comments.length,
               ),
             ],
+          ),
+          const SizedBox(
+            height: 16,
           ),
         ],
       ),
