@@ -7,7 +7,9 @@ import '../../../themes/app_themes.dart';
 final themeStateHolderProvider =
     StateNotifierProvider<ThemeStateHolder, ThemeData>(
   (ref) => ThemeStateHolder(
-    SchedulerBinding.instance.window.platformBrightness == Brightness.light ? AppThemes.lightThemeData : AppThemes.darkThemeData,
+    SchedulerBinding.instance.window.platformBrightness == Brightness.light
+        ? AppThemes.lightThemeData
+        : AppThemes.darkThemeData,
   ),
 );
 

@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/features/navigation_page/view/widgets/plus_button.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
+import '../../../home/cotroller/home_page_controller.dart';
 import '../../controller/menu_controller.dart';
 import 'bottom_nav_bar_item.dart';
 
@@ -29,7 +30,9 @@ class AppNavigationBar extends ConsumerWidget {
               child: Row(
                 children: [
                   BottomNavBarItem(
-                    onTap: () {},
+                    onTap: () {
+                      ref.read(homePageControllerProvider).animateScrollToZero();
+                    },
                     icon: SvgPicture.asset(
                       'assets/icons/ic_home_mobile.svg',
                       colorFilter: ColorFilter.mode(
@@ -69,7 +72,7 @@ class AppNavigationBar extends ConsumerWidget {
                     active: false,
                   ),
                   BottomNavBarItem(
-                    icon: PlusButton(),
+                    icon: const PlusButton(),
                     onTap: () {
                       ref.read(menuControllerProvider).switchMenu();
                     },

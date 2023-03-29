@@ -80,8 +80,7 @@ class PostBase extends StatelessWidget {
                             child: user?.imagePath == null &&
                                     (post != null || multPost != null)
                                 ? Text(
-                                    getAvatarName(user!.name)
-                                        .toUpperCase(),
+                                    getAvatarName(user!.name).toUpperCase(),
                                     style: context.textStyles.subheadlineBold!
                                         .copyWith(
                                       color: context.colors.textsBackground,
@@ -112,7 +111,9 @@ class PostBase extends StatelessWidget {
                                     emptyHeight: 17,
                                   ),
                                   SizedBox(
-                                    height: post != null || multPost != null ? 4 : 8,
+                                    height: post != null || multPost != null
+                                        ? 4
+                                        : 8,
                                   ),
                                   TextOrContainer(
                                     text: user?.username == null
@@ -128,9 +129,7 @@ class PostBase extends StatelessWidget {
                                 ],
                               ),
                               SizedBox(
-                                width: (user?.followed ?? true)
-                                    ? 12
-                                    : 24,
+                                width: (user?.followed ?? true) ? 12 : 24,
                               ),
                               if (user?.followed ?? true)
                                 Padding(
@@ -147,7 +146,8 @@ class PostBase extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-                        if (!(user?.followed ?? true) && (post != null || multPost != null))
+                        if (!(user?.followed ?? true) &&
+                            (post != null || multPost != null))
                           const AppTextButton(
                             text: 'Follow',
                           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
@@ -8,12 +9,14 @@ import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
-class HomePage extends StatelessWidget {
+import '../../state_holders/home_page_scroll_controller_state_holder.dart';
+
+class HomePage extends ConsumerWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final controller = ScrollController();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.watch(homePageScrollControllerStateHolderProvider);
     bool keepOffset = false;
     return Stack(
       children: [
@@ -22,22 +25,23 @@ class HomePage extends StatelessWidget {
           right: 0,
           left: 0,
           child: Center(
-            child: defaultTargetPlatform != TargetPlatform.android ? CupertinoActivityIndicator(
-              radius: 10,
-            ) : SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                color: context.colors.iconsDisabled!,
-                strokeWidth: 2,
-              ),
-            ),
+            child: defaultTargetPlatform != TargetPlatform.android
+                ? const CupertinoActivityIndicator(
+                    radius: 10,
+                  )
+                : SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: context.colors.iconsDisabled!,
+                      strokeWidth: 2,
+                    ),
+                  ),
           ),
         ), //TODO remove if not loading
         NotificationListener<ScrollUpdateNotification>(
           onNotification: (n) {
-            print(n.metrics.axis);
-            if (n.metrics.pixels < -120 && n.metrics.axis == Axis.vertical) {
+            if (n.metrics.pixels <= -120 && n.metrics.axis == Axis.vertical) {
               controller.animateTo(
                 -50,
                 duration: const Duration(milliseconds: 300),
@@ -155,7 +159,7 @@ class HomePage extends StatelessWidget {
                               ],
                             );
                           } else {
-                            return PostBase();
+                            return const PostBase();
                           }
                         },
                       ),

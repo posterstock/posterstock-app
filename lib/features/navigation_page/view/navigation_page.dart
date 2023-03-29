@@ -16,8 +16,8 @@ class NavigationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AutoTabsRouter.pageView(
-      physics: NeverScrollableScrollPhysics(),
-      routes: [
+      physics: const NeverScrollableScrollPhysics(),
+      routes: const [
         HomeRoute(),
         HomeRoute(),
         HomeRoute(),
@@ -48,8 +48,10 @@ class NavigationPage extends StatelessWidget {
               right: 0,
               bottom: 0,
               child: Padding(
-                padding: EdgeInsets.only(bottom: 57 + MediaQuery.of(context).padding.bottom,),
-                child: Material(
+                padding: EdgeInsets.only(
+                  bottom: 57 + MediaQuery.of(context).padding.bottom,
+                ),
+                child: const Material(
                   color: Colors.transparent,
                   child: MenuWidget(),
                 ),
@@ -77,7 +79,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
   void initState() {
     controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 250),
     );
     super.initState();
   }
@@ -94,7 +96,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
     return AnimatedBuilder(
       animation: controller,
       builder: (context, child) {
-        if (controller.value == controller.lowerBound) return SizedBox();
+        if (controller.value == controller.lowerBound) return const SizedBox();
         return Stack(
           children: [
             Container(
@@ -107,7 +109,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                         .withOpacity(controller.value),
                   ],
                   begin: Alignment.topCenter,
-                  end: Alignment(0.5, 0.3),
+                  end: const Alignment(0.5, 0.3),
                 ),
               ),
             ),

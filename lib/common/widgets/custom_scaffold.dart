@@ -25,9 +25,10 @@ class CustomScaffold extends StatelessWidget {
                   : Brightness.light,
           statusBarBrightness: Theme.of(context).brightness,
           systemNavigationBarColor: context.colors.backgroundsPrimary,
-          systemNavigationBarIconBrightness: Theme.of(context).brightness == Brightness.light
-              ? Brightness.dark
-              : Brightness.light,
+          systemNavigationBarIconBrightness:
+              Theme.of(context).brightness == Brightness.light
+                  ? Brightness.dark
+                  : Brightness.light,
         ),
         child: SafeArea(
           child: child,

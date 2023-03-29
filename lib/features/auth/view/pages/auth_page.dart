@@ -33,9 +33,10 @@ class AuthPage extends ConsumerWidget {
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
           systemNavigationBarColor: context.colors.backgroundsPrimary,
-          systemNavigationBarIconBrightness: Theme.of(context).brightness == Brightness.light
-              ? Brightness.dark
-              : Brightness.light,
+          systemNavigationBarIconBrightness:
+              Theme.of(context).brightness == Brightness.light
+                  ? Brightness.dark
+                  : Brightness.light,
         ),
         child: Stack(
           children: [

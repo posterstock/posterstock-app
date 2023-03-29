@@ -22,13 +22,13 @@ class MovieCard extends StatefulWidget {
   State<MovieCard> createState() => _MovieCardState();
 }
 
-class _MovieCardState extends State<MovieCard>
-    with SingleTickerProviderStateMixin {
+class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
   late AnimationController controller;
+  late AnimationController likeCommentController;
   PageController? pageController;
   int currentPage = 0;
   double? textHeight;
-  String description = '';
+  bool firstRun = true;
 
   @override
   void dispose() {
@@ -38,6 +38,10 @@ class _MovieCardState extends State<MovieCard>
 
   @override
   void initState() {
+    likeCommentController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 0),
+    );
     controller = AnimationController(
       vsync: this,
       lowerBound: -16.0,
@@ -53,19 +57,6 @@ class _MovieCardState extends State<MovieCard>
     super.initState();
   }
 
-  @override
-  void didChangeDependencies() {
-    description = (widget.movie?[currentPage].description ?? '').length > 280
-        ? (widget.movie?[currentPage].description ?? '').substring(0, 280)
-        : (widget.movie?[currentPage].description ?? '');
-    textHeight =
-        _textSize(description, context.textStyles.subheadline!).height < 100
-            ? 100
-            : _textSize(description, context.textStyles.subheadline!).height;
-    setState(() {});
-    super.didChangeDependencies();
-  }
-
   void animatePosterToSide() {
     controller.animateTo(
       0.0,
@@ -76,46 +67,59 @@ class _MovieCardState extends State<MovieCard>
 
   @override
   Widget build(BuildContext context) {
-    description = (widget.movie?[currentPage].description ?? '').length > 280
-        ? (widget.movie?[currentPage].description ?? '').substring(0, 280)
-        : (widget.movie?[currentPage].description ?? '');
-    textHeight ??=
-        _textSize(description, context.textStyles.subheadline!).height < 100
-            ? 100
-            : _textSize(description, context.textStyles.subheadline!).height;
+    getInitData();
     return SizedBox(
       height: (textHeight ?? 0) + 58 + 31 + 20,
       child: AnimatedBuilder(
         animation: controller,
         builder: (context, child) {
+          pageController = PageController(
+            initialPage: 0,
+            viewportFraction: 1 +
+                ((16 - controller.value) *
+                    9 /
+                    MediaQuery.of(context).size.width),
+          )..addListener(() {
+              likeCommentController.animateTo(
+                  (((pageController!.page ?? 0) * 100).toInt() % 100) / 100);
+            });
           return Stack(
             children: [
               PageView.builder(
                 onPageChanged: (int page) {
                   currentPage = page;
-                  description =
-                  (widget.movie?[currentPage].description ?? '').length > 280
-                      ? (widget.movie?[currentPage].description ?? '').substring(0, 280)
-                      : (widget.movie?[currentPage].description ?? '');
-                  textHeight =
-                  _textSize(description, context.textStyles.subheadline!).height < 100 ? 100 : _textSize(description, context.textStyles.subheadline!).height;
                   setState(() {});
                 },
                 physics: const CustomBouncePhysic(
-                    decelerationRate: ScrollDecelerationRate.normal),
-                controller: PageController(
-                  initialPage: 0,
-                  viewportFraction: 1 +
-                      ((16 - controller.value) *
-                          9 /
-                          MediaQuery.of(context).size.width),
+                  decelerationRate: ScrollDecelerationRate.normal,
                 ),
+                controller: pageController,
                 itemCount: widget.movie?.length ?? 1,
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: EdgeInsets.only(
                         left: controller.value < 0 ? 0 : controller.value),
-                    child: child,
+                    child: _MovieCardPageViewContent(
+                      likeCommentController: likeCommentController,
+                      controller: controller,
+                      onPosterTap: () {
+                        if (controller.value != 16.0) {
+                          controller.animateTo(
+                            16.0,
+                            duration: const Duration(milliseconds: 300),
+                          );
+                        } else {
+                          animatePosterToSide();
+                        }
+                      },
+                      textHeight: textHeight!,
+                      description:
+                          (widget.movie?[index].description ?? '').length > 280
+                              ? (widget.movie?[index].description ?? '')
+                                  .substring(0, 280)
+                              : (widget.movie?[index].description ?? ''),
+                      movie: widget.movie?[index],
+                    ),
                   );
                 },
               ),
@@ -124,8 +128,8 @@ class _MovieCardState extends State<MovieCard>
                   top: 0,
                   right: 16,
                   child: Container(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 5.0, horizontal: 12.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 5.0, horizontal: 12.0),
                     decoration: BoxDecoration(
                       color: context.colors.backgroundsSecondary,
                       borderRadius: BorderRadius.circular(16.0),
@@ -145,107 +149,6 @@ class _MovieCardState extends State<MovieCard>
             ],
           );
         },
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-              onTap: () {
-                if (controller.value != 16.0) {
-                  controller.animateTo(
-                    16.0,
-                    duration: const Duration(milliseconds: 300),
-                  );
-                } else {
-                  animatePosterToSide();
-                }
-              },
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10.0),
-                child: Container(
-                  width: 128,
-                  height: 193,
-                  color: context.colors.backgroundsSecondary,
-                  child: widget.movie?[currentPage].imagePath != null
-                      ? Image.network(
-                          widget.movie![currentPage].imagePath,
-                          fit: BoxFit.cover,
-                        )
-                      : const SizedBox(),
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 12,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextOrContainer(
-                  text: widget.movie != null
-                      ? widget.movie![currentPage].name
-                      : null,
-                  style: context.textStyles.subheadlineBold!,
-                  emptyWidth: 146,
-                  emptyHeight: 17,
-                ),
-                SizedBox(
-                  height: widget.movie != null ? 5 : 8,
-                ),
-                TextOrContainer(
-                  text: widget.movie != null
-                      ? widget.movie![currentPage].year.toString()
-                      : null,
-                  style: context.textStyles.caption1!.copyWith(
-                    color: context.colors.textsSecondary,
-                  ),
-                  emptyWidth: 120,
-                  emptyHeight: 12,
-                ),
-                SizedBox(
-                  height: widget.movie != null ? 10 : 8,
-                ),
-                if (widget.movie != null)
-                  SizedBox(
-                    height: textHeight,
-                    width: MediaQuery.of(context).size.width - 84,
-                    child: Text(
-                      description,
-                      style: context.textStyles.subheadline!,
-                    ),
-                  ),
-                const SizedBox(
-                  height: 14,
-                ),
-                if (widget.movie != null)
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width - 84,
-                    child: Row(
-                      children: [
-                        const Spacer(),
-                        ReactionButton(
-                          iconPath: 'assets/icons/ic_heart.svg',
-                          iconColor: context.colors.iconsDisabled!,
-                          amount: Random().nextInt(2) % 2 == 0
-                              ? null
-                              : Random().nextInt(5) * 100,
-                        ),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        ReactionButton(
-                          iconPath: 'assets/icons/ic_comment2.svg',
-                          iconColor: context.colors.iconsDisabled!,
-                          amount: Random().nextInt(2) % 2 == 0
-                              ? null
-                              : Random().nextInt(5) * 100,
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -259,5 +162,153 @@ class _MovieCardState extends State<MovieCard>
         maxWidth: MediaQuery.of(context).size.width - 84,
       );
     return textPainter.size;
+  }
+
+  void getInitData() {
+    if (firstRun) {
+      firstRun = false;
+      var description = (widget.movie?[0].description ?? '').length > 280
+          ? (widget.movie?[0].description ?? '').substring(0, 280)
+          : (widget.movie?[0].description ?? '');
+      textHeight =
+          _textSize(description, context.textStyles.subheadline!).height < 100
+              ? 100
+              : _textSize(description, context.textStyles.subheadline!).height;
+      if ((widget.movie?.length ?? 1) > 1) {
+        for (PostMovieModel i in widget.movie!) {
+          var size = _textSize(
+              (i.description ?? '').length > 280
+                  ? (i.description?.substring(0, 280) ?? '')
+                  : (i.description ?? ''),
+              context.textStyles.subheadline!);
+          if (size.height > textHeight!) {
+            textHeight = size.height;
+          }
+          if (textHeight! < 140) textHeight = 140;
+        }
+      }
+    }
+  }
+}
+
+class _MovieCardPageViewContent extends StatelessWidget {
+  const _MovieCardPageViewContent({
+    Key? key,
+    required this.likeCommentController,
+    required this.controller,
+    required this.onPosterTap,
+    this.movie,
+    required this.textHeight,
+    required this.description,
+  }) : super(key: key);
+  final AnimationController likeCommentController;
+  final AnimationController controller;
+  final void Function() onPosterTap;
+  final PostMovieModel? movie;
+  final double textHeight;
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () {
+            onPosterTap();
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10.0),
+            child: Container(
+              width: 128,
+              height: 193,
+              color: context.colors.backgroundsSecondary,
+              child: movie?.imagePath != null
+                  ? Image.network(
+                      movie!.imagePath,
+                      fit: BoxFit.cover,
+                    )
+                  : const SizedBox(),
+            ),
+          ),
+        ),
+        const SizedBox(
+          width: 12,
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextOrContainer(
+              text: movie != null ? movie!.name : null,
+              style: context.textStyles.subheadlineBold!,
+              emptyWidth: 146,
+              emptyHeight: 17,
+            ),
+            SizedBox(
+              height: movie != null ? 5 : 8,
+            ),
+            TextOrContainer(
+              text: movie != null ? movie!.year.toString() : null,
+              style: context.textStyles.caption1!.copyWith(
+                color: context.colors.textsSecondary,
+              ),
+              emptyWidth: 120,
+              emptyHeight: 12,
+            ),
+            SizedBox(
+              height: movie != null ? 10 : 8,
+            ),
+            if (movie != null)
+              SizedBox(
+                height: textHeight,
+                width: MediaQuery.of(context).size.width - 84,
+                child: Text(
+                  description,
+                  style: context.textStyles.subheadline!,
+                ),
+              ),
+            const SizedBox(
+              height: 14,
+            ),
+            if (movie != null)
+              AnimatedBuilder(
+                animation: likeCommentController,
+                builder: (context, child) {
+                  double opacity = (1 - likeCommentController.value * 4);
+                  if (opacity < 0) opacity = 0;
+                  if (likeCommentController.value > 0.8) {
+                    opacity = (likeCommentController.value - 0.8) * 5;
+                  }
+                  return Opacity(
+                    opacity: opacity,
+                    child: child,
+                  );
+                },
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width - 84,
+                  child: Row(
+                    children: [
+                      const Spacer(),
+                      ReactionButton(
+                        iconPath: 'assets/icons/ic_heart.svg',
+                        iconColor: context.colors.iconsDisabled!,
+                        amount: 0,
+                      ),
+                      const SizedBox(
+                        width: 12,
+                      ),
+                      ReactionButton(
+                        iconPath: 'assets/icons/ic_comment2.svg',
+                        iconColor: context.colors.iconsDisabled!,
+                        amount: 0,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
   }
 }

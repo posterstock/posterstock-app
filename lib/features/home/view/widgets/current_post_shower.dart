@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class CurrentPostShower extends StatelessWidget {
@@ -26,28 +25,40 @@ class CurrentPostShower extends StatelessWidget {
           if (index == 4) width = 2;
           if (index == 3) width = 4;
         } else if (current == 1) {
-          if (index == 3) width = 8;
+          if (index == 3) width = 6;
           if (index == 4) width = 4;
         } else if (current == length - 1) {
           if (index == length - 4) width = 4;
           if (index == length - 5) width = 2;
         } else if (current == length - 2) {
-          if (index == length - 4) width = 8;
+          if (index == length - 4) width = 6;
           if (index == length - 5) width = 4;
         } else {
           if (index == current - 2) width = 4;
           if (index == current + 2) width = 4;
         }
-        width ??= (current - index).abs() > 2 ? 0 : 8;
+        width ??= (current - index).abs() > 2 ? 0 : 6;
         return Row(
           children: [
             const SizedBox(width: 4),
             AnimatedContainer(
               transform: Matrix4(
-                1,0,0,0,
-                0,1,0,0,
-                0,0,1,0,
-                -translation,0,0,1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                -translation,
+                0,
+                0,
+                1,
               ),
               duration: duration,
               width: width,
