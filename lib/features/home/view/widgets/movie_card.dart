@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
@@ -41,6 +39,8 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
     likeCommentController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 0),
+      lowerBound: 0.0,
+      upperBound: widget.movie?.length.toDouble() ?? 1.0,
     );
     controller = AnimationController(
       vsync: this,
@@ -80,16 +80,13 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
                     9 /
                     MediaQuery.of(context).size.width),
           )..addListener(() {
-              likeCommentController.animateTo(
+              likeCommentController.animateTo((pageController?.page?.toInt() ??
+                      0) +
                   (((pageController!.page ?? 0) * 100).toInt() % 100) / 100);
             });
           return Stack(
             children: [
               PageView.builder(
-                onPageChanged: (int page) {
-                  currentPage = page;
-                  setState(() {});
-                },
                 physics: const CustomBouncePhysic(
                   decelerationRate: ScrollDecelerationRate.normal,
                 ),
@@ -124,28 +121,43 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
                 },
               ),
               if (widget.movie != null && widget.movie!.length > 1)
-                Positioned(
-                  top: 0,
-                  right: 16,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 5.0, horizontal: 12.0),
-                    decoration: BoxDecoration(
-                      color: context.colors.backgroundsSecondary,
-                      borderRadius: BorderRadius.circular(16.0),
-                    ),
-                    child: Text('${currentPage + 1}/${widget.movie?.length}'),
-                  ),
-                ),
+                AnimatedBuilder(
+                    animation: likeCommentController,
+                    builder: (context, child) {
+                      int page = likeCommentController.value.toInt();
+                      if (likeCommentController.value - likeCommentController.value.toInt() > 0.5) page++;
+                      return Positioned(
+                        top: 0,
+                        right: 16,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 5.0, horizontal: 12.0),
+                          decoration: BoxDecoration(
+                            color: context.colors.backgroundsSecondary,
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          child: Text(
+                              '${page + 1}/${widget.movie?.length}'),
+                        ),
+                      );
+                    }),
               if (widget.movie != null && widget.movie!.length > 1)
-                Positioned(
-                  bottom: 27,
-                  left: 68,
-                  child: CurrentPostShower(
-                    length: widget.movie!.length,
-                    current: currentPage,
-                  ),
-                )
+                AnimatedBuilder(
+                    animation: likeCommentController,
+                    builder: (context, child) {
+                      return Positioned(
+                        bottom: 27,
+                        left: 68,
+                        child: CurrentPostShower(
+                          length: widget.movie!.length,
+                          current: (likeCommentController.value -
+                                      likeCommentController.value.toInt()) >
+                                  0.5
+                              ? likeCommentController.value.toInt() + 1
+                              : likeCommentController.value.toInt(),
+                        ),
+                      );
+                    })
             ],
           );
         },
@@ -274,11 +286,20 @@ class _MovieCardPageViewContent extends StatelessWidget {
               AnimatedBuilder(
                 animation: likeCommentController,
                 builder: (context, child) {
-                  double opacity = (1 - likeCommentController.value * 4);
-                  if (opacity < 0) opacity = 0;
-                  if (likeCommentController.value > 0.8) {
-                    opacity = (likeCommentController.value - 0.8) * 5;
+                  double opacity = (1 -
+                      (likeCommentController.value -
+                              likeCommentController.value.toInt()) *
+                          4);
+                  if ((likeCommentController.value -
+                          likeCommentController.value.toInt()) >
+                      0.8) {
+                    opacity = ((likeCommentController.value -
+                                likeCommentController.value.toInt()) -
+                            0.8) *
+                        5;
                   }
+                  if (opacity < 0) opacity = 0;
+                  if (opacity > 1) opacity = 1;
                   return Opacity(
                     opacity: opacity,
                     child: child,

@@ -16,9 +16,10 @@ class HomePageController {
 
   void animateScrollToZero() {
     scrollControllerState.animateTo(
-      -130,
+      scrollControllerState.position.atEdge ? -130 : 0,
       duration: const Duration(milliseconds: 300),
       curve: Curves.linear,
     );
   }
+
 }
