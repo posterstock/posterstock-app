@@ -16,6 +16,8 @@ class CustomBouncePhysic extends BouncingScrollPhysics {
   @override
   BouncingScrollPhysics applyTo(ScrollPhysics? ancestor) {
     return CustomBouncePhysic(
-        parent: buildParent(ancestor), decelerationRate: decelerationRate);
+      parent: buildParent(ancestor),
+      decelerationRate: decelerationRate,
+    );
   }
 }

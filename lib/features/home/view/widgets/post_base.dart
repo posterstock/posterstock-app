@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
@@ -32,6 +33,7 @@ class PostBase extends StatelessWidget {
     } else if (multPost != null) {
       user = multPost!.author;
     }
+    //TODO move avatar generation from view layer
     const List<Color> avatar = [
       Color(0xfff09a90),
       Color(0xfff3d376),
@@ -55,7 +57,7 @@ class PostBase extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: 68.0),
                         child: Text(
-                          'Suggestion post',
+                          AppLocalizations.of(context)!.sugPost,
                           style: context.textStyles.caption1!.copyWith(
                             color: context.colors.textsDisabled,
                           ),
@@ -148,8 +150,8 @@ class PostBase extends StatelessWidget {
                         const Spacer(),
                         if (!(user?.followed ?? true) &&
                             (post != null || multPost != null))
-                          const AppTextButton(
-                            text: 'Follow',
+                          AppTextButton(
+                            text: AppLocalizations.of(context)!.follow,
                           ),
                         if (post != null || multPost != null)
                           GestureDetector(

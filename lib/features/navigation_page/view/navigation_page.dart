@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
@@ -147,7 +148,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
               hightlightColor: context.colors.textsPrimary!.withOpacity(0.2),
               iconColor: context.colors.iconsBackground!,
               picturePath: 'assets/icons/ic_collection.svg',
-              label: 'Add poster to your collection',
+              label: AppLocalizations.of(context)!.addPoster,
               animationValue: controller.value,
             ),
             MenuButton(
@@ -160,7 +161,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                 color: context.colors.fieldsHover!,
               ),
               picturePath: 'assets/icons/ic_bookmarks.svg',
-              label: 'Create a bookmark',
+              label: AppLocalizations.of(context)!.createBookmark,
               animationValue: controller.value,
             ),
             MenuButton(
@@ -173,7 +174,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                 color: context.colors.fieldsHover!,
               ),
               picturePath: 'assets/icons/ic_lists.svg',
-              label: 'Create a list',
+              label: AppLocalizations.of(context)!.createList,
               animationValue: controller.value,
             ),
           ],

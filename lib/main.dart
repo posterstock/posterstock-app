@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/common/state_holders/intl_state_holder.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
 
 import 'navigation/app_router.gr.dart';
@@ -23,6 +24,9 @@ class App extends ConsumerWidget {
       DeviceOrientation.portraitDown,
     ]);
     final theme = ref.watch(themeStateHolderProvider);
+    ref.read(localizations.notifier).setLocalizations(
+          AppLocalizations.of(context),
+        );
     return MaterialApp.router(
       routerDelegate: _appRouter.delegate(),
       routeInformationParser: _appRouter.defaultRouteParser(),

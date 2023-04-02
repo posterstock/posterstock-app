@@ -32,7 +32,7 @@ class LoginPage extends ConsumerWidget {
                     height: 30,
                   ),
                   Text(
-                    'Login code',
+                    AppLocalizations.of(context)!.loginCode,
                     style: context.textStyles.title2,
                   ),
                   const SizedBox(
@@ -50,7 +50,7 @@ class LoginPage extends ConsumerWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'We just sent you a temporary up code.\nPlease check your inbox.',
+                      AppLocalizations.of(context)!.codeSent,
                       style: context.textStyles.callout!.copyWith(
                         color: context.colors.textsSecondary,
                       ),
@@ -60,7 +60,7 @@ class LoginPage extends ConsumerWidget {
                     height: 12,
                   ),
                   AppTextField(
-                    hint: 'Paste login code',
+                    hint: AppLocalizations.of(context)!.pasteLoginCode,
                     removableWhenNotEmpty: true,
                     keyboardType: TextInputType.phone,
                     inputFormatters: [
@@ -77,7 +77,7 @@ class LoginPage extends ConsumerWidget {
                     height: 24,
                   ),
                   AuthButton(
-                    text: 'Continue with login code',
+                    text: AppLocalizations.of(context)!.contWithLoginCode,
                     disabled: codeState.isEmpty,
                     fillColor: context.colors.buttonsDisabled,
                     borderColor: context.colors.fieldsActive!,

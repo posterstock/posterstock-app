@@ -21,5 +21,4 @@ class HomePageController {
       curve: Curves.linear,
     );
   }
-
 }

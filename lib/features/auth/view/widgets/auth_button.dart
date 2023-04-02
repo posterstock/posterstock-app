@@ -136,7 +136,7 @@ class _AuthButtonState extends State<AuthButton>
                 child: Center(
                   child: widget.child ??
                       Text(
-                        widget.text ?? 'Default button',
+                        widget.text ?? '',
                         style: textStyle,
                       ),
                 ),

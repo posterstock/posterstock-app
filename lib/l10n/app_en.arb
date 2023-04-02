@@ -6,5 +6,20 @@
     "or": "Or",
     "contWithApple": "Continue with Apple",
     "contWithGoogle": "Continue with Google",
-    "privacyPolicy": "By clicking “Continue with Google/Email/SAML” above, you acknowledge that you have read and understood, and agree to Posterstock’s Terms & Contitions and Privacy Polis"
+    "privacyPolicy": "By clicking “Continue with Google/Email/SAML” above, you acknowledge that you have read and understood, and agree to Posterstock’s Terms & Contitions and Privacy Polis",
+    "invalidSymbols" : "Symbols cannot be used",
+    "codeSent" : "We just sent you a temporary up code.\nPlease check your inbox.",
+    "pasteLoginCode" : "Paste login code",
+    "contWithLoginCode" : "Continue with login code",
+    "loginCode" : "Login code",
+    "name" : "Name",
+    "username" : "Username",
+    "signUpCode" : "Sign up code",
+    "createAccount" : "Create new account",
+    "back" : "Back",
+    "sugPost" : "Suggestion post",
+    "follow" : "Follow",
+    "addPoster" : "Add poster to your collection",
+    "createBookmark" : "Create a bookmark",
+    "createList" : "Create a list"
 }

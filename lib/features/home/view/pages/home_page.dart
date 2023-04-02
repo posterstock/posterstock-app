@@ -38,7 +38,7 @@ class HomePage extends ConsumerWidget {
                     ),
                   ),
           ),
-        ), //TODO remove if not loading
+        ),
         NotificationListener<ScrollUpdateNotification>(
           onNotification: (n) {
             if (n.metrics.pixels <= -120 && n.metrics.axis == Axis.vertical) {

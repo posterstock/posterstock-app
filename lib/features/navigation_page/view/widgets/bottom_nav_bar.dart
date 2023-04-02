@@ -31,7 +31,9 @@ class AppNavigationBar extends ConsumerWidget {
                 children: [
                   BottomNavBarItem(
                     onTap: () {
-                      ref.read(homePageControllerProvider).animateScrollToZero();
+                      ref
+                          .read(homePageControllerProvider)
+                          .animateScrollToZero();
                     },
                     icon: SvgPicture.asset(
                       'assets/icons/ic_home_mobile.svg',

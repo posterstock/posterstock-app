@@ -39,7 +39,7 @@ class SignUpPage extends ConsumerWidget {
                     height: 30,
                   ),
                   Text(
-                    'Sign up code',
+                    AppLocalizations.of(context)!.signUpCode,
                     style: context.textStyles.title2,
                   ),
                   const SizedBox(
@@ -55,7 +55,7 @@ class SignUpPage extends ConsumerWidget {
                     height: 30,
                   ),
                   AppTextField(
-                    hint: 'Name',
+                    hint: AppLocalizations.of(context)!.name,
                     onChanged: (value) {
                       ref.read(signUpControllerProvider).setName(value);
                     },
@@ -64,7 +64,7 @@ class SignUpPage extends ConsumerWidget {
                     height: 24,
                   ),
                   AppTextField(
-                    hint: 'Username',
+                    hint: AppLocalizations.of(context)!.username,
                     removableWhenNotEmpty: true,
                     tickOnSuccess: true,
                     hasError: usernameErrorState != null,
@@ -104,7 +104,7 @@ class SignUpPage extends ConsumerWidget {
                     height: 25,
                   ),
                   Text(
-                    'We just sent you a temporary up code.\nPlease check your inbox and paste the sign up code below.',
+                    AppLocalizations.of(context)!.codeSent,
                     style: context.textStyles.callout!.copyWith(
                       color: context.colors.textsSecondary,
                     ),
@@ -113,7 +113,7 @@ class SignUpPage extends ConsumerWidget {
                     height: 8,
                   ),
                   AppTextField(
-                    hint: 'Paste login code',
+                    hint: AppLocalizations.of(context)!.pasteLoginCode,
                     removableWhenNotEmpty: true,
                     keyboardType: TextInputType.phone,
                     inputFormatters: [
@@ -130,7 +130,7 @@ class SignUpPage extends ConsumerWidget {
                     height: 24,
                   ),
                   AuthButton(
-                    text: 'Create new account',
+                    text: AppLocalizations.of(context)!.createAccount,
                     disabled: usernameErrorState != null ||
                         usernameState.length < 2 ||
                         nameState.isEmpty ||

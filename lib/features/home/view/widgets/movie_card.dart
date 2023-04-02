@@ -27,9 +27,11 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
   int currentPage = 0;
   double? textHeight;
   bool firstRun = true;
+  bool disposed = false;
 
   @override
   void dispose() {
+    disposed = true;
     controller.dispose();
     super.dispose();
   }
@@ -51,7 +53,7 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
     controller.animateTo(16.0, duration: Duration.zero);
     if (widget.movie != null) {
       Future.delayed(const Duration(milliseconds: 300), () {
-        animatePosterToSide();
+        if (!disposed) animatePosterToSide();
       });
     }
     super.initState();
@@ -125,7 +127,9 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
                     animation: likeCommentController,
                     builder: (context, child) {
                       int page = likeCommentController.value.toInt();
-                      if (likeCommentController.value - likeCommentController.value.toInt() > 0.5) page++;
+                      if (likeCommentController.value -
+                              likeCommentController.value.toInt() >
+                          0.5) page++;
                       return Positioned(
                         top: 0,
                         right: 16,
@@ -136,8 +140,7 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
                             color: context.colors.backgroundsSecondary,
                             borderRadius: BorderRadius.circular(16.0),
                           ),
-                          child: Text(
-                              '${page + 1}/${widget.movie?.length}'),
+                          child: Text('${page + 1}/${widget.movie?.length}'),
                         ),
                       );
                     }),
