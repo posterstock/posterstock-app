@@ -28,6 +28,7 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
   double? textHeight;
   bool firstRun = true;
   bool disposed = false;
+  late final ScrollPhysics physics;
 
   @override
   void dispose() {
@@ -38,6 +39,12 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    super.initState();
+    physics = CustomBouncePhysic(
+      decelerationRate: ScrollDecelerationRate.normal,
+      disableSwipeRight:
+          widget.movie?.length == null || widget.movie!.length < 2,
+    );
     likeCommentController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 0),
@@ -56,7 +63,6 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
         if (!disposed) animatePosterToSide();
       });
     }
-    super.initState();
   }
 
   void animatePosterToSide() {
@@ -86,12 +92,11 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
                       0) +
                   (((pageController!.page ?? 0) * 100).toInt() % 100) / 100);
             });
+
           return Stack(
             children: [
               PageView.builder(
-                physics: const CustomBouncePhysic(
-                  decelerationRate: ScrollDecelerationRate.normal,
-                ),
+                physics: physics,
                 controller: pageController,
                 itemCount: widget.movie?.length ?? 1,
                 itemBuilder: (context, index) {
