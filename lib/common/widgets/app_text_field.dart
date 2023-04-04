@@ -145,7 +145,12 @@ class _AppTextFieldState extends State<AppTextField> {
               hintStyle: context.textStyles.callout,
             ),
             onChanged: (value) {
-              if (widget.onChanged != null) widget.onChanged!(value);
+              if (widget.isUsername && value == '@') {
+                (widget.controller ?? nullController).text = '';
+              }
+              if (widget.onChanged != null) {
+                widget.onChanged!((widget.controller ?? nullController).text);
+              }
               setState(() {});
             },
             maxLines: 1,

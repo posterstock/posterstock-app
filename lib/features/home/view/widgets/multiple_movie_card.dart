@@ -24,11 +24,14 @@ class MultipleMovieCard extends StatelessWidget {
               children: List.generate(
                 post.posters.length,
                 (index) => Expanded(
-                  child: SizedBox(
+                  child: Container(
                     height: 163,
+                    color: context.colors.backgroundsSecondary,
                     child: Image.network(
                       post.posters[index],
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const SizedBox(),
                     ),
                   ),
                 ),

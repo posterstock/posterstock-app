@@ -158,8 +158,8 @@ class PostBase extends StatelessWidget {
                             onTap: () {},
                             child: Container(
                               color: Colors.transparent,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 5.0),
                               child: SvgPicture.asset(
                                 'assets/icons/ic_dots.svg',
                                 width: 24,

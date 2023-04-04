@@ -20,10 +20,9 @@ class NavigationPage extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       routes: const [
         HomeRoute(),
-        HomeRoute(),
-        HomeRoute(),
-        HomeRoute(),
-        HomeRoute(),
+        SearchRoute(),
+        NotificationsRoute(),
+        ProfileRoute(),
       ],
       builder: (context, child, _) {
         return Stack(

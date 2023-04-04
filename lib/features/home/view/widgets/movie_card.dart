@@ -88,6 +88,10 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
                     9 /
                     MediaQuery.of(context).size.width),
           )..addListener(() {
+              if (pageController?.page == null ||
+                  pageController!.page! < 0.05) {
+                return;
+              }
               likeCommentController.animateTo((pageController?.page?.toInt() ??
                       0) +
                   (((pageController!.page ?? 0) * 100).toInt() % 100) / 100);
@@ -95,37 +99,44 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
 
           return Stack(
             children: [
-              PageView.builder(
-                physics: physics,
-                controller: pageController,
-                itemCount: widget.movie?.length ?? 1,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.only(
-                        left: controller.value < 0 ? 0 : controller.value),
-                    child: _MovieCardPageViewContent(
-                      likeCommentController: likeCommentController,
-                      controller: controller,
-                      onPosterTap: () {
-                        if (controller.value != 16.0) {
-                          controller.animateTo(
-                            16.0,
-                            duration: const Duration(milliseconds: 300),
-                          );
-                        } else {
-                          animatePosterToSide();
-                        }
-                      },
-                      textHeight: textHeight!,
-                      description:
-                          (widget.movie?[index].description ?? '').length > 280
-                              ? (widget.movie?[index].description ?? '')
-                                  .substring(0, 280)
-                              : (widget.movie?[index].description ?? ''),
-                      movie: widget.movie?[index],
-                    ),
-                  );
-                },
+              OverflowBox(
+                maxWidth: MediaQuery.of(context).size.width +
+                    72 * (controller.value < 0 ? 0 : controller.value) / 16,
+                alignment: Alignment.centerLeft,
+                child: PageView.builder(
+                  physics: physics,
+                  controller: pageController,
+                  itemCount: widget.movie?.length ?? 1,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        left: controller.value < 0 ? 0 : controller.value,
+                      ),
+                      child: _MovieCardPageViewContent(
+                        likeCommentController: likeCommentController,
+                        controller: controller,
+                        onPosterTap: () {
+                          if (controller.value != 16.0) {
+                            controller.animateTo(
+                              16.0,
+                              duration: const Duration(milliseconds: 300),
+                            );
+                          } else {
+                            animatePosterToSide();
+                          }
+                        },
+                        textHeight: textHeight!,
+                        description:
+                            (widget.movie?[index].description ?? '').length >
+                                    280
+                                ? (widget.movie?[index].description ?? '')
+                                    .substring(0, 280)
+                                : (widget.movie?[index].description ?? ''),
+                        movie: widget.movie?[index],
+                      ),
+                    );
+                  },
+                ),
               ),
               if (widget.movie != null && widget.movie!.length > 1)
                 AnimatedBuilder(

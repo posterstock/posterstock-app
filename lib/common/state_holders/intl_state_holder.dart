@@ -8,7 +8,8 @@ final localizations = StateNotifierProvider<IntlStateHolder, AppLocalizations?>(
 class IntlStateHolder extends StateNotifier<AppLocalizations?> {
   IntlStateHolder(super._state);
 
-  void setLocalizations(AppLocalizations? local) {
+  Future<void> setLocalizations(AppLocalizations? local) async {
+    await Future.delayed(Duration.zero);
     state = local;
   }
 }

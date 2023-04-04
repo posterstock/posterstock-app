@@ -69,9 +69,9 @@ class SignUpPage extends ConsumerWidget {
                     tickOnSuccess: true,
                     hasError: usernameErrorState != null,
                     onChanged: (value) {
-                      final validCharacters = RegExp(r'[a-zA-Z0-9_]+$');
+                      final validCharacters = RegExp(r'[a-zA-Z0-9_.]+$');
                       ref.read(signUpControllerProvider).setUsername(value);
-                      for (int i = 1; i < value.length; i++) {
+                      for (int i = 0; i < value.length; i++) {
                         if (!validCharacters.hasMatch(value[i])) {
                           ref
                               .read(signUpControllerProvider)

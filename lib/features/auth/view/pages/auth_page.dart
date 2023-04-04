@@ -11,10 +11,10 @@ import 'package:poster_stock/features/auth/state_holders/auth_loading_state_hold
 import 'package:poster_stock/features/auth/view/widgets/auth_button.dart';
 import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
-import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/app_themes.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
+import '../../../../common/state_holders/intl_state_holder.dart';
 import '../../../../common/widgets/app_text_field.dart';
 
 class AuthPage extends ConsumerWidget {
@@ -23,6 +23,9 @@ class AuthPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.read(localizations.notifier).setLocalizations(
+          AppLocalizations.of(context),
+        ); //This must be initialized as soon as possible after returning Material App
     final loadingState = ref.watch(authLoadingStateHolderProvider);
     final errorState = ref.watch(authErrorStateHolderProvider);
     return Scaffold(
@@ -74,7 +77,8 @@ class AuthPage extends ConsumerWidget {
                     ),
                     Text(
                       AppLocalizations.of(context)!.welcome,
-                      style: context.textStyles.title2,
+                      style: context.textStyles.title2!,
+                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 34),
                     AppTextField(
@@ -183,7 +187,7 @@ class AuthPage extends ConsumerWidget {
   void loadApple(WidgetRef ref, BuildContext context) {
     ref.read(authControllerProvider).loadApple();
     Future.delayed(const Duration(seconds: 5), () {
-      AutoRouter.of(context).push(const LoginRoute()).then((value) {
+      AutoRouter.of(context).pushNamed('login').then((value) {
         ref.read(signUpControllerProvider)
           ..setName('')
           ..setUsername('')
@@ -197,7 +201,7 @@ class AuthPage extends ConsumerWidget {
   void loadGoogle(WidgetRef ref, BuildContext context) {
     ref.read(authControllerProvider).loadGoogle();
     Future.delayed(const Duration(seconds: 5), () {
-      AutoRouter.of(context).push(const NavigationRoute()).then(
+      AutoRouter.of(context).pushNamed('navigation').then(
         (value) {
           ref.read(signUpControllerProvider)
             ..setName('')
@@ -219,7 +223,7 @@ class AuthPage extends ConsumerWidget {
     } else {
       ref.read(authControllerProvider).removeError();
       ref.read(authControllerProvider).setEmail(value);
-      AutoRouter.of(context).push(const SignUpRoute()).then((value) {
+      AutoRouter.of(context).pushNamed('sign_up').then((value) {
         ref.read(signUpControllerProvider)
           ..setName('')
           ..setUsername('')
