@@ -26,6 +26,7 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
   PageController? pageController;
   int currentPage = 0;
   double? textHeight;
+  double? titleHeight;
   bool firstRun = true;
   bool disposed = false;
   late final ScrollPhysics physics;
@@ -77,7 +78,7 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     getInitData();
     return SizedBox(
-      height: (textHeight ?? 0) + 58 + 31 + 20,
+      height: (textHeight ?? 0) + 58 + 31 + titleHeight!,
       child: AnimatedBuilder(
         animation: controller,
         builder: (context, child) {
@@ -126,6 +127,7 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
                           }
                         },
                         textHeight: textHeight!,
+                        titleHeight: titleHeight!,
                         description:
                             (widget.movie?[index].description ?? '').length >
                                     280
@@ -219,6 +221,9 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
         }
       }
     }
+    titleHeight = _textSize(
+            widget.movie?[0].name ?? '', context.textStyles.subheadlineBold!)
+        .height;
   }
 }
 
@@ -230,6 +235,7 @@ class _MovieCardPageViewContent extends StatelessWidget {
     required this.onPosterTap,
     this.movie,
     required this.textHeight,
+    required this.titleHeight,
     required this.description,
   }) : super(key: key);
   final AnimationController likeCommentController;
@@ -237,6 +243,7 @@ class _MovieCardPageViewContent extends StatelessWidget {
   final void Function() onPosterTap;
   final PostMovieModel? movie;
   final double textHeight;
+  final double titleHeight;
   final String description;
 
   @override
@@ -269,11 +276,15 @@ class _MovieCardPageViewContent extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextOrContainer(
-              text: movie != null ? movie!.name : null,
-              style: context.textStyles.subheadlineBold!,
-              emptyWidth: 146,
-              emptyHeight: 17,
+            SizedBox(
+              width:
+                  movie != null ? MediaQuery.of(context).size.width - 84 : null,
+              child: TextOrContainer(
+                text: movie != null ? movie!.name : null,
+                style: context.textStyles.subheadlineBold!,
+                emptyWidth: 146,
+                emptyHeight: 17,
+              ),
             ),
             SizedBox(
               height: movie != null ? 5 : 8,

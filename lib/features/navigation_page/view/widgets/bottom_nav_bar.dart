@@ -6,7 +6,7 @@ import 'package:poster_stock/features/home/state_holders/home_page_scroll_contro
 import 'package:poster_stock/features/navigation_page/view/widgets/plus_button.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
-import '../../../home/cotroller/home_page_controller.dart';
+import '../../../home/controller/home_page_scroll_controller.dart';
 import '../../controller/menu_controller.dart';
 import 'bottom_nav_bar_item.dart';
 
@@ -44,7 +44,7 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                       if (homeScrollPosition.offset != 0.0 ||
                           AutoTabsRouter.of(context).activeIndex == 0) {
                         ref
-                            .read(homePageControllerProvider)
+                            .read(homePageScrollControllerProvider)
                             .animateScrollToZero();
                       }
                       AutoTabsRouter.of(context).setActiveIndex(0);

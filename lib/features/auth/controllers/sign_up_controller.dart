@@ -1,6 +1,7 @@
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/auth/state_holders/email_code_state_holder.dart';
+import 'package:poster_stock/features/auth/state_holders/sign_up_name_error_state_holdeer.dart';
 import 'package:poster_stock/features/auth/state_holders/sign_up_username_error_state_holder.dart';
 
 import '../../../common/state_holders/intl_state_holder.dart';
@@ -11,6 +12,7 @@ final signUpControllerProvider = Provider<SignUpController>(
   (ref) => SignUpController(
     usernameErrorState:
         ref.watch(signUpUsernameErrorStateHolderProvider.notifier),
+    nameErrorState: ref.watch(signUpNameErrorStateHolderProvider.notifier),
     nameState: ref.watch(nameStateHolderProvider.notifier),
     usernameState: ref.watch(usernameStateHolderProvider.notifier),
     codeState: ref.watch(emailCodeStateHolderProvider.notifier),
@@ -20,6 +22,7 @@ final signUpControllerProvider = Provider<SignUpController>(
 
 class SignUpController {
   final SignUpUsernameErrorStateHolder usernameErrorState;
+  final SignUpNameErrorStateHolder nameErrorState;
   final NameStateHolder nameState;
   final UsernameStateHolder usernameState;
   final EmailCodeStateHolder codeState;
@@ -27,6 +30,7 @@ class SignUpController {
 
   SignUpController({
     required this.usernameErrorState,
+    required this.nameErrorState,
     required this.nameState,
     required this.usernameState,
     required this.codeState,
@@ -39,6 +43,22 @@ class SignUpController {
 
   void removeUsernameError() {
     usernameErrorState.clearState();
+  }
+
+  void setTooLongErrorName() {
+    nameErrorState.updateState(localizations!.nameCantExceed32);
+  }
+
+  void setTooLongErrorUserName() {
+    usernameErrorState.updateState(localizations!.usernameCantExceed32);
+  }
+
+  void setTooShortErrorUserName() {
+    usernameErrorState.updateState(localizations!.usernameMinLength5);
+  }
+
+  void removeNameError() {
+    nameErrorState.clearState();
   }
 
   void setCode(String value) {

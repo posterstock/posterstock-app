@@ -53,7 +53,7 @@ class PostBase extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if ((post != null || multPost != null) && !user!.followed!)
+                    if ((post != null || multPost != null) && !user!.followed)
                       Padding(
                         padding: const EdgeInsets.only(left: 68.0),
                         child: Text(
@@ -63,7 +63,7 @@ class PostBase extends StatelessWidget {
                           ),
                         ),
                       ),
-                    if ((post != null || multPost != null) && !user!.followed!)
+                    if ((post != null || multPost != null) && !user!.followed)
                       const SizedBox(height: 12),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,

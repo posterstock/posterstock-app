@@ -13,6 +13,7 @@ import 'package:poster_stock/features/auth/view/widgets/auth_button.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../../../common/widgets/custom_scaffold.dart';
+import '../../state_holders/sign_up_name_error_state_holdeer.dart';
 import '../widgets/custom_app_bar.dart';
 
 class SignUpPage extends ConsumerWidget {
@@ -26,6 +27,7 @@ class SignUpPage extends ConsumerWidget {
     final usernameState = ref.watch(usernameStateHolderProvider);
     final usernameErrorState =
         ref.watch(signUpUsernameErrorStateHolderProvider);
+    final nameErrorState = ref.watch(signUpNameErrorStateHolderProvider);
     return CustomScaffold(
       child: Column(
         children: [
@@ -58,10 +60,32 @@ class SignUpPage extends ConsumerWidget {
                     hint: AppLocalizations.of(context)!.name,
                     onChanged: (value) {
                       ref.read(signUpControllerProvider).setName(value);
+                      if (value.length > 32) {
+                        ref
+                            .read(signUpControllerProvider)
+                            .setTooLongErrorName();
+                      } else {
+                        ref.read(signUpControllerProvider).removeNameError();
+                      }
                     },
+                    onRemoved: () {
+                      ref.read(signUpControllerProvider).setName('');
+                      ref.read(signUpControllerProvider).removeNameError();
+                    },
+                    hasError: nameErrorState != null,
                   ),
                   const SizedBox(
-                    height: 24,
+                    height: 6,
+                  ),
+                  SizedBox(
+                    height: 18,
+                    width: double.infinity,
+                    child: Text(
+                      nameErrorState ?? '',
+                      style: context.textStyles.caption2!.copyWith(
+                        color: context.colors.textsError,
+                      ),
+                    ),
                   ),
                   AppTextField(
                     hint: AppLocalizations.of(context)!.username,
@@ -69,6 +93,18 @@ class SignUpPage extends ConsumerWidget {
                     tickOnSuccess: true,
                     hasError: usernameErrorState != null,
                     onChanged: (value) {
+                      if (value.length < 5 && value.isNotEmpty) {
+                        ref
+                            .read(signUpControllerProvider)
+                            .setTooShortErrorUserName();
+                        return;
+                      }
+                      if (value.length > 32) {
+                        ref
+                            .read(signUpControllerProvider)
+                            .setTooLongErrorUserName();
+                        return;
+                      }
                       final validCharacters = RegExp(r'[a-zA-Z0-9_.]+$');
                       ref.read(signUpControllerProvider).setUsername(value);
                       for (int i = 0; i < value.length; i++) {
@@ -103,10 +139,13 @@ class SignUpPage extends ConsumerWidget {
                   const SizedBox(
                     height: 25,
                   ),
-                  Text(
-                    AppLocalizations.of(context)!.codeSent,
-                    style: context.textStyles.callout!.copyWith(
-                      color: context.colors.textsSecondary,
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      AppLocalizations.of(context)!.codeSent,
+                      style: context.textStyles.callout!.copyWith(
+                        color: context.colors.textsSecondary,
+                      ),
                     ),
                   ),
                   const SizedBox(
@@ -134,7 +173,8 @@ class SignUpPage extends ConsumerWidget {
                     disabled: usernameErrorState != null ||
                         usernameState.length < 2 ||
                         nameState.isEmpty ||
-                        codeState.isEmpty,
+                        codeState.isEmpty ||
+                        nameErrorState != null,
                     fillColor: context.colors.buttonsDisabled,
                     borderColor: context.colors.fieldsActive!,
                     pressedBorderColor: context.colors.fieldsActive!,

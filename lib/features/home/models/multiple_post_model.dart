@@ -1,21 +1,37 @@
+import 'package:poster_stock/features/home/models/post_base_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 
-class MultiplePostModel {
-  final String name;
-  final UserModel author;
+class MultiplePostModel extends PostBaseModel {
   final List<String> posters;
-  final String time;
-  final List<UserModel> likes;
-  final List<UserModel> comments;
-  final String? description;
 
   MultiplePostModel({
-    required this.name,
     required this.posters,
-    required this.author,
-    required this.time,
-    this.likes = const [],
-    this.comments = const [],
-    this.description,
-  });
+    required String name,
+    required UserModel author,
+    required String time,
+    List<UserModel> likes = const [],
+    List<UserModel> comments = const [],
+    String? description,
+  }) : super(
+          name: name,
+          author: author,
+          time: time,
+          likes: likes,
+          comments: comments,
+          description: description,
+        );
+
+  factory MultiplePostModel.fromJson(Map<String, Object?> json) {
+    return MultiplePostModel(
+      name: json['name'] as String,
+      author: UserModel.fromJson(json['user'] as Map<String, Object?>),
+      time: json['time'] as String,
+      likes: (json['likes'] as List<Map<String, Object?>>)
+          .map<UserModel>((e) => UserModel.fromJson(e))
+          .toList(),
+      comments: [],
+      description: json['description'] as String,
+      posters: json['posters'] as List<String>,
+    );
+  }
 }
