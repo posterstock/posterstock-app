@@ -1,4 +1,4 @@
-package com.example.poster_stock
+package com.thedirection.posterstock
 
 import io.flutter.embedding.android.FlutterActivity
 

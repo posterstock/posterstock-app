@@ -12,6 +12,14 @@ class AppAllTextStyles extends AppTextStyles {
             letterSpacing: 0.35,
             color: colors.textsPrimary,
           ),
+          title3: TextStyle(
+            fontFamily: 'SF-Pro-Display',
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+            height: 25 / 20,
+            letterSpacing: 0.38,
+            color: colors.textsPrimary,
+          ),
           calloutBold: TextStyle(
             fontFamily: 'SF-Pro-Text',
             fontWeight: FontWeight.w600,
@@ -81,6 +89,7 @@ class AppAllTextStyles extends AppTextStyles {
 class AppTextStyles extends ThemeExtension<AppTextStyles> {
   const AppTextStyles({
     required this.title2,
+    required this.title3,
     required this.callout,
     required this.calloutBold,
     required this.caption2,
@@ -92,6 +101,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   });
 
   final TextStyle? title2;
+  final TextStyle? title3;
   final TextStyle? callout;
   final TextStyle? calloutBold;
   final TextStyle? caption2;
@@ -104,6 +114,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   @override
   ThemeExtension<AppTextStyles> copyWith({
     final TextStyle? title2,
+    final TextStyle? title3,
     final TextStyle? callout,
     final TextStyle? calloutBold,
     final TextStyle? caption2,
@@ -115,6 +126,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   }) {
     return AppTextStyles(
       title2: title2 ?? this.title2,
+      title3: title3 ?? this.title3,
       callout: callout ?? this.callout,
       calloutBold: calloutBold ?? this.calloutBold,
       caption2: caption2 ?? this.caption2,
@@ -134,6 +146,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
     }
     return AppTextStyles(
       title2: TextStyle.lerp(title2, other.title2, t),
+      title3: TextStyle.lerp(title3, other.title3, t),
       callout: TextStyle.lerp(callout, other.callout, t),
       calloutBold: TextStyle.lerp(calloutBold, other.calloutBold, t),
       caption2: TextStyle.lerp(caption2, other.caption2, t),

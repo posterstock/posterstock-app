@@ -28,6 +28,7 @@ class AuthPage extends ConsumerWidget {
         ); //This must be initialized as soon as possible after returning Material App
     final loadingState = ref.watch(authLoadingStateHolderProvider);
     final errorState = ref.watch(authErrorStateHolderProvider);
+    final theme = ref.watch(themeStateHolderProvider);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -44,7 +45,7 @@ class AuthPage extends ConsumerWidget {
         child: Stack(
           children: [
             Image.asset(
-              'assets/header.png',
+              theme.brightness == Brightness.light ? 'assets/images/header_light.png' : 'assets/images/header_dark.png',
               fit: BoxFit.fitWidth,
             ),
             SafeArea(

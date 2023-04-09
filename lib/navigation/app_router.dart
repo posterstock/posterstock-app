@@ -4,6 +4,7 @@ import 'package:poster_stock/features/auth/view/pages/sign_up_page.dart';
 import 'package:poster_stock/features/home/view/pages/home_page.dart';
 import 'package:poster_stock/features/navigation_page/view/navigation_page.dart';
 import 'package:poster_stock/features/notifications/view/pages/notifications_page.dart';
+import 'package:poster_stock/features/poster/view/pages/poster_page/poster_page.dart';
 import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/features/search/view/pages/search_page.dart';
 
@@ -29,6 +30,7 @@ import '../features/auth/view/pages/auth_page.dart';
         AutoRoute(page: ProfilePage, path: 'profile'),
       ],
     ),
+    AutoRoute(page: PosterPage, path: 'poster'),
   ],
 )
 class $AppRouter {}

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/common/helpers/custom_scroll_behavior.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
 
 import 'navigation/app_router.gr.dart';
@@ -35,6 +36,12 @@ class App extends ConsumerWidget {
       supportedLocales: const [
         Locale('en'),
       ],
+      builder: (context, child) {
+        return ScrollConfiguration(
+          behavior: CustomScrollBehavior(),
+          child: child ?? const SizedBox(),
+        );
+      },
       theme: theme,
     );
   }

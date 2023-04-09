@@ -8,12 +8,80 @@ class MockHomePageApi implements IHomePageApi {
       'data': {
         'posts': [
           {
+            'collection': [
+              {
+                'name': 'The Lord of the Rings: The Fellowship of the Ring',
+                'year': 2001,
+                'poster':
+                    'https://upload.wikimedia.org/wikipedia/en/8/8a/The_Lord_of_the_Rings_The_Fellowship_of_the_Ring_%282001%29.jpg',
+                'user': {
+                  'name': 'Mikhail Kiva',
+                  'username': 'itsmishakiva',
+                  'followed': true
+                },
+                'time': '12:03',
+                'likes': [
+                  {
+                    'name': 'Mikhail Kiva',
+                    'username': 'itsmishakiva',
+                  },
+                  {
+                    'name': 'Ian Rakeda',
+                    'username': 'ianrakeda',
+                  },
+                  {
+                    'name': 'User',
+                    'username': 'user',
+                  },
+                  {
+                    'name': 'null',
+                    'username': 'null',
+                  },
+                ],
+                'description':
+                    "Set in Middle-earth, the story tells of the Dark Lord Sauron, who seeks the One Ring, which contains part of his might, to return to power. The Ring has found its way to the young hobbit Frodo Baggins. The fate of Middle-earth hangs in the balance as Frodo and eight companions (who form the Fellowship of the Ring) begin their journey to Mount Doom in the land of Mordor, the only place where the Ring can be destroyed. The Fellowship of the Ring was financed and distributed by American studio New Line Cinema, but filmed and edited entirely in Jackson's native New Zealand, concurrently with the other two parts of the trilogy.",
+              },
+              {
+                'name': 'The Lord of the Rings: The Fellowship of the Ring',
+                'year': 2001,
+                'poster':
+                    'https://upload.wikimedia.org/wikipedia/en/8/8a/The_Lord_of_the_Rings_The_Fellowship_of_the_Ring_%282001%29.jpg',
+                'user': {
+                  'name': 'Mikhail Kiva',
+                  'username': 'itsmishakiva',
+                  'followed': true
+                },
+                'time': '12:03',
+                'likes': [
+                  {
+                    'name': 'Mikhail Kiva',
+                    'username': 'itsmishakiva',
+                  },
+                  {
+                    'name': 'Ian Rakeda',
+                    'username': 'ianrakeda',
+                  },
+                  {
+                    'name': 'User',
+                    'username': 'user',
+                  },
+                  {
+                    'name': 'null',
+                    'username': 'null',
+                  },
+                ],
+                'description':
+                    "Set in Middle-earth, the story tells of the Dark Lord Sauron, who seeks the One Ring, which contains part of his might, to return to power. The Ring has found its way to the young hobbit Frodo Baggins. The fate of Middle-earth hangs in the balance as Frodo and eight companions (who form the Fellowship of the Ring) begin their journey to Mount Doom in the land of Mordor, the only place where the Ring can be destroyed. The Fellowship of the Ring was financed and distributed by American studio New Line Cinema, but filmed and edited entirely in Jackson's native New Zealand, concurrently with the other two parts of the trilogy.",
+              },
+            ],
+          },
+          {
             'name': 'The Lord of the Rings: The Fellowship of the Ring',
             'year': 2001,
             'poster':
                 'https://upload.wikimedia.org/wikipedia/en/8/8a/The_Lord_of_the_Rings_The_Fellowship_of_the_Ring_%282001%29.jpg',
             'user': {
-              'name': 'Mikhail Kiva',
+              'name': 'Mikhail Kivaaaaaaaaa',
               'username': 'itsmishakiva',
               'followed': true
             },
@@ -38,6 +106,64 @@ class MockHomePageApi implements IHomePageApi {
             ],
             'description':
                 "Set in Middle-earth, the story tells of the Dark Lord Sauron, who seeks the One Ring, which contains part of his might, to return to power. The Ring has found its way to the young hobbit Frodo Baggins. The fate of Middle-earth hangs in the balance as Frodo and eight companions (who form the Fellowship of the Ring) begin their journey to Mount Doom in the land of Mordor, the only place where the Ring can be destroyed. The Fellowship of the Ring was financed and distributed by American studio New Line Cinema, but filmed and edited entirely in Jackson's native New Zealand, concurrently with the other two parts of the trilogy.",
+          },
+          {
+            'name': 'The Lord of the Rings: The Fellowship of the Ring',
+            'year': 2001,
+            'poster':
+            'https://upload.wikimedia.org/wikipedia/en/8/8a/The_Lord_of_the_Rings_The_Fellowship_of_the_Ring_%282001%29.jpg',
+            'user': {
+              'name': 'Mikhail',
+              'username': 'itsmishakiva',
+              'followed': true
+            },
+            'time': '12:03',
+            'likes': [
+              {
+                'name': 'Mikhail Kivaaaaaaaaaa',
+                'username': 'itsmishakiva',
+              },
+              {
+                'name': 'Ian Rakeda',
+                'username': 'ianrakeda',
+              },
+              {
+                'name': 'User',
+                'username': 'user',
+              },
+              {
+                'name': 'null',
+                'username': 'null',
+              },
+            ],
+            'description':
+            "Set in Middle-earth, the story tells of the Dark Lord Sauron, who seeks the One Ring, which contains part of his might, to return to power. The Ring has found its way to the young hobbit Frodo Baggins. The fate of Middle-earth hangs in the balance as Frodo and eight companions (who form the Fellowship of the Ring) begin their journey to Mount Doom in the land of Mordor, the only place where the Ring can be destroyed. The Fellowship of the Ring was financed and distributed by American studio New Line Cinema, but filmed and edited entirely in Jackson's native New Zealand, concurrently with the other two parts of the trilogy.",
+          },
+          {
+            'name': 'The Lord of the Rings: The Fellowship of the Ring',
+            'user': {
+              'name': 'Mikhail Kiva',
+              'username': 'itsmishakiva',
+              'followed': true
+            },
+            'time': '12:03',
+            'likes': [
+              {
+                'name': 'Mikhail Kiva',
+                'username': 'itsmishakiva',
+              },
+              {
+                'name': 'Ian Rakeda',
+                'username': 'ianrakeda',
+              },
+            ],
+            'description':
+            "Set in Middle-earth, the story tells of the Dark Lord Sauron, who seeks the One Ring, which contains part of his might, to return to power. The Ring has found its way to the young hobbit Frodo Baggins. The fate of Middle-earth hangs in the balance as Frodo and eight companions (who form the Fellowship of the Ring) begin their journey to Mount Doom in the land of Mordor, the only place where the Ring can be destroyed. The Fellowship of the Ring was financed and distributed by American studio New Line Cinema, but filmed and edited entirely in Jackson's native New Zealand, concurrently with the other two parts of the trilogy.",
+            'posters' : [
+              'https://m.media-amazon.com/images/W/IMAGERENDERING_521856-T1/images/I/A1yy50fuVnL._RI_.jpg',
+              'https://billpetro.com/wp-content/uploads/2001/12/LOTR-1.jpeg',
+              'https://assets-prd.ignimgs.com/2022/05/16/lotrfellowship-1652740286087.jpg',
+            ],
           },
         ],
       },

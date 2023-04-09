@@ -186,13 +186,13 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
     );
   }
 
-  Size _textSize(String text, TextStyle style) {
+  Size _textSize(String text, TextStyle style, {double? width}) {
     final TextPainter textPainter = TextPainter(
       text: TextSpan(text: text, style: style),
       textDirection: TextDirection.ltr,
     )..layout(
-        minWidth: MediaQuery.of(context).size.width - 84,
-        maxWidth: MediaQuery.of(context).size.width - 84,
+        minWidth: width ?? MediaQuery.of(context).size.width - 84,
+        maxWidth: width ?? MediaQuery.of(context).size.width - 84,
       );
     return textPainter.size;
   }
@@ -222,7 +222,7 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
       }
     }
     titleHeight = _textSize(
-            widget.movie?[0].name ?? '', context.textStyles.subheadlineBold!)
+            widget.movie?[0].name ?? '', context.textStyles.subheadlineBold!, width: MediaQuery.of(context).size.width - 134)
         .height;
   }
 }
@@ -278,7 +278,7 @@ class _MovieCardPageViewContent extends StatelessWidget {
           children: [
             SizedBox(
               width:
-                  movie != null ? MediaQuery.of(context).size.width - 84 : null,
+                  movie != null ? MediaQuery.of(context).size.width - 134 : null,
               child: TextOrContainer(
                 text: movie != null ? movie!.name : null,
                 style: context.textStyles.subheadlineBold!,
@@ -343,7 +343,7 @@ class _MovieCardPageViewContent extends StatelessWidget {
                       ReactionButton(
                         iconPath: 'assets/icons/ic_heart.svg',
                         iconColor: context.colors.iconsDisabled!,
-                        amount: 0,
+                        amount: movie?.likes.length,
                       ),
                       const SizedBox(
                         width: 12,
@@ -351,7 +351,7 @@ class _MovieCardPageViewContent extends StatelessWidget {
                       ReactionButton(
                         iconPath: 'assets/icons/ic_comment2.svg',
                         iconColor: context.colors.iconsDisabled!,
-                        amount: 0,
+                        amount: movie?.comments.length,
                       ),
                     ],
                   ),

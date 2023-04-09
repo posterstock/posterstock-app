@@ -126,9 +126,22 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                       AutoTabsRouter.of(context).setActiveIndex(3);
                       setState(() {});
                     },
-                    icon: const CircleAvatar(
-                      radius: 11,
-                      backgroundColor: Color(0xFFD78A8A),
+                    //TODO check if has avatar
+                    icon: SvgPicture.asset(
+                      'assets/icons/ic_profile.svg',
+                      colorFilter: ColorFilter.mode(
+                        context.colors.iconsDefault!,
+                        BlendMode.srcIn,
+                      ),
+                      width: 24,
+                    ),
+                    activeIcon: SvgPicture.asset(
+                      'assets/icons/ic_profile_active.svg',
+                      colorFilter: ColorFilter.mode(
+                        context.colors.iconsDefault!,
+                        BlendMode.srcIn,
+                      ),
+                      width: 24,
                     ),
                     active: activeIndex == 3,
                   ),

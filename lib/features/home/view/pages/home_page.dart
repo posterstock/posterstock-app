@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
+import 'package:poster_stock/features/home/models/post_base_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
@@ -99,13 +100,13 @@ class HomePage extends ConsumerWidget {
                         future: postsFuture,
                         builder: (context, snapshot) {
                           if (posts != null && posts.length > index) {
-                            if (posts[index] is MultiplePostModel) {
+                            if (posts[index][0] is MultiplePostModel) {
                               return PostBase(
-                                multPost: posts[index] as MultiplePostModel,
+                                multPost: posts[index][0] as MultiplePostModel,
                               );
                             } else {
                               return PostBase(
-                                post: [posts[index] as PostMovieModel],
+                                post: (posts[index]).map((e) => (e as PostMovieModel)).toList(),
                               );
                             }
                           }

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,6 +9,7 @@ import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
+import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../../../common/widgets/app_text_button.dart';
@@ -42,7 +44,11 @@ class PostBase extends StatelessWidget {
     return Material(
       color: context.colors.backgroundsPrimary,
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          if (post != null) {
+            AutoRouter.of(context).push(PosterRoute(post: post![0]));
+          }
+        },
         child: ShimmerLoader(
           loaded: post != null || multPost != null,
           child: Column(
