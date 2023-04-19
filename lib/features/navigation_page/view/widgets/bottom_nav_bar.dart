@@ -41,12 +41,6 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                 children: [
                   BottomNavBarItem(
                     onTap: () {
-                      if (homeScrollPosition.offset != 0.0 ||
-                          AutoTabsRouter.of(context).activeIndex == 0) {
-                        ref
-                            .read(homePageScrollControllerProvider)
-                            .animateScrollToZero();
-                      }
                       AutoTabsRouter.of(context).setActiveIndex(0);
                       setState(() {});
                     },

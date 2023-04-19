@@ -4,9 +4,11 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/widgets/custom_ink_well_base.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
+import 'package:poster_stock/features/home/view/helpers/page_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
@@ -17,7 +19,7 @@ import 'movie_card.dart';
 import 'multiple_movie_card.dart';
 
 class PostBase extends StatelessWidget {
-  const PostBase({
+    PostBase({
     Key? key,
     this.post,
     this.multPost,
@@ -26,6 +28,7 @@ class PostBase extends StatelessWidget {
 
   final List<PostMovieModel>? post;
   final MultiplePostModel? multPost;
+  final PageHolder pageHolder = PageHolder();
 
   @override
   Widget build(BuildContext context) {
@@ -35,18 +38,12 @@ class PostBase extends StatelessWidget {
     } else if (multPost != null) {
       user = multPost!.author;
     }
-    //TODO move avatar generation from view layer
-    const List<Color> avatar = [
-      Color(0xfff09a90),
-      Color(0xfff3d376),
-      Color(0xff92bdf4),
-    ];
     return Material(
       color: context.colors.backgroundsPrimary,
       child: InkWell(
         onTap: () {
           if (post != null) {
-            AutoRouter.of(context).push(PosterRoute(post: post![0]));
+            AutoRouter.of(context).push(PosterRoute(post: post![pageHolder.page]));
           }
         },
         child: ShimmerLoader(
@@ -71,119 +68,21 @@ class PostBase extends StatelessWidget {
                       ),
                     if ((post != null || multPost != null) && !user!.followed)
                       const SizedBox(height: 12),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(
-                          width: 16,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4.0),
-                          child: CircleAvatar(
-                            radius: 20,
-                            backgroundImage: user?.imagePath != null
-                                ? NetworkImage(user!.imagePath!)
-                                : null,
-                            backgroundColor: avatar[Random().nextInt(3)],
-                            child: user?.imagePath == null &&
-                                    (post != null || multPost != null)
-                                ? Text(
-                                    getAvatarName(user!.name).toUpperCase(),
-                                    style: context.textStyles.subheadlineBold!
-                                        .copyWith(
-                                      color: context.colors.textsBackground,
-                                    ),
-                                  )
-                                : const SizedBox(),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (post == null && multPost == null)
-                                    const SizedBox(
-                                      height: 3,
-                                    ),
-                                  TextOrContainer(
-                                    text: user?.name,
-                                    style: context.textStyles.calloutBold,
-                                    emptyWidth: 146,
-                                    emptyHeight: 17,
-                                  ),
-                                  SizedBox(
-                                    height: post != null || multPost != null
-                                        ? 4
-                                        : 8,
-                                  ),
-                                  TextOrContainer(
-                                    text: user?.username == null
-                                        ? null
-                                        : '@${user!.username}',
-                                    style:
-                                        context.textStyles.caption1!.copyWith(
-                                      color: context.colors.textsSecondary,
-                                    ),
-                                    emptyWidth: 120,
-                                    emptyHeight: 12,
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                width: (user?.followed ?? true) ? 12 : 24,
-                              ),
-                              if (user?.followed ?? true)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 3.0),
-                                  child: Text(
-                                    (post?[0].time ?? multPost?.time) ?? '',
-                                    style:
-                                        context.textStyles.footNote!.copyWith(
-                                      color: context.colors.textsDisabled,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        const Spacer(),
-                        if (!(user?.followed ?? true) &&
-                            (post != null || multPost != null))
-                          AppTextButton(
-                            text: AppLocalizations.of(context)!.follow,
-                          ),
-                        if (post != null || multPost != null)
-                          GestureDetector(
-                            onTap: () {},
-                            child: Container(
-                              color: Colors.transparent,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 5.0),
-                              child: SvgPicture.asset(
-                                'assets/icons/ic_dots.svg',
-                                width: 24,
-                                colorFilter: ColorFilter.mode(
-                                  context.colors.iconsLayer!,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: UserInfoTile(
+                        loading: post == null && multPost == null,
+                        time: post?[0].time ?? multPost?.time,
+                        user: user,
+                      ),
+                    )
                   ],
                 ),
               ),
               if (post == null && multPost == null || post != null)
                 MovieCard(
                   movie: post,
+                  pageHolder: pageHolder,
                 ),
               if (multPost != null)
                 MultipleMovieCard(
@@ -196,6 +95,130 @@ class PostBase extends StatelessWidget {
     );
   }
 
+}
+
+class UserInfoTile extends StatelessWidget {
+  const UserInfoTile({
+    Key? key,
+    this.loading = false,
+    this.user,
+    this.time,
+    this.showFollowButton = true,
+  }) : super(key: key);
+
+  final bool loading;
+  final UserModel? user;
+  final String? time;
+  final bool showFollowButton;
+
+  @override
+  Widget build(BuildContext context) {
+    //TODO move avatar generation from view layer
+    const List<Color> avatar = [
+      Color(0xfff09a90),
+      Color(0xfff3d376),
+      Color(0xff92bdf4),
+    ];
+    return ShimmerLoader(
+      loaded: !loading,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: CircleAvatar(
+              radius: 20,
+              backgroundImage:
+                  user?.imagePath != null ? NetworkImage(user!.imagePath!) : null,
+              backgroundColor: avatar[Random().nextInt(3)],
+              child: user?.imagePath == null && !loading
+                  ? Text(
+                      getAvatarName(user!.name).toUpperCase(),
+                      style: context.textStyles.subheadlineBold!.copyWith(
+                        color: context.colors.textsBackground,
+                      ),
+                    )
+                  : const SizedBox(),
+            ),
+          ),
+          const SizedBox(
+            width: 12,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 2.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (loading)
+                      const SizedBox(
+                        height: 3,
+                      ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextOrContainer(
+                          text: user?.name,
+                          style: context.textStyles.calloutBold,
+                          emptyWidth: 146,
+                          emptyHeight: 17,
+                        ),
+                        const SizedBox(
+                          width: 12,
+                        ),
+                        if ((user?.followed ?? true) || !showFollowButton)
+                          Text(
+                            time ?? '',
+                            style: context.textStyles.footNote!.copyWith(
+                              color: context.colors.textsDisabled,
+                            ),
+                          ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: !loading ? 3 : 8,
+                    ),
+                    TextOrContainer(
+                      text: user?.username == null ? null : '@${user!.username}',
+                      style: context.textStyles.caption1!.copyWith(
+                        color: context.colors.textsSecondary,
+                      ),
+                      emptyWidth: 120,
+                      emptyHeight: 12,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const Spacer(),
+          if (!(user?.followed ?? true) && (!loading) && showFollowButton)
+            AppTextButton(
+              text: AppLocalizations.of(context)!.follow,
+            ),
+          if (!loading)
+            GestureDetector(
+              onTap: () {},
+              child: Container(
+                color: Colors.transparent,
+                padding:
+                    const EdgeInsets.fromLTRB(16.0, 5.0, 0.0, 5.0),
+                child: SvgPicture.asset(
+                  'assets/icons/ic_dots.svg',
+                  width: 24,
+                  colorFilter: ColorFilter.mode(
+                    context.colors.iconsLayer!,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
   String getAvatarName(String name) {
     String result = name[0];
     for (int i = 0; i < name.length; i++) {

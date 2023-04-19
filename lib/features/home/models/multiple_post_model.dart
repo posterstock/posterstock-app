@@ -1,3 +1,4 @@
+import 'package:poster_stock/features/home/models/comment_model.dart';
 import 'package:poster_stock/features/home/models/post_base_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 
@@ -10,7 +11,7 @@ class MultiplePostModel extends PostBaseModel {
     required UserModel author,
     required String time,
     List<UserModel> likes = const [],
-    List<UserModel> comments = const [],
+    List<CommentModel> comments = const [],
     String? description,
   }) : super(
           name: name,
@@ -26,10 +27,13 @@ class MultiplePostModel extends PostBaseModel {
       name: json['name'] as String,
       author: UserModel.fromJson(json['user'] as Map<String, Object?>),
       time: json['time'] as String,
-      likes: (json['likes'] as List<Map<String, Object?>>)
-          .map<UserModel>((e) => UserModel.fromJson(e))
-          .toList(),
-      comments: [],
+      likes: (json['likes'] as List<Map<String, Object?>>?)
+          ?.map<UserModel>((e) => UserModel.fromJson(e))
+          .toList() ??
+          [],
+      comments: (json['comments'] as List<Map<String, Object?>>?)
+          ?.map<CommentModel>((e) => CommentModel.fromJson(e))
+          .toList() ?? [],
       description: json['description'] as String,
       posters: json['posters'] as List<String>,
     );

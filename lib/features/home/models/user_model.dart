@@ -22,4 +22,9 @@ class UserModel {
       description: json['description'] as String?,
     );
   }
+
+  @override
+  String toString() {
+    return '$name $username $followed';
+  }
 }

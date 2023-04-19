@@ -1,3 +1,4 @@
+import 'package:poster_stock/features/home/models/comment_model.dart';
 import 'package:poster_stock/features/home/models/post_base_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 
@@ -12,7 +13,7 @@ class PostMovieModel extends PostBaseModel {
     required UserModel author,
     required String time,
     List<UserModel> likes = const [],
-    List<UserModel> comments = const [],
+    List<CommentModel> comments = const [],
     String? description,
   }) : super(
           name: name,
@@ -34,7 +35,9 @@ class PostMovieModel extends PostBaseModel {
               ?.map<UserModel>((e) => UserModel.fromJson(e))
               .toList() ??
           [],
-      comments: [],
+      comments: (json['comments'] as List<Map<String, Object?>>?)
+          ?.map<CommentModel>((e) => CommentModel.fromJson(e))
+          .toList() ?? [],
       description: json['description'] as String,
     );
   }

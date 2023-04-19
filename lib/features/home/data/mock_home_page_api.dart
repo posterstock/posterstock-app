@@ -13,7 +13,7 @@ class MockHomePageApi implements IHomePageApi {
                 'name': 'The Lord of the Rings: The Fellowship of the Ring',
                 'year': 2001,
                 'poster':
-                    'https://upload.wikimedia.org/wikipedia/en/8/8a/The_Lord_of_the_Rings_The_Fellowship_of_the_Ring_%282001%29.jpg',
+                    'https://m.media-amazon.com/images/I/A1yy50fuVnL._RI_.jpg',
                 'user': {
                   'name': 'Mikhail Kiva',
                   'username': 'itsmishakiva',
@@ -36,20 +36,37 @@ class MockHomePageApi implements IHomePageApi {
                   {
                     'name': 'null',
                     'username': 'null',
+                  },
+                ],
+                'comments': [
+                  {
+                    'user' : {
+                      'name': 'Mikhail Kiva',
+                      'username': 'itsmishakiva',
+                    },
+                    'comment' : 'I did not hit her, its not true, i did not hit her, i did noot',
+                    'time' : '13:25',
+                  },
+                  {
+                    'user' : {
+                      'name': 'Mikhail Kiva',
+                      'username': 'itsmishakiva',
+                    },
+                    'comment' : 'Oh, Hi, Mark',
+                    'time' : '13:25',
                   },
                 ],
                 'description':
                     "Set in Middle-earth, the story tells of the Dark Lord Sauron, who seeks the One Ring, which contains part of his might, to return to power. The Ring has found its way to the young hobbit Frodo Baggins. The fate of Middle-earth hangs in the balance as Frodo and eight companions (who form the Fellowship of the Ring) begin their journey to Mount Doom in the land of Mordor, the only place where the Ring can be destroyed. The Fellowship of the Ring was financed and distributed by American studio New Line Cinema, but filmed and edited entirely in Jackson's native New Zealand, concurrently with the other two parts of the trilogy.",
               },
               {
-                'name': 'The Lord of the Rings: The Fellowship of the Ring',
-                'year': 2001,
+                'name': 'Star Wars',
+                'year': 1978,
                 'poster':
-                    'https://upload.wikimedia.org/wikipedia/en/8/8a/The_Lord_of_the_Rings_The_Fellowship_of_the_Ring_%282001%29.jpg',
+                    'https://i.pinimg.com/originals/ba/2d/2e/ba2d2eb63d696bdbe4ace03d0af26c69.jpg',
                 'user': {
                   'name': 'Mikhail Kiva',
                   'username': 'itsmishakiva',
-                  'followed': true
                 },
                 'time': '12:03',
                 'likes': [
@@ -71,7 +88,7 @@ class MockHomePageApi implements IHomePageApi {
                   },
                 ],
                 'description':
-                    "Set in Middle-earth, the story tells of the Dark Lord Sauron, who seeks the One Ring, which contains part of his might, to return to power. The Ring has found its way to the young hobbit Frodo Baggins. The fate of Middle-earth hangs in the balance as Frodo and eight companions (who form the Fellowship of the Ring) begin their journey to Mount Doom in the land of Mordor, the only place where the Ring can be destroyed. The Fellowship of the Ring was financed and distributed by American studio New Line Cinema, but filmed and edited entirely in Jackson's native New Zealand, concurrently with the other two parts of the trilogy.",
+                    "Lorem Ipsum dolorum bla bla, great movie",
               },
             ],
           },
@@ -79,11 +96,11 @@ class MockHomePageApi implements IHomePageApi {
             'name': 'The Lord of the Rings: The Fellowship of the Ring',
             'year': 2001,
             'poster':
-                'https://upload.wikimedia.org/wikipedia/en/8/8a/The_Lord_of_the_Rings_The_Fellowship_of_the_Ring_%282001%29.jpg',
+                'https://m.media-amazon.com/images/I/A1yy50fuVnL._RI_.jpg',
             'user': {
               'name': 'Mikhail Kivaaaaaaaaa',
               'username': 'itsmishakiva',
-              'followed': true
+              'followed': false,
             },
             'time': '12:03',
             'likes': [
@@ -111,7 +128,7 @@ class MockHomePageApi implements IHomePageApi {
             'name': 'The Lord of the Rings: The Fellowship of the Ring',
             'year': 2001,
             'poster':
-            'https://upload.wikimedia.org/wikipedia/en/8/8a/The_Lord_of_the_Rings_The_Fellowship_of_the_Ring_%282001%29.jpg',
+            'https://m.media-amazon.com/images/I/A1yy50fuVnL._RI_.jpg',
             'user': {
               'name': 'Mikhail',
               'username': 'itsmishakiva',
@@ -160,9 +177,9 @@ class MockHomePageApi implements IHomePageApi {
             'description':
             "Set in Middle-earth, the story tells of the Dark Lord Sauron, who seeks the One Ring, which contains part of his might, to return to power. The Ring has found its way to the young hobbit Frodo Baggins. The fate of Middle-earth hangs in the balance as Frodo and eight companions (who form the Fellowship of the Ring) begin their journey to Mount Doom in the land of Mordor, the only place where the Ring can be destroyed. The Fellowship of the Ring was financed and distributed by American studio New Line Cinema, but filmed and edited entirely in Jackson's native New Zealand, concurrently with the other two parts of the trilogy.",
             'posters' : [
-              'https://m.media-amazon.com/images/W/IMAGERENDERING_521856-T1/images/I/A1yy50fuVnL._RI_.jpg',
-              'https://billpetro.com/wp-content/uploads/2001/12/LOTR-1.jpeg',
-              'https://assets-prd.ignimgs.com/2022/05/16/lotrfellowship-1652740286087.jpg',
+              'https://m.media-amazon.com/images/I/A1yy50fuVnL._RI_.jpg',
+              'https://m.media-amazon.com/images/I/A1yy50fuVnL._RI_.jpg',
+              'https://m.media-amazon.com/images/I/A1yy50fuVnL._RI_.jpg',
             ],
           },
         ],

@@ -10,22 +10,25 @@ class HomePagePostsRepository implements IHomePagePostsRepository {
 
   @override
   Future<List<List<PostBaseModel>>> getPosts() async {
-    final apiResult = await api.getPosts('MockToken', 0);
-    List<List<PostBaseModel>> result = [];
-    final list = apiResult['data']['posts'] as List<Map<String, dynamic>>;
-    for (var element in list) {
-      if (element['collection'] != null) {
-        result.add(
-          (element['collection'] as List<Map<String, dynamic>>)
-              .map((e) => PostMovieModel.fromJson(e))
-              .toList(),
-        );
-      } else if (element['year'] == null) {
-        result.add([MultiplePostModel.fromJson(element)]);
-      } else {
-        result.add([PostMovieModel.fromJson(element)]);
+    try {
+      final apiResult = await api.getPosts('MockToken', 0);
+      List<List<PostBaseModel>> result = [];
+      final list = apiResult['data']['posts'] as List<Map<String, dynamic>>;
+      for (var element in list) {
+        if (element['collection'] != null) {
+          result.add(
+            (element['collection'] as List<Map<String, dynamic>>)
+                .map((e) => PostMovieModel.fromJson(e))
+                .toList(),
+          );
+        } else if (element['year'] == null) {
+          result.add([MultiplePostModel.fromJson(element)]);
+        } else {
+          result.add([PostMovieModel.fromJson(element)]);
+        }
       }
-    }
-    return result;
+      return result;
+    } catch (e) {print(e);}
+    return [];
   }
 }

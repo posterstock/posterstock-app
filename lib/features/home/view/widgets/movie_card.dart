@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -6,15 +7,18 @@ import 'package:poster_stock/themes/build_context_extension.dart';
 import '../../models/post_movie_model.dart';
 import '../helpers/custom_bounce_physic.dart';
 import '../helpers/custom_elastic_curve.dart';
+import '../helpers/page_holder.dart';
 import 'current_post_shower.dart';
 
 class MovieCard extends StatefulWidget {
   const MovieCard({
     Key? key,
     this.movie,
+    required this.pageHolder,
   }) : super(key: key);
 
   final List<PostMovieModel>? movie;
+  final PageHolder pageHolder;
 
   @override
   State<MovieCard> createState() => _MovieCardState();
@@ -41,11 +45,7 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    physics = CustomBouncePhysic(
-      decelerationRate: ScrollDecelerationRate.normal,
-      disableSwipeRight:
-          widget.movie?.length == null || widget.movie!.length < 2,
-    );
+    physics = const HorizontalBlockedScrollPhysics();
     likeCommentController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 0),
@@ -77,6 +77,7 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     getInitData();
+    widget.pageHolder.page = (pageController?.page ?? 0).round();
     return SizedBox(
       height: (textHeight ?? 0) + 58 + 31 + titleHeight!,
       child: AnimatedBuilder(
@@ -89,6 +90,7 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
                     9 /
                     MediaQuery.of(context).size.width),
           )..addListener(() {
+              widget.pageHolder.page = (pageController?.page ?? 0).round();
               if (pageController?.page == null ||
                   pageController!.page! < 0.05) {
                 return;
@@ -186,34 +188,32 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
     );
   }
 
-  Size _textSize(String text, TextStyle style, {double? width}) {
-    final TextPainter textPainter = TextPainter(
-      text: TextSpan(text: text, style: style),
-      textDirection: TextDirection.ltr,
-    )..layout(
-        minWidth: width ?? MediaQuery.of(context).size.width - 84,
-        maxWidth: width ?? MediaQuery.of(context).size.width - 84,
-      );
-    return textPainter.size;
-  }
-
   void getInitData() {
     if (firstRun) {
       firstRun = false;
       var description = (widget.movie?[0].description ?? '').length > 280
           ? (widget.movie?[0].description ?? '').substring(0, 280)
           : (widget.movie?[0].description ?? '');
-      textHeight =
-          _textSize(description, context.textStyles.subheadline!).height < 100
-              ? 100
-              : _textSize(description, context.textStyles.subheadline!).height;
+      textHeight = TextInfoService.textSize(
+                      description,
+                      context.textStyles.subheadline!,
+                      MediaQuery.of(context).size.width - 84)
+                  .height <
+              100
+          ? 100
+          : TextInfoService.textSize(
+                  description,
+                  context.textStyles.subheadline!,
+                  MediaQuery.of(context).size.width - 84)
+              .height;
       if ((widget.movie?.length ?? 1) > 1) {
         for (PostMovieModel i in widget.movie!) {
-          var size = _textSize(
+          var size = TextInfoService.textSize(
               (i.description ?? '').length > 280
                   ? (i.description?.substring(0, 280) ?? '')
                   : (i.description ?? ''),
-              context.textStyles.subheadline!);
+              context.textStyles.subheadline!,
+              MediaQuery.of(context).size.width - 84);
           if (size.height > textHeight!) {
             textHeight = size.height;
           }
@@ -221,9 +221,11 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
         }
       }
     }
-    titleHeight = _textSize(
-            widget.movie?[0].name ?? '', context.textStyles.subheadlineBold!, width: MediaQuery.of(context).size.width - 134)
-        .height;
+    titleHeight = TextInfoService.textSize(
+      widget.movie?[0].name ?? '',
+      context.textStyles.subheadlineBold!,
+      MediaQuery.of(context).size.width - 134,
+    ).height;
   }
 }
 
@@ -251,23 +253,18 @@ class _MovieCardPageViewContent extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        GestureDetector(
-          onTap: () {
-            onPosterTap();
-          },
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10.0),
-            child: Container(
-              width: 128,
-              height: 193,
-              color: context.colors.backgroundsSecondary,
-              child: movie?.imagePath != null
-                  ? Image.network(
-                      movie!.imagePath,
-                      fit: BoxFit.cover,
-                    )
-                  : const SizedBox(),
-            ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10.0),
+          child: Container(
+            width: 128,
+            height: 193,
+            color: context.colors.backgroundsSecondary,
+            child: movie?.imagePath != null
+                ? Image.network(
+                    movie!.imagePath,
+                    fit: BoxFit.cover,
+                  )
+                : const SizedBox(),
           ),
         ),
         const SizedBox(
@@ -277,8 +274,9 @@ class _MovieCardPageViewContent extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              width:
-                  movie != null ? MediaQuery.of(context).size.width - 134 : null,
+              width: movie != null
+                  ? MediaQuery.of(context).size.width - 134
+                  : null,
               child: TextOrContainer(
                 text: movie != null ? movie!.name : null,
                 style: context.textStyles.subheadlineBold!,

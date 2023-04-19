@@ -1,3 +1,4 @@
+import 'package:poster_stock/features/home/models/comment_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 
 abstract class PostBaseModel {
@@ -6,7 +7,7 @@ abstract class PostBaseModel {
   final String time;
   final String? description;
   final List<UserModel> likes;
-  final List<UserModel> comments;
+  final List<CommentModel> comments;
 
   PostBaseModel({
     required this.name,
