@@ -28,6 +28,7 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.13.1
   auto_route_generator: ^5.0.3
   build_runner:
 
@@ -36,6 +37,14 @@ flutter_native_splash:
   android_12:
     image: "assets/images/logo.png"
     color: "#010306"
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/launcher_icon.png"
+  macos:
+    generate: true
+    image_path: "assets/launcher_icon.png"
 
 
 flutter:
@@ -68,7 +77,9 @@ flutter:
         - asset: fonts/SFProText/SF-Pro-Text-Heavy.otf
         - asset: fonts/SFProText/SF-Pro-Text-Light.otf
         - asset: fonts/SFProText/SF-Pro-Text-Medium.otf
+          weight: 500
         - asset: fonts/SFProText/SF-Pro-Text-Regular.otf
+          weight: 400
         - asset: fonts/SFProText/SF-Pro-Text-SemiBold.otf
         - asset: fonts/SFProText/SF-Pro-Text-Thin.otf
         - asset: fonts/SFProText/SF-Pro-Text-Ultralight.otf

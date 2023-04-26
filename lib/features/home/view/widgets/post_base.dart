@@ -4,7 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:poster_stock/common/widgets/custom_ink_well_base.dart';
+import 'package:poster_stock/common/helpers/custom_ink_well.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
@@ -19,7 +19,7 @@ import 'movie_card.dart';
 import 'multiple_movie_card.dart';
 
 class PostBase extends StatelessWidget {
-    PostBase({
+  PostBase({
     Key? key,
     this.post,
     this.multPost,
@@ -40,10 +40,14 @@ class PostBase extends StatelessWidget {
     }
     return Material(
       color: context.colors.backgroundsPrimary,
-      child: InkWell(
+      child: CustomInkWell(
         onTap: () {
           if (post != null) {
-            AutoRouter.of(context).push(PosterRoute(post: post![pageHolder.page]));
+            AutoRouter.of(context).push(
+              PosterRoute(
+                post: post![pageHolder.page],
+              ),
+            );
           }
         },
         child: ShimmerLoader(
@@ -94,7 +98,6 @@ class PostBase extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class UserInfoTile extends StatelessWidget {
@@ -104,12 +107,16 @@ class UserInfoTile extends StatelessWidget {
     this.user,
     this.time,
     this.showFollowButton = true,
+    this.darkBackground = false,
+    this.showSettings = true,
   }) : super(key: key);
 
   final bool loading;
   final UserModel? user;
   final String? time;
   final bool showFollowButton;
+  final bool darkBackground;
+  final bool showSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -128,8 +135,9 @@ class UserInfoTile extends StatelessWidget {
             padding: const EdgeInsets.only(top: 4.0),
             child: CircleAvatar(
               radius: 20,
-              backgroundImage:
-                  user?.imagePath != null ? NetworkImage(user!.imagePath!) : null,
+              backgroundImage: user?.imagePath != null
+                  ? NetworkImage(user!.imagePath!)
+                  : null,
               backgroundColor: avatar[Random().nextInt(3)],
               child: user?.imagePath == null && !loading
                   ? Text(
@@ -161,7 +169,10 @@ class UserInfoTile extends StatelessWidget {
                       children: [
                         TextOrContainer(
                           text: user?.name,
-                          style: context.textStyles.calloutBold,
+                          style: context.textStyles.calloutBold!.copyWith(
+                              color: darkBackground
+                                  ? context.colors.textsBackground!
+                                  : context.colors.textsPrimary),
                           emptyWidth: 146,
                           emptyHeight: 17,
                         ),
@@ -172,7 +183,10 @@ class UserInfoTile extends StatelessWidget {
                           Text(
                             time ?? '',
                             style: context.textStyles.footNote!.copyWith(
-                              color: context.colors.textsDisabled,
+                              color: darkBackground
+                                  ? context.colors.textsBackground!
+                                      .withOpacity(0.8)
+                                  : context.colors.textsDisabled,
                             ),
                           ),
                       ],
@@ -181,9 +195,12 @@ class UserInfoTile extends StatelessWidget {
                       height: !loading ? 3 : 8,
                     ),
                     TextOrContainer(
-                      text: user?.username == null ? null : '@${user!.username}',
+                      text:
+                          user?.username == null ? null : '@${user!.username}',
                       style: context.textStyles.caption1!.copyWith(
-                        color: context.colors.textsSecondary,
+                        color: darkBackground
+                            ? context.colors.textsBackground!.withOpacity(0.8)
+                            : context.colors.textsSecondary,
                       ),
                       emptyWidth: 120,
                       emptyHeight: 12,
@@ -198,13 +215,12 @@ class UserInfoTile extends StatelessWidget {
             AppTextButton(
               text: AppLocalizations.of(context)!.follow,
             ),
-          if (!loading)
+          if (!loading && showSettings)
             GestureDetector(
               onTap: () {},
               child: Container(
                 color: Colors.transparent,
-                padding:
-                    const EdgeInsets.fromLTRB(16.0, 5.0, 0.0, 5.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 5.0, 0.0, 5.0),
                 child: SvgPicture.asset(
                   'assets/icons/ic_dots.svg',
                   width: 24,
@@ -219,6 +235,7 @@ class UserInfoTile extends StatelessWidget {
       ),
     );
   }
+
   String getAvatarName(String name) {
     String result = name[0];
     for (int i = 0; i < name.length; i++) {

@@ -59,6 +59,14 @@ class AppAllTextStyles extends AppTextStyles {
             letterSpacing: -0.41,
             color: colors.textsPrimary,
           ),
+          bodyBold: TextStyle(
+            fontFamily: 'SF-Pro-Text',
+            fontWeight: FontWeight.w600,
+            fontSize: 17,
+            height: 22 / 17,
+            letterSpacing: -0.41,
+            color: colors.textsPrimary,
+          ),
           footNote: TextStyle(
             fontFamily: 'SF-Pro-Text',
             fontWeight: FontWeight.w400,
@@ -95,6 +103,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
     required this.caption2,
     required this.caption1,
     required this.bodyRegular,
+    required this.bodyBold,
     required this.footNote,
     required this.subheadlineBold,
     required this.subheadline,
@@ -107,6 +116,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   final TextStyle? caption2;
   final TextStyle? caption1;
   final TextStyle? bodyRegular;
+  final TextStyle? bodyBold;
   final TextStyle? footNote;
   final TextStyle? subheadlineBold;
   final TextStyle? subheadline;
@@ -120,6 +130,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
     final TextStyle? caption2,
     final TextStyle? caption1,
     final TextStyle? bodyRegular,
+    final TextStyle? bodyBold,
     final TextStyle? footNote,
     final TextStyle? subheadlineBold,
     final TextStyle? subheadline,
@@ -132,6 +143,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
       caption2: caption2 ?? this.caption2,
       caption1: caption1 ?? this.caption1,
       bodyRegular: bodyRegular ?? this.bodyRegular,
+      bodyBold: bodyBold ?? this.bodyBold,
       footNote: footNote ?? this.footNote,
       subheadlineBold: subheadlineBold ?? this.subheadlineBold,
       subheadline: subheadline ?? this.subheadline,
@@ -152,6 +164,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
       caption2: TextStyle.lerp(caption2, other.caption2, t),
       caption1: TextStyle.lerp(caption1, other.caption1, t),
       bodyRegular: TextStyle.lerp(bodyRegular, other.bodyRegular, t),
+      bodyBold: TextStyle.lerp(bodyBold, other.bodyBold, t),
       footNote: TextStyle.lerp(footNote, other.footNote, t),
       subheadlineBold:
           TextStyle.lerp(subheadlineBold, other.subheadlineBold, t),

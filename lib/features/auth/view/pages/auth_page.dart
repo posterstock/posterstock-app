@@ -45,7 +45,9 @@ class AuthPage extends ConsumerWidget {
         child: Stack(
           children: [
             Image.asset(
-              theme.brightness == Brightness.light ? 'assets/images/header_light.png' : 'assets/images/header_dark.png',
+              theme.brightness == Brightness.light
+                  ? 'assets/images/header_light.png'
+                  : 'assets/images/header_dark.png',
               fit: BoxFit.fitWidth,
             ),
             SafeArea(
@@ -66,14 +68,9 @@ class AuthPage extends ConsumerWidget {
                       child: Container(
                         width: 144,
                         height: 144,
-                        decoration: BoxDecoration(
-                          color: context.colors.backgroundsPrimary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(36),
-                          child: SvgPicture.asset('assets/icons/logo.svg'),
-                        ),
+                        child: Theme.of(context).brightness == Brightness.light
+                            ? SvgPicture.asset('assets/images/light_logo.svg')
+                            : SvgPicture.asset('assets/images/dark_logo.svg'),
                       ),
                     ),
                     Text(
