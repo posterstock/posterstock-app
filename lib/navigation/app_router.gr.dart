@@ -18,12 +18,13 @@ import '../features/auth/view/pages/auth_page.dart' as _i1;
 import '../features/auth/view/pages/login_page.dart' as _i3;
 import '../features/auth/view/pages/sign_up_page.dart' as _i2;
 import '../features/home/models/post_movie_model.dart' as _i12;
-import '../features/home/view/pages/home_page.dart' as _i6;
+import '../features/home/view/pages/home_page.dart' as _i7;
 import '../features/navigation_page/view/navigation_page.dart' as _i4;
-import '../features/notifications/view/pages/notifications_page.dart' as _i8;
+import '../features/notifications/view/pages/notifications_page.dart' as _i9;
 import '../features/poster/view/pages/poster_page/poster_page.dart' as _i5;
-import '../features/profile/view/pages/profile_page.dart' as _i9;
-import '../features/search/view/pages/search_page.dart' as _i7;
+import '../features/profile/models/user_details_model.dart' as _i13;
+import '../features/profile/view/pages/profile_page.dart' as _i6;
+import '../features/search/view/pages/search_page.dart' as _i8;
 
 class AppRouter extends _i10.RootStackRouter {
   AppRouter([_i11.GlobalKey<_i11.NavigatorState>? navigatorKey])
@@ -67,28 +68,33 @@ class AppRouter extends _i10.RootStackRouter {
         ),
       );
     },
+    ProfileRoute.name: (routeData) {
+      final args = routeData.argsAs<ProfileRouteArgs>(
+          orElse: () => const ProfileRouteArgs());
+      return _i10.MaterialPageX<dynamic>(
+        routeData: routeData,
+        child: _i6.ProfilePage(
+          key: args.key,
+          user: args.user,
+        ),
+      );
+    },
     HomeRoute.name: (routeData) {
       return _i10.MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const _i6.HomePage(),
+        child: const _i7.HomePage(),
       );
     },
     SearchRoute.name: (routeData) {
       return _i10.MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const _i7.SearchPage(),
+        child: const _i8.SearchPage(),
       );
     },
     NotificationsRoute.name: (routeData) {
       return _i10.MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const _i8.NotificationsPage(),
-      );
-    },
-    ProfileRoute.name: (routeData) {
-      return _i10.MaterialPageX<dynamic>(
-        routeData: routeData,
-        child: const _i9.ProfilePage(),
+        child: const _i9.NotificationsPage(),
       );
     },
   };
@@ -142,6 +148,10 @@ class AppRouter extends _i10.RootStackRouter {
         _i10.RouteConfig(
           PosterRoute.name,
           path: 'poster',
+        ),
+        _i10.RouteConfig(
+          ProfileRoute.name,
+          path: 'profile',
         ),
       ];
 }
@@ -242,7 +252,41 @@ class PosterRouteArgs {
 }
 
 /// generated route for
-/// [_i6.HomePage]
+/// [_i6.ProfilePage]
+class ProfileRoute extends _i10.PageRouteInfo<ProfileRouteArgs> {
+  ProfileRoute({
+    _i11.Key? key,
+    _i13.UserDetailsModel? user,
+  }) : super(
+          ProfileRoute.name,
+          path: 'profile',
+          args: ProfileRouteArgs(
+            key: key,
+            user: user,
+          ),
+        );
+
+  static const String name = 'ProfileRoute';
+}
+
+class ProfileRouteArgs {
+  const ProfileRouteArgs({
+    this.key,
+    this.user,
+  });
+
+  final _i11.Key? key;
+
+  final _i13.UserDetailsModel? user;
+
+  @override
+  String toString() {
+    return 'ProfileRouteArgs{key: $key, user: $user}';
+  }
+}
+
+/// generated route for
+/// [_i7.HomePage]
 class HomeRoute extends _i10.PageRouteInfo<void> {
   const HomeRoute()
       : super(
@@ -254,7 +298,7 @@ class HomeRoute extends _i10.PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [_i7.SearchPage]
+/// [_i8.SearchPage]
 class SearchRoute extends _i10.PageRouteInfo<void> {
   const SearchRoute()
       : super(
@@ -266,7 +310,7 @@ class SearchRoute extends _i10.PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [_i8.NotificationsPage]
+/// [_i9.NotificationsPage]
 class NotificationsRoute extends _i10.PageRouteInfo<void> {
   const NotificationsRoute()
       : super(
@@ -275,16 +319,4 @@ class NotificationsRoute extends _i10.PageRouteInfo<void> {
         );
 
   static const String name = 'NotificationsRoute';
-}
-
-/// generated route for
-/// [_i9.ProfilePage]
-class ProfileRoute extends _i10.PageRouteInfo<void> {
-  const ProfileRoute()
-      : super(
-          ProfileRoute.name,
-          path: 'profile',
-        );
-
-  static const String name = 'ProfileRoute';
 }

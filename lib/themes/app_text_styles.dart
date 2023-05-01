@@ -91,6 +91,14 @@ class AppAllTextStyles extends AppTextStyles {
             letterSpacing: -0.24,
             color: colors.textsPrimary,
           ),
+          headline: TextStyle(
+            fontFamily: 'SF-Pro-Text',
+            fontWeight: FontWeight.w700,
+            fontSize: 17,
+            height: 22 / 15,
+            letterSpacing: -0.41,
+            color: colors.textsPrimary,
+          ),
         );
 }
 
@@ -107,6 +115,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
     required this.footNote,
     required this.subheadlineBold,
     required this.subheadline,
+    required this.headline,
   });
 
   final TextStyle? title2;
@@ -120,6 +129,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   final TextStyle? footNote;
   final TextStyle? subheadlineBold;
   final TextStyle? subheadline;
+  final TextStyle? headline;
 
   @override
   ThemeExtension<AppTextStyles> copyWith({
@@ -134,6 +144,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
     final TextStyle? footNote,
     final TextStyle? subheadlineBold,
     final TextStyle? subheadline,
+    final TextStyle? headline,
   }) {
     return AppTextStyles(
       title2: title2 ?? this.title2,
@@ -147,6 +158,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
       footNote: footNote ?? this.footNote,
       subheadlineBold: subheadlineBold ?? this.subheadlineBold,
       subheadline: subheadline ?? this.subheadline,
+      headline: headline ?? this.headline,
     );
   }
 
@@ -169,6 +181,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
       subheadlineBold:
           TextStyle.lerp(subheadlineBold, other.subheadlineBold, t),
       subheadline: TextStyle.lerp(subheadline, other.subheadline, t),
+      headline: TextStyle.lerp(headline, other.headline, t),
     );
   }
 }

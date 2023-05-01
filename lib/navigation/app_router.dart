@@ -31,6 +31,7 @@ import '../features/auth/view/pages/auth_page.dart';
       ],
     ),
     AutoRoute(page: PosterPage, path: 'poster'),
+    AutoRoute(page: ProfilePage, path: 'profile'),
   ],
 )
 class $AppRouter {}

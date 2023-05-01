@@ -27,5 +27,7 @@
     "usernameMinLength5" : "Minimum length is 5 characters",
     "textReply" : "Write your comment",
     "reply" : "Reply",
-    "notifications" : "Notifications"
+    "notifications" : "Notifications",
+    "followers" : "followers",
+    "following" : "following"
 }

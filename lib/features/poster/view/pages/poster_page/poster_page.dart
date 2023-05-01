@@ -319,8 +319,8 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                         bottom: 20,
                         left: 16,
                         right: 16,
-                        child: IgnorePointer(
-                          ignoring: true,
+                        child: SizedBox(
+                          //ignoring: true,
                           child: Transform.translate(
                             offset: Offset(
                                 0, -imageHeight! + posterController!.value),

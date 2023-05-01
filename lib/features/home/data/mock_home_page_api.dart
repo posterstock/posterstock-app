@@ -17,6 +17,7 @@ class MockHomePageApi implements IHomePageApi {
                 'user': {
                   'name': 'Mikhail Kiva',
                   'username': 'itsmishakiva',
+                  'avatar' : 'https://avatars.githubusercontent.com/u/62376075?v=4',
                   'followed': true
                 },
                 'time': '12:03',

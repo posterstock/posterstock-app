@@ -10,7 +10,7 @@ class MockNotificationsService implements INotificationsService {
         'notifications': [
           {
             'user': {
-              'name': 'Mikhail Kiva',
+              'name': 'Mikhail',
               'username': 'itsmishakiva',
               'followed': true
             },
