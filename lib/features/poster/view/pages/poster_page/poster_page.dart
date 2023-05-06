@@ -162,9 +162,9 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                                     child: UserInfoTile(
                                       showFollowButton: false,
                                       user:
-                                          widget.post.comments[index % 2].user,
+                                          widget.post.comments[index].user,
                                       time:
-                                          widget.post.comments[index % 2].time,
+                                          widget.post.comments[index].time,
                                     ),
                                   ),
                                   const SizedBox(height: 12),
@@ -179,7 +179,7 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              widget.post.comments[index % 2]
+                                              widget.post.comments[index]
                                                   .comment,
                                               style: context
                                                   .textStyles.subheadline,
@@ -369,36 +369,36 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
               child: SizedBox(
                 height: 42,
                 child: AnimatedBuilder(
-                    animation: posterController!,
-                    builder: (context, child) {
-                      return Row(
-                        children: [
-                          CustomBackButton(
-                            color: Color.lerp(
-                              context.colors.iconsDefault,
-                              context.colors.iconsBackground,
-                              posterController!.value / imageHeight!,
+                  animation: posterController!,
+                  builder: (context, child) {
+                    return Row(
+                      children: [
+                        CustomBackButton(
+                          color: Color.lerp(
+                            context.colors.iconsDefault,
+                            context.colors.iconsBackground,
+                            posterController!.value / imageHeight!,
+                          ),
+                        ),
+                        const Spacer(),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: SvgPicture.asset(
+                            'assets/icons/ic_dots.svg',
+                            colorFilter: ColorFilter.mode(
+                              Color.lerp(
+                                context.colors.iconsDefault,
+                                context.colors.iconsBackground,
+                                posterController!.value / imageHeight!,
+                              )!,
+                              BlendMode.srcIn,
                             ),
                           ),
-                          const Spacer(),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: SvgPicture.asset(
-                              'assets/icons/ic_dots.svg',
-                              colorFilter: ColorFilter.mode(
-                                Color.lerp(
-                                  context.colors.iconsDefault,
-                                  context.colors.iconsBackground,
-                                  posterController!.value / imageHeight!,
-                                )!,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    }),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
             AnimatedBuilder(

@@ -36,8 +36,9 @@ class PostMovieModel extends PostBaseModel {
               .toList() ??
           [],
       comments: (json['comments'] as List<Map<String, Object?>>?)
-          ?.map<CommentModel>((e) => CommentModel.fromJson(e))
-          .toList() ?? [],
+              ?.map<CommentModel>((e) => CommentModel.fromJson(e))
+              .toList() ??
+          [],
       description: json['description'] as String,
     );
   }

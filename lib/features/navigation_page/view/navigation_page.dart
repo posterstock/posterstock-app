@@ -19,9 +19,9 @@ class NavigationPage extends StatelessWidget {
     return AutoTabsRouter.pageView(
       physics: const NeverScrollableScrollPhysics(),
       routes: [
-        HomeRoute(),
+        const HomeRoute(),
         SearchRoute(),
-        NotificationsRoute(),
+        const NotificationsRoute(),
         ProfileRoute(),
       ],
       builder: (context, child, _) {

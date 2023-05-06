@@ -17,7 +17,8 @@ class MockHomePageApi implements IHomePageApi {
                 'user': {
                   'name': 'Mikhail Kiva',
                   'username': 'itsmishakiva',
-                  'avatar' : 'https://avatars.githubusercontent.com/u/62376075?v=4',
+                  'avatar':
+                      'https://avatars.githubusercontent.com/u/62376075?v=4',
                   'followed': true
                 },
                 'time': '12:03',
@@ -41,20 +42,21 @@ class MockHomePageApi implements IHomePageApi {
                 ],
                 'comments': [
                   {
-                    'user' : {
+                    'user': {
                       'name': 'Mikhail Kiva',
                       'username': 'itsmishakiva',
                     },
-                    'comment' : 'I did not hit her, its not true, i did not hit her, i did noot',
-                    'time' : '13:25',
+                    'comment':
+                        'I did not hit her, its not true, i did not hit her, i did noot',
+                    'time': '13:25',
                   },
                   {
-                    'user' : {
+                    'user': {
                       'name': 'Mikhail Kiva',
                       'username': 'itsmishakiva',
                     },
-                    'comment' : 'Oh, Hi, Mark',
-                    'time' : '13:25',
+                    'comment': 'Oh, Hi, Mark',
+                    'time': '13:25',
                   },
                 ],
                 'description':
@@ -88,8 +90,7 @@ class MockHomePageApi implements IHomePageApi {
                     'username': 'null',
                   },
                 ],
-                'description':
-                    "Lorem Ipsum dolorum bla bla, great movie",
+                'description': "Lorem Ipsum dolorum bla bla, great movie",
               },
             ],
           },
@@ -124,68 +125,72 @@ class MockHomePageApi implements IHomePageApi {
             ],
             'comments': [
               {
-                'user' : {
+                'user': {
                   'name': 'Mikhail Kiva',
                   'username': 'itsmishakiva',
                 },
-                'comment' : 'I did not hit her, its not true, i did not hit her, i did noot',
-                'time' : '13:25',
+                'comment':
+                    'I did not hit her, its not true, i did not hit her, i did noot',
+                'time': '13:25',
               },
               {
-                'user' : {
+                'user': {
                   'name': 'Mikhail Kiva',
                   'username': 'itsmishakiva',
                 },
-                'comment' : 'Oh, Hi, Mark',
-                'time' : '13:25',
+                'comment': 'Oh, Hi, Mark',
+                'time': '13:25',
               },
               {
-                'user' : {
+                'user': {
                   'name': 'Mikhail Kiva',
                   'username': 'itsmishakiva',
                 },
-                'comment' : 'I did not hit her, its not true, i did not hit her, i did noot',
-                'time' : '13:25',
+                'comment':
+                    'I did not hit her, its not true, i did not hit her, i did noot',
+                'time': '13:25',
               },
               {
-                'user' : {
+                'user': {
                   'name': 'Mikhail Kiva',
                   'username': 'itsmishakiva',
                 },
-                'comment' : 'Oh, Hi, Mark',
-                'time' : '13:25',
+                'comment': 'Oh, Hi, Mark',
+                'time': '13:25',
               },
               {
-                'user' : {
+                'user': {
                   'name': 'Mikhail Kiva',
                   'username': 'itsmishakiva',
                 },
-                'comment' : 'I did not hit her, its not true, i did not hit her, i did noot',
-                'time' : '13:25',
+                'comment':
+                    'I did not hit her, its not true, i did not hit her, i did noot',
+                'time': '13:25',
               },
               {
-                'user' : {
+                'user': {
                   'name': 'Mikhail Kiva',
                   'username': 'itsmishakiva',
                 },
-                'comment' : 'Oh, Hi, Mark',
-                'time' : '13:25',
+                'comment': 'Oh, Hi, Mark',
+                'time': '13:25',
               },
               {
-                'user' : {
+                'user': {
                   'name': 'Mikhail Kiva',
                   'username': 'itsmishakiva',
                 },
-                'comment' : 'I did not hit her, its not true, i did not hit her, i did noot',
-                'time' : '13:25',
+                'comment':
+                    'I did not hit her, its not true, i did not hit her, i did noot',
+                'time': '13:25',
               },
               {
-                'user' : {
+                'user': {
                   'name': 'Mikhail Kiva',
                   'username': 'itsmishakiva',
                 },
-                'comment' : 'Oh, Hi, Mark',
-                'time' : '13:25',
+                'comment': 'Oh, Hi, Mark',
+                'time': '13:25',
               },
             ],
             'description':
@@ -195,7 +200,7 @@ class MockHomePageApi implements IHomePageApi {
             'name': 'The Lord of the Rings: The Fellowship of the Ring',
             'year': 2001,
             'poster':
-            'https://m.media-amazon.com/images/I/A1yy50fuVnL._RI_.jpg',
+                'https://m.media-amazon.com/images/I/A1yy50fuVnL._RI_.jpg',
             'user': {
               'name': 'Mikhail',
               'username': 'itsmishakiva',
@@ -221,7 +226,7 @@ class MockHomePageApi implements IHomePageApi {
               },
             ],
             'description':
-            "Set in Middle-earth, the story tells of the Dark Lord Sauron, who seeks the One Ring, which contains part of his might, to return to power. The Ring has found its way to the young hobbit Frodo Baggins. The fate of Middle-earth hangs in the balance as Frodo and eight companions (who form the Fellowship of the Ring) begin their journey to Mount Doom in the land of Mordor, the only place where the Ring can be destroyed. The Fellowship of the Ring was financed and distributed by American studio New Line Cinema, but filmed and edited entirely in Jackson's native New Zealand, concurrently with the other two parts of the trilogy.",
+                "Set in Middle-earth, the story tells of the Dark Lord Sauron, who seeks the One Ring, which contains part of his might, to return to power. The Ring has found its way to the young hobbit Frodo Baggins. The fate of Middle-earth hangs in the balance as Frodo and eight companions (who form the Fellowship of the Ring) begin their journey to Mount Doom in the land of Mordor, the only place where the Ring can be destroyed. The Fellowship of the Ring was financed and distributed by American studio New Line Cinema, but filmed and edited entirely in Jackson's native New Zealand, concurrently with the other two parts of the trilogy.",
           },
           {
             'name': 'The Lord of the Rings: The Fellowship of the Ring',
@@ -241,9 +246,79 @@ class MockHomePageApi implements IHomePageApi {
                 'username': 'ianrakeda',
               },
             ],
+            'comments': [
+              {
+                'user': {
+                  'name': 'Mikhail Kiva',
+                  'username': 'itsmishakiva',
+                },
+                'comment':
+                'I did not hit her, its not true, i did not hit her, i did noot',
+                'time': '13:25',
+              },
+              {
+                'user': {
+                  'name': 'Mikhail Kiva',
+                  'username': 'itsmishakiva',
+                },
+                'comment': 'Oh, Hi, Mark',
+                'time': '13:25',
+              },
+              {
+                'user': {
+                  'name': 'Mikhail Kiva',
+                  'username': 'itsmishakiva',
+                },
+                'comment':
+                'I did not hit her, its not true, i did not hit her, i did noot',
+                'time': '13:25',
+              },
+              {
+                'user': {
+                  'name': 'Mikhail Kiva',
+                  'username': 'itsmishakiva',
+                },
+                'comment': 'Oh, Hi, Mark',
+                'time': '13:25',
+              },
+              {
+                'user': {
+                  'name': 'Mikhail Kiva',
+                  'username': 'itsmishakiva',
+                },
+                'comment':
+                'I did not hit her, its not true, i did not hit her, i did noot',
+                'time': '13:25',
+              },
+              {
+                'user': {
+                  'name': 'Mikhail Kiva',
+                  'username': 'itsmishakiva',
+                },
+                'comment': 'Oh, Hi, Mark',
+                'time': '13:25',
+              },
+              {
+                'user': {
+                  'name': 'Mikhail Kiva',
+                  'username': 'itsmishakiva',
+                },
+                'comment':
+                'I did not hit her, its not true, i did not hit her, i did noot',
+                'time': '13:25',
+              },
+              {
+                'user': {
+                  'name': 'Mikhail Kiva',
+                  'username': 'itsmishakiva',
+                },
+                'comment': 'Oh, Hi, Mark',
+                'time': '13:25',
+              },
+            ],
             'description':
-            "Set in Middle-earth, the story tells of the Dark Lord Sauron, who seeks the One Ring, which contains part of his might, to return to power. The Ring has found its way to the young hobbit Frodo Baggins. The fate of Middle-earth hangs in the balance as Frodo and eight companions (who form the Fellowship of the Ring) begin their journey to Mount Doom in the land of Mordor, the only place where the Ring can be destroyed. The Fellowship of the Ring was financed and distributed by American studio New Line Cinema, but filmed and edited entirely in Jackson's native New Zealand, concurrently with the other two parts of the trilogy.",
-            'posters' : [
+                "Set in Middle-earth, the story tells of the Dark Lord Sauron, who seeks the One Ring, which contains part of his might, to return to power. The Ring has found its way to the young hobbit Frodo Baggins. The fate of Middle-earth hangs in the balance as Frodo and eight companions (who form the Fellowship of the Ring) begin their journey to Mount Doom in the land of Mordor, the only place where the Ring can be destroyed. The Fellowship of the Ring was financed and distributed by American studio New Line Cinema, but filmed and edited entirely in Jackson's native New Zealand, concurrently with the other two parts of the trilogy.",
+            'posters': [
               'https://m.media-amazon.com/images/I/A1yy50fuVnL._RI_.jpg',
               'https://m.media-amazon.com/images/I/A1yy50fuVnL._RI_.jpg',
               'https://m.media-amazon.com/images/I/A1yy50fuVnL._RI_.jpg',

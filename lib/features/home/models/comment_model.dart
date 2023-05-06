@@ -9,7 +9,7 @@ class CommentModel {
     required this.comment,
     required this.user,
     required this.time,
-});
+  });
 
   factory CommentModel.fromJson(Map<String, Object?> json) {
     return CommentModel(

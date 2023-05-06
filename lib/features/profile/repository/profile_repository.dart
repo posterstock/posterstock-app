@@ -24,5 +24,4 @@ class ProfileRepository implements IProfileRepository {
     // TODO: implement getProfilePosts
     throw UnimplementedError();
   }
-
 }

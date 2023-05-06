@@ -87,10 +87,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                           AutoRouter.of(context).pop();
                         },
                         child: Container(
-                            color: Colors.transparent,
-                            padding: const EdgeInsets.only(left: 7.0, right: 40.0),
-                            child:
-                                SvgPicture.asset('assets/icons/back_icon.svg', width: 18,),),
+                          color: Colors.transparent,
+                          padding:
+                              const EdgeInsets.only(left: 7.0, right: 40.0),
+                          child: SvgPicture.asset(
+                            'assets/icons/back_icon.svg',
+                            width: 18,
+                          ),
+                        ),
                       ),
                     ),
               flexibleSpace: Padding(
@@ -313,7 +317,7 @@ class _ProfileTabsState extends State<ProfileTabs>
     return TabBarView(
       controller: widget.controller,
       children: [
-        CollectionView(),
+        PostsCollectionView(),
         if (widget.controller.length == 3) const SizedBox(),
         const SizedBox(),
       ],
@@ -321,8 +325,8 @@ class _ProfileTabsState extends State<ProfileTabs>
   }
 }
 
-class CollectionView extends ConsumerWidget {
-  const CollectionView({Key? key}) : super(key: key);
+class PostsCollectionView extends ConsumerWidget {
+  const PostsCollectionView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -353,18 +357,29 @@ class CollectionView extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       itemCount: movies.length,
       itemBuilder: (context, index) {
-        return CollectionTile(movie: movies[index]);
+        return PostsCollectionTile(
+          imagePath: movies[index].imagePath,
+          name: movies[index].name,
+          year: movies[index].year.toString(),
+          description: movies[index].description,
+        );
       },
     );
   }
 }
 
-class CollectionTile extends StatelessWidget {
-  const CollectionTile({
+class PostsCollectionTile extends StatelessWidget {
+  const PostsCollectionTile({
     Key? key,
-    required this.movie,
+    required this.name,
+    required this.year,
+    required this.imagePath,
+    this.description,
   }) : super(key: key);
-  final PostMovieModel movie;
+  final String name;
+  final String year;
+  final String imagePath;
+  final String? description;
 
   @override
   Widget build(BuildContext context) {
@@ -373,13 +388,17 @@ class CollectionTile extends StatelessWidget {
         GestureDetector(
           onLongPress: () {
             showDialog(
-                context: context,
-                useSafeArea: false,
-                builder: (context) {
-                  return PosterImageDialog(
-                    movie: movie,
-                  );
-                });
+              context: context,
+              useSafeArea: false,
+              builder: (context) {
+                return PosterImageDialog(
+                  imagePath: imagePath,
+                  name: name,
+                  year: year,
+                  description: description,
+                );
+              },
+            );
           },
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
@@ -387,7 +406,7 @@ class CollectionTile extends StatelessWidget {
               color: context.colors.buttonsPrimary,
               height: 160,
               child: Image.network(
-                movie.imagePath,
+                imagePath,
                 fit: BoxFit.cover,
               ),
             ),
@@ -395,7 +414,7 @@ class CollectionTile extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          movie.name,
+          name,
           textAlign: TextAlign.center,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -405,7 +424,7 @@ class CollectionTile extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          movie.year.toString(),
+          year,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: context.textStyles.caption1!.copyWith(
@@ -420,10 +439,16 @@ class CollectionTile extends StatelessWidget {
 class PosterImageDialog extends StatefulWidget {
   const PosterImageDialog({
     super.key,
-    required this.movie,
+    required this.name,
+    required this.year,
+    required this.imagePath,
+    this.description,
   });
 
-  final PostMovieModel movie;
+  final String name;
+  final String year;
+  final String imagePath;
+  final String? description;
 
   @override
   State<PosterImageDialog> createState() => _PosterImageDialogState();
@@ -453,70 +478,74 @@ class _PosterImageDialogState extends State<PosterImageDialog>
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
         child: Container(
-            color: Colors.white.withOpacity(0.2),
-            alignment: Alignment.center,
-            child: AnimatedBuilder(
-              animation: controller,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: controller.value,
-                  child: child,
-                );
-              },
-              child: Transform.translate(
-                offset: const Offset(0, -80),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Container(
-                        color: context.colors.buttonsPrimary,
-                        height: 160,
-                        width: 106,
-                        child: Image.network(
-                          widget.movie.imagePath,
-                          fit: BoxFit.cover,
-                        ),
+          color: Colors.white.withOpacity(0.2),
+          alignment: Alignment.center,
+          child: AnimatedBuilder(
+            animation: controller,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: controller.value,
+                child: child,
+              );
+            },
+            child: Transform.translate(
+              offset: const Offset(0, -80),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Container(
+                      color: context.colors.buttonsPrimary,
+                      height: 160,
+                      width: 106,
+                      child: Image.network(
+                        widget.imagePath,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    const SizedBox(
-                      height: 20,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(18.0),
+                    margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                    decoration: BoxDecoration(
+                      color: context.colors.backgroundsPrimary,
+                      borderRadius: BorderRadius.circular(13.0),
                     ),
-                    Container(
-                        padding: EdgeInsets.all(18.0),
-                        margin: EdgeInsets.symmetric(horizontal: 16.0),
-                        decoration: BoxDecoration(
-                          color: context.colors.backgroundsPrimary,
-                          borderRadius: BorderRadius.circular(13.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.name,
+                          style: context.textStyles.subheadlineBold,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.movie.name,
-                              style: context.textStyles.subheadlineBold,
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              widget.movie.year.toString(),
-                              style: context.textStyles.caption1!.copyWith(
-                                color: context.colors.textsSecondary,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              (widget.movie.description ?? '').length > 280
-                                  ? widget.movie.description!.substring(0, 280)
-                                  : (widget.movie.description ?? ''),
-                              style: context.textStyles.subheadline,
-                            ),
-                          ],
-                        ))
-                  ],
-                ),
+                        const SizedBox(height: 5),
+                        Text(
+                          widget.year,
+                          style: context.textStyles.caption1!.copyWith(
+                            color: context.colors.textsSecondary,
+                          ),
+                        ),
+                        if (widget.description != null)
+                        const SizedBox(height: 12),
+                        if (widget.description != null)
+                        Text(
+                          widget.description!.length > 280
+                              ? widget.description!.substring(0, 280)
+                              : widget.description!,
+                          style: context.textStyles.subheadline,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            )),
+            ),
+          ),
+        ),
       ),
     );
   }

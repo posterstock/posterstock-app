@@ -106,7 +106,9 @@ class HomePage extends ConsumerWidget {
                               );
                             } else {
                               return PostBase(
-                                post: (posts[index]).map((e) => (e as PostMovieModel)).toList(),
+                                post: (posts[index])
+                                    .map((e) => (e as PostMovieModel))
+                                    .toList(),
                               );
                             }
                           }

@@ -28,7 +28,9 @@ class HomePagePostsRepository implements IHomePagePostsRepository {
         }
       }
       return result;
-    } catch (e) {print(e);}
+    } catch (e) {
+      print(e);
+    }
     return [];
   }
 }

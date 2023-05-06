@@ -20,6 +20,9 @@ class AppTextField extends StatefulWidget {
     this.tickOnSuccess = false,
     this.isUsername = false,
     this.keyboardType,
+    this.crossPadding,
+    this.crossButton,
+    this.leading,
   }) : super(key: key);
   final String hint;
   final Function(String)? onSubmitted;
@@ -33,6 +36,9 @@ class AppTextField extends StatefulWidget {
   final bool hasError;
   final bool isUsername;
   final TextInputType? keyboardType;
+  final EdgeInsets? crossPadding;
+  final Widget? crossButton;
+  final Widget? leading;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -83,12 +89,19 @@ class _AppTextFieldState extends State<AppTextField> {
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(horizontal: 18),
               isDense: true,
-              prefix: Text(
-                widget.isUsername ? '@' : '',
-                style: context.textStyles.callout!.copyWith(
-                  color: Colors.transparent,
-                ),
+              prefixIcon: Icon(
+                Icons.search,
+                color: context.colors.iconsDisabled,
+                size: 22,
               ),
+              prefix: widget.leading == null
+                  ? null
+                  : Text(
+                      widget.isUsername ? '@' : '',
+                      style: context.textStyles.callout!.copyWith(
+                        color: Colors.transparent,
+                      ),
+                    ),
               suffixIcon: (widget.tickOnSuccess &&
                       (widget.controller ?? nullController).text.length > 1 &&
                       !widget.hasError
@@ -117,16 +130,18 @@ class _AppTextFieldState extends State<AppTextField> {
                           child: Container(
                             color: Colors.transparent,
                             child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: SvgPicture.asset(
-                                'assets/icons/ic_close.svg',
-                                colorFilter: ColorFilter.mode(
-                                  widget.hasError
-                                      ? context.colors.textsError!
-                                      : context.colors.iconsDisabled!,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
+                              padding: widget.crossPadding ??
+                                  const EdgeInsets.all(16.0),
+                              child: widget.crossButton ??
+                                  SvgPicture.asset(
+                                    'assets/icons/ic_close.svg',
+                                    colorFilter: ColorFilter.mode(
+                                      widget.hasError
+                                          ? context.colors.textsError!
+                                          : context.colors.iconsDisabled!,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
                             ),
                           ),
                         )

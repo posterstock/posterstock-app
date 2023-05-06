@@ -50,6 +50,13 @@ class PostBase extends StatelessWidget {
               ),
             );
           }
+          if (multPost != null) {
+            AutoRouter.of(context).push(
+              CollectionRoute(
+                post: multPost!,
+              ),
+            );
+          }
         },
         child: ShimmerLoader(
           loaded: post != null || multPost != null,
@@ -149,7 +156,10 @@ class UserInfoTile extends StatelessWidget {
           ));
         },
         child: IgnorePointer(
-          ignoring: true,
+          ignoring:
+              (!(user?.followed ?? true) && (!loading) && showFollowButton)
+                  ? false
+                  : true,
           child: Container(
             color: Colors.transparent,
             child: Row(
@@ -224,7 +234,8 @@ class UserInfoTile extends StatelessWidget {
                                 : '@${user!.username}',
                             style: context.textStyles.caption1!.copyWith(
                               color: darkBackground
-                                  ? context.colors.textsBackground!.withOpacity(0.8)
+                                  ? context.colors.textsBackground!
+                                      .withOpacity(0.8)
                                   : context.colors.textsSecondary,
                             ),
                             emptyWidth: 120,
@@ -239,6 +250,7 @@ class UserInfoTile extends StatelessWidget {
                 if (!(user?.followed ?? true) && (!loading) && showFollowButton)
                   AppTextButton(
                     text: AppLocalizations.of(context)!.follow,
+                    onTap: () {},
                   ),
                 if (!loading && showSettings)
                   GestureDetector(

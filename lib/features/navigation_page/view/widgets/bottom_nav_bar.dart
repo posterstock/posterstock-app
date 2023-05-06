@@ -40,7 +40,8 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                 children: [
                   BottomNavBarItem(
                     onTap: () {
-                      if (AutoTabsRouter.of(context).activeIndex == 0 && homeScrollPosition.offset > 10) {
+                      if (AutoTabsRouter.of(context).activeIndex == 0 &&
+                          homeScrollPosition.offset > 10) {
                         homeScrollPosition.animateTo(
                           0,
                           duration: const Duration(milliseconds: 300),

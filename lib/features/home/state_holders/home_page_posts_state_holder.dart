@@ -6,7 +6,8 @@ final homePagePostsStateHolderProvider =
   (ref) => HomePagePostsStateHolder(null),
 );
 
-class HomePagePostsStateHolder extends StateNotifier<List<List<PostBaseModel>>?> {
+class HomePagePostsStateHolder
+    extends StateNotifier<List<List<PostBaseModel>>?> {
   HomePagePostsStateHolder(super.state);
 
   void updateState(List<List<PostBaseModel>> posts) {

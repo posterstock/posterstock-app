@@ -52,7 +52,9 @@ class MultipleMovieCard extends StatelessWidget {
             height: 15,
           ),
           Text(
-            (post.description ?? '').length > 140 ? post.description!.substring(0, 140) : (post.description ?? ''),
+            (post.description ?? '').length > 140
+                ? post.description!.substring(0, 140)
+                : (post.description ?? ''),
             style: context.textStyles.callout!.copyWith(
               color: context.colors.textsPrimary,
             ),

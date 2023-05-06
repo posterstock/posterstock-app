@@ -6,9 +6,9 @@ class TextInfoService {
       text: TextSpan(text: text, style: style),
       textDirection: TextDirection.ltr,
     )..layout(
-      minWidth: width,
-      maxWidth: width,
-    );
+        minWidth: width,
+        maxWidth: width,
+      );
     return textPainter.size;
   }
 }

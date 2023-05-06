@@ -21,9 +21,10 @@ class AppTextButton extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(33),
       child: Material(
-        color: backgroundColor ?? ( disabled
-            ? context.colors.buttonsDisabled!.withOpacity(0.4)
-            : context.colors.buttonsPrimary),
+        color: backgroundColor ??
+            (disabled
+                ? context.colors.buttonsDisabled!.withOpacity(0.4)
+                : context.colors.buttonsPrimary),
         child: InkWell(
           highlightColor: context.colors.textsPrimary!.withOpacity(0.2),
           onTap: disabled ? null : (onTap ?? () {}),

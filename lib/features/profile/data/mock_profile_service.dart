@@ -4,16 +4,16 @@ class MockProfileService implements IProfileService {
   @override
   Future<Map<String, dynamic>> getProfileInfo(String token, int id) async {
     return {
-      'data' : {
-        'username' : 'itsmishakiva',
-        'name' : 'Misha Kiva',
-        'avatar' : 'https://avatars.githubusercontent.com/u/62376075?v=4',
-        'followed' : true,
-        'description' : 'Hello There!',
-        'following' : 15,
-        'followers' : 250,
-        'posters' : 13,
-        'lists' : 10
+      'data': {
+        'username': 'itsmishakiva',
+        'name': 'Misha Kiva',
+        'avatar': 'https://avatars.githubusercontent.com/u/62376075?v=4',
+        'followed': true,
+        'description': 'Hello There!',
+        'following': 15,
+        'followers': 250,
+        'posters': 13,
+        'lists': 10
       },
     };
   }
@@ -29,5 +29,4 @@ class MockProfileService implements IProfileService {
     // TODO: implement getProfilePosts
     throw UnimplementedError();
   }
-
 }

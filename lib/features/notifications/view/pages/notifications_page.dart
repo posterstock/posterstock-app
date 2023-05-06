@@ -18,7 +18,8 @@ class NotificationsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifications = ref.watch(notificationsStateHolderProvider);
-    if (notifications == null) ref.read(notificationsControllerProvider).getNotificationsData();
+    if (notifications == null)
+      ref.read(notificationsControllerProvider).getNotificationsData();
     final controller = ScrollController();
     bool keepOffset = false;
     return NotificationListener<ScrollUpdateNotification>(
@@ -32,7 +33,10 @@ class NotificationsPage extends ConsumerWidget {
           Future.delayed(const Duration(milliseconds: 300), () {
             keepOffset = true;
           });
-          ref.read(notificationsControllerProvider).getNotificationsData().then((value) {
+          ref
+              .read(notificationsControllerProvider)
+              .getNotificationsData()
+              .then((value) {
             keepOffset = false;
           });
         }
@@ -66,7 +70,8 @@ class NotificationsPage extends ConsumerWidget {
               ),
             ),
             CustomScrollView(
-              physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+              physics: AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics()),
               controller: controller,
               slivers: [
                 SliverAppBar(
@@ -100,7 +105,9 @@ class NotificationsPage extends ConsumerWidget {
                         },
                       );
                     },
-                    childCount: notifications == null ? 0 : (notifications.isEmpty ? 1 : notifications.length),
+                    childCount: notifications == null
+                        ? 0
+                        : (notifications.isEmpty ? 1 : notifications.length),
                   ),
                 )
               ],
@@ -173,7 +180,9 @@ class NotificationTile extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 8,),
+                    const SizedBox(
+                      height: 8,
+                    ),
                     Text(
                       notification.time,
                       style: context.textStyles.caption1!.copyWith(

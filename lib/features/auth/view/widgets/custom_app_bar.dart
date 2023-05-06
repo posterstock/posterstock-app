@@ -35,7 +35,7 @@ class CustomAppBar extends StatelessWidget {
 
 class CustomBackButton extends StatelessWidget {
   const CustomBackButton({
-  this.color,
+    this.color,
     super.key,
   });
 

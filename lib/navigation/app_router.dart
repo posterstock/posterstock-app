@@ -9,6 +9,7 @@ import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/features/search/view/pages/search_page.dart';
 
 import '../features/auth/view/pages/auth_page.dart';
+import '../features/collection/view/collection_page.dart';
 
 @MaterialAutoRouter(
   replaceInRouteName: 'Page,Route',
@@ -31,6 +32,7 @@ import '../features/auth/view/pages/auth_page.dart';
       ],
     ),
     AutoRoute(page: PosterPage, path: 'poster'),
+    AutoRoute(page: CollectionPage, path: 'collection'),
     AutoRoute(page: ProfilePage, path: 'profile'),
   ],
 )

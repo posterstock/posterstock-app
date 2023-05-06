@@ -28,12 +28,13 @@ class MultiplePostModel extends PostBaseModel {
       author: UserModel.fromJson(json['user'] as Map<String, Object?>),
       time: json['time'] as String,
       likes: (json['likes'] as List<Map<String, Object?>>?)
-          ?.map<UserModel>((e) => UserModel.fromJson(e))
-          .toList() ??
+              ?.map<UserModel>((e) => UserModel.fromJson(e))
+              .toList() ??
           [],
       comments: (json['comments'] as List<Map<String, Object?>>?)
-          ?.map<CommentModel>((e) => CommentModel.fromJson(e))
-          .toList() ?? [],
+              ?.map<CommentModel>((e) => CommentModel.fromJson(e))
+              .toList() ??
+          [],
       description: json['description'] as String,
       posters: json['posters'] as List<String>,
     );
