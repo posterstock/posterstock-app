@@ -7,13 +7,16 @@ class CustomScaffold extends StatelessWidget {
     Key? key,
     required this.child,
     this.bottomNavBar,
+    this.backgroundColor,
   }) : super(key: key);
   final Widget child;
   final Widget? bottomNavBar;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor ?? context.colors.backgroundsPrimary,
       resizeToAvoidBottomInset: false,
       bottomNavigationBar: bottomNavBar,
       body: AnnotatedRegion<SystemUiOverlayStyle>(

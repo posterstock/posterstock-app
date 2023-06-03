@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
@@ -8,14 +9,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
+import 'package:poster_stock/common/widgets/list_grid_widget.dart';
+import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
+import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
+import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
+import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../../../common/services/text_info_service.dart';
+import '../../../navigation_page/controller/menu_controller.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({
@@ -32,6 +39,12 @@ class ProfilePage extends ConsumerStatefulWidget {
 class _ProfilePageState extends ConsumerState<ProfilePage>
     with SingleTickerProviderStateMixin {
   TabController? tabController;
+
+  static const List<Color> avatar = [
+    Color(0xfff09a90),
+    Color(0xfff3d376),
+    Color(0xff92bdf4),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -93,10 +106,47 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                           child: SvgPicture.asset(
                             'assets/icons/back_icon.svg',
                             width: 18,
+                            colorFilter: ColorFilter.mode(
+                                context.colors.iconsDefault!, BlendMode.srcIn),
                           ),
                         ),
                       ),
                     ),
+              actions: [
+                Align(
+                  alignment: Alignment.topRight,
+                  child: GestureDetector(
+                    onTap: () {
+                      if (profile?.mySelf == true) {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return const MyProfileDialog();
+                          },
+                          backgroundColor: Colors.transparent,
+                        );
+                      } else {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) => OtherProfileDialog(
+                            user: profile!,
+                          ),
+                          backgroundColor: Colors.transparent,
+                        );
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: SvgPicture.asset(
+                        'assets/icons/ic_dots_vertical.svg',
+                        width: 12,
+                        colorFilter: ColorFilter.mode(
+                            context.colors.iconsDefault!, BlendMode.srcIn),
+                      ),
+                    ),
+                  ),
+                )
+              ],
               flexibleSpace: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
@@ -115,13 +165,22 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                       children: [
                         CircleAvatar(
                           radius: 40,
-                          backgroundColor: context.colors.backgroundsSecondary,
                           backgroundImage: profile?.imagePath == null
                               ? null
                               : Image.network(
                                   profile!.imagePath!,
                                   fit: BoxFit.cover,
                                 ).image,
+                          backgroundColor: avatar[Random().nextInt(3)],
+                          child: profile?.imagePath == null &&
+                                  profile?.name != null
+                              ? Text(
+                                  getAvatarName(profile!.name).toUpperCase(),
+                                  style: context.textStyles.title3!.copyWith(
+                                    color: context.colors.textsBackground,
+                                  ),
+                                )
+                              : const SizedBox(),
                         ),
                         const SizedBox(
                           width: 38,
@@ -259,7 +318,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
               pinned: true,
               leading: const SizedBox(),
               flexibleSpace: tabController == null
-                  ? SizedBox()
+                  ? const SizedBox()
                   : TabBar(
                       dividerColor: Colors.transparent,
                       controller: tabController,
@@ -293,12 +352,23 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
           ];
         },
         body: tabController == null
-            ? SizedBox()
+            ? const SizedBox()
             : ProfileTabs(
                 controller: tabController!,
               ),
       ),
     );
+  }
+
+  String getAvatarName(String name) {
+    String result = name[0];
+    for (int i = 0; i < name.length; i++) {
+      if (name[i] == ' ' && i != name.length - 1) {
+        result += name[i + 1];
+        break;
+      }
+    }
+    return result;
   }
 }
 
@@ -312,14 +382,94 @@ class ProfileTabs extends StatefulWidget {
 
 class _ProfileTabsState extends State<ProfileTabs>
     with SingleTickerProviderStateMixin {
+  final lists = List.generate(
+    20,
+    (index) => MultiplePostModel(
+        posters: [
+          'https://m.media-amazon.com/images/I/61YwNp4JaPL._AC_UF1000,1000_QL80_.jpg',
+          'https://upload.wikimedia.org/wikipedia/commons/5/51/This_Gun_for_Hire_%281942%29_poster.jpg',
+          'https://media1.popsugar-assets.com/files/thumbor/1TbaTW9g1m1b4wQ3eMvy1dzsv14/fit-in/728xorig/filters:format_auto-!!-:strip_icc-!!-/2023/04/04/606/n/1922283/d37d2acbdda350b9_BARBIE_Character_RYAN_InstaVert_1638x2048_DOM/i/Ryan-Gosling-Barbie-Poster.jpg',
+          if (index % 2 == 0)
+            'https://m.media-amazon.com/images/I/51ifcV+yjPL._AC_.jpg',
+          if (index % 3 == 0)
+            'https://i.etsystatic.com/27817007/r/il/64df86/3235749828/il_1080xN.3235749828_oy85.jpg',
+          if (index % 4 == 0)
+            'https://creativereview.imgix.net/content/uploads/2018/12/Unknown-5.jpeg?auto=compress,format&q=60&w=2024&h=3000',
+        ],
+        name: 'Some random list number $index',
+        author: UserModel(
+          name: 'Name $index',
+          username: 'username$index',
+          followed: index % 2 == 0,
+          imagePath: index % 2 == 0
+              ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
+              : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
+        ),
+        time: '12:00',
+        description:
+            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."),
+  );
+
+  final posters = List.generate(
+    20,
+    (index) => PostMovieModel(
+        year: 2000 + index,
+        imagePath: index % 2 == 0
+            ? 'https://m.media-amazon.com/images/I/61YwNp4JaPL._AC_UF1000,1000_QL80_.jpg'
+            : 'https://m.media-amazon.com/images/I/51ifcV+yjPL._AC_.jpg',
+        name: index % 2 == 0 ? 'Joker' : 'The Walking Dead',
+        author: UserModel(
+          name: 'Name $index',
+          username: 'username$index',
+          followed: index % 2 == 0,
+          imagePath: index % 2 == 0
+              ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
+              : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
+        ),
+        time: '12:00',
+        description:
+            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."),
+  );
+
   @override
   Widget build(BuildContext context) {
     return TabBarView(
       controller: widget.controller,
       children: [
-        PostsCollectionView(),
-        if (widget.controller.length == 3) const SizedBox(),
-        const SizedBox(),
+        const PostsCollectionView(),
+        if (widget.controller.length == 3)
+          ListView.separated(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            itemCount: posters.length,
+            itemBuilder: (context, index) {
+              return PostBase(
+                post: [posters[index]],
+                showSuggestion: false,
+              );
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return Divider(
+                height: 0.5,
+                thickness: 0.5,
+                color: context.colors.fieldsDefault,
+              );
+            },
+          ),
+        GridView.builder(
+          padding: const EdgeInsets.all(16.0),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 13.0,
+            mainAxisSpacing: 16.0,
+            mainAxisExtent: 113,
+          ),
+          itemCount: lists.length,
+          itemBuilder: (context, index) {
+            return ListGridWidget(post: lists[index]);
+          },
+        ),
       ],
     );
   }
@@ -362,6 +512,7 @@ class PostsCollectionView extends ConsumerWidget {
           name: movies[index].name,
           year: movies[index].year.toString(),
           description: movies[index].description,
+          post: movies[index],
         );
       },
     );
@@ -374,18 +525,36 @@ class PostsCollectionTile extends StatelessWidget {
     required this.name,
     required this.year,
     required this.imagePath,
+    this.post,
     this.description,
   }) : super(key: key);
   final String name;
   final String year;
   final String imagePath;
   final String? description;
+  final PostMovieModel? post;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         GestureDetector(
+          onTap: () {
+            if (post != null) {
+              AutoRouter.of(context).push(
+                PosterRoute(
+                  post: PostMovieModel(
+                    year: post!.year,
+                    imagePath: post!.imagePath,
+                    name: post!.name,
+                    author: post!.author,
+                    time: post!.time,
+                    description: post!.description,
+                  ),
+                ),
+              );
+            }
+          },
           onLongPress: () {
             showDialog(
               context: context,
@@ -403,7 +572,7 @@ class PostsCollectionTile extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
             child: Container(
-              color: context.colors.buttonsPrimary,
+              color: context.colors.backgroundsSecondary,
               height: 160,
               child: Image.network(
                 imagePath,
@@ -530,20 +699,215 @@ class _PosterImageDialogState extends State<PosterImageDialog>
                           ),
                         ),
                         if (widget.description != null)
-                        const SizedBox(height: 12),
+                          const SizedBox(height: 12),
                         if (widget.description != null)
-                        Text(
-                          widget.description!.length > 280
-                              ? widget.description!.substring(0, 280)
-                              : widget.description!,
-                          style: context.textStyles.subheadline,
-                        ),
+                          Text(
+                            widget.description!.length > 280
+                                ? widget.description!.substring(0, 280)
+                                : widget.description!,
+                            style: context.textStyles.subheadline,
+                          ),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class OtherProfileDialog extends ConsumerWidget {
+  const OtherProfileDialog({
+    Key? key,
+    required this.user,
+  }) : super(key: key);
+
+  final UserDetailsModel user;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: SizedBox(
+        height: 214 + MediaQuery.of(context).padding.bottom,
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topRight: Radius.circular(16.0),
+            topLeft: Radius.circular(16.0),
+          ),
+          child: SizedBox(
+            height: 214,
+            child: Material(
+              color: context.colors.backgroundsPrimary,
+              child: Column(
+                children: [
+                  const SizedBox(height: 14),
+                  Container(
+                    height: 4,
+                    width: 36,
+                    color: context.colors.fieldsDefault,
+                  ),
+                  const SizedBox(height: 22),
+                  Text(
+                    user.name,
+                    style: context.textStyles.bodyBold,
+                  ),
+                  const SizedBox(height: 10.5),
+                  Divider(
+                    height: 0.5,
+                    thickness: 0.5,
+                    color: context.colors.fieldsDefault,
+                  ),
+                  InkWell(
+                    onTap: () {},
+                    child: SizedBox(
+                      height: 52,
+                      width: double.infinity,
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 16),
+                          Text(
+                            'Unfollow',
+                            style: context.textStyles.bodyRegular,
+                          ),
+                          const Spacer(),
+                          Text(
+                            '􀜗',
+                            style: context.textStyles.bodyRegular,
+                          ),
+                          const SizedBox(width: 16),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    height: 0.5,
+                    thickness: 0.5,
+                    color: context.colors.fieldsDefault,
+                  ),
+                  InkWell(
+                    onTap: () {},
+                    child: SizedBox(
+                      height: 52,
+                      width: double.infinity,
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 16),
+                          Text(
+                            'Report',
+                            style: context.textStyles.bodyRegular!.copyWith(
+                              color: context.colors.textsError,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            '􀉻',
+                            style: context.textStyles.bodyRegular!.copyWith(
+                              color: context.colors.textsError,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MyProfileDialog extends ConsumerWidget {
+  const MyProfileDialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: SizedBox(
+        height: 200,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: SizedBox(
+                  height: 104,
+                  child: Material(
+                    color: context.colors.backgroundsPrimary,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                              AutoRouter.of(context).push(SettingsRoute());
+                            },
+                            child: Center(
+                              child: Text(
+                                'Settings',
+                                style: context.textStyles.bodyRegular,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          height: 0.5,
+                          thickness: 0.5,
+                          color: context.colors.fieldsDefault,
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                              ref.read(menuControllerProvider).jumpToPage(1);
+                            },
+                            child: Center(
+                              child: Text(
+                                'Search 􀊫',
+                                style: context.textStyles.bodyRegular,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: SizedBox(
+                  height: 52,
+                  child: Material(
+                    color: context.colors.backgroundsPrimary,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Center(
+                        child: Text(
+                          'Cancel',
+                          style: context.textStyles.bodyRegular,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

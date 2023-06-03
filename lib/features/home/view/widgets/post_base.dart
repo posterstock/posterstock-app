@@ -24,12 +24,14 @@ class PostBase extends StatelessWidget {
     Key? key,
     this.post,
     this.multPost,
+    this.showSuggestion = true,
   })  : assert(post == null || multPost == null),
         super(key: key);
 
   final List<PostMovieModel>? post;
   final MultiplePostModel? multPost;
   final PageHolder pageHolder = PageHolder();
+  final bool showSuggestion;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +70,7 @@ class PostBase extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if ((post != null || multPost != null) && !user!.followed)
+                    if ((post != null || multPost != null) && !user!.followed && showSuggestion)
                       Padding(
                         padding: const EdgeInsets.only(left: 68.0),
                         child: Text(

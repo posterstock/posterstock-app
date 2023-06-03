@@ -7,6 +7,10 @@ import 'package:poster_stock/features/notifications/view/pages/notifications_pag
 import 'package:poster_stock/features/poster/view/pages/poster_page/poster_page.dart';
 import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/features/search/view/pages/search_page.dart';
+import 'package:poster_stock/features/settings/view/screens/change_email_%20code_screen.dart';
+import 'package:poster_stock/features/settings/view/screens/change_email_screen.dart';
+import 'package:poster_stock/features/settings/view/screens/choose_language_page.dart';
+import 'package:poster_stock/features/settings/view/screens/settings_page.dart';
 
 import '../features/auth/view/pages/auth_page.dart';
 import '../features/collection/view/collection_page.dart';
@@ -34,6 +38,10 @@ import '../features/collection/view/collection_page.dart';
     AutoRoute(page: PosterPage, path: 'poster'),
     AutoRoute(page: CollectionPage, path: 'collection'),
     AutoRoute(page: ProfilePage, path: 'profile'),
+    AutoRoute(page: SettingsPage, path: 'settings'),
+    AutoRoute(page: ChooseLanguagePage, path: 'language'),
+    AutoRoute(page: ChangeEmailScreen, path: 'change_email'),
+    AutoRoute(page: ChangeEmailCodeScreen, path: 'change_email_code'),
   ],
 )
 class $AppRouter {}

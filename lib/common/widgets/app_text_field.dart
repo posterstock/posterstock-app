@@ -20,9 +20,9 @@ class AppTextField extends StatefulWidget {
     this.tickOnSuccess = false,
     this.isUsername = false,
     this.keyboardType,
-    this.crossPadding,
     this.crossButton,
-    this.leading,
+    this.crossPadding,
+    this.searchField = false,
   }) : super(key: key);
   final String hint;
   final Function(String)? onSubmitted;
@@ -36,9 +36,9 @@ class AppTextField extends StatefulWidget {
   final bool hasError;
   final bool isUsername;
   final TextInputType? keyboardType;
-  final EdgeInsets? crossPadding;
   final Widget? crossButton;
-  final Widget? leading;
+  final EdgeInsets? crossPadding;
+  final bool searchField;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -89,51 +89,61 @@ class _AppTextFieldState extends State<AppTextField> {
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(horizontal: 18),
               isDense: true,
-              prefixIcon: Icon(
-                Icons.search,
-                color: context.colors.iconsDisabled,
-                size: 22,
+              prefix: Text(
+                widget.isUsername ? '@' : '',
+                style: context.textStyles.callout!.copyWith(
+                  color: Colors.transparent,
+                ),
               ),
-              prefix: widget.leading == null
-                  ? null
-                  : Text(
-                      widget.isUsername ? '@' : '',
-                      style: context.textStyles.callout!.copyWith(
-                        color: Colors.transparent,
-                      ),
-                    ),
-              suffixIcon: (widget.tickOnSuccess &&
-                      (widget.controller ?? nullController).text.length > 1 &&
-                      !widget.hasError
+              prefixIcon: widget.searchField
                   ? Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: SvgPicture.asset(
-                        'assets/icons/ic_check.svg',
+                    padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                    child: SvgPicture.asset(
+                        'assets/icons/ic_search.svg',
+                        width: 15,
                         colorFilter: ColorFilter.mode(
-                          context.colors.iconsActive!,
+                          context.colors.iconsDisabled!,
                           BlendMode.srcIn,
                         ),
                       ),
-                    )
-                  : widget.removable ||
-                          (widget.removableWhenNotEmpty &&
-                              (widget.controller ?? nullController)
-                                  .text
-                                  .isNotEmpty)
-                      ? GestureDetector(
-                          onTap: () {
-                            widget.controller?.text = '';
-                            nullController.text = '';
-                            setState(() {});
-                            if (widget.onRemoved != null) widget.onRemoved!();
-                          },
-                          child: Container(
-                            color: Colors.transparent,
-                            child: Padding(
-                              padding: widget.crossPadding ??
-                                  const EdgeInsets.all(16.0),
-                              child: widget.crossButton ??
-                                  SvgPicture.asset(
+                  )
+                  : null,
+              suffixIcon: (widget.crossButton == null ||
+                      widget.controller?.text == '' ||
+                      widget.controller?.text == null
+                  ? (widget.tickOnSuccess &&
+                          (widget.controller ?? nullController).text.length >
+                              1 &&
+                          !widget.hasError
+                      ? Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: SvgPicture.asset(
+                            'assets/icons/ic_check.svg',
+                            colorFilter: ColorFilter.mode(
+                              context.colors.iconsActive!,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        )
+                      : widget.removable ||
+                              (widget.removableWhenNotEmpty &&
+                                  (widget.controller ?? nullController)
+                                      .text
+                                      .isNotEmpty)
+                          ? GestureDetector(
+                              onTap: () {
+                                widget.controller?.text = '';
+                                nullController.text = '';
+                                setState(() {});
+                                if (widget.onRemoved != null) {
+                                  widget.onRemoved!();
+                                }
+                              },
+                              child: Container(
+                                color: Colors.transparent,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: SvgPicture.asset(
                                     'assets/icons/ic_close.svg',
                                     colorFilter: ColorFilter.mode(
                                       widget.hasError
@@ -142,13 +152,27 @@ class _AppTextFieldState extends State<AppTextField> {
                                       BlendMode.srcIn,
                                     ),
                                   ),
-                            ),
-                          ),
-                        )
-                      : const Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: SizedBox(height: 24),
-                        )),
+                                ),
+                              ),
+                            )
+                          : const Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: SizedBox(height: 24),
+                            ))
+                  : GestureDetector(
+                      onTap: () {
+                        if (widget.onRemoved != null) {
+                          nullController.text = '';
+                          widget.controller?.text = '';
+                          widget.onRemoved!();
+                          setState(() {});
+                        }
+                      },
+                      child: Padding(
+                        padding: widget.crossPadding ?? EdgeInsets.zero,
+                        child: widget.crossButton,
+                      ),
+                    )),
               filled: true,
               fillColor: focused
                   ? context.colors.backgroundsPrimary

@@ -9,6 +9,7 @@ import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_error_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_loading_state_holder.dart';
 import 'package:poster_stock/features/auth/view/widgets/auth_button.dart';
+import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
 import 'package:poster_stock/themes/app_themes.dart';

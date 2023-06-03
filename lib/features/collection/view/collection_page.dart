@@ -7,6 +7,7 @@ import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../../common/services/text_info_service.dart';
+import '../../poster/view/pages/poster_page/poster_page.dart';
 import '../../profile/view/pages/profile_page.dart';
 
 class CollectionPage extends StatefulWidget {
@@ -236,6 +237,12 @@ class _CollectionPageState extends State<CollectionPage>
                 ),
               ),
             ),
+          ),
+          const Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: CommentTextField(),
           )
         ],
       ),
@@ -250,7 +257,6 @@ class _CollectionPageState extends State<CollectionPage>
       context.textStyles.title3!,
       MediaQuery.of(context).size.width - 32,
     ).height;
-    result += 20;
     result += TextInfoService.textSize(
       (widget.post.description ?? '').length > 280
           ? widget.post.description!.substring(0, 280)
@@ -283,6 +289,7 @@ class CollectionInfoWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           UserInfoTile(
             user: post.author,

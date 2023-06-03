@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_scroll_controller_state_holder.dart';
+import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
+import 'package:poster_stock/features/navigation_page/state_holder/navigation_route_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/view/widgets/plus_button.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -21,7 +23,16 @@ class AppNavigationBar extends ConsumerStatefulWidget {
 class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
   @override
   Widget build(BuildContext context) {
-    int activeIndex = AutoTabsRouter.of(context).activeIndex;
+    final router = ref.watch(navigationRouterStateHolderProvider);
+    if (router == null) {
+      Future.delayed(
+        Duration.zero,
+        () => ref.read(menuControllerProvider).setRouter(
+              AutoTabsRouter.of(context),
+            ),
+      );
+    }
+    int activeIndex = ref.watch(navigationPageStateHolderProvider);
     final homeScrollPosition =
         ref.watch(homePageScrollControllerStateHolderProvider);
     return SafeArea(
@@ -40,22 +51,20 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                 children: [
                   BottomNavBarItem(
                     onTap: () {
-                      if (AutoTabsRouter.of(context).activeIndex == 0 &&
-                          homeScrollPosition.offset > 10) {
+                      ref.read(menuControllerProvider).jumpToPage(0);
+                      if (activeIndex == 0 && homeScrollPosition.offset > 10) {
                         homeScrollPosition.animateTo(
                           0,
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.linear,
                         );
-                      } else if (AutoTabsRouter.of(context).activeIndex == 0) {
+                      } else if (activeIndex == 0) {
                         homeScrollPosition.animateTo(
                           -180,
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.linear,
                         );
                       }
-                      AutoTabsRouter.of(context).setActiveIndex(0);
-                      setState(() {});
                     },
                     icon: SvgPicture.asset(
                       'assets/icons/ic_home_mobile.svg',
@@ -77,8 +86,7 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                   ),
                   BottomNavBarItem(
                     onTap: () {
-                      AutoTabsRouter.of(context).setActiveIndex(1);
-                      setState(() {});
+                      ref.read(menuControllerProvider).jumpToPage(1);
                     },
                     icon: SvgPicture.asset(
                       'assets/icons/ic_research.svg',
@@ -107,8 +115,7 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                   ),
                   BottomNavBarItem(
                     onTap: () {
-                      AutoTabsRouter.of(context).setActiveIndex(2);
-                      setState(() {});
+                      ref.read(menuControllerProvider).jumpToPage(2);
                     },
                     icon: SvgPicture.asset(
                       'assets/icons/ic_notification-2.svg',
@@ -130,8 +137,7 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                   ),
                   BottomNavBarItem(
                     onTap: () {
-                      AutoTabsRouter.of(context).setActiveIndex(3);
-                      setState(() {});
+                      ref.read(menuControllerProvider).jumpToPage(3);
                     },
                     //TODO check if has avatar
                     icon: SvgPicture.asset(

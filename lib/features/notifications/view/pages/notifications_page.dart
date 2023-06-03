@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,8 @@ import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/notifications/controllers/notifications_controller.dart';
 import 'package:poster_stock/features/notifications/models/notification_model.dart';
 import 'package:poster_stock/features/notifications/state_holders/notifications_state_holder.dart';
+import 'package:poster_stock/features/profile/models/user_details_model.dart';
+import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class NotificationsPage extends ConsumerWidget {
@@ -18,8 +21,9 @@ class NotificationsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifications = ref.watch(notificationsStateHolderProvider);
-    if (notifications == null)
+    if (notifications == null) {
       ref.read(notificationsControllerProvider).getNotificationsData();
+    }
     final controller = ScrollController();
     bool keepOffset = false;
     return NotificationListener<ScrollUpdateNotification>(
@@ -146,20 +150,40 @@ class NotificationTile extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundImage: notification.user.imagePath != null
-                    ? NetworkImage(notification.user.imagePath!)
-                    : null,
-                backgroundColor: avatar[Random().nextInt(3)],
-                child: notification.user.imagePath == null
-                    ? Text(
-                        getAvatarName(notification.user.name).toUpperCase(),
-                        style: context.textStyles.subheadlineBold!.copyWith(
-                          color: context.colors.textsBackground,
-                        ),
-                      )
-                    : const SizedBox(),
+              GestureDetector(
+                onTap: () {
+                  AutoRouter.of(context).push(
+                    ProfileRoute(
+                      user: UserDetailsModel(
+                        name: notification.user.name,
+                        username: notification.user.username,
+                        following: 0,
+                        followers: 0,
+                        followed: notification.user.followed,
+                        posters: 0,
+                        lists: 0,
+                        mySelf: false,
+                        imagePath: notification.user.imagePath,
+                        description: notification.user.description,
+                      ),
+                    ),
+                  );
+                },
+                child: CircleAvatar(
+                  radius: 20,
+                  backgroundImage: notification.user.imagePath != null
+                      ? NetworkImage(notification.user.imagePath!)
+                      : null,
+                  backgroundColor: avatar[Random().nextInt(3)],
+                  child: notification.user.imagePath == null
+                      ? Text(
+                          getAvatarName(notification.user.name).toUpperCase(),
+                          style: context.textStyles.calloutBold!.copyWith(
+                            color: context.colors.textsBackground,
+                          ),
+                        )
+                      : const SizedBox(),
+                ),
               ),
               const SizedBox(
                 width: 16,
