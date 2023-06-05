@@ -353,6 +353,7 @@ class CollectionInfoWidget extends StatelessWidget {
                   year: '20xx',
                   //description: 'This is test tile',
                   imagePath: post.posters[index],
+                  index: index,
                 );
               },
             ),

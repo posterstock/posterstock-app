@@ -30,6 +30,8 @@ class ChooseLanguagePage extends ConsumerWidget {
                 elevation: 0,
                 leadingWidth: 130,
                 toolbarHeight: 42,
+                titleSpacing: 0,
+                centerTitle: true,
                 leading: Align(
                   alignment: Alignment.centerLeft,
                   child: GestureDetector(

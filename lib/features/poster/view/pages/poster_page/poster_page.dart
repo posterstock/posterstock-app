@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
@@ -161,10 +162,8 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                                     ),
                                     child: UserInfoTile(
                                       showFollowButton: false,
-                                      user:
-                                          widget.post.comments[index].user,
-                                      time:
-                                          widget.post.comments[index].time,
+                                      user: widget.post.comments[index].user,
+                                      time: widget.post.comments[index].time,
                                     ),
                                   ),
                                   const SizedBox(height: 12),
@@ -179,8 +178,8 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              widget.post.comments[index]
-                                                  .comment,
+                                              widget
+                                                  .post.comments[index].comment,
                                               style: context
                                                   .textStyles.subheadline,
                                             ),
@@ -381,17 +380,36 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                           ),
                         ),
                         const Spacer(),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: SvgPicture.asset(
-                            'assets/icons/ic_dots.svg',
-                            colorFilter: ColorFilter.mode(
-                              Color.lerp(
-                                context.colors.iconsDefault,
-                                context.colors.iconsBackground,
-                                posterController!.value / imageHeight!,
-                              )!,
-                              BlendMode.srcIn,
+                        GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) => GestureDetector(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                  color: Colors.transparent,
+                                  child: PosterActionsDialog(),
+                                ),
+                              ),
+                              backgroundColor: Colors.transparent,
+                              isScrollControlled: true,
+                            );
+                          },
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: SvgPicture.asset(
+                              'assets/icons/ic_dots.svg',
+                              colorFilter: ColorFilter.mode(
+                                Color.lerp(
+                                  context.colors.iconsDefault,
+                                  context.colors.iconsBackground,
+                                  posterController!.value / imageHeight!,
+                                )!,
+                                BlendMode.srcIn,
+                              ),
                             ),
                           ),
                         ),
@@ -805,6 +823,207 @@ class PosterInfo extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class PosterActionsDialog extends ConsumerWidget {
+  const PosterActionsDialog({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: SizedBox(
+        height: 490,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: SizedBox(
+                  height: 384,
+                  child: Material(
+                    color: context.colors.backgroundsPrimary,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 36,
+                          child: Center(
+                            child: Text(
+                              'Movie',
+                              style: context.textStyles.footNote!.copyWith(
+                                color: context.colors.textsSecondary,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          height: 0.5,
+                          thickness: 0.5,
+                          color: context.colors.fieldsDefault,
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              print(1);
+                            },
+                            child: Center(
+                              child: Text(
+                                'Add to list',
+                                style: context.textStyles.bodyRegular!.copyWith(
+                                  color: context.colors.textsPrimary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          height: 0.5,
+                          thickness: 0.5,
+                          color: context.colors.fieldsDefault,
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              print(1);
+                            },
+                            child: Center(
+                              child: Text(
+                                'Open Wikipedia',
+                                style: context.textStyles.bodyRegular!.copyWith(
+                                  color: context.colors.textsPrimary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          height: 0.5,
+                          thickness: 0.5,
+                          color: context.colors.fieldsDefault,
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              print(1);
+                            },
+                            child: Center(
+                              child: Text(
+                                'Where to watch',
+                                style: context.textStyles.bodyRegular!.copyWith(
+                                  color: context.colors.textsPrimary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 36,
+                          child: Center(
+                            child: Text(
+                              'Movie',
+                              style: context.textStyles.footNote!.copyWith(
+                                color: context.colors.textsSecondary,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          height: 0.5,
+                          thickness: 0.5,
+                          color: context.colors.fieldsDefault,
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              print(1);
+                            },
+                            child: Center(
+                              child: Text(
+                                'Follow',
+                                style: context.textStyles.bodyRegular!.copyWith(
+                                  color: context.colors.textsPrimary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          height: 0.5,
+                          thickness: 0.5,
+                          color: context.colors.fieldsDefault,
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              print(1);
+                            },
+                            child: Center(
+                              child: Text(
+                                'Share',
+                                style: context.textStyles.bodyRegular!.copyWith(
+                                  color: context.colors.textsPrimary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          height: 0.5,
+                          thickness: 0.5,
+                          color: context.colors.fieldsDefault,
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              print(1);
+                            },
+                            child: Center(
+                              child: Text(
+                                'Report',
+                                style: context.textStyles.bodyRegular!.copyWith(
+                                  color: context.colors.textsError,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: SizedBox(
+                  height: 52,
+                  child: Material(
+                    color: context.colors.backgroundsPrimary,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Center(
+                        child: Text(
+                          'Cancel',
+                          style: context.textStyles.bodyRegular,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

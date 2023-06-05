@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
-import 'package:poster_stock/features/auth/state_holders/email_code_state_holder.dart';
 import 'package:poster_stock/features/settings/controllers/change_email_controller.dart';
 import 'package:poster_stock/features/settings/state_holders/change_email_code_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -32,7 +31,6 @@ class ChangeEmailCodeScreen extends ConsumerWidget {
               AppBar(
                 backgroundColor: context.colors.backgroundsSecondary,
                 elevation: 0,
-                leadingWidth: 130,
                 leading: Align(
                   alignment: Alignment.centerLeft,
                   child: GestureDetector(
@@ -59,7 +57,12 @@ class ChangeEmailCodeScreen extends ConsumerWidget {
                 ),
                 actions: [
                   CupertinoButton(
-                    onPressed: code.length < 4 ? null : () {},
+                    onPressed: code.length < 4
+                        ? null
+                        : () {
+                            AutoRouter.of(context)
+                                .popUntilRouteWithPath('settings');
+                          },
                     child: const Text('Verify'),
                   ),
                 ],

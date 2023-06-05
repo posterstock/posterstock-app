@@ -21,10 +21,10 @@ class MovieCard extends StatefulWidget {
   final PageHolder pageHolder;
 
   @override
-  State<MovieCard> createState() => _MovieCardState();
+  State<MovieCard> createState() => MovieCardState();
 }
 
-class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
+class MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
   late AnimationController controller;
   late AnimationController likeCommentController;
   PageController? pageController;
@@ -78,7 +78,7 @@ class _MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     getInitData();
     widget.pageHolder.page = (pageController?.page ?? 0).round();
-    return SizedBox(
+    return Container(
       height: (textHeight ?? 0) + 58 + 31 + titleHeight!,
       child: AnimatedBuilder(
         animation: controller,

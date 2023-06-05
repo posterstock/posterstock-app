@@ -32,6 +32,7 @@ class PostBase extends StatelessWidget {
   final MultiplePostModel? multPost;
   final PageHolder pageHolder = PageHolder();
   final bool showSuggestion;
+  final GlobalKey<MovieCardState> postKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +96,7 @@ class PostBase extends StatelessWidget {
               ),
               if (post == null && multPost == null || post != null)
                 MovieCard(
+                  key: postKey,
                   movie: post,
                   pageHolder: pageHolder,
                 ),

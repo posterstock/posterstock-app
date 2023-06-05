@@ -26,6 +26,8 @@ class SettingsPage extends ConsumerWidget {
               elevation: 0,
               leadingWidth: 130,
               toolbarHeight: 42,
+              titleSpacing: 0,
+              centerTitle: true,
               leading: Align(
                 alignment: Alignment.centerLeft,
                 child: GestureDetector(
@@ -129,7 +131,24 @@ class SettingsPage extends ConsumerWidget {
                     height: 24,
                   ),
                   DoubleButton(
-                    onTap1: () {},
+                    onTap1: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) => GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            color: Colors.transparent,
+                            child: const AreYouSureDialog(
+                              actionText: 'Disconnect Google account',
+                            ),
+                          ),
+                        ),
+                        backgroundColor: Colors.transparent,
+                        isScrollControlled: true,
+                      );
+                    },
                     onTap2: () {},
                     child1: Row(
                       children: [
@@ -211,7 +230,24 @@ class SettingsPage extends ConsumerWidget {
                     height: 24,
                   ),
                   SettingsButton(
-                    onTap: () {},
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) => GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            color: Colors.transparent,
+                            child: const AreYouSureDialog(
+                              actionText: 'Logout',
+                            ),
+                          ),
+                        ),
+                        backgroundColor: Colors.transparent,
+                        isScrollControlled: true,
+                      );
+                    },
                     child: Center(
                       child: Text(
                         'Logout',
@@ -418,6 +454,99 @@ class MultipleSettingsButton extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AreYouSureDialog extends ConsumerWidget {
+  const AreYouSureDialog({
+    Key? key,
+    required this.actionText,
+  }) : super(key: key);
+
+  final String actionText;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: SizedBox(
+        height: 200,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: SizedBox(
+                  height: 88,
+                  child: Material(
+                    color: context.colors.backgroundsPrimary,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 36,
+                          child: Center(
+                            child: Text(
+                              'Are you sure you want to do this?',
+                              style: context.textStyles.footNote!.copyWith(
+                                color: context.colors.textsSecondary,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          height: 0.5,
+                          thickness: 0.5,
+                          color: context.colors.fieldsDefault,
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              print(1);
+                            },
+                            child: Center(
+                              child: Text(
+                                actionText,
+                                style: context.textStyles.bodyRegular!.copyWith(
+                                  color: context.colors.textsError,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: SizedBox(
+                  height: 52,
+                  child: Material(
+                    color: context.colors.backgroundsPrimary,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Center(
+                        child: Text(
+                          'Cancel',
+                          style: context.textStyles.bodyRegular,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
