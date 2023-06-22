@@ -55,7 +55,7 @@ class PostBase extends StatelessWidget {
           }
           if (multPost != null) {
             AutoRouter.of(context).push(
-              CollectionRoute(
+              ListRoute(
                 post: multPost!,
               ),
             );
@@ -190,67 +190,68 @@ class UserInfoTile extends StatelessWidget {
                 const SizedBox(
                   width: 12,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 2.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (loading)
-                            const SizedBox(
-                              height: 3,
-                            ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              TextOrContainer(
-                                text: user?.name,
-                                style: context.textStyles.calloutBold!.copyWith(
-                                    color: darkBackground
-                                        ? context.colors.textsBackground!
-                                        : context.colors.textsPrimary),
-                                emptyWidth: 146,
-                                emptyHeight: 17,
-                              ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 2.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (loading)
                               const SizedBox(
-                                width: 12,
+                                height: 3,
                               ),
-                              if ((user?.followed ?? true) || !showFollowButton)
-                                Text(
-                                  time ?? '',
-                                  style: context.textStyles.footNote!.copyWith(
-                                    color: darkBackground
-                                        ? context.colors.textsBackground!
-                                            .withOpacity(0.8)
-                                        : context.colors.textsDisabled,
-                                  ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                TextOrContainer(
+                                  text: user?.name,
+                                  style: context.textStyles.calloutBold!.copyWith(
+                                      color: darkBackground
+                                          ? context.colors.textsBackground!
+                                          : context.colors.textsPrimary),
+                                  emptyWidth: 146,
+                                  emptyHeight: 17,
                                 ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: !loading ? 3 : 8,
-                          ),
-                          TextOrContainer(
-                            text: user?.username == null
-                                ? null
-                                : '@${user!.username}',
-                            style: context.textStyles.caption1!.copyWith(
-                              color: darkBackground
-                                  ? context.colors.textsBackground!
-                                      .withOpacity(0.8)
-                                  : context.colors.textsSecondary,
+                                const SizedBox(
+                                  width: 12,
+                                ),
+                                if ((user?.followed ?? true) || !showFollowButton)
+                                  Text(
+                                    time ?? '',
+                                    style: context.textStyles.footNote!.copyWith(
+                                      color: darkBackground
+                                          ? context.colors.textsBackground!
+                                              .withOpacity(0.8)
+                                          : context.colors.textsDisabled,
+                                    ),
+                                  ),
+                              ],
                             ),
-                            emptyWidth: 120,
-                            emptyHeight: 12,
-                          ),
-                        ],
-                      ),
-                    ],
+                            SizedBox(
+                              height: !loading ? 3 : 8,
+                            ),
+                            TextOrContainer(
+                              text: user?.username == null
+                                  ? null
+                                  : '@${user!.username}',
+                              style: context.textStyles.caption1!.copyWith(
+                                color: darkBackground
+                                    ? context.colors.textsBackground!
+                                        .withOpacity(0.8)
+                                    : context.colors.textsSecondary,
+                              ),
+                              emptyWidth: 120,
+                              emptyHeight: 12,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const Spacer(),
                 if (!(user?.followed ?? true) && (!loading) && showFollowButton)
                   AppTextButton(
                     text: AppLocalizations.of(context)!.follow,

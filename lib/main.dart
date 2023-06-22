@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:photo_manager/photo_manager.dart';
 import 'package:poster_stock/common/constants/languages.dart';
 import 'package:poster_stock/common/helpers/custom_scroll_behavior.dart';
 import 'package:poster_stock/features/settings/controllers/app_language_controller.dart';
@@ -13,6 +14,9 @@ import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_ho
 import 'navigation/app_router.gr.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  PhotoManager.clearFileCache();
+  //TODO
   PackageInfo.setMockInitialValues(
     appName: 'Posterstock',
     packageName: 'com.thedirection.posterstock',

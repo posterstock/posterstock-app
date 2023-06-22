@@ -24,12 +24,14 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
   @override
   Widget build(BuildContext context) {
     final router = ref.watch(navigationRouterStateHolderProvider);
-    if (router == null) {
-      Future.delayed(
-        Duration.zero,
-        () => ref.read(menuControllerProvider).setRouter(
-              AutoTabsRouter.of(context),
-            ),
+    if (router == null || router != AutoTabsRouter.of(context)) {
+      Future(
+        () {
+          ref.read(menuControllerProvider).setRouter(
+            AutoTabsRouter.of(context),
+          );
+          ref.read(menuControllerProvider).jumpToPage(0);
+        }
       );
     }
     int activeIndex = ref.watch(navigationPageStateHolderProvider);

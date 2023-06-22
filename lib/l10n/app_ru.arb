@@ -29,5 +29,11 @@
     "reply" : "Ответить",
     "notifications" : "Уведомления",
     "followers" : "подписчики",
-    "following" : "подписки"
+    "following" : "подписки",
+    "privacyPolicyText1": "By clicking \"Continue with Email/Google/Apple\" above, you acknowledge that you have read, understood, and agreed to the",
+    "privacyPolicyLink1" : " Terms ",
+    "privacyPolicyText2" : "and",
+    "privacyPolicyLink2" : " Privacy Policy ",
+    "privacyPolicyText3" : "of Posterstock. The social network is developed by",
+    "privacyPolicyLink3" : " Thedirection OÜ."
 }

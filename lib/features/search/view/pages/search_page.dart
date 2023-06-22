@@ -170,6 +170,17 @@ class SearchTabViewState extends State<SearchTabView>
             if (index % 4 == 0)
               'https://creativereview.imgix.net/content/uploads/2018/12/Unknown-5.jpeg?auto=compress,format&q=60&w=2024&h=3000',
           ],
+          posterNames: [
+            'Joker',
+            'Random',
+            'Barbie',
+            if (index % 2 == 0)
+              'The Walking Dead',
+            if (index % 3 == 0)
+              'JAWS',
+            if (index % 4 == 0)
+              'Spider-Man',
+          ],
           name: 'Some random list number $index',
           author: UserModel(
             name: 'Name $index',
@@ -181,7 +192,7 @@ class SearchTabViewState extends State<SearchTabView>
           ),
           time: '12:00',
           description:
-              "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."),
+          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."),
     );
     return Column(
       children: [

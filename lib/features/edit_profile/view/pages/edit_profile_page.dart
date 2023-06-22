@@ -3,12 +3,16 @@ import 'dart:math';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
+import 'package:poster_stock/features/create_list/view/pick_cover_dialog.dart';
+import 'package:poster_stock/features/edit_profile/controller/profile_controller.dart';
+import 'package:poster_stock/features/edit_profile/state_holder/avatar_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
-class EditProfilePage extends StatelessWidget {
+class EditProfilePage extends ConsumerWidget {
   const EditProfilePage({Key? key}) : super(key: key);
 
   static const List<Color> avatar = [
@@ -18,7 +22,8 @@ class EditProfilePage extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final photo = ref.watch(avatarStateHolderProvider);
     return CustomScaffold(
       backgroundColor: context.colors.backgroundsSecondary,
       child: SizedBox(
@@ -74,6 +79,9 @@ class EditProfilePage extends StatelessWidget {
                 onTap: () {
                   showModalBottomSheet(
                     context: context,
+                    backgroundColor: Colors.transparent,
+                    isScrollControlled: true,
+                    useSafeArea: true,
                     builder: (context) => GestureDetector(
                       onTap: () {
                         Navigator.pop(context);
@@ -84,13 +92,18 @@ class EditProfilePage extends StatelessWidget {
                         child: const ProfilePhotoDialog(),
                       ),
                     ),
-                    backgroundColor: Colors.transparent,
-                    isScrollControlled: true,
                   );
                 },
                 child: CircleAvatar(
                   radius: 50,
                   backgroundColor: avatar[Random().nextInt(3)],
+                  backgroundImage: photo == null
+                      ? null
+                      : Image.memory(
+                          photo,
+                          fit: BoxFit.cover,
+                          cacheWidth: 150,
+                        ).image,
                   child: Center(
                     child: SvgPicture.asset(
                       'assets/icons/ic_camera.svg',
@@ -101,7 +114,24 @@ class EditProfilePage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               CupertinoButton(
-                onPressed: () {},
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    isScrollControlled: true,
+                    useSafeArea: true,
+                    builder: (context) => GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        height: double.infinity,
+                        color: Colors.transparent,
+                        child: const ProfilePhotoDialog(),
+                      ),
+                    ),
+                  );
+                },
                 child: const Text('Change profile photo'),
               ),
               const SizedBox(height: 24),
@@ -116,7 +146,7 @@ class EditProfilePage extends StatelessWidget {
                   children: [
                     Container(
                       color: context.colors.backgroundsPrimary,
-                      width: 100,
+                      width: 124,
                       height: 47,
                       child: Align(
                         alignment: Alignment.centerLeft,
@@ -131,7 +161,6 @@ class EditProfilePage extends StatelessWidget {
                     ),
                     Expanded(
                       child: TextField(
-                        keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: context.colors.backgroundsPrimary,
@@ -160,7 +189,7 @@ class EditProfilePage extends StatelessWidget {
                   children: [
                     Container(
                       color: context.colors.backgroundsPrimary,
-                      width: 100,
+                      width: 124,
                       height: 47,
                       child: Align(
                         alignment: Alignment.centerLeft,
@@ -175,7 +204,6 @@ class EditProfilePage extends StatelessWidget {
                     ),
                     Expanded(
                       child: TextField(
-                        keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
                           prefixText: '@',
                           filled: true,
@@ -227,7 +255,6 @@ class EditProfilePage extends StatelessWidget {
                     ),
                   ),
                   TextField(
-                    keyboardType: TextInputType.phone,
                     maxLines: null,
                     minLines: 5,
                     decoration: InputDecoration(
@@ -304,7 +331,22 @@ class ProfilePhotoDialog extends ConsumerWidget {
                         Expanded(
                           child: InkWell(
                             onTap: () {
-                              print(1);
+                              Navigator.pop(context);
+                              showModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.transparent,
+                                isScrollControlled: true,
+                                useSafeArea: true,
+                                builder: (context) => PickCoverDialog(
+                                  onItemTap: (BuildContext context,
+                                      WidgetRef ref, Uint8List image) {
+                                    ref
+                                        .read(profileControllerProvider)
+                                        .setPhoto(image);
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              );
                             },
                             child: Center(
                               child: Text(
@@ -344,7 +386,8 @@ class ProfilePhotoDialog extends ConsumerWidget {
                         Expanded(
                           child: InkWell(
                             onTap: () {
-                              print(1);
+                              ref.read(profileControllerProvider).removePhoto();
+                              Navigator.pop(context);
                             },
                             child: Center(
                               child: Text(

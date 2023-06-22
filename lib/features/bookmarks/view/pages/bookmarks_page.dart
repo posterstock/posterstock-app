@@ -6,10 +6,11 @@ import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 final posters = List.generate(
-  30,
-      (index) => PostMovieModel(
+  300,
+  (index) => PostMovieModel(
       year: 2000 + index,
       imagePath: index % 2 == 0
           ? 'https://m.media-amazon.com/images/I/61YwNp4JaPL._AC_UF1000,1000_QL80_.jpg'
@@ -30,43 +31,28 @@ final posters = List.generate(
 );
 
 class BookmarksPage extends StatelessWidget {
-  const BookmarksPage({
+  BookmarksPage({
     Key? key,
     this.startIndex = 0,
   }) : super(key: key);
   final int startIndex;
+  final ItemScrollController scrollController = ItemScrollController();
 
   @override
   Widget build(BuildContext context) {
-    final ScrollController scrollController =
-        ScrollController(initialScrollOffset: 313.0 * startIndex);
     final List<PostMovieModel> bookmarks = posters;
-    final List<GlobalKey> keys = List.generate(
-      bookmarks.length,
-      (index) => GlobalKey(),
-    );
+    Future(() {
+      scrollController.jumpTo(index: startIndex);
+    });
     final List<PostBase> posts = List.generate(
       bookmarks.length,
       (index) => PostBase(
         showSuggestion: false,
-        key: keys[index],
         post: [
           bookmarks[index],
         ],
       ),
     );
-    Future(() async {
-      if (posts[startIndex].key is GlobalKey &&
-          (posts[startIndex].key! as GlobalKey).currentContext != null) {
-        Scrollable.ensureVisible(
-          (posts[startIndex].key! as GlobalKey).currentContext!,
-          duration: const Duration(milliseconds: 0),
-        );
-      } else if ((posts[startIndex].key! as GlobalKey).currentContext ==
-          null) {
-        print('not found');
-      }
-    });
     return CustomScaffold(
       child: Column(
         children: [
@@ -102,7 +88,7 @@ class BookmarksPage extends StatelessWidget {
               style: context.textStyles.bodyBold,
             ),
           ),
-          Expanded(
+          /*Expanded(
             child: ListView.separated(
               controller: scrollController,
               itemCount: bookmarks.length,
@@ -115,7 +101,21 @@ class BookmarksPage extends StatelessWidget {
                 color: context.colors.fieldsDefault,
               ),
             ),
-          ),
+          ),*/
+          Expanded(
+            child: ScrollablePositionedList.separated(
+              itemScrollController: scrollController,
+              itemCount: bookmarks.length,
+              itemBuilder: (context, index) {
+                return posts[index];
+              },
+              separatorBuilder: (context, index) => Divider(
+                height: 0.5,
+                thickness: 0.5,
+                color: context.colors.fieldsDefault,
+              ),
+            ),
+          )
         ],
       ),
     );

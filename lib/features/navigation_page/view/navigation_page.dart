@@ -5,9 +5,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
+import 'package:poster_stock/features/create_bookmark/view/create_bookmark.dart';
+import 'package:poster_stock/features/create_list/view/create_list_dialog.dart';
+import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/menu_state_holder.dart';
-import 'package:poster_stock/features/navigation_page/state_holder/navigation_route_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/view/widgets/bottom_nav_bar.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -150,6 +152,15 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
               picturePath: 'assets/icons/ic_collection.svg',
               label: AppLocalizations.of(context)!.addPoster,
               animationValue: controller.value,
+              onTap: () {
+                showModalBottomSheet(
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    isScrollControlled: true,
+                    useSafeArea: true,
+                    builder: (context) => const CreatePosterDialog(),
+                );
+              },
             ),
             MenuButton(
               width: width,
@@ -163,6 +174,15 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
               picturePath: 'assets/icons/ic_bookmarks.svg',
               label: AppLocalizations.of(context)!.createBookmark,
               animationValue: controller.value,
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  builder: (context) => const CreateBookmarkDialog(),
+                );
+              },
             ),
             MenuButton(
               width: width,
@@ -176,6 +196,15 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
               picturePath: 'assets/icons/ic_lists.svg',
               label: AppLocalizations.of(context)!.createList,
               animationValue: controller.value,
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  builder: (context) => const CreateListDialog(),
+                );
+              },
             ),
           ],
         );
@@ -193,6 +222,7 @@ class MenuButton extends StatelessWidget {
     required this.hightlightColor,
     required this.iconColor,
     required this.picturePath,
+    required this.onTap,
     this.border,
     required this.label,
     this.animationValue = 0,
@@ -207,6 +237,7 @@ class MenuButton extends StatelessWidget {
   final Border? border;
   final String label;
   final double animationValue;
+  final void Function() onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -232,7 +263,7 @@ class MenuButton extends StatelessWidget {
                       color: color,
                       child: InkWell(
                         highlightColor: hightlightColor,
-                        onTap: () {},
+                        onTap: onTap,
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: SvgPicture.asset(

@@ -323,6 +323,11 @@ class MockHomePageApi implements IHomePageApi {
               'https://m.media-amazon.com/images/I/A1yy50fuVnL._RI_.jpg',
               'https://m.media-amazon.com/images/I/A1yy50fuVnL._RI_.jpg',
             ],
+            'titles' : [
+              'Joker',
+              'The Lord of the Rings',
+              'Hello there',
+            ]
           },
         ],
       },

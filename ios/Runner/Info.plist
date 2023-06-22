@@ -45,6 +45,8 @@
 	<false/>
 	<key>UIStatusBarStyle</key>
 	<string></string>
+	<key>NSPhotoLibraryUsageDescription</key>
+    <string>In order to access your photo library</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationLandscapeLeft</string>

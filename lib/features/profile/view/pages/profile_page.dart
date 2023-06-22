@@ -10,6 +10,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/common/widgets/list_grid_widget.dart';
+import 'package:poster_stock/features/edit_profile/state_holder/avatar_state_holder.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
@@ -48,6 +49,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   @override
   Widget build(BuildContext context) {
     var profile = ref.watch(profileInfoStateHolderProvider);
+    final photo = ref.watch(avatarStateHolderProvider);
     if (widget.user != null) {
       profile = widget.user;
     } else if (profile == null) {
@@ -68,107 +70,104 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
               pinned: false,
               floating: true,
               elevation: 0,
-              expandedHeight: 210 +
-                  TextInfoService
-                      .textSize(
-                      profile?.description ?? '',
-                      context.textStyles.footNote!,
-                      MediaQuery
-                          .of(context)
-                          .size
-                          .width - 32)
+              expandedHeight: 225 +
+                  TextInfoService.textSize(
+                          profile?.description ?? '',
+                          context.textStyles.footNote!,
+                          MediaQuery.of(context).size.width - 32)
                       .height,
-              toolbarHeight: 210 +
-                  TextInfoService
-                      .textSize(
-                      profile?.description ?? '',
-                      context.textStyles.footNote!,
-                      MediaQuery
-                          .of(context)
-                          .size
-                          .width - 32)
+              toolbarHeight: 225 +
+                  TextInfoService.textSize(
+                          profile?.description ?? '',
+                          context.textStyles.footNote!,
+                          MediaQuery.of(context).size.width - 32)
                       .height,
-              collapsedHeight: 210 +
-                  TextInfoService
-                      .textSize(
-                      profile?.description ?? '',
-                      context.textStyles.footNote!,
-                      MediaQuery
-                          .of(context)
-                          .size
-                          .width - 32)
+              collapsedHeight: 225 +
+                  TextInfoService.textSize(
+                          profile?.description ?? '',
+                          context.textStyles.footNote!,
+                          MediaQuery.of(context).size.width - 32)
                       .height,
               backgroundColor: context.colors.backgroundsPrimary,
               centerTitle: true,
+              leading: SizedBox(),
               title: const SizedBox(),
-              leadingWidth: 65,
-              leading: (profile?.mySelf ?? false)
-                  ? const SizedBox()
-                  : Align(
-                alignment: Alignment.topLeft,
-                child: GestureDetector(
-                  onTap: () {
-                    AutoRouter.of(context).pop();
-                  },
-                  child: Container(
-                    color: Colors.transparent,
-                    padding:
-                    const EdgeInsets.only(left: 7.0, right: 40.0),
-                    child: SvgPicture.asset(
-                      'assets/icons/back_icon.svg',
-                      width: 18,
-                      colorFilter: ColorFilter.mode(
-                          context.colors.iconsDefault!, BlendMode.srcIn),
-                    ),
-                  ),
-                ),
-              ),
-              actions: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: GestureDetector(
-                    onTap: () {
-                      if (profile?.mySelf == true) {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return const MyProfileDialog();
-                          },
-                          backgroundColor: Colors.transparent,
-                        );
-                      } else {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) =>
-                              OtherProfileDialog(
-                                user: profile!,
-                              ),
-                          backgroundColor: Colors.transparent,
-                        );
-                      }
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 16.0),
-                      child: SvgPicture.asset(
-                        'assets/icons/ic_dots_vertical.svg',
-                        width: 12,
-                        colorFilter: ColorFilter.mode(
-                            context.colors.iconsDefault!, BlendMode.srcIn),
-                      ),
-                    ),
-                  ),
-                )
-              ],
               flexibleSpace: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(
-                      child: Text(
-                        profile?.username ?? 'Profile',
-                        style: context.textStyles.bodyBold,
-                      ),
+                    const SizedBox(height: 12.0),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 65,
+                          child: (profile?.mySelf ?? false)
+                              ? const SizedBox()
+                              : Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      AutoRouter.of(context).pop();
+                                    },
+                                    child: Container(
+                                      color: Colors.transparent,
+                                      padding:
+                                          const EdgeInsets.only(right: 40.0),
+                                      child: SvgPicture.asset(
+                                        'assets/icons/back_icon.svg',
+                                        width: 18,
+                                        colorFilter: ColorFilter.mode(
+                                          context.colors.iconsDefault!,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          profile?.username ?? 'Profile',
+                          style: context.textStyles.bodyBold,
+                        ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () {
+                            if (profile?.mySelf == true) {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return const MyProfileDialog();
+                                },
+                                backgroundColor: Colors.transparent,
+                              );
+                            } else {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (context) => OtherProfileDialog(
+                                  user: profile!,
+                                ),
+                                backgroundColor: Colors.transparent,
+                              );
+                            }
+                          },
+                          child: Container(
+                            width: 65,
+                            color: Colors.transparent,
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: SvgPicture.asset(
+                                'assets/icons/ic_dots_vertical.svg',
+                                width: 12,
+                                colorFilter: ColorFilter.mode(
+                                    context.colors.iconsDefault!,
+                                    BlendMode.srcIn),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(
                       height: 18,
@@ -177,23 +176,24 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                       children: [
                         CircleAvatar(
                           radius: 40,
-                          backgroundImage: profile?.imagePath == null
-                              ? null
-                              : Image
-                              .network(
-                            profile!.imagePath!,
-                            fit: BoxFit.cover,
-                          )
-                              .image,
+                          backgroundImage:
+                              photo == null || profile?.mySelf != true
+                                  ? null
+                                  : Image.memory(
+                                      photo,
+                                      fit: BoxFit.cover,
+                                      cacheWidth: 150,
+                                    ).image,
                           backgroundColor: avatar[Random().nextInt(3)],
                           child: profile?.imagePath == null &&
-                              profile?.name != null
+                                      profile?.name != null ||
+                                  photo == null && profile?.mySelf == true
                               ? Text(
-                            getAvatarName(profile!.name).toUpperCase(),
-                            style: context.textStyles.title3!.copyWith(
-                              color: context.colors.textsBackground,
-                            ),
-                          )
+                                  getAvatarName(profile!.name).toUpperCase(),
+                                  style: context.textStyles.title3!.copyWith(
+                                    color: context.colors.textsBackground,
+                                  ),
+                                )
                               : const SizedBox(),
                         ),
                         const SizedBox(
@@ -299,16 +299,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                           text: (profile?.mySelf ?? false)
                               ? 'Edit'
                               : ((profile?.followed ?? false)
-                              ? AppLocalizations.of(context)!
-                              .following
-                              .capitalize()
-                              : AppLocalizations.of(context)!.follow),
+                                  ? AppLocalizations.of(context)!
+                                      .following
+                                      .capitalize()
+                                  : AppLocalizations.of(context)!.follow),
                           backgroundColor: ((profile?.mySelf ?? false) ||
-                              (profile?.followed ?? false))
+                                  (profile?.followed ?? false))
                               ? context.colors.fieldsDefault
                               : null,
                           textColor: ((profile?.mySelf ?? false) ||
-                              (profile?.followed ?? false))
+                                  (profile?.followed ?? false))
                               ? context.colors.textsPrimary
                               : null,
                         ),
@@ -336,45 +336,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
               toolbarHeight: 48,
               pinned: true,
               leading: const SizedBox(),
-              flexibleSpace: tabController == null
-                  ? const SizedBox()
-                  : TabBar(
-                dividerColor: Colors.transparent,
-                controller: tabController,
-                indicatorColor: context.colors.iconsActive,
-                tabs: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    child: Text(
-                      "Collection",
-                      style: context.textStyles.subheadline,
-                    ),
+              flexibleSpace:
+                  tabController == null || tabController?.animation == null ? const SizedBox() : ProfileTabBar(
+                    animation: tabController!.animation!,
+                    tabController: tabController,
+                    profile: profile,
                   ),
-                  if (profile?.mySelf ?? false)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
-                      child: Text(
-                        "Bookmarks",
-                        style: context.textStyles.subheadline,
-                      ),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    child: Text(
-                      "Lists",
-                      style: context.textStyles.subheadline,
-                    ),
-                  ),
-                ],
-              ),
             ),
           ];
         },
         body: tabController == null
             ? const SizedBox()
             : ProfileTabs(
-          controller: tabController!,
-        ),
+                controller: tabController!,
+              ),
       ),
     );
   }
@@ -403,52 +378,58 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
     with SingleTickerProviderStateMixin {
   final lists = List.generate(
     20,
-        (index) =>
-        MultiplePostModel(
-            posters: [
-              'https://m.media-amazon.com/images/I/61YwNp4JaPL._AC_UF1000,1000_QL80_.jpg',
-              'https://upload.wikimedia.org/wikipedia/commons/5/51/This_Gun_for_Hire_%281942%29_poster.jpg',
-              'https://media1.popsugar-assets.com/files/thumbor/1TbaTW9g1m1b4wQ3eMvy1dzsv14/fit-in/728xorig/filters:format_auto-!!-:strip_icc-!!-/2023/04/04/606/n/1922283/d37d2acbdda350b9_BARBIE_Character_RYAN_InstaVert_1638x2048_DOM/i/Ryan-Gosling-Barbie-Poster.jpg',
-              if (index % 2 == 0)
-                'https://m.media-amazon.com/images/I/51ifcV+yjPL._AC_.jpg',
-              if (index % 3 == 0)
-                'https://i.etsystatic.com/27817007/r/il/64df86/3235749828/il_1080xN.3235749828_oy85.jpg',
-              if (index % 4 == 0)
-                'https://creativereview.imgix.net/content/uploads/2018/12/Unknown-5.jpeg?auto=compress,format&q=60&w=2024&h=3000',
-            ],
-            name: 'Some random list number $index',
-            author: UserModel(
-              name: 'Name $index',
-              username: 'username$index',
-              followed: index % 2 == 0,
-              imagePath: index % 2 == 0
-                  ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
-                  : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
-            ),
-            time: '12:00',
-            description:
+    (index) => MultiplePostModel(
+        posters: [
+          'https://m.media-amazon.com/images/I/61YwNp4JaPL._AC_UF1000,1000_QL80_.jpg',
+          'https://upload.wikimedia.org/wikipedia/commons/5/51/This_Gun_for_Hire_%281942%29_poster.jpg',
+          'https://media1.popsugar-assets.com/files/thumbor/1TbaTW9g1m1b4wQ3eMvy1dzsv14/fit-in/728xorig/filters:format_auto-!!-:strip_icc-!!-/2023/04/04/606/n/1922283/d37d2acbdda350b9_BARBIE_Character_RYAN_InstaVert_1638x2048_DOM/i/Ryan-Gosling-Barbie-Poster.jpg',
+          if (index % 2 == 0)
+            'https://m.media-amazon.com/images/I/51ifcV+yjPL._AC_.jpg',
+          if (index % 3 == 0)
+            'https://i.etsystatic.com/27817007/r/il/64df86/3235749828/il_1080xN.3235749828_oy85.jpg',
+          if (index % 4 == 0)
+            'https://creativereview.imgix.net/content/uploads/2018/12/Unknown-5.jpeg?auto=compress,format&q=60&w=2024&h=3000',
+        ],
+        posterNames: [
+          'Joker',
+          'Random',
+          'Barbie',
+          if (index % 2 == 0) 'The Walking Dead',
+          if (index % 3 == 0) 'JAWS',
+          if (index % 4 == 0) 'Spider-Man',
+        ],
+        name: 'Some random list number $index',
+        author: UserModel(
+          name: 'Name $index',
+          username: 'username$index',
+          followed: index % 2 == 0,
+          imagePath: index % 2 == 0
+              ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
+              : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
+        ),
+        time: '12:00',
+        description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."),
   );
 
   final posters = List.generate(
-    30,
-        (index) =>
-        PostMovieModel(
-            year: 2000 + index,
-            imagePath: index % 2 == 0
-                ? 'https://m.media-amazon.com/images/I/61YwNp4JaPL._AC_UF1000,1000_QL80_.jpg'
-                : 'https://m.media-amazon.com/images/I/51ifcV+yjPL._AC_.jpg',
-            name: index % 2 == 0 ? 'Joker' : 'The Walking Dead',
-            author: UserModel(
-              name: 'Name $index',
-              username: 'username$index',
-              followed: index % 2 == 0,
-              imagePath: index % 2 == 0
-                  ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
-                  : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
-            ),
-            time: '12:00',
-            description:
+    300,
+    (index) => PostMovieModel(
+        year: 2000 + index,
+        imagePath: index % 2 == 0
+            ? 'https://m.media-amazon.com/images/I/61YwNp4JaPL._AC_UF1000,1000_QL80_.jpg'
+            : 'https://m.media-amazon.com/images/I/51ifcV+yjPL._AC_.jpg',
+        name: index % 2 == 0 ? 'Joker' : 'The Walking Dead',
+        author: UserModel(
+          name: 'Name $index',
+          username: 'username$index',
+          followed: index % 2 == 0,
+          imagePath: index % 2 == 0
+              ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
+              : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
+        ),
+        time: '12:00',
+        description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."),
   );
 
@@ -481,6 +462,7 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
                 BookmarksRoute(startIndex: index),
               );
             },
+            customOnLongTap: () {},
           ),
         GridView.builder(
           padding: const EdgeInsets.all(16.0),
@@ -505,9 +487,11 @@ class PostsCollectionView extends ConsumerWidget {
     Key? key,
     required this.movies,
     this.customOnItemTap,
+    this.customOnLongTap,
   }) : super(key: key);
   final List<PostMovieModel> movies;
   final void Function(PostMovieModel, int)? customOnItemTap;
+  final void Function()? customOnLongTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -520,21 +504,15 @@ class PostsCollectionView extends ConsumerWidget {
         crossAxisSpacing: 12.5,
         mainAxisSpacing: 15,
         mainAxisExtent:
-        ((MediaQuery
-            .of(context)
-            .size
-            .width - 57) / 3) / 106 * 160 + 32,
+            ((MediaQuery.of(context).size.width - 57) / 3) / 106 * 160 + 32,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       itemCount: movies.length,
       itemBuilder: (context, index) {
         return PostsCollectionTile(
-          imagePath: movies[index].imagePath,
-          name: movies[index].name,
-          year: movies[index].year.toString(),
-          description: movies[index].description,
           post: movies[index],
           customOnItemTap: customOnItemTap,
+          customOnLongTap: customOnLongTap,
           index: index,
         );
       },
@@ -543,21 +521,23 @@ class PostsCollectionView extends ConsumerWidget {
 }
 
 class PostsCollectionTile extends StatelessWidget {
-  const PostsCollectionTile({Key? key,
-    required this.name,
-    required this.year,
-    required this.imagePath,
+  const PostsCollectionTile({
+    Key? key,
     this.post,
-    this.description,
-    this.customOnItemTap, required this.index,})
-      : super(key: key);
+    this.customOnItemTap,
+    required this.index,
+    this.imagePath,
+    this.name,
+    this.customOnLongTap,
+    this.year,
+  }) : super(key: key);
   final int index;
-  final String name;
-  final String year;
-  final String imagePath;
-  final String? description;
   final PostMovieModel? post;
+  final String? imagePath;
+  final String? name;
+  final String? year;
   final void Function(PostMovieModel, int)? customOnItemTap;
+  final void Function()? customOnLongTap;
 
   @override
   Widget build(BuildContext context) {
@@ -565,36 +545,42 @@ class PostsCollectionTile extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: () {
-            if (post != null && customOnItemTap == null) {
-              AutoRouter.of(context).push(
-                PosterRoute(
-                  post: PostMovieModel(
-                    year: post!.year,
-                    imagePath: post!.imagePath,
-                    name: post!.name,
-                    author: post!.author,
-                    time: post!.time,
-                    description: post!.description,
+            if (post != null) {
+              if (customOnItemTap == null) {
+                AutoRouter.of(context).push(
+                  PosterRoute(
+                    post: PostMovieModel(
+                      year: post!.year,
+                      imagePath: post!.imagePath,
+                      name: post!.name,
+                      author: post!.author,
+                      time: post!.time,
+                      description: post!.description,
+                    ),
                   ),
-                ),
-              );
-            } else if (post != null) {
-              customOnItemTap!(post!, index);
+                );
+              } else {
+                customOnItemTap!(post!, index);
+              }
             }
           },
           onLongPress: () {
-            showDialog(
-              context: context,
-              useSafeArea: false,
-              builder: (context) {
-                return PosterImageDialog(
-                  imagePath: imagePath,
-                  name: name,
-                  year: year,
-                  description: description,
-                );
-              },
-            );
+            if (customOnLongTap != null) {
+              customOnLongTap!();
+            } else {
+              showDialog(
+                context: context,
+                useSafeArea: false,
+                builder: (context) {
+                  return PosterImageDialog(
+                    imagePath: imagePath ?? post!.imagePath,
+                    name: post == null ? null : post!.name,
+                    year: post == null ? null : post!.year.toString(),
+                    description: post == null ? null : post!.description,
+                  );
+                },
+              );
+            }
           },
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
@@ -602,7 +588,7 @@ class PostsCollectionTile extends StatelessWidget {
               color: context.colors.backgroundsSecondary,
               height: 160,
               child: Image.network(
-                imagePath,
+                post == null ? imagePath! : post!.imagePath,
                 fit: BoxFit.cover,
               ),
             ),
@@ -610,7 +596,7 @@ class PostsCollectionTile extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          name,
+          post == null ? name! : post!.name,
           textAlign: TextAlign.center,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -619,32 +605,30 @@ class PostsCollectionTile extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          year,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: context.textStyles.caption1!.copyWith(
-            color: context.colors.textsDisabled,
+          Text(
+            year ?? (post == null ? '' : post!.year.toString()),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.textStyles.caption1!.copyWith(
+              color: context.colors.textsDisabled,
+            ),
           ),
-        ),
       ],
     );
   }
 }
 
 class PosterImageDialog extends StatefulWidget {
-  const PosterImageDialog
-
-  ({
-  super.key,
-  required this.name,
-  required this.year,
-  required this.imagePath,
-  this.description,
+  const PosterImageDialog({
+    super.key,
+    this.name,
+    this.year,
+    required this.imagePath,
+    this.description,
   });
 
-  final String name;
-  final String year;
+  final String? name;
+  final String? year;
   final String imagePath;
   final String? description;
 
@@ -704,39 +688,40 @@ class _PosterImageDialogState extends State<PosterImageDialog>
                 const SizedBox(
                   height: 20,
                 ),
-                Container(
-                  padding: const EdgeInsets.all(18.0),
-                  margin: const EdgeInsets.symmetric(horizontal: 16.0),
-                  decoration: BoxDecoration(
-                    color: context.colors.backgroundsPrimary,
-                    borderRadius: BorderRadius.circular(13.0),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.name,
-                        style: context.textStyles.subheadlineBold,
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        widget.year,
-                        style: context.textStyles.caption1!.copyWith(
-                          color: context.colors.textsSecondary,
-                        ),
-                      ),
-                      if (widget.description != null)
-                        const SizedBox(height: 12),
-                      if (widget.description != null)
+                if (widget.name != null)
+                  Container(
+                    padding: const EdgeInsets.all(18.0),
+                    margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                    decoration: BoxDecoration(
+                      color: context.colors.backgroundsPrimary,
+                      borderRadius: BorderRadius.circular(13.0),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          widget.description!.length > 280
-                              ? widget.description!.substring(0, 280)
-                              : widget.description!,
-                          style: context.textStyles.subheadline,
+                          widget.name!,
+                          style: context.textStyles.subheadlineBold,
                         ),
-                    ],
+                        const SizedBox(height: 5),
+                        Text(
+                          widget.year ?? '',
+                          style: context.textStyles.caption1!.copyWith(
+                            color: context.colors.textsSecondary,
+                          ),
+                        ),
+                        if (widget.description != null)
+                          const SizedBox(height: 12),
+                        if (widget.description != null)
+                          Text(
+                            widget.description!.length > 280
+                                ? widget.description!.substring(0, 280)
+                                : widget.description!,
+                            style: context.textStyles.subheadline,
+                          ),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -759,10 +744,7 @@ class OtherProfileDialog extends ConsumerWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: SizedBox(
-        height: 214 + MediaQuery
-            .of(context)
-            .padding
-            .bottom,
+        height: 214 + MediaQuery.of(context).padding.bottom,
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
             topRight: Radius.circular(16.0),
@@ -940,6 +922,58 @@ class MyProfileDialog extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class ProfileTabBar extends AnimatedWidget {
+  const ProfileTabBar({
+    super.key,
+    required Animation<double> animation,
+    this.tabController,
+    this.profile,
+  })  : super(listenable: animation);
+
+  final TabController? tabController;
+  final UserDetailsModel? profile;
+
+  @override
+  Widget build(BuildContext context) {
+    final animation = listenable as Animation<double>;
+    return TabBar(
+      dividerColor: Colors.transparent,
+      controller: tabController,
+      indicatorColor: context.colors.iconsActive,
+      tabs: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14.0),
+          child: Text(
+            "Collection",
+            style: animation.value >= 0 && animation.value <= 0.5
+                ? context.textStyles.subheadlineBold
+                : context.textStyles.subheadline,
+          ),
+        ),
+        if (profile?.mySelf ?? false)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14.0),
+            child: Text(
+              "Bookmarks",
+              style: animation.value > 0.5 && animation.value <= 1.5
+                  ? context.textStyles.subheadlineBold
+                  : context.textStyles.subheadline,
+            ),
+          ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14.0),
+          child: Text(
+            "Lists",
+            style: animation.value > 1.5 && animation.value <= 2
+                ? context.textStyles.subheadlineBold
+                : context.textStyles.subheadline,
+          ),
+        ),
+      ],
     );
   }
 }

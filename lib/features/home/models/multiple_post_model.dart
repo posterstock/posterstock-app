@@ -4,9 +4,11 @@ import 'package:poster_stock/features/home/models/user_model.dart';
 
 class MultiplePostModel extends PostBaseModel {
   final List<String> posters;
+  final List<String> posterNames;
 
   MultiplePostModel({
     required this.posters,
+    required this.posterNames,
     required String name,
     required UserModel author,
     required String time,
@@ -37,6 +39,7 @@ class MultiplePostModel extends PostBaseModel {
           [],
       description: json['description'] as String,
       posters: json['posters'] as List<String>,
+      posterNames: json['titles'] as List<String>,
     );
   }
 }

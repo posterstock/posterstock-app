@@ -16,7 +16,7 @@ class ListGridWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         AutoRouter.of(context).push(
-          CollectionRoute(post: post),
+          ListRoute(post: post),
         );
       },
       child: Column(

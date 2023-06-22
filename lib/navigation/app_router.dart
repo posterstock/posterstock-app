@@ -15,7 +15,7 @@ import 'package:poster_stock/features/settings/view/screens/choose_language_page
 import 'package:poster_stock/features/settings/view/screens/settings_page.dart';
 
 import '../features/auth/view/pages/auth_page.dart';
-import '../features/collection/view/collection_page.dart';
+import '../features/list/view/list_page.dart';
 
 @MaterialAutoRouter(
   replaceInRouteName: 'Page,Route',
@@ -38,7 +38,7 @@ import '../features/collection/view/collection_page.dart';
       ],
     ),
     AutoRoute(page: PosterPage, path: 'poster'),
-    AutoRoute(page: CollectionPage, path: 'collection'),
+    AutoRoute(page: ListPage, path: 'collection'),
     AutoRoute(page: ProfilePage, path: 'profile'),
     AutoRoute(page: SettingsPage, path: 'settings'),
     AutoRoute(page: ChooseLanguagePage, path: 'language'),

@@ -6,7 +6,6 @@
     "or": "Or",
     "contWithApple": "Continue with Apple",
     "contWithGoogle": "Continue with Google",
-    "privacyPolicy": "By clicking “Continue with Google/Email/SAML” above, you acknowledge that you have read and understood, and agree to Posterstock’s Terms & Contitions and Privacy Polis",
     "invalidSymbols" : "Symbols cannot be used",
     "codeSent" : "We just sent you a temporary up code.\nPlease check your inbox.",
     "pasteLoginCode" : "Paste login code",
@@ -29,5 +28,11 @@
     "reply" : "Reply",
     "notifications" : "Notifications",
     "followers" : "followers",
-    "following" : "following"
+    "following" : "following",
+    "privacyPolicyText1": "By clicking \"Continue with Email/Google/Apple\" above, you acknowledge that you have read, understood, and agreed to the",
+    "privacyPolicyLink1" : " Terms ",
+    "privacyPolicyText2" : "and",
+    "privacyPolicyLink2" : " Privacy Policy ",
+    "privacyPolicyText3" : "of Posterstock. The social network is developed by",
+    "privacyPolicyLink3" : " Thedirection OÜ."
 }

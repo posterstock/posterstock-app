@@ -1,18 +1,24 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
+import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
+import 'package:poster_stock/features/theme_switcher/state_holder/theme_value_state_holder.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
+import 'package:poster_stock/themes/app_themes.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = ref.watch(themeValueStateHolderProvider);
     return CustomScaffold(
       backgroundColor: context.colors.backgroundsSecondary,
       child: SingleChildScrollView(
@@ -67,18 +73,26 @@ class SettingsPage extends ConsumerWidget {
                     },
                     child: Row(
                       children: [
-                        Expanded(
+                        SizedBox(
+                          width: 129,
                           child: Text(
                             'Language',
                             style: context.textStyles.bodyRegular,
                           ),
                         ),
                         const Spacer(),
-                        Text(
-                          ref.watch(chosenLanguageStateHolder)?.languageName ??
-                              "English",
-                          style: context.textStyles.bodyRegular!.copyWith(
-                            color: context.colors.textsSecondary,
+                        Expanded(
+                          child: Text(
+                            ref
+                                    .watch(chosenLanguageStateHolder)
+                                    ?.languageName ??
+                                "English",
+                            maxLines: 1,
+                            textAlign: TextAlign.right,
+                            overflow: TextOverflow.ellipsis,
+                            style: context.textStyles.bodyRegular!.copyWith(
+                              color: context.colors.textsSecondary,
+                            ),
                           ),
                         ),
                         const SizedBox(
@@ -103,17 +117,22 @@ class SettingsPage extends ConsumerWidget {
                     },
                     child: Row(
                       children: [
-                        Expanded(
+                        SizedBox(
+                          width: 129,
                           child: Text(
                             'Email',
                             style: context.textStyles.bodyRegular,
                           ),
                         ),
-                        const Spacer(),
-                        Text(
-                          'itsmishakiva@outlook.com',
-                          style: context.textStyles.bodyRegular!.copyWith(
-                            color: context.colors.textsSecondary,
+                        Expanded(
+                          child: Text(
+                            'itsmishakiva@outlook.com',
+                            maxLines: 1,
+                            textAlign: TextAlign.right,
+                            overflow: TextOverflow.ellipsis,
+                            style: context.textStyles.bodyRegular!.copyWith(
+                              color: context.colors.textsSecondary,
+                            ),
                           ),
                         ),
                         const SizedBox(
@@ -190,41 +209,116 @@ class SettingsPage extends ConsumerWidget {
                   const SizedBox(
                     height: 24,
                   ),
-                  DoubleButton(
-                    onTap1: () {},
-                    onTap2: () {},
-                    child1: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Terms of Service',
+                  MultipleSettingsButton(
+                    onTaps: [
+                      () {
+                        changeTheme(ref, Themes.system);
+                      },
+                      () {
+                        changeTheme(ref, Themes.light);
+                      },
+                      () {
+                        changeTheme(ref, Themes.dark);
+                      },
+                    ],
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'System theme',
                             style: context.textStyles.bodyRegular,
                           ),
-                        ),
-                        const Spacer(),
-                        Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 14,
-                          color: context.colors.iconsDisabled,
-                        ),
-                      ],
-                    ),
-                    child2: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Privacy Policy',
+                          const Spacer(),
+                          if (theme == Themes.system)
+                            Text(
+                              '􀆅',
+                              style: context.textStyles.headline!.copyWith(
+                                color: context.colors.iconsActive,
+                              ),
+                            ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'Light theme',
                             style: context.textStyles.bodyRegular,
                           ),
-                        ),
-                        const Spacer(),
-                        Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 14,
-                          color: context.colors.iconsDisabled,
-                        ),
-                      ],
-                    ),
+                          const Spacer(),
+                          if (theme == Themes.light)
+                            Text(
+                              '􀆅',
+                              style: context.textStyles.headline!.copyWith(
+                                color: context.colors.iconsActive,
+                              ),
+                            ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'Dark theme',
+                            style: context.textStyles.bodyRegular,
+                          ),
+                          const Spacer(),
+                          if (theme == Themes.dark)
+                            Text(
+                              '􀆅',
+                              style: context.textStyles.headline!.copyWith(
+                                color: context.colors.iconsActive,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 24,
+                  ),
+                  MultipleSettingsButton(
+                    onTaps: [() {
+                      launchUrlString(
+                        "https://thedirection.org/posterstock_terms",
+                      );
+                    }, () {
+                      launchUrlString(
+                        "https://thedirection.org/posterstock_privacy",
+                      );
+                    }],
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Terms of Service',
+                              style: context.textStyles.bodyRegular,
+                            ),
+                          ),
+                          const Spacer(),
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 14,
+                            color: context.colors.iconsDisabled,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Privacy Policy',
+                              style: context.textStyles.bodyRegular,
+                            ),
+                          ),
+                          const Spacer(),
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 14,
+                            color: context.colors.iconsDisabled,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   const SizedBox(
                     height: 24,
@@ -298,6 +392,28 @@ class SettingsPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  void changeTheme(WidgetRef ref, Themes theme) {
+    if (theme == Themes.dark) {
+      ref.read(themeControllerProvider).updateTheme(AppThemes.darkThemeData, theme);
+    } else if (theme == Themes.light) {
+      ref.read(themeControllerProvider).updateTheme(AppThemes.lightThemeData, theme);
+    } else {
+      var systemBrightness =
+          SchedulerBinding.instance.window.platformBrightness;
+      if (systemBrightness == Brightness.light) {
+        ref.read(themeControllerProvider).updateTheme(
+              AppThemes.lightThemeData,
+              theme,
+            );
+      } else {
+        ref.read(themeControllerProvider).updateTheme(
+              AppThemes.darkThemeData,
+              theme,
+            );
+      }
+    }
   }
 }
 

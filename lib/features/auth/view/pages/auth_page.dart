@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -14,6 +15,8 @@ import 'package:poster_stock/features/theme_switcher/controller/theme_controller
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
 import 'package:poster_stock/themes/app_themes.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../../common/state_holders/intl_state_holder.dart';
 import '../../../../common/widgets/app_text_field.dart';
@@ -62,18 +65,14 @@ class AuthPage extends ConsumerWidget {
                           MediaQuery.of(context).padding.top,
                       width: double.infinity,
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        changeTheme(ref);
-                      },
-                      child: Container(
-                        width: 144,
-                        height: 144,
-                        child: Theme.of(context).brightness == Brightness.light
-                            ? SvgPicture.asset('assets/images/light_logo.svg')
-                            : SvgPicture.asset('assets/images/dark_logo.svg'),
-                      ),
+                    SizedBox(
+                      width: 144,
+                      height: 144,
+                      child: Theme.of(context).brightness == Brightness.light
+                          ? SvgPicture.asset('assets/images/light_logo.svg')
+                          : SvgPicture.asset('assets/images/dark_logo.svg'),
                     ),
+                    const SizedBox(height: 9),
                     Text(
                       AppLocalizations.of(context)!.welcome,
                       style: context.textStyles.title2!,
@@ -158,10 +157,49 @@ class AuthPage extends ConsumerWidget {
                       ),
                     ),
                     const Spacer(),
-                    Text(
-                      AppLocalizations.of(context)!.privacyPolicy,
-                      style: context.textStyles.caption2,
+                    RichText(
+                      textDirection: TextDirection.ltr,
                       textAlign: TextAlign.center,
+                      text: TextSpan(
+                        text: AppLocalizations.of(context)!.privacyPolicyText1,
+                        style: context.textStyles.caption2,
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: AppLocalizations.of(context)!
+                                .privacyPolicyLink1,
+                            style: context.textStyles.caption2!.copyWith(
+                              decoration: TextDecoration.underline,
+                            ),
+                            recognizer: TapGestureRecognizer()..onTap = () => launchUrlString("https://thedirection.org/posterstock_terms"),
+                          ),
+                          TextSpan(
+                            text: AppLocalizations.of(context)!
+                                .privacyPolicyText2,
+                            style: context.textStyles.caption2,
+                          ),
+                          TextSpan(
+                            text: AppLocalizations.of(context)!
+                                .privacyPolicyLink2,
+                            style: context.textStyles.caption2!.copyWith(
+                              decoration: TextDecoration.underline,
+                            ),
+                            recognizer: TapGestureRecognizer()..onTap = () => launchUrlString("https://thedirection.org/posterstock_privacy"),
+                          ),
+                          TextSpan(
+                            text: AppLocalizations.of(context)!
+                                .privacyPolicyText3,
+                            style: context.textStyles.caption2,
+                          ),
+                          TextSpan(
+                            text: AppLocalizations.of(context)!
+                                .privacyPolicyLink3,
+                            style: context.textStyles.caption2!.copyWith(
+                              decoration: TextDecoration.underline,
+                            ),
+                            recognizer: TapGestureRecognizer()..onTap = () => launchUrlString("https://thedirection.org/"),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 26),
                   ],
@@ -172,15 +210,6 @@ class AuthPage extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  void changeTheme(WidgetRef ref) {
-    final theme = ref.watch(themeStateHolderProvider);
-    if (theme.brightness == Brightness.light) {
-      ref.read(themeControllerProvider).updateTheme(AppThemes.darkThemeData);
-    } else {
-      ref.read(themeControllerProvider).updateTheme(AppThemes.lightThemeData);
-    }
   }
 
   void loadApple(WidgetRef ref, BuildContext context) {

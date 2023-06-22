@@ -8,16 +8,18 @@ class CustomScaffold extends StatelessWidget {
     required this.child,
     this.bottomNavBar,
     this.backgroundColor,
+    this.resize = false,
   }) : super(key: key);
   final Widget child;
   final Widget? bottomNavBar;
   final Color? backgroundColor;
+  final bool resize;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor ?? context.colors.backgroundsPrimary,
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: resize,
       bottomNavigationBar: bottomNavBar,
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(

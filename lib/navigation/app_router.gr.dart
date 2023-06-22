@@ -18,11 +18,11 @@ import '../features/auth/view/pages/auth_page.dart' as _i1;
 import '../features/auth/view/pages/login_page.dart' as _i3;
 import '../features/auth/view/pages/sign_up_page.dart' as _i2;
 import '../features/bookmarks/view/pages/bookmarks_page.dart' as _i13;
-import '../features/collection/view/collection_page.dart' as _i6;
 import '../features/edit_profile/view/pages/edit_profile_page.dart' as _i12;
 import '../features/home/models/multiple_post_model.dart' as _i20;
 import '../features/home/models/post_movie_model.dart' as _i19;
 import '../features/home/view/pages/home_page.dart' as _i14;
+import '../features/list/view/list_page.dart' as _i6;
 import '../features/navigation_page/view/navigation_page.dart' as _i4;
 import '../features/notifications/view/pages/notifications_page.dart' as _i16;
 import '../features/poster/view/pages/poster_page/poster_page.dart' as _i5;
@@ -77,11 +77,11 @@ class AppRouter extends _i17.RootStackRouter {
         ),
       );
     },
-    CollectionRoute.name: (routeData) {
-      final args = routeData.argsAs<CollectionRouteArgs>();
+    ListRoute.name: (routeData) {
+      final args = routeData.argsAs<ListRouteArgs>();
       return _i17.MaterialPageX<dynamic>(
         routeData: routeData,
-        child: _i6.CollectionPage(
+        child: _i6.ListPage(
           key: args.key,
           post: args.post,
         ),
@@ -216,7 +216,7 @@ class AppRouter extends _i17.RootStackRouter {
           path: 'poster',
         ),
         _i17.RouteConfig(
-          CollectionRoute.name,
+          ListRoute.name,
           path: 'collection',
         ),
         _i17.RouteConfig(
@@ -346,25 +346,25 @@ class PosterRouteArgs {
 }
 
 /// generated route for
-/// [_i6.CollectionPage]
-class CollectionRoute extends _i17.PageRouteInfo<CollectionRouteArgs> {
-  CollectionRoute({
+/// [_i6.ListPage]
+class ListRoute extends _i17.PageRouteInfo<ListRouteArgs> {
+  ListRoute({
     _i18.Key? key,
     required _i20.MultiplePostModel post,
   }) : super(
-          CollectionRoute.name,
+          ListRoute.name,
           path: 'collection',
-          args: CollectionRouteArgs(
+          args: ListRouteArgs(
             key: key,
             post: post,
           ),
         );
 
-  static const String name = 'CollectionRoute';
+  static const String name = 'ListRoute';
 }
 
-class CollectionRouteArgs {
-  const CollectionRouteArgs({
+class ListRouteArgs {
+  const ListRouteArgs({
     this.key,
     required this.post,
   });
@@ -375,7 +375,7 @@ class CollectionRouteArgs {
 
   @override
   String toString() {
-    return 'CollectionRouteArgs{key: $key, post: $post}';
+    return 'ListRouteArgs{key: $key, post: $post}';
   }
 }
 

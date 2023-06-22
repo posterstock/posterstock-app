@@ -1,9 +1,12 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../../common/widgets/app_text_field.dart';
 import '../../controllers/sign_up_controller.dart';
@@ -92,10 +95,56 @@ class LoginPage extends ConsumerWidget {
                     onTap: () {},
                   ),
                   const Spacer(),
-                  Text(
-                    AppLocalizations.of(context)!.privacyPolicy,
-                    style: context.textStyles.caption2,
+                  RichText(
+                    textDirection: TextDirection.ltr,
                     textAlign: TextAlign.center,
+                    text: TextSpan(
+                      text: AppLocalizations.of(context)!.privacyPolicyText1,
+                      style: context.textStyles.caption2,
+                      children: <TextSpan>[
+                        TextSpan(
+                          text:
+                              AppLocalizations.of(context)!.privacyPolicyLink1,
+                          style: context.textStyles.caption2!.copyWith(
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () => launchUrlString(
+                                  "https://thedirection.org/posterstock_terms",
+                                ),
+                        ),
+                        TextSpan(
+                          text:
+                              AppLocalizations.of(context)!.privacyPolicyText2,
+                          style: context.textStyles.caption2,
+                        ),
+                        TextSpan(
+                          text:
+                              AppLocalizations.of(context)!.privacyPolicyLink2,
+                          style: context.textStyles.caption2!.copyWith(
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () => launchUrlString(
+                                "https://thedirection.org/posterstock_privacy"),
+                        ),
+                        TextSpan(
+                          text:
+                              AppLocalizations.of(context)!.privacyPolicyText3,
+                          style: context.textStyles.caption2,
+                        ),
+                        TextSpan(
+                          text:
+                              AppLocalizations.of(context)!.privacyPolicyLink3,
+                          style: context.textStyles.caption2!.copyWith(
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () =>
+                                launchUrlString("https://thedirection.org/"),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 26),
                 ],
