@@ -734,10 +734,12 @@ class _PosterImageDialogState extends State<PosterImageDialog>
 class OtherProfileDialog extends ConsumerWidget {
   const OtherProfileDialog({
     Key? key,
-    required this.user,
-  }) : super(key: key);
+    this.user,
+    this.user1,
+  }): assert(user == null || user1 == null),super(key: key);
 
-  final UserDetailsModel user;
+  final UserDetailsModel? user;
+  final UserModel? user1;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -764,7 +766,7 @@ class OtherProfileDialog extends ConsumerWidget {
                   ),
                   const SizedBox(height: 22),
                   Text(
-                    user.name,
+                    (user?.name ?? user1?.name) ?? '',
                     style: context.textStyles.bodyBold,
                   ),
                   const SizedBox(height: 10.5),

@@ -12,6 +12,7 @@ import 'package:poster_stock/features/home/view/helpers/page_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
+import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -71,7 +72,9 @@ class PostBase extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if ((post != null || multPost != null) && !user!.followed && showSuggestion)
+                    if ((post != null || multPost != null) &&
+                        !user!.followed &&
+                        showSuggestion)
                       Padding(
                         padding: const EdgeInsets.only(left: 68.0),
                         child: Text(
@@ -141,7 +144,7 @@ class UserInfoTile extends StatelessWidget {
     return ShimmerLoader(
       loaded: !loading,
       child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
+        //behavior: HitTestBehavior.translucent,
         onTap: () {
           if (user == null) return;
           AutoRouter.of(context).push(ProfileRoute(
@@ -159,122 +162,133 @@ class UserInfoTile extends StatelessWidget {
             ),
           ));
         },
-        child: IgnorePointer(
-          ignoring:
-              (!(user?.followed ?? true) && (!loading) && showFollowButton)
-                  ? false
-                  : true,
-          child: Container(
-            color: Colors.transparent,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
-                  child: CircleAvatar(
-                    radius: 20,
-                    backgroundImage: user?.imagePath != null
-                        ? NetworkImage(user!.imagePath!)
-                        : null,
-                    backgroundColor: avatar[Random().nextInt(3)],
-                    child: user?.imagePath == null && !loading
-                        ? Text(
-                            getAvatarName(user!.name).toUpperCase(),
-                            style: context.textStyles.subheadlineBold!.copyWith(
-                              color: context.colors.textsBackground,
+        child: Container(
+          color: Colors.transparent,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 4.0),
+                child: CircleAvatar(
+                  radius: 20,
+                  backgroundImage: user?.imagePath != null
+                      ? NetworkImage(user!.imagePath!)
+                      : null,
+                  backgroundColor: avatar[Random().nextInt(3)],
+                  child: user?.imagePath == null && !loading
+                      ? Text(
+                          getAvatarName(user!.name).toUpperCase(),
+                          style: context.textStyles.subheadlineBold!.copyWith(
+                            color: context.colors.textsBackground,
+                          ),
+                        )
+                      : const SizedBox(),
+                ),
+              ),
+              const SizedBox(
+                width: 12,
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 2.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (loading)
+                            const SizedBox(
+                              height: 3,
                             ),
-                          )
-                        : const SizedBox(),
-                  ),
-                ),
-                const SizedBox(
-                  width: 12,
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 2.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (loading)
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              TextOrContainer(
+                                text: user?.name,
+                                style: context.textStyles.calloutBold!.copyWith(
+                                    color: darkBackground
+                                        ? context.colors.textsBackground!
+                                        : context.colors.textsPrimary),
+                                emptyWidth: 146,
+                                emptyHeight: 17,
+                              ),
                               const SizedBox(
-                                height: 3,
+                                width: 12,
                               ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                TextOrContainer(
-                                  text: user?.name,
-                                  style: context.textStyles.calloutBold!.copyWith(
-                                      color: darkBackground
-                                          ? context.colors.textsBackground!
-                                          : context.colors.textsPrimary),
-                                  emptyWidth: 146,
-                                  emptyHeight: 17,
-                                ),
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                if ((user?.followed ?? true) || !showFollowButton)
-                                  Text(
-                                    time ?? '',
-                                    style: context.textStyles.footNote!.copyWith(
-                                      color: darkBackground
-                                          ? context.colors.textsBackground!
-                                              .withOpacity(0.8)
-                                          : context.colors.textsDisabled,
-                                    ),
+                              if ((user?.followed ?? true) || !showFollowButton)
+                                Text(
+                                  time ?? '',
+                                  style: context.textStyles.footNote!.copyWith(
+                                    color: darkBackground
+                                        ? context.colors.textsBackground!
+                                            .withOpacity(0.8)
+                                        : context.colors.textsDisabled,
                                   ),
-                              ],
+                                ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: !loading ? 3 : 8,
+                          ),
+                          TextOrContainer(
+                            text: user?.username == null
+                                ? null
+                                : '@${user!.username}',
+                            style: context.textStyles.caption1!.copyWith(
+                              color: darkBackground
+                                  ? context.colors.textsBackground!
+                                      .withOpacity(0.8)
+                                  : context.colors.textsSecondary,
                             ),
-                            SizedBox(
-                              height: !loading ? 3 : 8,
-                            ),
-                            TextOrContainer(
-                              text: user?.username == null
-                                  ? null
-                                  : '@${user!.username}',
-                              style: context.textStyles.caption1!.copyWith(
-                                color: darkBackground
-                                    ? context.colors.textsBackground!
-                                        .withOpacity(0.8)
-                                    : context.colors.textsSecondary,
-                              ),
-                              emptyWidth: 120,
-                              emptyHeight: 12,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                            emptyWidth: 120,
+                            emptyHeight: 12,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                if (!(user?.followed ?? true) && (!loading) && showFollowButton)
-                  AppTextButton(
-                    text: AppLocalizations.of(context)!.follow,
-                    onTap: () {},
-                  ),
-                if (!loading && showSettings)
-                  GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      color: Colors.transparent,
-                      padding: const EdgeInsets.fromLTRB(16.0, 5.0, 0.0, 5.0),
-                      child: SvgPicture.asset(
-                        'assets/icons/ic_dots.svg',
-                        width: 24,
-                        colorFilter: ColorFilter.mode(
-                          context.colors.iconsLayer!,
-                          BlendMode.srcIn,
+              ),
+              if (!(user?.followed ?? true) && (!loading) && showFollowButton)
+                AppTextButton(
+                  text: AppLocalizations.of(context)!.follow,
+                  onTap: () {},
+                ),
+              if (!loading && showSettings)
+                GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      backgroundColor: Colors.transparent,
+                      isScrollControlled: true,
+                      builder: (context) => GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          color: Colors.transparent,
+                          child: OtherProfileDialog(
+                            user1: user!,
+                          ),
                         ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    color: Colors.transparent,
+                    padding: const EdgeInsets.fromLTRB(16.0, 5.0, 0.0, 5.0),
+                    child: SvgPicture.asset(
+                      'assets/icons/ic_dots.svg',
+                      width: 24,
+                      colorFilter: ColorFilter.mode(
+                        context.colors.iconsLayer!,
+                        BlendMode.srcIn,
                       ),
                     ),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         ),
       ),

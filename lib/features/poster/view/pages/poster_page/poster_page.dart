@@ -481,7 +481,7 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                             ),
                             GestureDetector(
                               onTap: () {
-                                print(1);
+                                //TODO dialog
                               },
                               child: SvgPicture.asset(
                                 'assets/icons/ic_collection.svg',
@@ -542,7 +542,6 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
         MediaQuery.of(context).size.width - 84,
       ).height;
     }
-    print(result);
     return MediaQuery.of(context).size.height - result < 0
         ? 0
         : MediaQuery.of(context).size.height - result;
@@ -559,12 +558,12 @@ class CommentTextField extends StatefulWidget {
 }
 
 class _CommentTextFieldState extends State<CommentTextField> {
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     setState(() {});
   }
+
   final FocusNode focus = FocusNode();
   final GlobalKey key = GlobalKey();
   final TextEditingController controller = TextEditingController();
@@ -582,7 +581,8 @@ class _CommentTextFieldState extends State<CommentTextField> {
           color: context.colors.fieldsDefault,
         ),
         Container(
-          height: focus.hasPrimaryFocus && MediaQuery.of(context).viewInsets.bottom != 0
+          height: focus.hasPrimaryFocus &&
+                  MediaQuery.of(context).viewInsets.bottom != 0
               ? null
               : 56 + MediaQuery.of(context).padding.bottom,
           color: context.colors.backgroundsPrimary,
@@ -608,7 +608,8 @@ class _CommentTextFieldState extends State<CommentTextField> {
             ),
           ),
         ),
-        if (focus.hasPrimaryFocus && MediaQuery.of(context).viewInsets.bottom != 0)
+        if (focus.hasPrimaryFocus &&
+            MediaQuery.of(context).viewInsets.bottom != 0)
           Container(
             height: 56,
             color: context.colors.backgroundsPrimary,

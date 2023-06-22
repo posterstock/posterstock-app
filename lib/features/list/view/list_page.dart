@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
@@ -39,14 +40,11 @@ class _ListPageState extends State<ListPage>
   double velocity = 0;
 
   void jumpToEnd({bool? up}) {
-    if (scrollController.offset == 0 ||
-        scrollController.offset == 250) return;
+    if (scrollController.offset == 0 || scrollController.offset == 250) return;
     WidgetsBinding.instance.addPostFrameCallback(
-          (_) {
+      (_) {
         int durationValue = (200 *
-            (1 -
-                (animationController.value - 250 / 2).abs() /
-                    (250 / 2)))
+                (1 - (animationController.value - 250 / 2).abs() / (250 / 2)))
             .round();
         if (durationValue < 50) durationValue = 50;
         if (up == false ||
@@ -65,8 +63,7 @@ class _ListPageState extends State<ListPage>
         }
       },
     );
-    if (up == false ||
-        animationController.value > 250 * 0.5 && up != true) {
+    if (up == false || animationController.value > 250 * 0.5 && up != true) {
       animationController.animateTo(
         250,
         duration: const Duration(milliseconds: 300),
@@ -131,6 +128,22 @@ class _ListPageState extends State<ListPage>
                     leading: const CustomBackButton(),
                     actions: [
                       GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            isScrollControlled: true,
+                            builder: (context) => GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                color: Colors.transparent,
+                                child: const ListActionsDialog(),
+                              ),
+                            ),
+                          );
+                        },
                         child: Padding(
                           padding: const EdgeInsets.only(right: 16),
                           child: SvgPicture.asset(
@@ -156,15 +169,15 @@ class _ListPageState extends State<ListPage>
                           }
                           if (index == widget.post.comments.length + 1) {
                             return SizedBox(
-                              height: getEmptySpaceHeightForCollection(context) <
+                              height: getEmptySpaceHeightForCollection(
+                                          context) <
                                       56 + MediaQuery.of(context).padding.bottom
                                   ? 56 + MediaQuery.of(context).padding.bottom
                                   : getEmptySpaceHeightForCollection(context),
                             );
                           }
                           return Padding(
-                            padding:
-                            const EdgeInsets.symmetric(vertical: 6.0),
+                            padding: const EdgeInsets.symmetric(vertical: 6.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -174,10 +187,8 @@ class _ListPageState extends State<ListPage>
                                   ),
                                   child: UserInfoTile(
                                     showFollowButton: false,
-                                    user:
-                                    widget.post.comments[index - 1].user,
-                                    time:
-                                    widget.post.comments[index - 1].time,
+                                    user: widget.post.comments[index - 1].user,
+                                    time: widget.post.comments[index - 1].time,
                                   ),
                                 ),
                                 const SizedBox(height: 12),
@@ -189,13 +200,13 @@ class _ListPageState extends State<ListPage>
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             widget.post.comments[index - 1]
                                                 .comment,
-                                            style: context
-                                                .textStyles.subheadline,
+                                            style:
+                                                context.textStyles.subheadline,
                                           ),
                                           const SizedBox(height: 12),
                                           if (index - 1 !=
@@ -203,8 +214,8 @@ class _ListPageState extends State<ListPage>
                                             Divider(
                                               height: 0.5,
                                               thickness: 0.5,
-                                              color: context
-                                                  .colors.fieldsDefault,
+                                              color:
+                                                  context.colors.fieldsDefault,
                                             ),
                                         ],
                                       ),
@@ -229,8 +240,8 @@ class _ListPageState extends State<ListPage>
                   animation: animationController,
                   builder: (context, child) {
                     return Transform.translate(
-                      offset: Offset(
-                          0, (animationController.value - 36) / (250 - 36) * 42),
+                      offset: Offset(0,
+                          (animationController.value - 36) / (250 - 36) * 42),
                       child: Transform.scale(
                         alignment: Alignment.topCenter,
                         scale: animationController.value / 250 > 1
@@ -239,7 +250,8 @@ class _ListPageState extends State<ListPage>
                             : animationController.value / 250,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular((1 -
-                                  (animationController.value - 36) / (250 - 36)) *
+                                  (animationController.value - 36) /
+                                      (250 - 36)) *
                               20),
                           child: child,
                         ),
@@ -274,8 +286,7 @@ class _ListPageState extends State<ListPage>
   }
 
   double getEmptySpaceHeightForCollection(BuildContext context) {
-    double result =
-        widget.post.comments.length * 80 + 180;
+    double result = widget.post.comments.length * 80 + 180;
     result += TextInfoService.textSize(
       widget.post.name,
       context.textStyles.title3!,
@@ -288,7 +299,10 @@ class _ListPageState extends State<ListPage>
       context.textStyles.subheadline!,
       MediaQuery.of(context).size.width - 32,
     ).height;
-    result += (widget.post.posters.length % 3 == 0 ? widget.post.posters.length / 3 : widget.post.posters.length ~/ 3 + 1) * 212;
+    result += (widget.post.posters.length % 3 == 0
+            ? widget.post.posters.length / 3
+            : widget.post.posters.length ~/ 3 + 1) *
+        212;
     result += 32;
     for (var comment in widget.post.comments) {
       result += TextInfoService.textSize(
@@ -357,7 +371,10 @@ class CollectionInfoWidget extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           SizedBox(
-            height: (post.posters.length % 3 == 0 ? post.posters.length / 3 : post.posters.length ~/ 3 + 1) * 212,
+            height: (post.posters.length % 3 == 0
+                    ? post.posters.length / 3
+                    : post.posters.length ~/ 3 + 1) *
+                212,
             child: GridView.builder(
               padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(
@@ -384,6 +401,136 @@ class CollectionInfoWidget extends StatelessWidget {
           ),
           const SizedBox(height: 16),
         ],
+      ),
+    );
+  }
+}
+
+class ListActionsDialog extends ConsumerWidget {
+  const ListActionsDialog({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: SizedBox(
+        height: 310,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: SizedBox(
+                  height: 190,
+                  child: Material(
+                    color: context.colors.backgroundsPrimary,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 36,
+                          child: Center(
+                            child: Text(
+                              'List',
+                              style: context.textStyles.footNote!.copyWith(
+                                color: context.colors.textsSecondary,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          height: 0.5,
+                          thickness: 0.5,
+                          color: context.colors.fieldsDefault,
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              print(1);
+                            },
+                            child: Center(
+                              child: Text(
+                                'Follow',
+                                style: context.textStyles.bodyRegular!.copyWith(
+                                  color: context.colors.textsPrimary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          height: 0.5,
+                          thickness: 0.5,
+                          color: context.colors.fieldsDefault,
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              print(1);
+                            },
+                            child: Center(
+                              child: Text(
+                                'Share',
+                                style: context.textStyles.bodyRegular!.copyWith(
+                                  color: context.colors.textsPrimary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          height: 0.5,
+                          thickness: 0.5,
+                          color: context.colors.fieldsDefault,
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              print(1);
+                            },
+                            child: Center(
+                              child: Text(
+                                'Report',
+                                style: context.textStyles.bodyRegular!.copyWith(
+                                  color: context.colors.textsError,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: SizedBox(
+                  height: 52,
+                  child: Material(
+                    color: context.colors.backgroundsPrimary,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Center(
+                        child: Text(
+                          'Cancel',
+                          style: context.textStyles.bodyRegular,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

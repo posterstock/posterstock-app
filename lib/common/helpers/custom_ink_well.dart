@@ -25,12 +25,13 @@ class CustomInkWellState extends State<CustomInkWell>
   );
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return InkWell(
-      highlightColor: Colors.transparent,
-      hoverColor: Colors.transparent,
-      focusColor: Colors.transparent,
-      splashColor: Colors.transparent,
+    return GestureDetector(
       onTapDown: (details) {
         controller.animateTo(1);
       },
