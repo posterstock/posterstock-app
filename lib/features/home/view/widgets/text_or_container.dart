@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 
 class TextOrContainer extends StatelessWidget {
-  const TextOrContainer(
-      {Key? key, this.text, this.style, this.emptyWidth, this.emptyHeight})
-      : super(key: key);
+  const TextOrContainer({
+    Key? key,
+    this.text,
+    this.style,
+    this.emptyWidth,
+    this.emptyHeight,
+    this.overflow,
+  }) : super(key: key);
 
   final String? text;
   final TextStyle? style;
   final double? emptyWidth;
   final double? emptyHeight;
+  final TextOverflow? overflow;
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +22,7 @@ class TextOrContainer extends StatelessWidget {
       return Text(
         text!,
         style: style,
+        overflow: overflow,
       );
     }
     return Container(

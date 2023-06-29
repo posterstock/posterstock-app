@@ -143,6 +143,10 @@ class LoginPage extends ConsumerWidget {
                             ..onTap = () =>
                                 launchUrlString("https://thedirection.org/"),
                         ),
+                        TextSpan(
+                          text: '.',
+                          style: context.textStyles.caption2,
+                        ),
                       ],
                     ),
                   ),

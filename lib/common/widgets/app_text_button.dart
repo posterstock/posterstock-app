@@ -38,6 +38,7 @@ class AppTextButton extends StatelessWidget {
               style: context.textStyles.calloutBold!.copyWith(
                 color: textColor ?? context.colors.textsBackground,
               ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ),

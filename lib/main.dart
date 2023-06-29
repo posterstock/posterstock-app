@@ -59,7 +59,6 @@ class App extends ConsumerWidget {
         }
       });
     }
-    print(appLocale);
     return MaterialApp.router(
       routerDelegate: _appRouter.delegate(),
       routeInformationParser: _appRouter.defaultRouteParser(),

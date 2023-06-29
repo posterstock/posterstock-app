@@ -92,69 +92,68 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
               centerTitle: true,
               leading: SizedBox(),
               title: const SizedBox(),
-              flexibleSpace: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 12.0),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 65,
-                          child: (profile?.mySelf ?? false)
-                              ? const SizedBox()
-                              : Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      AutoRouter.of(context).pop();
-                                    },
-                                    child: Container(
-                                      color: Colors.transparent,
-                                      padding:
-                                          const EdgeInsets.only(right: 40.0),
-                                      child: SvgPicture.asset(
-                                        'assets/icons/back_icon.svg',
-                                        width: 18,
-                                        colorFilter: ColorFilter.mode(
-                                          context.colors.iconsDefault!,
-                                          BlendMode.srcIn,
-                                        ),
+              flexibleSpace: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 12.0),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 65,
+                        child: (profile?.mySelf ?? false)
+                            ? const SizedBox()
+                            : Align(
+                                alignment: Alignment.centerLeft,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    AutoRouter.of(context).pop();
+                                  },
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    padding: const EdgeInsets.only(right: 40.0),
+                                    child: SvgPicture.asset(
+                                      'assets/icons/back_icon.svg',
+                                      width: 18,
+                                      colorFilter: ColorFilter.mode(
+                                        context.colors.iconsDefault!,
+                                        BlendMode.srcIn,
                                       ),
                                     ),
                                   ),
                                 ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          profile?.username ?? 'Profile',
-                          style: context.textStyles.bodyBold,
-                        ),
-                        const Spacer(),
-                        GestureDetector(
-                          onTap: () {
-                            if (profile?.mySelf == true) {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (context) {
-                                  return const MyProfileDialog();
-                                },
-                                backgroundColor: Colors.transparent,
-                              );
-                            } else {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (context) => OtherProfileDialog(
-                                  user: profile!,
-                                ),
-                                backgroundColor: Colors.transparent,
-                              );
-                            }
-                          },
-                          child: Container(
-                            width: 65,
-                            color: Colors.transparent,
+                              ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        profile?.username ?? 'Profile',
+                        style: context.textStyles.bodyBold,
+                      ),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          if (profile?.mySelf == true) {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return const MyProfileDialog();
+                              },
+                              backgroundColor: Colors.transparent,
+                            );
+                          } else {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) => OtherProfileDialog(
+                                user: profile!,
+                              ),
+                              backgroundColor: Colors.transparent,
+                            );
+                          }
+                        },
+                        child: Container(
+                          width: 65,
+                          color: Colors.transparent,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 16.0),
                             child: Align(
                               alignment: Alignment.centerRight,
                               child: SvgPicture.asset(
@@ -167,165 +166,173 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 18,
-                    ),
-                    Row(
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundImage:
+                        const SizedBox(
+                          height: 18,
+                        ),
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 40,
+                              backgroundImage:
                               photo == null || profile?.mySelf != true
                                   ? null
                                   : Image.memory(
-                                      photo,
-                                      fit: BoxFit.cover,
-                                      cacheWidth: 150,
-                                    ).image,
-                          backgroundColor: avatar[Random().nextInt(3)],
-                          child: profile?.imagePath == null &&
-                                      profile?.name != null ||
+                                photo,
+                                fit: BoxFit.cover,
+                                cacheWidth: 150,
+                              ).image,
+                              backgroundColor: avatar[Random().nextInt(3)],
+                              child: profile?.imagePath == null &&
+                                  profile?.name != null ||
                                   photo == null && profile?.mySelf == true
-                              ? Text(
-                                  getAvatarName(profile!.name).toUpperCase(),
-                                  style: context.textStyles.title3!.copyWith(
-                                    color: context.colors.textsBackground,
-                                  ),
-                                )
-                              : const SizedBox(),
-                        ),
-                        const SizedBox(
-                          width: 38,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              profile?.followers.toString() ?? '0',
-                              style: context.textStyles.headline,
+                                  ? Text(
+                                getAvatarName(profile!.name).toUpperCase(),
+                                style: context.textStyles.title3!.copyWith(
+                                  color: context.colors.textsBackground,
+                                ),
+                              )
+                                  : const SizedBox(),
                             ),
                             const SizedBox(
-                              height: 3,
+                              width: 38,
                             ),
-                            Text(
-                              AppLocalizations.of(context)!.followers,
-                              style: context.textStyles.caption1!.copyWith(
-                                color: context.colors.textsSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          width: 36,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              profile?.following.toString() ?? '0',
-                              style: context.textStyles.headline,
-                            ),
-                            const SizedBox(
-                              height: 3,
-                            ),
-                            Text(
-                              AppLocalizations.of(context)!.following,
-                              style: context.textStyles.caption1!.copyWith(
-                                color: context.colors.textsSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    Row(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              profile?.name ?? '',
-                              style: context.textStyles.headline,
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                SvgPicture.asset(
-                                  'assets/icons/ic_collection.svg',
-                                  colorFilter: ColorFilter.mode(
-                                    context.colors.iconsDefault!,
-                                    BlendMode.srcIn,
-                                  ),
-                                  width: 16,
-                                ),
-                                const SizedBox(width: 4),
                                 Text(
-                                  profile?.posters.toString() ?? '0',
-                                  style: context.textStyles.caption1!.copyWith(
-                                      color: context.colors.textsPrimary),
+                                  profile?.followers.toString() ?? '0',
+                                  style: context.textStyles.headline,
                                 ),
-                                const SizedBox(width: 12),
-                                SvgPicture.asset(
-                                  'assets/icons/ic_lists.svg',
-                                  colorFilter: ColorFilter.mode(
-                                    context.colors.iconsDefault!,
-                                    BlendMode.srcIn,
-                                  ),
-                                  width: 16,
+                                const SizedBox(
+                                  height: 3,
                                 ),
-                                const SizedBox(width: 4),
                                 Text(
-                                  profile?.lists.toString() ?? '0',
+                                  AppLocalizations.of(context)!.followers,
                                   style: context.textStyles.caption1!.copyWith(
-                                      color: context.colors.textsPrimary),
+                                    color: context.colors.textsSecondary,
+                                  ),
                                 ),
                               ],
                             ),
+                            const SizedBox(
+                              width: 36,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  profile?.following.toString() ?? '0',
+                                  style: context.textStyles.headline,
+                                ),
+                                const SizedBox(
+                                  height: 3,
+                                ),
+                                Text(
+                                  AppLocalizations.of(context)!.following,
+                                  style: context.textStyles.caption1!.copyWith(
+                                    color: context.colors.textsSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Spacer(),
                           ],
                         ),
-                        const Spacer(),
-                        AppTextButton(
-                          onTap: () {
-                            if (profile?.mySelf ?? false) {
-                              AutoRouter.of(context).push(EditProfileRoute());
-                            }
-                          },
-                          text: (profile?.mySelf ?? false)
-                              ? 'Edit'
-                              : ((profile?.followed ?? false)
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  profile?.name ?? '',
+                                  style: context.textStyles.headline,
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    SvgPicture.asset(
+                                      'assets/icons/ic_collection.svg',
+                                      colorFilter: ColorFilter.mode(
+                                        context.colors.iconsDefault!,
+                                        BlendMode.srcIn,
+                                      ),
+                                      width: 16,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      profile?.posters.toString() ?? '0',
+                                      style: context.textStyles.caption1!.copyWith(
+                                          color: context.colors.textsPrimary),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    SvgPicture.asset(
+                                      'assets/icons/ic_lists.svg',
+                                      colorFilter: ColorFilter.mode(
+                                        context.colors.iconsDefault!,
+                                        BlendMode.srcIn,
+                                      ),
+                                      width: 16,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      profile?.lists.toString() ?? '0',
+                                      style: context.textStyles.caption1!.copyWith(
+                                          color: context.colors.textsPrimary),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const Spacer(),
+                            AppTextButton(
+                              onTap: () {
+                                if (profile?.mySelf ?? false) {
+                                  AutoRouter.of(context).push(EditProfileRoute());
+                                }
+                              },
+                              text: (profile?.mySelf ?? false)
+                                  ? 'Edit'
+                                  : ((profile?.followed ?? false)
                                   ? AppLocalizations.of(context)!
-                                      .following
-                                      .capitalize()
+                                  .following
+                                  .capitalize()
                                   : AppLocalizations.of(context)!.follow),
-                          backgroundColor: ((profile?.mySelf ?? false) ||
+                              backgroundColor: ((profile?.mySelf ?? false) ||
                                   (profile?.followed ?? false))
-                              ? context.colors.fieldsDefault
-                              : null,
-                          textColor: ((profile?.mySelf ?? false) ||
+                                  ? context.colors.fieldsDefault
+                                  : null,
+                              textColor: ((profile?.mySelf ?? false) ||
                                   (profile?.followed ?? false))
-                              ? context.colors.textsPrimary
-                              : null,
+                                  ? context.colors.textsPrimary
+                                  : null,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Text(
+                          profile?.description ?? '',
+                          style: context.textStyles.footNote,
+                        ),
+                        const SizedBox(
+                          height: 16,
                         ),
                       ],
                     ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    Text(
-                      profile?.description ?? '',
-                      style: context.textStyles.footNote,
-                    ),
-                    const SizedBox(
-                      height: 16,
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             SliverAppBar(
@@ -337,11 +344,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
               pinned: true,
               leading: const SizedBox(),
               flexibleSpace:
-                  tabController == null || tabController?.animation == null ? const SizedBox() : ProfileTabBar(
-                    animation: tabController!.animation!,
-                    tabController: tabController,
-                    profile: profile,
-                  ),
+                  tabController == null || tabController?.animation == null
+                      ? const SizedBox()
+                      : ProfileTabBar(
+                          animation: tabController!.animation!,
+                          tabController: tabController,
+                          profile: profile,
+                        ),
             ),
           ];
         },
@@ -503,8 +512,7 @@ class PostsCollectionView extends ConsumerWidget {
         crossAxisCount: 3,
         crossAxisSpacing: 12.5,
         mainAxisSpacing: 15,
-        mainAxisExtent:
-            ((MediaQuery.of(context).size.width - 57) / 3) / 106 * 160 + 32,
+        mainAxisExtent: 201,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       itemCount: movies.length,
@@ -605,14 +613,14 @@ class PostsCollectionTile extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-          Text(
-            year ?? (post == null ? '' : post!.year.toString()),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: context.textStyles.caption1!.copyWith(
-              color: context.colors.textsDisabled,
-            ),
+        Text(
+          year ?? (post == null ? '' : post!.year.toString()),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: context.textStyles.caption1!.copyWith(
+            color: context.colors.textsDisabled,
           ),
+        ),
       ],
     );
   }
@@ -736,7 +744,8 @@ class OtherProfileDialog extends ConsumerWidget {
     Key? key,
     this.user,
     this.user1,
-  }): assert(user == null || user1 == null),super(key: key);
+  })  : assert(user == null || user1 == null),
+        super(key: key);
 
   final UserDetailsModel? user;
   final UserModel? user1;
@@ -934,7 +943,7 @@ class ProfileTabBar extends AnimatedWidget {
     required Animation<double> animation,
     this.tabController,
     this.profile,
-  })  : super(listenable: animation);
+  }) : super(listenable: animation);
 
   final TabController? tabController;
   final UserDetailsModel? profile;

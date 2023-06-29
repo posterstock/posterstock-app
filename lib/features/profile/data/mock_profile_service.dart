@@ -9,7 +9,7 @@ class MockProfileService implements IProfileService {
         'name': 'Misha Kiva',
         'avatar': 'https://avatars.githubusercontent.com/u/62376075?v=4',
         'followed': true,
-        'description': 'Hello There!',
+        'description': 'Hello There',
         'following': 15,
         'followers': 250,
         'posters': 13,

@@ -261,6 +261,10 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                           ),
                           recognizer: TapGestureRecognizer()..onTap = () => launchUrlString("https://thedirection.org/"),
                         ),
+                        TextSpan(
+                          text: '.',
+                          style: context.textStyles.caption2,
+                        ),
                       ],
                     ),
                   ),

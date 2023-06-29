@@ -1,0 +1,10 @@
+<svg width="40" height="37" viewBox="0 0 40 37" fill="none" xmlns="http://www.w3.org/2000/svg">
+<mask id="path-1-inside-1_8494_31517" fill="white">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M20 29C23.3137 29 26 26.3137 26 23H39V37H1V23H14C14 26.3137 16.6863 29 20 29Z"/>
+</mask>
+<path d="M26 23V21.5H24.5V23H26ZM39 23H40.5V21.5H39V23ZM39 37V38.5H40.5V37H39ZM1 37H-0.5V38.5H1V37ZM1 23V21.5H-0.5V23H1ZM14 23H15.5V21.5H14V23ZM24.5 23C24.5 25.4853 22.4853 27.5 20 27.5V30.5C24.1421 30.5 27.5 27.1421 27.5 23H24.5ZM26 24.5H39V21.5H26V24.5ZM37.5 23V37H40.5V23H37.5ZM39 35.5H1V38.5H39V35.5ZM2.5 37V23H-0.5V37H2.5ZM1 24.5H14V21.5H1V24.5ZM20 27.5C17.5147 27.5 15.5 25.4853 15.5 23H12.5C12.5 27.1421 15.8579 30.5 20 30.5V27.5Z" fill="#BDBDBD" mask="url(#path-1-inside-1_8494_31517)"/>
+<path d="M1.5 23.5L9.63158 10H30.4211L38.5 23.5" stroke="#BDBDBD" stroke-width="1.5"/>
+<path d="M20.25 5.5V0" stroke="#BDBDBD" stroke-width="1.5"/>
+<path d="M12 5.5L8 1.5" stroke="#BDBDBD" stroke-width="1.5"/>
+<path d="M28 5.5L32 1.5" stroke="#BDBDBD" stroke-width="1.5"/>
+</svg>

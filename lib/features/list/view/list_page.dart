@@ -384,8 +384,7 @@ class CollectionInfoWidget extends StatelessWidget {
                 crossAxisCount: 3,
                 crossAxisSpacing: 12.5,
                 mainAxisSpacing: 15,
-                mainAxisExtent:
-                    ((MediaQuery.of(context).size.width - 57) / 3) / 106 * 200,
+                mainAxisExtent: 201,
               ),
               itemCount: post.posters.length,
               itemBuilder: (context, index) {

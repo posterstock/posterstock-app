@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
+import 'package:poster_stock/features/auth/view/pages/sign_up_page.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
@@ -189,48 +190,57 @@ class UserInfoTile extends StatelessWidget {
                 width: 12,
               ),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 2.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 42,
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (loading)
                             const SizedBox(
                               height: 3,
                             ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              TextOrContainer(
-                                text: user?.name,
-                                style: context.textStyles.calloutBold!.copyWith(
-                                    color: darkBackground
-                                        ? context.colors.textsBackground!
-                                        : context.colors.textsPrimary),
-                                emptyWidth: 146,
-                                emptyHeight: 17,
-                              ),
-                              const SizedBox(
-                                width: 12,
-                              ),
-                              if ((user?.followed ?? true) || !showFollowButton)
-                                Text(
-                                  time ?? '',
-                                  style: context.textStyles.footNote!.copyWith(
-                                    color: darkBackground
-                                        ? context.colors.textsBackground!
-                                            .withOpacity(0.8)
-                                        : context.colors.textsDisabled,
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width - 68 - 179 + 42,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                ExpandChecker(
+                                  expand: !(user?.followed ?? true),
+                                  child: TextOrContainer(
+                                    text: user?.name,
+                                    style: context.textStyles.calloutBold!.copyWith(
+                                        color: darkBackground
+                                            ? context.colors.textsBackground!
+                                            : context.colors.textsPrimary),
+                                    emptyWidth: 146,
+                                    emptyHeight: 17,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                            ],
+                                const SizedBox(
+                                  width: 12,
+                                ),
+                                if ((user?.followed ?? true) || !showFollowButton)
+                                  Text(
+                                    time ?? '',
+                                    style: context.textStyles.footNote!.copyWith(
+                                      color: darkBackground
+                                          ? context.colors.textsBackground!
+                                              .withOpacity(0.8)
+                                          : context.colors.textsDisabled,
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
+                          if (loading)
                           SizedBox(
-                            height: !loading ? 3 : 8,
+                            height: 3,
                           ),
+                          if (!loading)
+                            Spacer(),
                           TextOrContainer(
                             text: user?.username == null
                                 ? null
@@ -246,8 +256,8 @@ class UserInfoTile extends StatelessWidget {
                           ),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               if (!(user?.followed ?? true) && (!loading) && showFollowButton)
