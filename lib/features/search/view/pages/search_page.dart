@@ -74,6 +74,7 @@ class SearchPage extends ConsumerWidget {
                       textController.text = '';
                       ref.read(menuControllerProvider).jumpToPage(
                             ref.watch(previousPageStateHolderProvider),
+                            context,
                           );
                     },
                   ),
@@ -174,12 +175,9 @@ class SearchTabViewState extends State<SearchTabView>
             'Joker',
             'Random',
             'Barbie',
-            if (index % 2 == 0)
-              'The Walking Dead',
-            if (index % 3 == 0)
-              'JAWS',
-            if (index % 4 == 0)
-              'Spider-Man',
+            if (index % 2 == 0) 'The Walking Dead',
+            if (index % 3 == 0) 'JAWS',
+            if (index % 4 == 0) 'Spider-Man',
           ],
           name: 'Some random list number $index',
           author: UserModel(
@@ -192,7 +190,7 @@ class SearchTabViewState extends State<SearchTabView>
           ),
           time: '12:00',
           description:
-          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."),
+              "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."),
     );
     return Column(
       children: [

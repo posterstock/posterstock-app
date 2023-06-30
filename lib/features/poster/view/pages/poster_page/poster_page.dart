@@ -93,7 +93,7 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
         if (scrollController.offset < 0) return;
         if (velocity > 15) {
           jumpToEnd(up: false);
-        } else if (velocity < -15) {
+        } else if (velocity < -13) {
           jumpToEnd(up: true);
         } else {
           jumpToEnd();
@@ -185,6 +185,7 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                                         showFollowButton: false,
                                         user: widget.post.comments[index].user,
                                         time: widget.post.comments[index].time,
+                                        behavior: HitTestBehavior.translucent,
                                       ),
                                     ),
                                     const SizedBox(height: 12),

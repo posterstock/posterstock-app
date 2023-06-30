@@ -84,7 +84,7 @@ class _ListPageState extends State<ListPage>
         if (scrollController.offset < 0) return;
         if (velocity > 15) {
           jumpToEnd(up: false);
-        } else if (velocity < -15) {
+        } else if (velocity < -13) {
           jumpToEnd(up: true);
         } else {
           jumpToEnd();
@@ -189,6 +189,7 @@ class _ListPageState extends State<ListPage>
                                     showFollowButton: false,
                                     user: widget.post.comments[index - 1].user,
                                     time: widget.post.comments[index - 1].time,
+                                    behavior: HitTestBehavior.translucent,
                                   ),
                                 ),
                                 const SizedBox(height: 12),
@@ -393,7 +394,6 @@ class CollectionInfoWidget extends StatelessWidget {
                   name: post.posterNames[index],
                   index: index,
                   year: '1999',
-                  customOnLongTap: () {},
                 );
               },
             ),

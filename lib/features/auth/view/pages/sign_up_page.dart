@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,16 +29,34 @@ class SignUpPage extends ConsumerStatefulWidget {
 }
 
 class _SignUpPageState extends ConsumerState<SignUpPage> {
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    print('changed');
-    setState(() {});
-  }
-
   final GlobalKey text1 = GlobalKey();
   final GlobalKey text2 = GlobalKey();
   final GlobalKey text3 = GlobalKey();
+  final ScrollController controller = ScrollController();
+
+  void animateScrollTo(double value, ScrollController controller) async {
+    await waitWhile(() => controller.hasClients);
+    controller.animateTo(
+      value,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.linear,
+    );
+  }
+
+  Future waitWhile(bool Function() test,
+      [Duration pollInterval = Duration.zero]) {
+    var completer = Completer();
+    check() {
+      if (test()) {
+        completer.complete();
+      } else {
+        Timer(pollInterval, check);
+      }
+    }
+
+    check();
+    return completer.future;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,231 +69,243 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     final nameErrorState = ref.watch(signUpNameErrorStateHolderProvider);
     final screenHeight = (MediaQuery.of(context).size.height -
         MediaQuery.of(context).viewInsets.bottom);
-    return CustomScaffold(
-      resize: true,
-      child: ColumnOrList(
-        isList: screenHeight < 650,
-        children: [
-          const CustomAppBar(),
-          ExpandChecker(
-            expand: screenHeight >= 650,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Text(
-                    AppLocalizations.of(context)!.signUpCode,
-                    style: context.textStyles.title2,
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Text(
-                    emailState!,
-                    style: context.textStyles.callout!.copyWith(
-                      color: context.colors.textsSecondary,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: CustomScaffold(
+        resize: true,
+        child: ColumnOrList(
+          controller: controller,
+          isList: screenHeight < 700,
+          children: [
+            const CustomAppBar(),
+            ExpandChecker(
+              expand: screenHeight >= 700,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 30,
                     ),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  AppTextField(
-                    key: text1,
-                    hint: AppLocalizations.of(context)!.name,
-                    onChanged: (value) {
-                      ref.read(signUpControllerProvider).setName(value);
-                      if (value.length > 32) {
-                        ref
-                            .read(signUpControllerProvider)
-                            .setTooLongErrorName();
-                      } else {
-                        ref.read(signUpControllerProvider).removeNameError();
-                      }
-                    },
-                    onRemoved: () {
-                      ref.read(signUpControllerProvider).setName('');
-                      ref.read(signUpControllerProvider).removeNameError();
-                    },
-                    hasError: nameErrorState != null,
-                  ),
-                  const SizedBox(
-                    height: 6,
-                  ),
-                  SizedBox(
-                    height: 18,
-                    width: double.infinity,
-                    child: Text(
-                      nameErrorState ?? '',
-                      style: context.textStyles.caption2!.copyWith(
-                        color: context.colors.textsError,
-                      ),
+                    Text(
+                      AppLocalizations.of(context)!.signUpCode,
+                      style: context.textStyles.title2,
                     ),
-                  ),
-                  AppTextField(
-                    key: text2,
-                    hint: AppLocalizations.of(context)!.username,
-                    removableWhenNotEmpty: true,
-                    tickOnSuccess: true,
-                    hasError: usernameErrorState != null,
-                    onChanged: (value) {
-                      if (value.length < 5 && value.isNotEmpty) {
-                        ref
-                            .read(signUpControllerProvider)
-                            .setTooShortErrorUserName();
-                        return;
-                      }
-                      if (value.length > 32) {
-                        ref
-                            .read(signUpControllerProvider)
-                            .setTooLongErrorUserName();
-                        return;
-                      }
-                      final validCharacters = RegExp(r'[a-zA-Z0-9_.]+$');
-                      ref.read(signUpControllerProvider).setUsername(value);
-                      for (int i = 0; i < value.length; i++) {
-                        if (!validCharacters.hasMatch(value[i])) {
-                          ref
-                              .read(signUpControllerProvider)
-                              .setWrongSymbolsErrorUsername();
-                          return;
-                        }
-                      }
-                      ref.read(signUpControllerProvider).removeUsernameError();
-                    },
-                    onRemoved: () {
-                      ref.read(signUpControllerProvider).removeUsernameError();
-                      ref.read(signUpControllerProvider).setUsername('');
-                    },
-                    isUsername: true,
-                  ),
-                  const SizedBox(
-                    height: 6,
-                  ),
-                  SizedBox(
-                    height: 13,
-                    width: double.infinity,
-                    child: Text(
-                      usernameErrorState ?? '',
-                      style: context.textStyles.caption2!.copyWith(
-                        color: context.colors.textsError,
-                      ),
+                    const SizedBox(
+                      height: 30,
                     ),
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      AppLocalizations.of(context)!.codeSent,
+                    Text(
+                      emailState!,
                       style: context.textStyles.callout!.copyWith(
                         color: context.colors.textsSecondary,
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  AppTextField(
-                    key: text3,
-                    hint: AppLocalizations.of(context)!.pasteLoginCode,
-                    removableWhenNotEmpty: true,
-                    keyboardType: TextInputType.phone,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                    ],
-                    onChanged: (value) {
-                      ref.read(signUpControllerProvider).setCode(value);
-                    },
-                    onRemoved: () {
-                      ref.read(signUpControllerProvider).removeCode();
-                    },
-                  ),
-                  const SizedBox(
-                    height: 24,
-                  ),
-                  AuthButton(
-                    text: AppLocalizations.of(context)!.createAccount,
-                    disabled: usernameErrorState != null ||
-                        usernameState.length < 2 ||
-                        nameState.isEmpty ||
-                        codeState.isEmpty ||
-                        nameErrorState != null,
-                    fillColor: context.colors.buttonsDisabled,
-                    borderColor: context.colors.fieldsActive!,
-                    pressedBorderColor: context.colors.fieldsActive!,
-                    disabledTextStyle: context.textStyles.calloutBold!.copyWith(
-                      color: context.colors.textsAction!.withOpacity(0.5),
+                    const SizedBox(
+                      height: 30,
                     ),
-                    disabledBorderColor: Colors.transparent,
-                    textStyle: context.textStyles.calloutBold!.copyWith(
-                      color: context.colors.textsAction!,
+                    AppTextField(
+                      key: text1,
+                      autofocus: true,
+                      hint: AppLocalizations.of(context)!.name,
+                      onTap: () {
+                        animateScrollTo(0, controller);
+                      },
+                      onChanged: (value) {
+                        ref.read(signUpControllerProvider).setName(value);
+                        if (value.length > 32) {
+                          ref
+                              .read(signUpControllerProvider)
+                              .setTooLongErrorName();
+                        } else {
+                          ref.read(signUpControllerProvider).removeNameError();
+                        }
+                      },
+                      onRemoved: () {
+                        ref.read(signUpControllerProvider).setName('');
+                        ref.read(signUpControllerProvider).removeNameError();
+                      },
+                      hasError: nameErrorState != null,
                     ),
-                    onTap: () {},
-                  ),
-                  ExpandChecker(
-                    expand: screenHeight >= 700,
-                    child: const SizedBox(),
-                  ),
-                  if (screenHeight < 700)
-                    const SizedBox(height: 40),
-                  RichText(
-                    textDirection: TextDirection.ltr,
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                      text: AppLocalizations.of(context)!.privacyPolicyText1,
-                      style: context.textStyles.caption2,
-                      children: <TextSpan>[
-                        TextSpan(
-                          text: AppLocalizations.of(context)!
-                              .privacyPolicyLink1,
-                          style: context.textStyles.caption2!.copyWith(
-                            decoration: TextDecoration.underline,
-                          ),
-                          recognizer: TapGestureRecognizer()..onTap = () => launchUrlString("https://thedirection.org/posterstock_terms"),
+                    const SizedBox(
+                      height: 6,
+                    ),
+                    SizedBox(
+                      height: 18,
+                      width: double.infinity,
+                      child: Text(
+                        nameErrorState ?? '',
+                        style: context.textStyles.caption2!.copyWith(
+                          color: context.colors.textsError,
                         ),
-                        TextSpan(
-                          text: AppLocalizations.of(context)!
-                              .privacyPolicyText2,
-                          style: context.textStyles.caption2,
+                      ),
+                    ),
+                    AppTextField(
+                      key: text2,
+                      hint: AppLocalizations.of(context)!.username,
+                      removableWhenNotEmpty: true,
+                      tickOnSuccess: true,
+                      hasError: usernameErrorState != null,
+                      onTap: () {
+                        animateScrollTo(120, controller);
+                      },
+                      onChanged: (value) {
+                        if (value.length < 5 && value.isNotEmpty) {
+                          ref
+                              .read(signUpControllerProvider)
+                              .setTooShortErrorUserName();
+                          return;
+                        }
+                        if (value.length > 32) {
+                          ref
+                              .read(signUpControllerProvider)
+                              .setTooLongErrorUserName();
+                          return;
+                        }
+                        final validCharacters = RegExp(r'[a-zA-Z0-9_.]+$');
+                        ref.read(signUpControllerProvider).setUsername(value);
+                        for (int i = 0; i < value.length; i++) {
+                          if (!validCharacters.hasMatch(value[i])) {
+                            ref
+                                .read(signUpControllerProvider)
+                                .setWrongSymbolsErrorUsername();
+                            return;
+                          }
+                        }
+                        ref
+                            .read(signUpControllerProvider)
+                            .removeUsernameError();
+                      },
+                      onRemoved: () {
+                        ref
+                            .read(signUpControllerProvider)
+                            .removeUsernameError();
+                        ref.read(signUpControllerProvider).setUsername('');
+                      },
+                      isUsername: true,
+                    ),
+                    const SizedBox(
+                      height: 6,
+                    ),
+                    SizedBox(
+                      height: 13,
+                      width: double.infinity,
+                      child: Text(
+                        usernameErrorState ?? '',
+                        style: context.textStyles.caption2!.copyWith(
+                          color: context.colors.textsError,
                         ),
-                        TextSpan(
-                          text: AppLocalizations.of(context)!
-                              .privacyPolicyLink2,
-                          style: context.textStyles.caption2!.copyWith(
-                            decoration: TextDecoration.underline,
-                          ),
-                          recognizer: TapGestureRecognizer()..onTap = () => launchUrlString("https://thedirection.org/posterstock_privacy"),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        AppLocalizations.of(context)!.codeSent,
+                        style: context.textStyles.callout!.copyWith(
+                          color: context.colors.textsSecondary,
                         ),
-                        TextSpan(
-                          text: AppLocalizations.of(context)!
-                              .privacyPolicyText3,
-                          style: context.textStyles.caption2,
-                        ),
-                        TextSpan(
-                          text: AppLocalizations.of(context)!
-                              .privacyPolicyLink3,
-                          style: context.textStyles.caption2!.copyWith(
-                            decoration: TextDecoration.underline,
-                          ),
-                          recognizer: TapGestureRecognizer()..onTap = () => launchUrlString("https://thedirection.org/"),
-                        ),
-                        TextSpan(
-                          text: '.',
-                          style: context.textStyles.caption2,
-                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    AppTextField(
+                      key: text3,
+                      hint: AppLocalizations.of(context)!.pasteLoginCode,
+                      removableWhenNotEmpty: true,
+                      keyboardType: TextInputType.phone,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
                       ],
+                      onChanged: (value) {
+                        ref.read(signUpControllerProvider).setCode(value);
+                      },
+                      onRemoved: () {
+                        ref.read(signUpControllerProvider).removeCode();
+                      },
+                      onTap: () {
+                        animateScrollTo(175, controller);
+                      },
                     ),
-                  ),
-                  const SizedBox(height: 26),
-                ],
+                    const SizedBox(
+                      height: 24,
+                    ),
+                    AuthButton(
+                      text: AppLocalizations.of(context)!.createAccount,
+                      disabled: usernameErrorState != null ||
+                          usernameState.length < 2 ||
+                          nameState.isEmpty ||
+                          codeState.isEmpty ||
+                          nameErrorState != null,
+                      fillColor: context.colors.buttonsDisabled,
+                      borderColor: context.colors.fieldsActive!,
+                      pressedBorderColor: context.colors.fieldsActive!,
+                      disabledTextStyle:
+                          context.textStyles.calloutBold!.copyWith(
+                        color: context.colors.textsAction!.withOpacity(0.5),
+                      ),
+                      disabledBorderColor: Colors.transparent,
+                      textStyle: context.textStyles.calloutBold!.copyWith(
+                        color: context.colors.textsAction!,
+                      ),
+                      onTap: () {},
+                    ),
+                    ExpandChecker(
+                      expand: screenHeight >= 700,
+                      child: const SizedBox(),
+                    ),
+                    if (screenHeight < 700) const SizedBox(height: 40),
+                    RichText(
+                      textDirection: TextDirection.ltr,
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        text: AppLocalizations.of(context)!.privacyPolicyText1,
+                        style: context.textStyles.caption2,
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: AppLocalizations.of(context)!
+                                .privacyPolicyLink1,
+                            style: context.textStyles.caption2!.copyWith(
+                              decoration: TextDecoration.underline,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () => launchUrlString(
+                                  "https://thedirection.org/posterstock_terms"),
+                          ),
+                          TextSpan(
+                            text: AppLocalizations.of(context)!
+                                .privacyPolicyText2,
+                            style: context.textStyles.caption2,
+                          ),
+                          TextSpan(
+                            text: AppLocalizations.of(context)!
+                                .privacyPolicyLink2,
+                            style: context.textStyles.caption2!.copyWith(
+                              decoration: TextDecoration.underline,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () => launchUrlString(
+                                  "https://thedirection.org/posterstock_privacy"),
+                          ),
+                          TextSpan(
+                            text: AppLocalizations.of(context)!
+                                .privacyPolicyText3,
+                            style: context.textStyles.caption2,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 26),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -284,14 +316,19 @@ class ColumnOrList extends StatelessWidget {
     Key? key,
     required this.children,
     required this.isList,
+    this.controller,
   }) : super(key: key);
   final List<Widget> children;
   final bool isList;
+  final ScrollController? controller;
 
   @override
   Widget build(BuildContext context) {
     if (isList) {
       return ListView(
+        controller: controller,
+        physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics()),
         children: children,
       );
     }

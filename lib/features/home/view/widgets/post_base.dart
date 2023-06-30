@@ -125,6 +125,7 @@ class UserInfoTile extends StatelessWidget {
     this.showFollowButton = true,
     this.darkBackground = false,
     this.showSettings = true,
+    this.behavior,
   }) : super(key: key);
 
   final bool loading;
@@ -133,6 +134,7 @@ class UserInfoTile extends StatelessWidget {
   final bool showFollowButton;
   final bool darkBackground;
   final bool showSettings;
+  final HitTestBehavior? behavior;
 
   @override
   Widget build(BuildContext context) {
@@ -145,7 +147,7 @@ class UserInfoTile extends StatelessWidget {
     return ShimmerLoader(
       loaded: !loading,
       child: GestureDetector(
-        //behavior: HitTestBehavior.translucent,
+        behavior: behavior,
         onTap: () {
           if (user == null) return;
           AutoRouter.of(context).push(ProfileRoute(

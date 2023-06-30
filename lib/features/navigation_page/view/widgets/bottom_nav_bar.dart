@@ -30,7 +30,7 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
           ref.read(menuControllerProvider).setRouter(
             AutoTabsRouter.of(context),
           );
-          ref.read(menuControllerProvider).jumpToPage(0);
+          ref.read(menuControllerProvider).jumpToPage(0, context);
         }
       );
     }
@@ -53,7 +53,7 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                 children: [
                   BottomNavBarItem(
                     onTap: () {
-                      ref.read(menuControllerProvider).jumpToPage(0);
+                      ref.read(menuControllerProvider).jumpToPage(0, context);
                       if (activeIndex == 0 && homeScrollPosition.offset > 10) {
                         homeScrollPosition.animateTo(
                           0,
@@ -88,7 +88,7 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                   ),
                   BottomNavBarItem(
                     onTap: () {
-                      ref.read(menuControllerProvider).jumpToPage(1);
+                      ref.read(menuControllerProvider).jumpToPage(1, context);
                     },
                     icon: SvgPicture.asset(
                       'assets/icons/ic_research.svg',
@@ -117,7 +117,7 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                   ),
                   BottomNavBarItem(
                     onTap: () {
-                      ref.read(menuControllerProvider).jumpToPage(2);
+                      ref.read(menuControllerProvider).jumpToPage(2, context);
                     },
                     icon: SvgPicture.asset(
                       'assets/icons/ic_notification-2.svg',
@@ -139,7 +139,7 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                   ),
                   BottomNavBarItem(
                     onTap: () {
-                      ref.read(menuControllerProvider).jumpToPage(3);
+                      ref.read(menuControllerProvider).jumpToPage(3, context);
                     },
                     //TODO check if has avatar
                     icon: SvgPicture.asset(

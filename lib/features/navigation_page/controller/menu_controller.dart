@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/menu_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
@@ -37,7 +38,8 @@ class MenuController {
     menuState.updateState(!menuValue);
   }
 
-  void jumpToPage(int page) {
+  void jumpToPage(int page, BuildContext context) {
+    FocusScope.of(context).unfocus();
     previousPageState.updatePage(routerValue?.activeIndex ?? 0);
     routerState.updatePage(page);
     pagesState.updatePage(page);

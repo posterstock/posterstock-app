@@ -15,6 +15,7 @@ import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
+import 'package:poster_stock/features/peek_pop/peek_and_pop_dialog.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
@@ -71,23 +72,29 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
               floating: true,
               elevation: 0,
               expandedHeight: 225 +
-                  TextInfoService.textSize(
-                          profile?.description ?? '',
-                          context.textStyles.footNote!,
-                          MediaQuery.of(context).size.width - 32)
-                      .height,
+                  ((profile?.description != null)
+                      ? TextInfoService.textSize(
+                              profile?.description ?? '',
+                              context.textStyles.footNote!,
+                              MediaQuery.of(context).size.width - 32)
+                          .height
+                      : 0),
               toolbarHeight: 225 +
-                  TextInfoService.textSize(
-                          profile?.description ?? '',
-                          context.textStyles.footNote!,
-                          MediaQuery.of(context).size.width - 32)
-                      .height,
+                  ((profile?.description != null)
+                      ? TextInfoService.textSize(
+                              profile?.description ?? '',
+                              context.textStyles.footNote!,
+                              MediaQuery.of(context).size.width - 32)
+                          .height
+                      : 0),
               collapsedHeight: 225 +
-                  TextInfoService.textSize(
-                          profile?.description ?? '',
-                          context.textStyles.footNote!,
-                          MediaQuery.of(context).size.width - 32)
-                      .height,
+                  ((profile?.description != null)
+                      ? TextInfoService.textSize(
+                              profile?.description ?? '',
+                              context.textStyles.footNote!,
+                              MediaQuery.of(context).size.width - 32)
+                          .height
+                      : 0),
               backgroundColor: context.colors.backgroundsPrimary,
               centerTitle: true,
               leading: SizedBox(),
@@ -110,7 +117,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                   },
                                   child: Container(
                                     color: Colors.transparent,
-                                    padding: const EdgeInsets.only(right: 40.0),
+                                    padding: const EdgeInsets.only(
+                                        left: 7.0, right: 31.0),
                                     child: SvgPicture.asset(
                                       'assets/icons/back_icon.svg',
                                       width: 18,
@@ -182,23 +190,25 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                             CircleAvatar(
                               radius: 40,
                               backgroundImage:
-                              photo == null || profile?.mySelf != true
-                                  ? null
-                                  : Image.memory(
-                                photo,
-                                fit: BoxFit.cover,
-                                cacheWidth: 150,
-                              ).image,
+                                  photo == null || profile?.mySelf != true
+                                      ? null
+                                      : Image.memory(
+                                          photo,
+                                          fit: BoxFit.cover,
+                                          cacheWidth: 150,
+                                        ).image,
                               backgroundColor: avatar[Random().nextInt(3)],
                               child: profile?.imagePath == null &&
-                                  profile?.name != null ||
-                                  photo == null && profile?.mySelf == true
+                                          profile?.name != null ||
+                                      photo == null && profile?.mySelf == true
                                   ? Text(
-                                getAvatarName(profile!.name).toUpperCase(),
-                                style: context.textStyles.title3!.copyWith(
-                                  color: context.colors.textsBackground,
-                                ),
-                              )
+                                      getAvatarName(profile!.name)
+                                          .toUpperCase(),
+                                      style:
+                                          context.textStyles.title3!.copyWith(
+                                        color: context.colors.textsBackground,
+                                      ),
+                                    )
                                   : const SizedBox(),
                             ),
                             const SizedBox(
@@ -272,8 +282,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                     const SizedBox(width: 4),
                                     Text(
                                       profile?.posters.toString() ?? '0',
-                                      style: context.textStyles.caption1!.copyWith(
-                                          color: context.colors.textsPrimary),
+                                      style: context.textStyles.caption1!
+                                          .copyWith(
+                                              color:
+                                                  context.colors.textsPrimary),
                                     ),
                                     const SizedBox(width: 12),
                                     SvgPicture.asset(
@@ -287,8 +299,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                     const SizedBox(width: 4),
                                     Text(
                                       profile?.lists.toString() ?? '0',
-                                      style: context.textStyles.caption1!.copyWith(
-                                          color: context.colors.textsPrimary),
+                                      style: context.textStyles.caption1!
+                                          .copyWith(
+                                              color:
+                                                  context.colors.textsPrimary),
                                     ),
                                   ],
                                 ),
@@ -298,37 +312,41 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                             AppTextButton(
                               onTap: () {
                                 if (profile?.mySelf ?? false) {
-                                  AutoRouter.of(context).push(EditProfileRoute());
+                                  AutoRouter.of(context)
+                                      .push(EditProfileRoute());
                                 }
                               },
                               text: (profile?.mySelf ?? false)
                                   ? 'Edit'
                                   : ((profile?.followed ?? false)
-                                  ? AppLocalizations.of(context)!
-                                  .following
-                                  .capitalize()
-                                  : AppLocalizations.of(context)!.follow),
+                                      ? AppLocalizations.of(context)!
+                                          .following
+                                          .capitalize()
+                                      : AppLocalizations.of(context)!.follow),
                               backgroundColor: ((profile?.mySelf ?? false) ||
-                                  (profile?.followed ?? false))
+                                      (profile?.followed ?? false))
                                   ? context.colors.fieldsDefault
                                   : null,
                               textColor: ((profile?.mySelf ?? false) ||
-                                  (profile?.followed ?? false))
+                                      (profile?.followed ?? false))
                                   ? context.colors.textsPrimary
                                   : null,
                             ),
                           ],
                         ),
-                        const SizedBox(
-                          height: 12,
-                        ),
-                        Text(
-                          profile?.description ?? '',
-                          style: context.textStyles.footNote,
-                        ),
-                        const SizedBox(
-                          height: 16,
-                        ),
+                        if (profile?.description != null)
+                          const SizedBox(
+                            height: 12,
+                          ),
+                        if (profile?.description != null)
+                          Text(
+                            profile!.description!,
+                            style: context.textStyles.footNote,
+                          ),
+                        if (profile?.description != null)
+                          const SizedBox(
+                            height: 16,
+                          ),
                       ],
                     ),
                   ),
@@ -549,48 +567,40 @@ class PostsCollectionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: () {
-            if (post != null) {
-              if (customOnItemTap == null) {
-                AutoRouter.of(context).push(
-                  PosterRoute(
-                    post: PostMovieModel(
-                      year: post!.year,
-                      imagePath: post!.imagePath,
-                      name: post!.name,
-                      author: post!.author,
-                      time: post!.time,
-                      description: post!.description,
-                    ),
-                  ),
-                );
-              } else {
-                customOnItemTap!(post!, index);
-              }
-            }
-          },
-          onLongPress: () {
-            if (customOnLongTap != null) {
-              customOnLongTap!();
-            } else {
-              showDialog(
-                context: context,
-                useSafeArea: false,
-                builder: (context) {
-                  return PosterImageDialog(
-                    imagePath: imagePath ?? post!.imagePath,
-                    name: post == null ? null : post!.name,
-                    year: post == null ? null : post!.year.toString(),
-                    description: post == null ? null : post!.description,
-                  );
-                },
-              );
-            }
-          },
-          child: ClipRRect(
+    return PeekAndPopDialog(
+      customOnLongTap: customOnLongTap,
+      onTap: () {
+        if (post != null) {
+          if (customOnItemTap == null) {
+            AutoRouter.of(context).push(
+              PosterRoute(
+                post: PostMovieModel(
+                  year: post!.year,
+                  imagePath: post!.imagePath,
+                  name: post!.name,
+                  author: post!.author,
+                  time: post!.time,
+                  description: post!.description,
+                ),
+              ),
+            );
+          } else {
+            customOnItemTap!(post!, index);
+          }
+        }
+      },
+      dialog: Material(
+        color: Colors.transparent,
+        child: PosterImageDialog(
+          imagePath: imagePath ?? post!.imagePath,
+          name: post == null ? null : post!.name,
+          year: post == null ? null : post!.year.toString(),
+          description: post == null ? null : post!.description,
+        ),
+      ),
+      child: Column(
+        children: [
+          ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
             child: Container(
               color: context.colors.backgroundsSecondary,
@@ -601,27 +611,27 @@ class PostsCollectionTile extends StatelessWidget {
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          post == null ? name! : post!.name,
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: context.textStyles.caption2!.copyWith(
-            color: context.colors.textsPrimary,
+          const SizedBox(height: 8),
+          Text(
+            post == null ? name! : post!.name,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.textStyles.caption2!.copyWith(
+              color: context.colors.textsPrimary,
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          year ?? (post == null ? '' : post!.year.toString()),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: context.textStyles.caption1!.copyWith(
-            color: context.colors.textsDisabled,
+          const SizedBox(height: 4),
+          Text(
+            year ?? (post == null ? '' : post!.year.toString()),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.textStyles.caption1!.copyWith(
+              color: context.colors.textsDisabled,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -662,7 +672,8 @@ class _PosterImageDialogState extends State<PosterImageDialog>
   Widget build(BuildContext context) {
     controller.forward();
     return Listener(
-      onPointerUp: (d) {
+      onPointerUp: (intent) {
+        print(1);
         Navigator.pop(context);
       },
       child: BackdropFilter(
@@ -891,7 +902,6 @@ class MyProfileDialog extends ConsumerWidget {
                           child: InkWell(
                             onTap: () {
                               Navigator.pop(context);
-                              ref.read(menuControllerProvider).jumpToPage(1);
                             },
                             child: Center(
                               child: Text(

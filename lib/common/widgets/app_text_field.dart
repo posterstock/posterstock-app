@@ -17,17 +17,21 @@ class AppTextField extends StatefulWidget {
     this.inputFormatters,
     this.hasError = false,
     this.onRemoved,
+    this.onTap,
     this.tickOnSuccess = false,
     this.isUsername = false,
     this.keyboardType,
     this.crossButton,
     this.crossPadding,
     this.searchField = false,
+    this.autofocus = false,
+    this.focus,
   }) : super(key: key);
   final String hint;
   final Function(String)? onSubmitted;
   final Function(String)? onChanged;
   final Function()? onRemoved;
+  final Function()? onTap;
   final TextEditingController? controller;
   final bool removable;
   final bool removableWhenNotEmpty;
@@ -39,6 +43,8 @@ class AppTextField extends StatefulWidget {
   final Widget? crossButton;
   final EdgeInsets? crossPadding;
   final bool searchField;
+  final bool? autofocus;
+  final FocusNode? focus;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -46,12 +52,13 @@ class AppTextField extends StatefulWidget {
 
 class _AppTextFieldState extends State<AppTextField> {
   final TextEditingController nullController = TextEditingController();
-  final FocusNode focus = FocusNode();
+  late final FocusNode focus;
 
   bool focused = false;
 
   @override
   void initState() {
+    focus = widget.focus ?? FocusNode();
     focus.addListener(() {
       setState(() {
         focused = focus.hasFocus;
@@ -78,8 +85,10 @@ class _AppTextFieldState extends State<AppTextField> {
       child: Stack(
         children: [
           TextField(
+            autofocus: widget.autofocus!,
+            onTap: widget.onTap,
             keyboardType: widget.keyboardType,
-            focusNode: focus,
+            focusNode: widget.focus ?? focus,
             cursorColor: context.colors.textsPrimary!,
             inputFormatters: widget.inputFormatters,
             style: context.textStyles.callout!

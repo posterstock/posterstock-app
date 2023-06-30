@@ -31,6 +31,7 @@ class ChangeEmailCodeScreen extends ConsumerWidget {
               AppBar(
                 backgroundColor: context.colors.backgroundsSecondary,
                 elevation: 0,
+                leadingWidth: 130,
                 leading: Align(
                   alignment: Alignment.centerLeft,
                   child: GestureDetector(

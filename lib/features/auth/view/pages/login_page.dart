@@ -133,20 +133,6 @@ class LoginPage extends ConsumerWidget {
                               AppLocalizations.of(context)!.privacyPolicyText3,
                           style: context.textStyles.caption2,
                         ),
-                        TextSpan(
-                          text:
-                              AppLocalizations.of(context)!.privacyPolicyLink3,
-                          style: context.textStyles.caption2!.copyWith(
-                            decoration: TextDecoration.underline,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () =>
-                                launchUrlString("https://thedirection.org/"),
-                        ),
-                        TextSpan(
-                          text: '.',
-                          style: context.textStyles.caption2,
-                        ),
                       ],
                     ),
                   ),
