@@ -71,9 +71,12 @@ class App extends ConsumerWidget {
       supportedLocales: locales,
       locale: appLocale?.locale ?? locales[0],
       builder: (context, child) {
-        return ScrollConfiguration(
-          behavior: CustomScrollBehavior(),
-          child: child ?? const SizedBox(),
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          child: ScrollConfiguration(
+            behavior: CustomScrollBehavior(),
+            child: child ?? const SizedBox(),
+          ),
         );
       },
       theme: theme,

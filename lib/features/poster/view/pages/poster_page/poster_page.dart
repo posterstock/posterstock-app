@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
@@ -120,7 +121,7 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
               if (notification.metrics.pixels < 0) return false;
               jumpToEnd();
             }
-            return false;
+            return true;
           },
           child: Stack(
             children: [
@@ -559,12 +560,6 @@ class CommentTextField extends StatefulWidget {
 }
 
 class _CommentTextFieldState extends State<CommentTextField> {
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    setState(() {});
-  }
-
   final FocusNode focus = FocusNode();
   final GlobalKey key = GlobalKey();
   final TextEditingController controller = TextEditingController();
@@ -572,70 +567,80 @@ class _CommentTextFieldState extends State<CommentTextField> {
   @override
   Widget build(BuildContext context) {
     focus.addListener(() {
+      print(11);
       setState(() {});
     });
-    return Column(
-      children: [
-        Divider(
-          height: 0.5,
-          thickness: 0.5,
-          color: context.colors.fieldsDefault,
-        ),
-        Container(
-          height: focus.hasPrimaryFocus &&
-                  MediaQuery.of(context).viewInsets.bottom != 0
-              ? null
-              : 56 + MediaQuery.of(context).padding.bottom,
-          color: context.colors.backgroundsPrimary,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              key: key,
-              maxLines: null,
-              focusNode: focus,
-              controller: controller,
-              cursorWidth: 1,
-              cursorColor: context.colors.textsAction,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: AppLocalizations.of(context)!.textReply,
-                hintStyle: context.textStyles.callout!.copyWith(
-                  color: context.colors.textsDisabled,
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {});
-              },
-            ),
+    return NotificationListener(
+      onNotification: (not) {
+        return true;
+      },
+      child: Column(
+        children: [
+          Divider(
+            height: 0.5,
+            thickness: 0.5,
+            color: context.colors.fieldsDefault,
           ),
-        ),
-        if (focus.hasPrimaryFocus &&
-            MediaQuery.of(context).viewInsets.bottom != 0)
           Container(
-            height: 56,
+            height: focus.hasFocus &&
+                    MediaQuery.of(context).viewInsets.bottom != 0
+                ? null
+                : 56 + MediaQuery.of(context).padding.bottom,
             color: context.colors.backgroundsPrimary,
-            child: Row(
-              children: [
-                const Spacer(),
-                Text(
-                  '${controller.text.length}/140',
-                  style: context.textStyles.footNote!.copyWith(
-                    color: controller.text.length > 140
-                        ? context.colors.textsError
-                        : context.colors.textsDisabled,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextField(
+                key: key,
+                maxLines: null,
+                focusNode: focus,
+                controller: controller,
+                cursorWidth: 1,
+                cursorColor: context.colors.textsAction,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: AppLocalizations.of(context)!.textReply,
+                  hintStyle: context.textStyles.callout!.copyWith(
+                    color: context.colors.textsDisabled,
                   ),
                 ),
-                const SizedBox(width: 12),
-                AppTextButton(
-                  text: AppLocalizations.of(context)!.reply,
-                  disabled:
-                      controller.text.isEmpty || controller.text.length > 140,
-                ),
-                const SizedBox(width: 16),
-              ],
+                onChanged: (value) {
+                  setState(() {});
+                },
+              ),
             ),
-          )
-      ],
+          ),
+          if (focus.hasFocus)
+            KeyboardVisibilityBuilder(
+              builder: (context, visible) {
+                if (!visible) return SizedBox();
+                return Container(
+                  height: 56,
+                  color: context.colors.backgroundsPrimary,
+                  child: Row(
+                    children: [
+                      const Spacer(),
+                      Text(
+                        '${controller.text.length}/140',
+                        style: context.textStyles.footNote!.copyWith(
+                          color: controller.text.length > 140
+                              ? context.colors.textsError
+                              : context.colors.textsDisabled,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      AppTextButton(
+                        text: AppLocalizations.of(context)!.reply,
+                        disabled:
+                            controller.text.isEmpty || controller.text.length > 140,
+                      ),
+                      const SizedBox(width: 16),
+                    ],
+                  ),
+                );
+              }
+            )
+        ],
+      ),
     );
   }
 }
@@ -696,7 +701,7 @@ class _ImageDialogState extends State<ImageDialog>
                         (MediaQuery.of(context).size.height * 0.3),
               );
             }
-            return false;
+            return true;
           },
           child: Stack(
             children: [

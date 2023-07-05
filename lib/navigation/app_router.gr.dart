@@ -127,9 +127,11 @@ class AppRouter extends _i17.RootStackRouter {
       );
     },
     EditProfileRoute.name: (routeData) {
+      final args = routeData.argsAs<EditProfileRouteArgs>(
+          orElse: () => const EditProfileRouteArgs());
       return _i17.MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const _i12.EditProfilePage(),
+        child: _i12.EditProfilePage(key: args.key),
       );
     },
     BookmarksRoute.name: (routeData) {
@@ -488,14 +490,26 @@ class ChangeEmailCodeScreenArgs {
 
 /// generated route for
 /// [_i12.EditProfilePage]
-class EditProfileRoute extends _i17.PageRouteInfo<void> {
-  const EditProfileRoute()
+class EditProfileRoute extends _i17.PageRouteInfo<EditProfileRouteArgs> {
+  EditProfileRoute({_i18.Key? key})
       : super(
           EditProfileRoute.name,
           path: 'edit_profile',
+          args: EditProfileRouteArgs(key: key),
         );
 
   static const String name = 'EditProfileRoute';
+}
+
+class EditProfileRouteArgs {
+  const EditProfileRouteArgs({this.key});
+
+  final _i18.Key? key;
+
+  @override
+  String toString() {
+    return 'EditProfileRouteArgs{key: $key}';
+  }
 }
 
 /// generated route for

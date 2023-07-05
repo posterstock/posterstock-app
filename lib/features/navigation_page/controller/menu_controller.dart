@@ -5,6 +5,8 @@ import 'package:poster_stock/features/navigation_page/state_holder/menu_state_ho
 import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/navigation_route_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/previous_page_state_holder.dart';
+import 'package:poster_stock/features/navigation_page/view/navigation_page.dart';
+import 'package:poster_stock/navigation/app_router.gr.dart';
 
 final menuControllerProvider = Provider<MenuController>(
   (ref) => MenuController(
@@ -40,6 +42,10 @@ class MenuController {
 
   void jumpToPage(int page, BuildContext context) {
     FocusScope.of(context).unfocus();
+    AutoRouter.of(context).popUntilRouteWithPath('navigation');
+    if (menuValue ==true) {
+      menuState.updateState(!menuValue);
+    }
     previousPageState.updatePage(routerValue?.activeIndex ?? 0);
     routerState.updatePage(page);
     pagesState.updatePage(page);

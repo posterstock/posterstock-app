@@ -263,9 +263,12 @@ class UserInfoTile extends StatelessWidget {
                 ),
               ),
               if (!(user?.followed ?? true) && (!loading) && showFollowButton)
-                AppTextButton(
-                  text: AppLocalizations.of(context)!.follow,
-                  onTap: () {},
+                SizedBox(
+                  width: 81,
+                  child: AppTextButton(
+                    text: AppLocalizations.of(context)!.follow,
+                    onTap: () {},
+                  ),
                 ),
               if (!loading && showSettings)
                 GestureDetector(

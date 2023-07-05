@@ -1,6 +1,7 @@
 library peek_and_pop_dialog;
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -44,22 +45,31 @@ class _PeekAndPopDialogState extends State<PeekAndPopDialog> {
           }
         },
         builder: (context, state) {
-          return GestureDetector(
-            onTap: () {if (!long) widget.onTap();},
-            onPanCancel: () {_timer?.cancel();context.read<PeekAndPopDialogCubit>().updateState(false); Future((){long = false;});} ,
-            onPanEnd: (d) { _timer?.cancel(); context.read<PeekAndPopDialogCubit>().updateState(false); Future((){long = false;});} ,
-            onPanDown: (_) => {
-              _timer = Timer(const Duration(milliseconds: 500), () {
-                long = true;
-                if (widget.customOnLongTap != null) {
-                  widget.customOnLongTap!();
-                  return;
-                }
-                context.read<PeekAndPopDialogCubit>().updateState(true);
-                Vibration.vibrate(duration: 100, amplitude: 100);
-              })
+          return Listener(
+            onPointerUp: (details) {
+              _timer?.cancel(); context.read<PeekAndPopDialogCubit>().updateState(false); Future((){long = false;});
             },
-            child: widget.child,
+            child: GestureDetector(
+              onTap: () {if (!long) widget.onTap();},
+              onPanCancel: () {_timer?.cancel();} ,
+              onPanEnd: (d) { _timer?.cancel(); context.read<PeekAndPopDialogCubit>().updateState(false); Future((){long = false;});} ,
+              onPanDown: (_) => {
+                _timer = Timer(const Duration(milliseconds: 500), () {
+                  long = true;
+                  if (widget.customOnLongTap != null) {
+                    widget.customOnLongTap!();
+                    return;
+                  }
+                  context.read<PeekAndPopDialogCubit>().updateState(true);
+                  if (Platform.isIOS) {
+                    Vibration.vibrate(duration: 50, amplitude: 50);
+                  } else {
+                    Vibration.vibrate(duration: 50, amplitude: 100);
+                  }
+                })
+              },
+              child: widget.child,
+            ),
           );
         },
       ),

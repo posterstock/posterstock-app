@@ -26,6 +26,9 @@ class AppTextField extends StatefulWidget {
     this.searchField = false,
     this.autofocus = false,
     this.focus,
+    this.maxLines,
+    this.minLines,
+    this.style,
   }) : super(key: key);
   final String hint;
   final Function(String)? onSubmitted;
@@ -45,6 +48,9 @@ class AppTextField extends StatefulWidget {
   final bool searchField;
   final bool? autofocus;
   final FocusNode? focus;
+  final int? maxLines;
+  final int? minLines;
+  final TextStyle? style;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -91,7 +97,7 @@ class _AppTextFieldState extends State<AppTextField> {
             focusNode: widget.focus ?? focus,
             cursorColor: context.colors.textsPrimary!,
             inputFormatters: widget.inputFormatters,
-            style: context.textStyles.callout!
+            style: (widget.style ?? context.textStyles.callout!)
                 .copyWith(color: context.colors.textsPrimary!),
             onSubmitted: widget.onSubmitted,
             controller: widget.controller ?? nullController,
@@ -100,7 +106,7 @@ class _AppTextFieldState extends State<AppTextField> {
               isDense: true,
               prefix: Text(
                 widget.isUsername ? '@' : '',
-                style: context.textStyles.callout!.copyWith(
+                style: (widget.style ?? context.textStyles.callout!).copyWith(
                   color: Colors.transparent,
                 ),
               ),
@@ -190,7 +196,7 @@ class _AppTextFieldState extends State<AppTextField> {
               focusedBorder: defaultBorder,
               border: defaultBorder,
               hintText: widget.hint,
-              hintStyle: context.textStyles.callout,
+              hintStyle: widget.style ?? context.textStyles.callout!,
             ),
             onChanged: (value) {
               if (widget.isUsername && value == '@') {
@@ -201,7 +207,8 @@ class _AppTextFieldState extends State<AppTextField> {
               }
               setState(() {});
             },
-            maxLines: 1,
+            maxLines: widget.maxLines ?? 1,
+            minLines: widget.minLines,
           ),
           Align(
             alignment: Alignment.centerLeft,
@@ -209,7 +216,7 @@ class _AppTextFieldState extends State<AppTextField> {
               padding: const EdgeInsets.only(left: 18.0),
               child: Text(
                 widget.isUsername ? '@' : '',
-                style: context.textStyles.callout!.copyWith(
+                style: (widget.style ?? context.textStyles.callout!).copyWith(
                   color: context.colors.textsDisabled,
                 ),
               ),
