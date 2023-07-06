@@ -13,6 +13,7 @@ import 'package:poster_stock/features/settings/view/screens/change_email_%20code
 import 'package:poster_stock/features/settings/view/screens/change_email_screen.dart';
 import 'package:poster_stock/features/settings/view/screens/choose_language_page.dart';
 import 'package:poster_stock/features/settings/view/screens/settings_page.dart';
+import 'package:poster_stock/features/users_list/view/users_list_page.dart';
 
 import '../features/auth/view/pages/auth_page.dart';
 import '../features/list/view/list_page.dart';
@@ -46,6 +47,7 @@ import '../features/list/view/list_page.dart';
     AutoRoute(page: ChangeEmailCodeScreen, path: 'change_email_code'),
     AutoRoute(page: EditProfilePage, path: 'edit_profile'),
     AutoRoute(page: BookmarksPage, path: 'bookmarks'),
+    AutoRoute(page: UsersListPage, path: 'users_list'),
   ],
 )
 class $AppRouter {}

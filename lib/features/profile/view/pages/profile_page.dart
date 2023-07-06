@@ -22,6 +22,7 @@ import 'package:poster_stock/features/profile/controllers/profile_controller.dar
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/view/empty_collection_widget.dart';
+import 'package:poster_stock/features/users_list/view/users_list_page.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -250,46 +251,103 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                               const SizedBox(
                                 width: 38,
                               ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    profile?.followers.toString() ?? '0',
-                                    style: context.textStyles.headline,
-                                  ),
-                                  const SizedBox(
-                                    height: 3,
-                                  ),
-                                  Text(
-                                    AppLocalizations.of(context)!.followers,
-                                    style:
-                                        context.textStyles.caption1!.copyWith(
-                                      color: context.colors.textsSecondary,
+                              GestureDetector(
+                                onTap: () {
+                                  AutoRouter.of(context).push(
+                                    UsersListRoute(
+                                      user: List.generate(
+                                        20,
+                                        (index) => UserDetailsModel(
+                                          name: 'Name $index',
+                                          username: 'username$index',
+                                          following: 12,
+                                          followers: 11,
+                                          lists: 10,
+                                          followed: false,
+                                          posters: 123,
+                                          mySelf: false,
+                                          imagePath: index % 2 == 0
+                                              ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
+                                              : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
+                                        ),
+                                      ),
                                     ),
+                                  );
+                                },
+                                child: Container(
+                                  color: Colors.transparent,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        profile?.followers.toString() ?? '0',
+                                        style: context.textStyles.headline,
+                                      ),
+                                      const SizedBox(
+                                        height: 3,
+                                      ),
+                                      Text(
+                                        AppLocalizations.of(context)!.followers,
+                                        style: context.textStyles.caption1!
+                                            .copyWith(
+                                          color: context.colors.textsSecondary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                               const SizedBox(
                                 width: 36,
                               ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    profile?.following.toString() ?? '0',
-                                    style: context.textStyles.headline,
-                                  ),
-                                  const SizedBox(
-                                    height: 3,
-                                  ),
-                                  Text(
-                                    AppLocalizations.of(context)!.following,
-                                    style:
-                                        context.textStyles.caption1!.copyWith(
-                                      color: context.colors.textsSecondary,
+                              GestureDetector(
+                                onTap: () {
+                                  AutoRouter.of(context).push(
+                                    UsersListRoute(
+                                      following: true,
+                                      user: List.generate(
+                                        20,
+                                        (index) => UserDetailsModel(
+                                          name: 'Name $index',
+                                          username: 'username$index',
+                                          following: 12,
+                                          followers: 11,
+                                          lists: 10,
+                                          followed: false,
+                                          posters: 123,
+                                          mySelf: false,
+                                          imagePath: index % 2 == 0
+                                              ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
+                                              : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
+                                        ),
+                                      ),
                                     ),
+                                  );
+                                },
+                                child: Container(
+                                  color: Colors.transparent,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        profile?.following.toString() ?? '0',
+                                        style: context.textStyles.headline,
+                                      ),
+                                      const SizedBox(
+                                        height: 3,
+                                      ),
+                                      Text(
+                                        AppLocalizations.of(context)!.following,
+                                        style: context.textStyles.caption1!
+                                            .copyWith(
+                                          color: context.colors.textsSecondary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                               const Spacer(),
                             ],

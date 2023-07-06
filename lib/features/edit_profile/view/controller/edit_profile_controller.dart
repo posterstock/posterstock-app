@@ -46,4 +46,7 @@ class EditProfileController {
     editProfileNameStateHolder
         .updateError(localizations!.nameCantExceed32);
   }
+  void removeNameError() {
+    editProfileNameStateHolder.clearError();
+  }
 }

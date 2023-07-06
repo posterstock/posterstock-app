@@ -14,10 +14,18 @@ class EmptyCollectionWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SvgPicture.asset('assets/icons/empty_collection.svg'),
+        SvgPicture.asset(
+          'assets/icons/empty_collection.svg',
+          colorFilter: ColorFilter.mode(
+            context.colors.iconsDisabled!,
+            BlendMode.srcIn,
+          ),
+        ),
         const SizedBox(height: 16),
         Text(
-          profileName != null ? "$profileName has not added any posters to the collection yet. " : "Press 􀁍 for add poster to your collection",
+          profileName != null
+              ? "$profileName has not added any posters to the collection yet. "
+              : "Press 􀁍 for add poster to your collection",
           style: context.textStyles.subheadlineBold!.copyWith(
             color: context.colors.textsDisabled,
           ),

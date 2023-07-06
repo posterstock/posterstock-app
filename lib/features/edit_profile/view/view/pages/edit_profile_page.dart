@@ -192,8 +192,19 @@ class EditProfilePage extends ConsumerWidget {
                             ),
                           ),
                           style: context.textStyles.callout!.copyWith(
-                            color: nameError == null ? context.colors.textsPrimary : context.colors.textsError,
+                            color: nameError == null
+                                ? context.colors.textsPrimary
+                                : context.colors.textsError,
                           ),
+                          onChanged: (value) {
+                            if (value.length > 32) {
+                              ref
+                                  .read(editProfileControllerProvider)
+                                  .setTooLongErrorName();
+                              return;
+                            }
+                            ref.read(editProfileControllerProvider).removeNameError();
+                          },
                           onTap: () {
                             controller.animateTo(
                               0,
@@ -342,9 +353,7 @@ class _UsernameFieldProfileState extends ConsumerState<UsernameFieldProfile> {
           return;
         }
         if (value.length < 5) {
-          ref
-              .read(editProfileControllerProvider)
-              .setTooShortErrorUsername();
+          ref.read(editProfileControllerProvider).setTooShortErrorUsername();
           return;
         }
         if (value.length > 32) {
@@ -520,12 +529,13 @@ class ProfilePhotoDialog extends ConsumerWidget {
                         Expanded(
                           child: InkWell(
                             onTap: () async {
-                              final xfile = await ImagePicker().pickImage(source: ImageSource.camera);
+                              final xfile = await ImagePicker()
+                                  .pickImage(source: ImageSource.camera);
                               final image = await xfile?.readAsBytes();
                               if (image != null) {
                                 ref
-                                  .read(profileControllerProvider)
-                                  .setPhoto(image);
+                                    .read(profileControllerProvider)
+                                    .setPhoto(image);
                               }
                             },
                             child: Center(

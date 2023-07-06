@@ -11,8 +11,8 @@
 // ignore_for_file: type=lint
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:auto_route/auto_route.dart' as _i17;
-import 'package:flutter/material.dart' as _i18;
+import 'package:auto_route/auto_route.dart' as _i18;
+import 'package:flutter/material.dart' as _i19;
 
 import '../features/auth/view/pages/auth_page.dart' as _i1;
 import '../features/auth/view/pages/login_page.dart' as _i3;
@@ -20,57 +20,58 @@ import '../features/auth/view/pages/sign_up_page.dart' as _i2;
 import '../features/bookmarks/view/pages/bookmarks_page.dart' as _i13;
 import '../features/edit_profile/view/view/pages/edit_profile_page.dart'
     as _i12;
-import '../features/home/models/multiple_post_model.dart' as _i20;
-import '../features/home/models/post_movie_model.dart' as _i19;
-import '../features/home/view/pages/home_page.dart' as _i14;
+import '../features/home/models/multiple_post_model.dart' as _i21;
+import '../features/home/models/post_movie_model.dart' as _i20;
+import '../features/home/view/pages/home_page.dart' as _i15;
 import '../features/list/view/list_page.dart' as _i6;
 import '../features/navigation_page/view/navigation_page.dart' as _i4;
-import '../features/notifications/view/pages/notifications_page.dart' as _i16;
+import '../features/notifications/view/pages/notifications_page.dart' as _i17;
 import '../features/poster/view/pages/poster_page/poster_page.dart' as _i5;
-import '../features/profile/models/user_details_model.dart' as _i21;
+import '../features/profile/models/user_details_model.dart' as _i22;
 import '../features/profile/view/pages/profile_page.dart' as _i7;
-import '../features/search/view/pages/search_page.dart' as _i15;
+import '../features/search/view/pages/search_page.dart' as _i16;
 import '../features/settings/view/screens/change_email_%20code_screen.dart'
     as _i11;
 import '../features/settings/view/screens/change_email_screen.dart' as _i10;
 import '../features/settings/view/screens/choose_language_page.dart' as _i9;
 import '../features/settings/view/screens/settings_page.dart' as _i8;
+import '../features/users_list/view/users_list_page.dart' as _i14;
 
-class AppRouter extends _i17.RootStackRouter {
-  AppRouter([_i18.GlobalKey<_i18.NavigatorState>? navigatorKey])
+class AppRouter extends _i18.RootStackRouter {
+  AppRouter([_i19.GlobalKey<_i19.NavigatorState>? navigatorKey])
       : super(navigatorKey);
 
   @override
-  final Map<String, _i17.PageFactory> pagesMap = {
+  final Map<String, _i18.PageFactory> pagesMap = {
     AuthRoute.name: (routeData) {
       final args =
           routeData.argsAs<AuthRouteArgs>(orElse: () => const AuthRouteArgs());
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i1.AuthPage(key: args.key),
       );
     },
     SignUpRoute.name: (routeData) {
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: const _i2.SignUpPage(),
       );
     },
     LoginRoute.name: (routeData) {
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: const _i3.LoginPage(),
       );
     },
     NavigationRoute.name: (routeData) {
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: const _i4.NavigationPage(),
       );
     },
     PosterRoute.name: (routeData) {
       final args = routeData.argsAs<PosterRouteArgs>();
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i5.PosterPage(
           key: args.key,
@@ -80,7 +81,7 @@ class AppRouter extends _i17.RootStackRouter {
     },
     ListRoute.name: (routeData) {
       final args = routeData.argsAs<ListRouteArgs>();
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i6.ListPage(
           key: args.key,
@@ -91,7 +92,7 @@ class AppRouter extends _i17.RootStackRouter {
     ProfileRoute.name: (routeData) {
       final args = routeData.argsAs<ProfileRouteArgs>(
           orElse: () => const ProfileRouteArgs());
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i7.ProfilePage(
           key: args.key,
@@ -100,13 +101,13 @@ class AppRouter extends _i17.RootStackRouter {
       );
     },
     SettingsRoute.name: (routeData) {
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: const _i8.SettingsPage(),
       );
     },
     ChooseLanguageRoute.name: (routeData) {
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: const _i9.ChooseLanguagePage(),
       );
@@ -114,7 +115,7 @@ class AppRouter extends _i17.RootStackRouter {
     ChangeEmailScreen.name: (routeData) {
       final args = routeData.argsAs<ChangeEmailScreenArgs>(
           orElse: () => const ChangeEmailScreenArgs());
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i10.ChangeEmailScreen(key: args.key),
       );
@@ -122,7 +123,7 @@ class AppRouter extends _i17.RootStackRouter {
     ChangeEmailCodeScreen.name: (routeData) {
       final args = routeData.argsAs<ChangeEmailCodeScreenArgs>(
           orElse: () => const ChangeEmailCodeScreenArgs());
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i11.ChangeEmailCodeScreen(key: args.key),
       );
@@ -130,7 +131,7 @@ class AppRouter extends _i17.RootStackRouter {
     EditProfileRoute.name: (routeData) {
       final args = routeData.argsAs<EditProfileRouteArgs>(
           orElse: () => const EditProfileRouteArgs());
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i12.EditProfilePage(key: args.key),
       );
@@ -138,7 +139,7 @@ class AppRouter extends _i17.RootStackRouter {
     BookmarksRoute.name: (routeData) {
       final args = routeData.argsAs<BookmarksRouteArgs>(
           orElse: () => const BookmarksRouteArgs());
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i13.BookmarksPage(
           key: args.key,
@@ -146,117 +147,132 @@ class AppRouter extends _i17.RootStackRouter {
         ),
       );
     },
-    HomeRoute.name: (routeData) {
-      return _i17.MaterialPageX<dynamic>(
+    UsersListRoute.name: (routeData) {
+      final args = routeData.argsAs<UsersListRouteArgs>();
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const _i14.HomePage(),
+        child: _i14.UsersListPage(
+          key: args.key,
+          following: args.following,
+          user: args.user,
+        ),
+      );
+    },
+    HomeRoute.name: (routeData) {
+      return _i18.MaterialPageX<dynamic>(
+        routeData: routeData,
+        child: const _i15.HomePage(),
       );
     },
     SearchRoute.name: (routeData) {
       final args = routeData.argsAs<SearchRouteArgs>(
           orElse: () => const SearchRouteArgs());
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
-        child: _i15.SearchPage(key: args.key),
+        child: _i16.SearchPage(key: args.key),
       );
     },
     NotificationsRoute.name: (routeData) {
-      return _i17.MaterialPageX<dynamic>(
+      return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const _i16.NotificationsPage(),
+        child: const _i17.NotificationsPage(),
       );
     },
   };
 
   @override
-  List<_i17.RouteConfig> get routes => [
-        _i17.RouteConfig(
+  List<_i18.RouteConfig> get routes => [
+        _i18.RouteConfig(
           '/#redirect',
           path: '/',
           redirectTo: 'auth',
           fullMatch: true,
         ),
-        _i17.RouteConfig(
+        _i18.RouteConfig(
           AuthRoute.name,
           path: 'auth',
         ),
-        _i17.RouteConfig(
+        _i18.RouteConfig(
           SignUpRoute.name,
           path: 'sign_up',
         ),
-        _i17.RouteConfig(
+        _i18.RouteConfig(
           LoginRoute.name,
           path: 'login',
         ),
-        _i17.RouteConfig(
+        _i18.RouteConfig(
           NavigationRoute.name,
           path: 'navigation',
           children: [
-            _i17.RouteConfig(
+            _i18.RouteConfig(
               HomeRoute.name,
               path: 'home',
               parent: NavigationRoute.name,
             ),
-            _i17.RouteConfig(
+            _i18.RouteConfig(
               SearchRoute.name,
               path: 'search',
               parent: NavigationRoute.name,
             ),
-            _i17.RouteConfig(
+            _i18.RouteConfig(
               NotificationsRoute.name,
               path: 'notifications',
               parent: NavigationRoute.name,
             ),
-            _i17.RouteConfig(
+            _i18.RouteConfig(
               ProfileRoute.name,
               path: 'profile',
               parent: NavigationRoute.name,
             ),
           ],
         ),
-        _i17.RouteConfig(
+        _i18.RouteConfig(
           PosterRoute.name,
           path: 'poster',
         ),
-        _i17.RouteConfig(
+        _i18.RouteConfig(
           ListRoute.name,
           path: 'collection',
         ),
-        _i17.RouteConfig(
+        _i18.RouteConfig(
           ProfileRoute.name,
           path: 'profile',
         ),
-        _i17.RouteConfig(
+        _i18.RouteConfig(
           SettingsRoute.name,
           path: 'settings',
         ),
-        _i17.RouteConfig(
+        _i18.RouteConfig(
           ChooseLanguageRoute.name,
           path: 'language',
         ),
-        _i17.RouteConfig(
+        _i18.RouteConfig(
           ChangeEmailScreen.name,
           path: 'change_email',
         ),
-        _i17.RouteConfig(
+        _i18.RouteConfig(
           ChangeEmailCodeScreen.name,
           path: 'change_email_code',
         ),
-        _i17.RouteConfig(
+        _i18.RouteConfig(
           EditProfileRoute.name,
           path: 'edit_profile',
         ),
-        _i17.RouteConfig(
+        _i18.RouteConfig(
           BookmarksRoute.name,
           path: 'bookmarks',
+        ),
+        _i18.RouteConfig(
+          UsersListRoute.name,
+          path: 'users_list',
         ),
       ];
 }
 
 /// generated route for
 /// [_i1.AuthPage]
-class AuthRoute extends _i17.PageRouteInfo<AuthRouteArgs> {
-  AuthRoute({_i18.Key? key})
+class AuthRoute extends _i18.PageRouteInfo<AuthRouteArgs> {
+  AuthRoute({_i19.Key? key})
       : super(
           AuthRoute.name,
           path: 'auth',
@@ -269,7 +285,7 @@ class AuthRoute extends _i17.PageRouteInfo<AuthRouteArgs> {
 class AuthRouteArgs {
   const AuthRouteArgs({this.key});
 
-  final _i18.Key? key;
+  final _i19.Key? key;
 
   @override
   String toString() {
@@ -279,7 +295,7 @@ class AuthRouteArgs {
 
 /// generated route for
 /// [_i2.SignUpPage]
-class SignUpRoute extends _i17.PageRouteInfo<void> {
+class SignUpRoute extends _i18.PageRouteInfo<void> {
   const SignUpRoute()
       : super(
           SignUpRoute.name,
@@ -291,7 +307,7 @@ class SignUpRoute extends _i17.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i3.LoginPage]
-class LoginRoute extends _i17.PageRouteInfo<void> {
+class LoginRoute extends _i18.PageRouteInfo<void> {
   const LoginRoute()
       : super(
           LoginRoute.name,
@@ -303,8 +319,8 @@ class LoginRoute extends _i17.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i4.NavigationPage]
-class NavigationRoute extends _i17.PageRouteInfo<void> {
-  const NavigationRoute({List<_i17.PageRouteInfo>? children})
+class NavigationRoute extends _i18.PageRouteInfo<void> {
+  const NavigationRoute({List<_i18.PageRouteInfo>? children})
       : super(
           NavigationRoute.name,
           path: 'navigation',
@@ -316,10 +332,10 @@ class NavigationRoute extends _i17.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i5.PosterPage]
-class PosterRoute extends _i17.PageRouteInfo<PosterRouteArgs> {
+class PosterRoute extends _i18.PageRouteInfo<PosterRouteArgs> {
   PosterRoute({
-    _i18.Key? key,
-    required _i19.PostMovieModel post,
+    _i19.Key? key,
+    required _i20.PostMovieModel post,
   }) : super(
           PosterRoute.name,
           path: 'poster',
@@ -338,9 +354,9 @@ class PosterRouteArgs {
     required this.post,
   });
 
-  final _i18.Key? key;
+  final _i19.Key? key;
 
-  final _i19.PostMovieModel post;
+  final _i20.PostMovieModel post;
 
   @override
   String toString() {
@@ -350,10 +366,10 @@ class PosterRouteArgs {
 
 /// generated route for
 /// [_i6.ListPage]
-class ListRoute extends _i17.PageRouteInfo<ListRouteArgs> {
+class ListRoute extends _i18.PageRouteInfo<ListRouteArgs> {
   ListRoute({
-    _i18.Key? key,
-    required _i20.MultiplePostModel post,
+    _i19.Key? key,
+    required _i21.MultiplePostModel post,
   }) : super(
           ListRoute.name,
           path: 'collection',
@@ -372,9 +388,9 @@ class ListRouteArgs {
     required this.post,
   });
 
-  final _i18.Key? key;
+  final _i19.Key? key;
 
-  final _i20.MultiplePostModel post;
+  final _i21.MultiplePostModel post;
 
   @override
   String toString() {
@@ -384,10 +400,10 @@ class ListRouteArgs {
 
 /// generated route for
 /// [_i7.ProfilePage]
-class ProfileRoute extends _i17.PageRouteInfo<ProfileRouteArgs> {
+class ProfileRoute extends _i18.PageRouteInfo<ProfileRouteArgs> {
   ProfileRoute({
-    _i18.Key? key,
-    _i21.UserDetailsModel? user,
+    _i19.Key? key,
+    _i22.UserDetailsModel? user,
   }) : super(
           ProfileRoute.name,
           path: 'profile',
@@ -406,9 +422,9 @@ class ProfileRouteArgs {
     this.user,
   });
 
-  final _i18.Key? key;
+  final _i19.Key? key;
 
-  final _i21.UserDetailsModel? user;
+  final _i22.UserDetailsModel? user;
 
   @override
   String toString() {
@@ -418,7 +434,7 @@ class ProfileRouteArgs {
 
 /// generated route for
 /// [_i8.SettingsPage]
-class SettingsRoute extends _i17.PageRouteInfo<void> {
+class SettingsRoute extends _i18.PageRouteInfo<void> {
   const SettingsRoute()
       : super(
           SettingsRoute.name,
@@ -430,7 +446,7 @@ class SettingsRoute extends _i17.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i9.ChooseLanguagePage]
-class ChooseLanguageRoute extends _i17.PageRouteInfo<void> {
+class ChooseLanguageRoute extends _i18.PageRouteInfo<void> {
   const ChooseLanguageRoute()
       : super(
           ChooseLanguageRoute.name,
@@ -442,8 +458,8 @@ class ChooseLanguageRoute extends _i17.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i10.ChangeEmailScreen]
-class ChangeEmailScreen extends _i17.PageRouteInfo<ChangeEmailScreenArgs> {
-  ChangeEmailScreen({_i18.Key? key})
+class ChangeEmailScreen extends _i18.PageRouteInfo<ChangeEmailScreenArgs> {
+  ChangeEmailScreen({_i19.Key? key})
       : super(
           ChangeEmailScreen.name,
           path: 'change_email',
@@ -456,7 +472,7 @@ class ChangeEmailScreen extends _i17.PageRouteInfo<ChangeEmailScreenArgs> {
 class ChangeEmailScreenArgs {
   const ChangeEmailScreenArgs({this.key});
 
-  final _i18.Key? key;
+  final _i19.Key? key;
 
   @override
   String toString() {
@@ -467,8 +483,8 @@ class ChangeEmailScreenArgs {
 /// generated route for
 /// [_i11.ChangeEmailCodeScreen]
 class ChangeEmailCodeScreen
-    extends _i17.PageRouteInfo<ChangeEmailCodeScreenArgs> {
-  ChangeEmailCodeScreen({_i18.Key? key})
+    extends _i18.PageRouteInfo<ChangeEmailCodeScreenArgs> {
+  ChangeEmailCodeScreen({_i19.Key? key})
       : super(
           ChangeEmailCodeScreen.name,
           path: 'change_email_code',
@@ -481,7 +497,7 @@ class ChangeEmailCodeScreen
 class ChangeEmailCodeScreenArgs {
   const ChangeEmailCodeScreenArgs({this.key});
 
-  final _i18.Key? key;
+  final _i19.Key? key;
 
   @override
   String toString() {
@@ -491,8 +507,8 @@ class ChangeEmailCodeScreenArgs {
 
 /// generated route for
 /// [_i12.EditProfilePage]
-class EditProfileRoute extends _i17.PageRouteInfo<EditProfileRouteArgs> {
-  EditProfileRoute({_i18.Key? key})
+class EditProfileRoute extends _i18.PageRouteInfo<EditProfileRouteArgs> {
+  EditProfileRoute({_i19.Key? key})
       : super(
           EditProfileRoute.name,
           path: 'edit_profile',
@@ -505,7 +521,7 @@ class EditProfileRoute extends _i17.PageRouteInfo<EditProfileRouteArgs> {
 class EditProfileRouteArgs {
   const EditProfileRouteArgs({this.key});
 
-  final _i18.Key? key;
+  final _i19.Key? key;
 
   @override
   String toString() {
@@ -515,9 +531,9 @@ class EditProfileRouteArgs {
 
 /// generated route for
 /// [_i13.BookmarksPage]
-class BookmarksRoute extends _i17.PageRouteInfo<BookmarksRouteArgs> {
+class BookmarksRoute extends _i18.PageRouteInfo<BookmarksRouteArgs> {
   BookmarksRoute({
-    _i18.Key? key,
+    _i19.Key? key,
     int startIndex = 0,
   }) : super(
           BookmarksRoute.name,
@@ -537,7 +553,7 @@ class BookmarksRouteArgs {
     this.startIndex = 0,
   });
 
-  final _i18.Key? key;
+  final _i19.Key? key;
 
   final int startIndex;
 
@@ -548,8 +564,47 @@ class BookmarksRouteArgs {
 }
 
 /// generated route for
-/// [_i14.HomePage]
-class HomeRoute extends _i17.PageRouteInfo<void> {
+/// [_i14.UsersListPage]
+class UsersListRoute extends _i18.PageRouteInfo<UsersListRouteArgs> {
+  UsersListRoute({
+    _i19.Key? key,
+    bool following = false,
+    required List<_i22.UserDetailsModel> user,
+  }) : super(
+          UsersListRoute.name,
+          path: 'users_list',
+          args: UsersListRouteArgs(
+            key: key,
+            following: following,
+            user: user,
+          ),
+        );
+
+  static const String name = 'UsersListRoute';
+}
+
+class UsersListRouteArgs {
+  const UsersListRouteArgs({
+    this.key,
+    this.following = false,
+    required this.user,
+  });
+
+  final _i19.Key? key;
+
+  final bool following;
+
+  final List<_i22.UserDetailsModel> user;
+
+  @override
+  String toString() {
+    return 'UsersListRouteArgs{key: $key, following: $following, user: $user}';
+  }
+}
+
+/// generated route for
+/// [_i15.HomePage]
+class HomeRoute extends _i18.PageRouteInfo<void> {
   const HomeRoute()
       : super(
           HomeRoute.name,
@@ -560,9 +615,9 @@ class HomeRoute extends _i17.PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [_i15.SearchPage]
-class SearchRoute extends _i17.PageRouteInfo<SearchRouteArgs> {
-  SearchRoute({_i18.Key? key})
+/// [_i16.SearchPage]
+class SearchRoute extends _i18.PageRouteInfo<SearchRouteArgs> {
+  SearchRoute({_i19.Key? key})
       : super(
           SearchRoute.name,
           path: 'search',
@@ -575,7 +630,7 @@ class SearchRoute extends _i17.PageRouteInfo<SearchRouteArgs> {
 class SearchRouteArgs {
   const SearchRouteArgs({this.key});
 
-  final _i18.Key? key;
+  final _i19.Key? key;
 
   @override
   String toString() {
@@ -584,8 +639,8 @@ class SearchRouteArgs {
 }
 
 /// generated route for
-/// [_i16.NotificationsPage]
-class NotificationsRoute extends _i17.PageRouteInfo<void> {
+/// [_i17.NotificationsPage]
+class NotificationsRoute extends _i18.PageRouteInfo<void> {
   const NotificationsRoute()
       : super(
           NotificationsRoute.name,

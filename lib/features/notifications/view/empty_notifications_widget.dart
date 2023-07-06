@@ -13,6 +13,10 @@ class EmptyNotificationsWidget extends StatelessWidget {
         children: [
           SvgPicture.asset(
             'assets/icons/ic_empty_nots.svg',
+            colorFilter: ColorFilter.mode(
+              context.colors.iconsDisabled!,
+              BlendMode.srcIn,
+            ),
           ),
           const SizedBox(height: 5),
           Text(
