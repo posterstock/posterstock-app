@@ -913,6 +913,7 @@ class PosterActionsDialog extends ConsumerWidget {
                               print(1);
                             },
                             child: Center(
+                              //TODO REMOVE THIS IF THIS MOVIE NOT IN COLLECTION
                               child: Text(
                                 'Add to list',
                                 style: context.textStyles.bodyRegular!.copyWith(

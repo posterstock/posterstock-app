@@ -46,40 +46,26 @@ class _ChoosePosterTileState extends State<ChoosePosterTile> {
                 ),
               ),
               Positioned(
-                  top: 4,
-                  right: 4,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(4.0),
-                    child: Transform.scale(
-                      scale: 1.2,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        width: 22,
-                        height: 22,
-                        color: chosen ? context.colors.backgroundsPrimary : context.colors.textsBackground!.withOpacity(0.4),
-                        child: chosen ? SvgPicture.asset('assets/icons/ic_check.svg') : null,
-                      ),
+                top: 4,
+                right: 4,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4.0),
+                  child: Transform.scale(
+                    scale: 1.2,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 22,
+                      height: 22,
+                      color: chosen
+                          ? context.colors.backgroundsPrimary
+                          : context.colors.textsBackground!.withOpacity(0.4),
+                      child: chosen
+                          ? SvgPicture.asset('assets/icons/ic_check.svg')
+                          : null,
                     ),
-                  ) /*Container(
-                  width: 22,
-                  height: 22,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4.0),
-                    color: chosen
-                        ? context.colors.backgroundsPrimary
-                        : context.colors.textsBackground!.withOpacity(0.4),
                   ),
-                  child: chosen
-                      ? SvgPicture.asset(
-                          'assets/icons/ic_check.svg',
-                          colorFilter: ColorFilter.mode(
-                            context.colors.iconsActive!,
-                            BlendMode.srcIn,
-                          ),
-                        )
-                      : null,
-                ),*/
-                  ),
+                ),
+              ),
             ],
           ),
         ),

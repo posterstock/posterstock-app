@@ -4,12 +4,18 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/create_list/view/pick_cover_dialog.dart';
 import 'package:poster_stock/features/edit_profile/controller/profile_controller.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/avatar_state_holder.dart';
+import 'package:poster_stock/features/edit_profile/view/controller/edit_profile_controller.dart';
+import 'package:poster_stock/features/edit_profile/view/state_holders/edit_profile_name_error.dart';
+import 'package:poster_stock/features/edit_profile/view/state_holders/edit_profile_username_state_holder.dart';
+import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class EditProfilePage extends ConsumerWidget {
@@ -21,12 +27,17 @@ class EditProfilePage extends ConsumerWidget {
     Color(0xff92bdf4),
   ];
 
-  final Color avatarColor = avatar[Random().nextInt(3)];
-  final ScrollController controller = ScrollController();
+  final avatarColor = avatar[Random().nextInt(3)];
+  final controller = ScrollController();
+  TextEditingController? nameController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final photo = ref.watch(avatarStateHolderProvider);
+    final usernameError = ref.watch(editProfileUsernameStateHolder);
+    final nameError = ref.watch(editProfileNameStateHolder);
+    final initialName = ref.watch(profileInfoStateHolderProvider)?.name;
+    nameController ??= TextEditingController(text: initialName ?? '');
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -170,6 +181,7 @@ class EditProfilePage extends ConsumerWidget {
                       ),
                       Expanded(
                         child: TextField(
+                          controller: nameController,
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: context.colors.backgroundsPrimary,
@@ -180,7 +192,7 @@ class EditProfilePage extends ConsumerWidget {
                             ),
                           ),
                           style: context.textStyles.callout!.copyWith(
-                            color: context.colors.textsPrimary,
+                            color: nameError == null ? context.colors.textsPrimary : context.colors.textsError,
                           ),
                           onTap: () {
                             controller.animateTo(
@@ -229,7 +241,22 @@ class EditProfilePage extends ConsumerWidget {
                   thickness: 1,
                   color: context.colors.fieldsDefault,
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(
+                  height: 4,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    child: Text(
+                      usernameError ?? '',
+                      style: context.textStyles.caption1!.copyWith(
+                        color: context.colors.textsError,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 26),
                 Divider(
                   height: 1,
                   thickness: 1,
@@ -250,7 +277,7 @@ class EditProfilePage extends ConsumerWidget {
   }
 }
 
-class UsernameFieldProfile extends StatefulWidget {
+class UsernameFieldProfile extends ConsumerStatefulWidget {
   const UsernameFieldProfile({
     super.key,
     required this.controller,
@@ -259,17 +286,22 @@ class UsernameFieldProfile extends StatefulWidget {
   final ScrollController controller;
 
   @override
-  State<UsernameFieldProfile> createState() => _UsernameFieldProfileState();
+  ConsumerState<UsernameFieldProfile> createState() =>
+      _UsernameFieldProfileState();
 }
 
-class _UsernameFieldProfileState extends State<UsernameFieldProfile> {
-  final TextEditingController controller = TextEditingController();
+class _UsernameFieldProfileState extends ConsumerState<UsernameFieldProfile> {
+  TextEditingController? controller;
   final FocusNode focusNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
     focusNode.addListener(() {
       setState(() {});
     });
+    final usernameError = ref.watch(editProfileUsernameStateHolder);
+    final initialUsername = ref.watch(profileInfoStateHolderProvider)?.username;
+    controller ??= TextEditingController(text: initialUsername ?? '');
     return TextField(
       controller: controller,
       focusNode: focusNode,
@@ -284,12 +316,18 @@ class _UsernameFieldProfileState extends State<UsernameFieldProfile> {
         prefix: Text(
           '@',
           style: context.textStyles.callout!.copyWith(
-            color: !(focusNode.hasFocus || controller.text.isNotEmpty) ? Colors.transparent : context.colors.textsDisabled,
+            color: !(focusNode.hasFocus || controller!.text.isNotEmpty)
+                ? Colors.transparent
+                : (usernameError == null
+                    ? context.colors.textsDisabled
+                    : context.colors.textsError),
           ),
         ),
       ),
       style: context.textStyles.callout!.copyWith(
-        color: context.colors.textsPrimary,
+        color: usernameError == null
+            ? context.colors.textsPrimary
+            : context.colors.textsError,
       ),
       onTap: () {
         widget.controller.animateTo(
@@ -297,6 +335,32 @@ class _UsernameFieldProfileState extends State<UsernameFieldProfile> {
           duration: Duration(milliseconds: 300),
           curve: Curves.linear,
         );
+      },
+      onChanged: (value) {
+        if (value.isEmpty) {
+          ref.read(editProfileControllerProvider).removeUsernameError();
+          return;
+        }
+        if (value.length < 5) {
+          ref
+              .read(editProfileControllerProvider)
+              .setTooShortErrorUsername();
+          return;
+        }
+        if (value.length > 32) {
+          ref.read(editProfileControllerProvider).setTooLongErrorUsername();
+          return;
+        }
+        final validCharacters = RegExp(r'[a-zA-Z0-9_.]+$');
+        for (int i = 0; i < value.length; i++) {
+          if (!validCharacters.hasMatch(value[i])) {
+            ref
+                .read(editProfileControllerProvider)
+                .setWrongSymbolsErrorUsername();
+            return;
+          }
+        }
+        ref.read(editProfileControllerProvider).removeUsernameError();
       },
     );
   }
@@ -311,11 +375,13 @@ class ProfileDescriptionField extends StatefulWidget {
   final ScrollController controller;
 
   @override
-  State<ProfileDescriptionField> createState() => _ProfileDescriptionFieldState();
+  State<ProfileDescriptionField> createState() =>
+      _ProfileDescriptionFieldState();
 }
 
 class _ProfileDescriptionFieldState extends State<ProfileDescriptionField> {
   final textController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -333,7 +399,9 @@ class _ProfileDescriptionFieldState extends State<ProfileDescriptionField> {
               Text(
                 '${textController.text.length}/140',
                 style: context.textStyles.footNote!.copyWith(
-                  color: textController.text.length <= 140 ? context.colors.textsDisabled : context.colors.textsError,
+                  color: textController.text.length <= 140
+                      ? context.colors.textsDisabled
+                      : context.colors.textsError,
                 ),
               ),
             ],
@@ -451,8 +519,14 @@ class ProfilePhotoDialog extends ConsumerWidget {
                         ),
                         Expanded(
                           child: InkWell(
-                            onTap: () {
-                              print(1);
+                            onTap: () async {
+                              final xfile = await ImagePicker().pickImage(source: ImageSource.camera);
+                              final image = await xfile?.readAsBytes();
+                              if (image != null) {
+                                ref
+                                  .read(profileControllerProvider)
+                                  .setPhoto(image);
+                              }
                             },
                             child: Center(
                               child: Text(

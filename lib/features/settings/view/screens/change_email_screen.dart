@@ -60,9 +60,16 @@ class ChangeEmailScreen extends ConsumerWidget {
                 ),
                 actions: [
                   CupertinoButton(
-                    onPressed: checkEmail(email) ? () {
-                      AutoRouter.of(context).push(ChangeEmailCodeScreen());
-                    } : null,
+                    onPressed: () {
+                      ref
+                          .read(changeEmailControllerProvider)
+                          .updateEmail(controller.text);
+                      if (checkEmail(controller.text)) {
+                        AutoRouter.of(context).push(
+                          ChangeEmailCodeScreen(),
+                        );
+                      }
+                    },
                     child: Text('Next'),
                   ),
                 ],
@@ -71,7 +78,8 @@ class ChangeEmailScreen extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
-                  'Your current email is posterstock@mail.ru. What would you like to update it to? Your email is not  displayed in your public profile on PosterStock.',
+                  //TODO email
+                  'Your current email is test@test.com. What would you like to update it to? Your email is not  displayed in your public profile on Posterstock.',
                   style: context.textStyles.footNote!
                       .copyWith(color: context.colors.textsSecondary),
                 ),
@@ -86,7 +94,7 @@ class ChangeEmailScreen extends ConsumerWidget {
                 height: 47,
                 child: TextField(
                   controller: controller,
-                  onChanged: (value) {
+                  onSubmitted: (value) {
                     ref.read(changeEmailControllerProvider).updateEmail(value);
                   },
                   decoration: InputDecoration(
@@ -129,7 +137,7 @@ class ChangeEmailScreen extends ConsumerWidget {
                               )),
                   ),
                   style: context.textStyles.callout!.copyWith(
-                      color: checkEmail(email)
+                      color: checkEmail(email) || email.isEmpty
                           ? context.colors.textsAction
                           : context.colors.textsError),
                 ),

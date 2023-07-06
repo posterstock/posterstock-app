@@ -21,11 +21,11 @@ import 'package:poster_stock/features/peek_pop/peek_and_pop_dialog.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
+import 'package:poster_stock/features/profile/view/empty_collection_widget.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../../../common/services/text_info_service.dart';
-import '../../../navigation_page/controller/menu_controller.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({
@@ -489,6 +489,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
               ? const SizedBox()
               : ProfileTabs(
                   controller: tabController!,
+                  username: widget.user?.mySelf == true
+                      ? null
+                      : widget.user?.username,
                 ),
         ),
       ),
@@ -508,8 +511,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 }
 
 class ProfileTabs extends ConsumerStatefulWidget {
-  const ProfileTabs({Key? key, required this.controller}) : super(key: key);
+  const ProfileTabs({
+    Key? key,
+    required this.controller,
+    this.username,
+  }) : super(key: key);
   final TabController controller;
+  final String? username;
 
   @override
   ConsumerState<ProfileTabs> createState() => _ProfileTabsState();
@@ -573,12 +581,13 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
         description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."),
   );
+  final List<PostMovieModel> movies = [];
 
   @override
   Widget build(BuildContext context) {
-    List<PostMovieModel> movies = [];
+    //List<PostMovieModel> movies = [];
     List<List>? helper = ref.watch(homePagePostsStateHolderProvider);
-    if (helper != null) {
+    /*if (helper != null) {
       for (var i in helper) {
         if (i[0] is PostMovieModel) {
           movies.add(i[0]);
@@ -588,12 +597,13 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
           movies.add(i[1]);
         }
       }
-    }
+    }*/
     return TabBarView(
       controller: widget.controller,
       children: [
         PostsCollectionView(
           movies: movies,
+          username: widget.username,
         ),
         if (widget.controller.length == 3)
           PostsCollectionView(
@@ -629,13 +639,30 @@ class PostsCollectionView extends ConsumerWidget {
     required this.movies,
     this.customOnItemTap,
     this.customOnLongTap,
+    this.username,
   }) : super(key: key);
   final List<PostMovieModel> movies;
   final void Function(PostMovieModel, int)? customOnItemTap;
   final void Function()? customOnLongTap;
+  final String? username;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (movies.isEmpty) {
+      return Column(
+        children: [
+          SizedBox(
+            height: (MediaQuery.of(context).size.height - 480 - 56) / 2,
+          ),
+          SizedBox(
+            width: username == null ? 170 : 250,
+            child: EmptyCollectionWidget(
+              profileName: username,
+            ),
+          ),
+        ],
+      );
+    }
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),

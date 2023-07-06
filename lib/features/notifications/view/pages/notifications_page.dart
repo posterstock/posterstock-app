@@ -11,7 +11,9 @@ import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/notifications/controllers/notifications_controller.dart';
 import 'package:poster_stock/features/notifications/models/notification_model.dart';
 import 'package:poster_stock/features/notifications/state_holders/notifications_state_holder.dart';
+import 'package:poster_stock/features/notifications/view/empty_notifications_widget.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
+import 'package:poster_stock/features/profile/view/empty_collection_widget.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -21,9 +23,6 @@ class NotificationsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifications = ref.watch(notificationsStateHolderProvider);
-    if (notifications == null) {
-      ref.read(notificationsControllerProvider).getNotificationsData();
-    }
     final controller = ScrollController();
     bool keepOffset = false;
     return NotificationListener<ScrollUpdateNotification>(
@@ -74,8 +73,9 @@ class NotificationsPage extends ConsumerWidget {
               ),
             ),
             CustomScrollView(
-              physics: AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics()),
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
               controller: controller,
               slivers: [
                 SliverAppBar(
@@ -93,27 +93,38 @@ class NotificationsPage extends ConsumerWidget {
                   toolbarHeight: 42,
                   expandedHeight: 42,
                 ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (notifications!.isEmpty) {
-                        return Container(
-                          height: 78,
-                          color: context.colors.backgroundsPrimary,
-                        );
-                      }
-                      return NotificationTile(
-                        notification: notifications[index],
-                        onTap: () {
-                          print(1);
-                        },
-                      );
-                    },
-                    childCount: notifications == null
-                        ? 0
-                        : (notifications.isEmpty ? 1 : notifications.length),
+                if (notifications == null)
+                  SliverToBoxAdapter(
+                    child: Container(
+                      color: context.colors.backgroundsPrimary,
+                      height: MediaQuery.of(context).size.height - 200,
+                      child: const Center(
+                        child: EmptyNotificationsWidget(),
+                      ),
+                    ),
                   ),
-                )
+                if (notifications != null)
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        if (notifications!.isEmpty) {
+                          return Container(
+                            height: 78,
+                            color: context.colors.backgroundsPrimary,
+                          );
+                        }
+                        return NotificationTile(
+                          notification: notifications[index],
+                          onTap: () {
+                            print(1);
+                          },
+                        );
+                      },
+                      childCount: notifications == null
+                          ? 0
+                          : (notifications.isEmpty ? 1 : notifications.length),
+                    ),
+                  )
               ],
             ),
           ],

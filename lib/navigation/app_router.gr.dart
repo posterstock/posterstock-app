@@ -18,7 +18,8 @@ import '../features/auth/view/pages/auth_page.dart' as _i1;
 import '../features/auth/view/pages/login_page.dart' as _i3;
 import '../features/auth/view/pages/sign_up_page.dart' as _i2;
 import '../features/bookmarks/view/pages/bookmarks_page.dart' as _i13;
-import '../features/edit_profile/view/pages/edit_profile_page.dart' as _i12;
+import '../features/edit_profile/view/view/pages/edit_profile_page.dart'
+    as _i12;
 import '../features/home/models/multiple_post_model.dart' as _i20;
 import '../features/home/models/post_movie_model.dart' as _i19;
 import '../features/home/view/pages/home_page.dart' as _i14;

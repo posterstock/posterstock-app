@@ -5,7 +5,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
-import 'package:poster_stock/features/create_bookmark/view/create_bookmark.dart';
 import 'package:poster_stock/features/create_list/view/create_list_dialog.dart';
 import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
@@ -180,7 +179,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                   backgroundColor: Colors.transparent,
                   isScrollControlled: true,
                   useSafeArea: true,
-                  builder: (context) => const CreateBookmarkDialog(),
+                  builder: (context) => const CreatePosterDialog(bookmark: true,),
                 );
               },
             ),

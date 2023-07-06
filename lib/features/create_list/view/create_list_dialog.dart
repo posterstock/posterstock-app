@@ -439,7 +439,7 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
               const SizedBox(width: 16),
             ],
           ),
-        )
+        ),
       ],
     );
   }

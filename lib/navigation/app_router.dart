@@ -2,7 +2,7 @@ import 'package:auto_route/annotations.dart';
 import 'package:poster_stock/features/auth/view/pages/login_page.dart';
 import 'package:poster_stock/features/auth/view/pages/sign_up_page.dart';
 import 'package:poster_stock/features/bookmarks/view/pages/bookmarks_page.dart';
-import 'package:poster_stock/features/edit_profile/view/pages/edit_profile_page.dart';
+import 'package:poster_stock/features/edit_profile/view/view/pages/edit_profile_page.dart';
 import 'package:poster_stock/features/home/view/pages/home_page.dart';
 import 'package:poster_stock/features/navigation_page/view/navigation_page.dart';
 import 'package:poster_stock/features/notifications/view/pages/notifications_page.dart';
