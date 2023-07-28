@@ -1,30 +1,39 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/state_holders/auth_id_state_holder.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/create_list/view/create_list_dialog.dart';
 import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
+import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/menu_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/view/widgets/bottom_nav_bar.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
-class NavigationPage extends StatelessWidget {
+class NavigationPage extends ConsumerWidget {
   const NavigationPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return AutoTabsRouter.pageView(
       physics: const NeverScrollableScrollPhysics(),
       routes: [
         const HomeRoute(),
         SearchRoute(),
         const NotificationsRoute(),
-        ProfileRoute(),
+        ProfileRoute(
+          user: UserModel(
+            id: ref.watch(authIdStateHolderProvider) ?? 0,
+            name: '',
+            username: '',
+          ),
+        ),
       ],
       builder: (context, child, _) {
         return Stack(
@@ -153,11 +162,11 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
               animationValue: controller.value,
               onTap: () {
                 showModalBottomSheet(
-                    context: context,
-                    backgroundColor: Colors.transparent,
-                    isScrollControlled: true,
-                    useSafeArea: true,
-                    builder: (context) => const CreatePosterDialog(),
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  builder: (context) => const CreatePosterDialog(),
                 );
               },
             ),
@@ -179,7 +188,9 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                   backgroundColor: Colors.transparent,
                   isScrollControlled: true,
                   useSafeArea: true,
-                  builder: (context) => const CreatePosterDialog(bookmark: true,),
+                  builder: (context) => const CreatePosterDialog(
+                    bookmark: true,
+                  ),
                 );
               },
             ),

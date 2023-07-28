@@ -2,7 +2,7 @@ import 'package:poster_stock/features/home/data/i_home_page_api.dart';
 
 class MockHomePageApi implements IHomePageApi {
   @override
-  Future<Map<String, dynamic>> getPosts(String token, int offset) async {
+  Future<Map<String, dynamic>> getPosts(String token, {bool getNewPosts = false}) async {
     await Future.delayed(const Duration(milliseconds: 1000));
     return {
       'data': {
@@ -333,4 +333,12 @@ class MockHomePageApi implements IHomePageApi {
       },
     };
   }
+
+  @override
+  Future<void> setLike(String token, int id, bool like) {
+    // TODO: implement setLike
+    throw UnimplementedError();
+  }
+
+
 }

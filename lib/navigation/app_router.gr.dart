@@ -13,6 +13,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i18;
 import 'package:flutter/material.dart' as _i19;
+import 'package:poster_stock/features/home/models/user_model.dart' as _i23;
 
 import '../features/auth/view/pages/auth_page.dart' as _i1;
 import '../features/auth/view/pages/login_page.dart' as _i3;
@@ -76,6 +77,7 @@ class AppRouter extends _i18.RootStackRouter {
         child: _i5.PosterPage(
           key: args.key,
           post: args.post,
+          index: args.index,
         ),
       );
     },
@@ -90,8 +92,7 @@ class AppRouter extends _i18.RootStackRouter {
       );
     },
     ProfileRoute.name: (routeData) {
-      final args = routeData.argsAs<ProfileRouteArgs>(
-          orElse: () => const ProfileRouteArgs());
+      final args = routeData.argsAs<ProfileRouteArgs>();
       return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i7.ProfilePage(
@@ -336,12 +337,14 @@ class PosterRoute extends _i18.PageRouteInfo<PosterRouteArgs> {
   PosterRoute({
     _i19.Key? key,
     required _i20.PostMovieModel post,
+    required int index,
   }) : super(
           PosterRoute.name,
           path: 'poster',
           args: PosterRouteArgs(
             key: key,
             post: post,
+            index: index,
           ),
         );
 
@@ -352,11 +355,14 @@ class PosterRouteArgs {
   const PosterRouteArgs({
     this.key,
     required this.post,
+    required this.index,
   });
 
   final _i19.Key? key;
 
   final _i20.PostMovieModel post;
+
+  final int index;
 
   @override
   String toString() {
@@ -403,7 +409,7 @@ class ListRouteArgs {
 class ProfileRoute extends _i18.PageRouteInfo<ProfileRouteArgs> {
   ProfileRoute({
     _i19.Key? key,
-    _i22.UserDetailsModel? user,
+    required _i23.UserModel user,
   }) : super(
           ProfileRoute.name,
           path: 'profile',
@@ -419,12 +425,12 @@ class ProfileRoute extends _i18.PageRouteInfo<ProfileRouteArgs> {
 class ProfileRouteArgs {
   const ProfileRouteArgs({
     this.key,
-    this.user,
+    required this.user,
   });
 
   final _i19.Key? key;
 
-  final _i22.UserDetailsModel? user;
+  final _i23.UserModel user;
 
   @override
   String toString() {
@@ -569,7 +575,7 @@ class UsersListRoute extends _i18.PageRouteInfo<UsersListRouteArgs> {
   UsersListRoute({
     _i19.Key? key,
     bool following = false,
-    required List<_i22.UserDetailsModel> user,
+    required List<_i23.UserModel> user,
   }) : super(
           UsersListRoute.name,
           path: 'users_list',
@@ -594,7 +600,7 @@ class UsersListRouteArgs {
 
   final bool following;
 
-  final List<_i22.UserDetailsModel> user;
+  final List<_i23.UserModel> user;
 
   @override
   String toString() {

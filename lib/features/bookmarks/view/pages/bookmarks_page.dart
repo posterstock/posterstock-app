@@ -11,12 +11,15 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 final posters = List.generate(
   300,
   (index) => PostMovieModel(
-      year: 2000 + index,
+      liked: false,
+      id: 1,
+      year: '2020',
       imagePath: index % 2 == 0
           ? 'https://m.media-amazon.com/images/I/61YwNp4JaPL._AC_UF1000,1000_QL80_.jpg'
           : 'https://m.media-amazon.com/images/I/51ifcV+yjPL._AC_.jpg',
       name: index % 2 == 0 ? 'Joker' : 'The Walking Dead',
       author: UserModel(
+        id: 12,
         name: 'Name $index',
         username: 'username$index',
         followed: index % 2 == 0,
@@ -48,9 +51,7 @@ class BookmarksPage extends StatelessWidget {
       bookmarks.length,
       (index) => PostBase(
         showSuggestion: false,
-        post: [
-          bookmarks[index],
-        ],
+        index: index,
       ),
     );
     return CustomScaffold(

@@ -6,7 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
+import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
+import 'package:poster_stock/features/home/state_holders/home_page_likes_state_holder.dart';
+import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
 import 'package:poster_stock/features/home/view/helpers/custom_bounce_physic.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
@@ -14,11 +17,13 @@ import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../../../../common/helpers/hero_dialog_route.dart';
 import '../../../../../common/widgets/app_text_button.dart';
+import '../../../../home/view/widgets/movie_card.dart';
 
 class PosterPage extends StatefulWidget {
-  const PosterPage({Key? key, required this.post}) : super(key: key);
+  const PosterPage({Key? key, required this.post, required this.index}) : super(key: key);
 
   final PostMovieModel post;
+  final int index;
 
   @override
   State<PosterPage> createState() => _PosterPageState();
@@ -156,6 +161,7 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                                 animation: posterController!,
                                 builder: (context, child) {
                                   return PosterInfo(
+                                    index: widget.index,
                                     post: widget.post,
                                   );
                                 },
@@ -171,14 +177,14 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                               height: 8,
                             ),
                             ...List<Widget>.generate(
-                              widget.post.comments.length,
+                              widget.post.comments,
                               (index) => Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 6.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Padding(
+                                    /*Padding(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 16.0,
                                       ),
@@ -188,7 +194,7 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                                         time: widget.post.comments[index].time,
                                         behavior: HitTestBehavior.translucent,
                                       ),
-                                    ),
+                                    ),*/
                                     const SizedBox(height: 12),
                                     Row(
                                       children: [
@@ -200,15 +206,15 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(
+                                              /*Text(
                                                 widget.post.comments[index]
                                                     .comment,
                                                 style: context
                                                     .textStyles.subheadline,
-                                              ),
+                                              ),*/
                                               const SizedBox(height: 12),
                                               if (index !=
-                                                  widget.post.comments.length -
+                                                  widget.post.comments -
                                                       1)
                                                 Divider(
                                                   height: 0.5,
@@ -515,7 +521,7 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
 
   double getEmptySpaceHeightForSingleMovie(BuildContext context) {
     double result =
-        widget.post.comments.length * 80 + MediaQuery.of(context).padding.top;
+        widget.post.comments * 80 + MediaQuery.of(context).padding.top;
     result += 42 + 8 + 44;
     result += TextInfoService.textSize(
       widget.post.name,
@@ -537,13 +543,13 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
       MediaQuery.of(context).size.width - 32,
     ).height;
     result += 24;
-    for (var comment in widget.post.comments) {
+    /*for (var comment in widget.post.comments) {
       result += TextInfoService.textSize(
         comment.comment,
         context.textStyles.subheadline!,
         MediaQuery.of(context).size.width - 84,
       ).height;
-    }
+    }*/
     return MediaQuery.of(context).size.height - result < 0
         ? 0
         : MediaQuery.of(context).size.height - result;
@@ -798,16 +804,19 @@ class PosterPageAppBar extends StatelessWidget {
   }
 }
 
-class PosterInfo extends StatelessWidget {
+class PosterInfo extends ConsumerWidget {
   const PosterInfo({
     super.key,
     required this.post,
+    required this.index,
   });
 
   final PostMovieModel post;
+  final int index;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final likes = ref.watch(homePageLikesStateHolderProvider)?[index];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -850,16 +859,18 @@ class PosterInfo extends StatelessWidget {
         Row(
           children: [
             const Spacer(),
-            ReactionButton(
-              iconPath: 'assets/icons/ic_heart.svg',
-              iconColor: context.colors.iconsDisabled!,
-              amount: post.likes.length,
+            LikeButton(
+              liked: likes?.$1 ?? false,
+              amount: likes?.$2 ?? 0,
+              onTap: () {
+                ref.read(homePagePostsControllerProvider).setLike(index);
+              },
             ),
             const SizedBox(width: 12),
             ReactionButton(
               iconPath: 'assets/icons/ic_comment2.svg',
               iconColor: context.colors.iconsDisabled!,
-              amount: post.comments.length,
+              amount: post.comments,
             ),
           ],
         ),

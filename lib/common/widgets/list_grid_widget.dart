@@ -31,7 +31,7 @@ class ListGridWidget extends StatelessWidget {
                   post.posters.length,
                   (index) => Expanded(
                     child: Image.network(
-                      post.posters[index],
+                      post.posters[index].image,
                       fit: BoxFit.cover,
                       height: 92,
                     ),

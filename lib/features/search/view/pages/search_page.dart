@@ -123,15 +123,10 @@ class SearchTabViewState extends State<SearchTabView>
   Widget build(BuildContext context) {
     final users = List.generate(
       20,
-      (index) => UserDetailsModel(
+      (index) => UserModel(
+        id: 12,
         name: 'Name $index',
         username: 'username$index',
-        following: 12,
-        followers: 11,
-        lists: 10,
-        followed: false,
-        posters: 123,
-        mySelf: false,
         imagePath: index % 2 == 0
             ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
             : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
@@ -140,12 +135,15 @@ class SearchTabViewState extends State<SearchTabView>
     final posters = List.generate(
       20,
       (index) => PostMovieModel(
-          year: 2000 + index,
+          liked: false,
+          id: 1,
+          year: '2020',
           imagePath: index % 2 == 0
               ? 'https://m.media-amazon.com/images/I/61YwNp4JaPL._AC_UF1000,1000_QL80_.jpg'
               : 'https://m.media-amazon.com/images/I/51ifcV+yjPL._AC_.jpg',
           name: index % 2 == 0 ? 'Joker' : 'The Walking Dead',
           author: UserModel(
+            id: 12,
             name: 'Name $index',
             username: 'username$index',
             followed: index % 2 == 0,
@@ -157,41 +155,7 @@ class SearchTabViewState extends State<SearchTabView>
           description:
               "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."),
     );
-    final lists = List.generate(
-      20,
-      (index) => MultiplePostModel(
-          posters: [
-            'https://m.media-amazon.com/images/I/61YwNp4JaPL._AC_UF1000,1000_QL80_.jpg',
-            'https://upload.wikimedia.org/wikipedia/commons/5/51/This_Gun_for_Hire_%281942%29_poster.jpg',
-            'https://media1.popsugar-assets.com/files/thumbor/1TbaTW9g1m1b4wQ3eMvy1dzsv14/fit-in/728xorig/filters:format_auto-!!-:strip_icc-!!-/2023/04/04/606/n/1922283/d37d2acbdda350b9_BARBIE_Character_RYAN_InstaVert_1638x2048_DOM/i/Ryan-Gosling-Barbie-Poster.jpg',
-            if (index % 2 == 0)
-              'https://m.media-amazon.com/images/I/51ifcV+yjPL._AC_.jpg',
-            if (index % 3 == 0)
-              'https://i.etsystatic.com/27817007/r/il/64df86/3235749828/il_1080xN.3235749828_oy85.jpg',
-            if (index % 4 == 0)
-              'https://creativereview.imgix.net/content/uploads/2018/12/Unknown-5.jpeg?auto=compress,format&q=60&w=2024&h=3000',
-          ],
-          posterNames: [
-            'Joker',
-            'Random',
-            'Barbie',
-            if (index % 2 == 0) 'The Walking Dead',
-            if (index % 3 == 0) 'JAWS',
-            if (index % 4 == 0) 'Spider-Man',
-          ],
-          name: 'Some random list number $index',
-          author: UserModel(
-            name: 'Name $index',
-            username: 'username$index',
-            followed: index % 2 == 0,
-            imagePath: index % 2 == 0
-                ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
-                : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
-          ),
-          time: '12:00',
-          description:
-              "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."),
-    );
+    final lists = [];
     return Column(
       children: [
         TabBar(
@@ -255,7 +219,7 @@ class SearchTabViewState extends State<SearchTabView>
                 itemCount: posters.length,
                 itemBuilder: (context, index) {
                   return PostBase(
-                    post: [posters[index]],
+                    index: index,
                     showSuggestion: false,
                   );
                 },

@@ -1,4 +1,5 @@
 class UserModel {
+  final int id;
   final String name;
   final String username;
   final String? imagePath;
@@ -6,6 +7,7 @@ class UserModel {
   final String? description;
 
   UserModel({
+    required this.id,
     required this.name,
     required this.username,
     this.imagePath,
@@ -15,6 +17,7 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, Object?> json) {
     return UserModel(
+      id: json['id'] as int,
       name: json['name'] as String,
       username: json['username'] as String,
       imagePath: json['avatar'] as String?,

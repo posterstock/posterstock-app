@@ -167,7 +167,7 @@ class _ListPageState extends State<ListPage>
                               post: widget.post,
                             );
                           }
-                          if (index == widget.post.comments.length + 1) {
+                          /*if (index == widget.post.comments.length + 1) {
                             return SizedBox(
                               height: getEmptySpaceHeightForCollection(
                                           context) <
@@ -175,13 +175,13 @@ class _ListPageState extends State<ListPage>
                                   ? 56 + MediaQuery.of(context).padding.bottom
                                   : getEmptySpaceHeightForCollection(context),
                             );
-                          }
+                          }*/
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 6.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Padding(
+                                /*Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16.0,
                                   ),
@@ -191,7 +191,7 @@ class _ListPageState extends State<ListPage>
                                     time: widget.post.comments[index - 1].time,
                                     behavior: HitTestBehavior.translucent,
                                   ),
-                                ),
+                                ),*/
                                 const SizedBox(height: 12),
                                 Row(
                                   children: [
@@ -203,21 +203,21 @@ class _ListPageState extends State<ListPage>
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
+                                          /*Text(
                                             widget.post.comments[index - 1]
                                                 .comment,
                                             style:
                                                 context.textStyles.subheadline,
-                                          ),
+                                          ),*/
                                           const SizedBox(height: 12),
-                                          if (index - 1 !=
+                                          /*if (index - 1 !=
                                               widget.post.comments.length - 1)
                                             Divider(
                                               height: 0.5,
                                               thickness: 0.5,
                                               color:
                                                   context.colors.fieldsDefault,
-                                            ),
+                                            ),*/
                                         ],
                                       ),
                                     ),
@@ -227,7 +227,7 @@ class _ListPageState extends State<ListPage>
                             ),
                           );
                         },
-                        childCount: 2 + widget.post.comments.length,
+                        childCount: 2//2 + widget.post.comments.length,
                       ),
                     ),
                   ),
@@ -264,7 +264,7 @@ class _ListPageState extends State<ListPage>
                       widget.post.posters.length,
                       (index) => Expanded(
                         child: Image.network(
-                          widget.post.posters[index],
+                          widget.post.posters[index].image,
                           height: 250,
                           fit: BoxFit.cover,
                         ),
@@ -287,7 +287,8 @@ class _ListPageState extends State<ListPage>
   }
 
   double getEmptySpaceHeightForCollection(BuildContext context) {
-    double result = widget.post.comments.length * 80 + 180;
+    //double result = widget.post.comments.length * 80 + 180;\
+    double result = 180;
     result += TextInfoService.textSize(
       widget.post.name,
       context.textStyles.title3!,
@@ -305,13 +306,13 @@ class _ListPageState extends State<ListPage>
             : widget.post.posters.length ~/ 3 + 1) *
         212;
     result += 32;
-    for (var comment in widget.post.comments) {
+    /*for (var comment in widget.post.comments) {
       result += TextInfoService.textSize(
         comment.comment,
         context.textStyles.subheadline!,
         MediaQuery.of(context).size.width - 84,
       ).height;
-    }
+    }*/
     return MediaQuery.of(context).size.height - result < 0
         ? 0
         : MediaQuery.of(context).size.height - result;
@@ -351,17 +352,17 @@ class CollectionInfoWidget extends StatelessWidget {
           Row(
             children: [
               const Spacer(),
-              ReactionButton(
+              /*ReactionButton(
                 iconPath: 'assets/icons/ic_heart.svg',
                 iconColor: context.colors.iconsDisabled!,
                 amount: post.likes.length,
-              ),
+              ),*/
               const SizedBox(width: 12),
-              ReactionButton(
+              /*ReactionButton(
                 iconPath: 'assets/icons/ic_comment2.svg',
                 iconColor: context.colors.iconsDisabled!,
                 amount: post.comments.length,
-              ),
+              ),*/
             ],
           ),
           const SizedBox(height: 16),
@@ -390,8 +391,8 @@ class CollectionInfoWidget extends StatelessWidget {
               itemCount: post.posters.length,
               itemBuilder: (context, index) {
                 return PostsCollectionTile(
-                  imagePath: post.posters[index],
-                  name: post.posterNames[index],
+                  imagePath: post.posters[index].image,
+                  name: post.posters[index].title,
                   index: index,
                   year: '1999',
                 );

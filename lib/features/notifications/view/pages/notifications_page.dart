@@ -8,6 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
+import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/notifications/controllers/notifications_controller.dart';
 import 'package:poster_stock/features/notifications/models/notification_model.dart';
 import 'package:poster_stock/features/notifications/state_holders/notifications_state_holder.dart';
@@ -165,15 +166,11 @@ class NotificationTile extends StatelessWidget {
                 onTap: () {
                   AutoRouter.of(context).push(
                     ProfileRoute(
-                      user: UserDetailsModel(
+                      user: UserModel(
+                        id: 1,
                         name: notification.user.name,
                         username: notification.user.username,
-                        following: 0,
-                        followers: 0,
                         followed: notification.user.followed,
-                        posters: 0,
-                        lists: 0,
-                        mySelf: false,
                         imagePath: notification.user.imagePath,
                         description: notification.user.description,
                       ),

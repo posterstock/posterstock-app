@@ -8,11 +8,13 @@ class ReactionButton extends StatelessWidget {
     required this.iconPath,
     required this.iconColor,
     this.amount,
+    this.onTap,
   });
 
   final String iconPath;
   final Color iconColor;
   final int? amount;
+  final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class ReactionButton extends StatelessWidget {
         color: context.colors.backgroundsSecondary!,
         child: InkWell(
           highlightColor: context.colors.textsDisabled!.withOpacity(0.2),
-          onTap: () {},
+          onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             child: Row(

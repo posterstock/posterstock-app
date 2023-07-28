@@ -2,13 +2,16 @@ import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
 import 'package:poster_stock/features/auth/view/pages/sign_up_page.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
+import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
 import 'package:poster_stock/features/home/view/helpers/page_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
@@ -21,28 +24,28 @@ import '../../../../common/widgets/app_text_button.dart';
 import 'movie_card.dart';
 import 'multiple_movie_card.dart';
 
-class PostBase extends StatelessWidget {
+class PostBase extends ConsumerWidget {
   PostBase({
     Key? key,
-    this.post,
-    this.multPost,
+    this.index,
     this.showSuggestion = true,
-  })  : assert(post == null || multPost == null),
-        super(key: key);
+  }) : super(key: key);
 
-  final List<PostMovieModel>? post;
-  final MultiplePostModel? multPost;
+  final int? index;
   final PageHolder pageHolder = PageHolder();
   final bool showSuggestion;
   final GlobalKey<MovieCardState> postKey = GlobalKey();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final anyPost = index == null ? null : ref.watch(homePagePostsStateHolderProvider)?[index!];
+    List<PostMovieModel>? post = anyPost?[0] is PostMovieModel ? anyPost?.map((e) => e as PostMovieModel).toList() : null;
+    MultiplePostModel? multPost  = anyPost?[0] is MultiplePostModel ? (anyPost?[0]) as MultiplePostModel : null;
     UserModel? user;
     if (post != null) {
-      user = post![0].author;
+      user = post[0].author;
     } else if (multPost != null) {
-      user = multPost!.author;
+      user = multPost.author;
     }
     return Material(
       color: context.colors.backgroundsPrimary,
@@ -52,6 +55,7 @@ class PostBase extends StatelessWidget {
             AutoRouter.of(context).push(
               PosterRoute(
                 post: post![pageHolder.page],
+                index: index ?? 0,
               ),
             );
           }
@@ -101,7 +105,7 @@ class PostBase extends StatelessWidget {
               if (post == null && multPost == null || post != null)
                 MovieCard(
                   key: postKey,
-                  movie: post,
+                  index: index!,
                   pageHolder: pageHolder,
                 ),
               if (multPost != null)
@@ -151,15 +155,11 @@ class UserInfoTile extends StatelessWidget {
         onTap: () {
           if (user == null) return;
           AutoRouter.of(context).push(ProfileRoute(
-            user: UserDetailsModel(
+            user: UserModel(
+              id: 11,
               username: user!.username,
               name: user!.name,
-              following: 0,
-              followers: 0,
-              posters: 0,
-              lists: 0,
               followed: user!.followed,
-              mySelf: false,
               description: user!.description,
               imagePath: user!.imagePath,
             ),
@@ -180,11 +180,11 @@ class UserInfoTile extends StatelessWidget {
                   backgroundColor: avatar[Random().nextInt(3)],
                   child: user?.imagePath == null && !loading
                       ? Text(
-                          getAvatarName(user!.name).toUpperCase(),
-                          style: context.textStyles.subheadlineBold!.copyWith(
-                            color: context.colors.textsBackground,
-                          ),
-                        )
+                    getAvatarName(user!.name).toUpperCase(),
+                    style: context.textStyles.subheadlineBold!.copyWith(
+                      color: context.colors.textsBackground,
+                    ),
+                  )
                       : const SizedBox(),
                 ),
               ),
@@ -200,11 +200,14 @@ class UserInfoTile extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                            const SizedBox(
-                              height: 3,
-                            ),
+                          const SizedBox(
+                            height: 3,
+                          ),
                           SizedBox(
-                            width: MediaQuery.of(context).size.width - 68 - 179 + 42,
+                            width: MediaQuery
+                                .of(context)
+                                .size
+                                .width - 68 - 179 + 42,
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
@@ -212,7 +215,8 @@ class UserInfoTile extends StatelessWidget {
                                   expand: !(user?.followed ?? true),
                                   child: TextOrContainer(
                                     text: user?.name,
-                                    style: context.textStyles.calloutBold!.copyWith(
+                                    style: context.textStyles.calloutBold!
+                                        .copyWith(
                                         color: darkBackground
                                             ? context.colors.textsBackground!
                                             : context.colors.textsPrimary),
@@ -224,13 +228,15 @@ class UserInfoTile extends StatelessWidget {
                                 const SizedBox(
                                   width: 12,
                                 ),
-                                if ((user?.followed ?? true) || !showFollowButton)
+                                if ((user?.followed ?? true) ||
+                                    !showFollowButton)
                                   Text(
                                     time ?? '',
-                                    style: context.textStyles.footNote!.copyWith(
+                                    style: context.textStyles.footNote!
+                                        .copyWith(
                                       color: darkBackground
                                           ? context.colors.textsBackground!
-                                              .withOpacity(0.8)
+                                          .withOpacity(0.8)
                                           : context.colors.textsDisabled,
                                     ),
                                   ),
@@ -238,9 +244,9 @@ class UserInfoTile extends StatelessWidget {
                             ),
                           ),
                           if (loading)
-                          SizedBox(
-                            height: 3,
-                          ),
+                            SizedBox(
+                              height: 3,
+                            ),
                           if (!loading)
                             Spacer(),
                           TextOrContainer(
@@ -250,7 +256,7 @@ class UserInfoTile extends StatelessWidget {
                             style: context.textStyles.caption1!.copyWith(
                               color: darkBackground
                                   ? context.colors.textsBackground!
-                                      .withOpacity(0.8)
+                                  .withOpacity(0.8)
                                   : context.colors.textsSecondary,
                             ),
                             emptyWidth: 120,
@@ -277,17 +283,18 @@ class UserInfoTile extends StatelessWidget {
                       context: context,
                       backgroundColor: Colors.transparent,
                       isScrollControlled: true,
-                      builder: (context) => GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          color: Colors.transparent,
-                          child: OtherProfileDialog(
-                            user1: user!,
+                      builder: (context) =>
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              color: Colors.transparent,
+                              child: OtherProfileDialog(
+                                user1: user!,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
                     );
                   },
                   child: Container(

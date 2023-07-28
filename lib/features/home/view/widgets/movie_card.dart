@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
+import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
+import 'package:poster_stock/features/home/state_holders/home_page_likes_state_holder.dart';
+import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -10,21 +15,22 @@ import '../helpers/custom_elastic_curve.dart';
 import '../helpers/page_holder.dart';
 import 'current_post_shower.dart';
 
-class MovieCard extends StatefulWidget {
+class MovieCard extends ConsumerStatefulWidget {
   const MovieCard({
     Key? key,
-    this.movie,
+    required this.index,
     required this.pageHolder,
   }) : super(key: key);
 
-  final List<PostMovieModel>? movie;
   final PageHolder pageHolder;
+  final int index;
 
   @override
-  State<MovieCard> createState() => MovieCardState();
+  ConsumerState<MovieCard> createState() => MovieCardState();
 }
 
-class MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
+class MovieCardState extends ConsumerState<MovieCard>
+    with TickerProviderStateMixin {
   late AnimationController controller;
   late AnimationController likeCommentController;
   PageController? pageController;
@@ -34,6 +40,7 @@ class MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
   bool firstRun = true;
   bool disposed = false;
   late final ScrollPhysics physics;
+  List<PostMovieModel>? movie;
 
   @override
   void dispose() {
@@ -46,24 +53,6 @@ class MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     physics = const HorizontalBlockedScrollPhysics();
-    likeCommentController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 0),
-      lowerBound: 0.0,
-      upperBound: widget.movie?.length.toDouble() ?? 1.0,
-    );
-    controller = AnimationController(
-      vsync: this,
-      lowerBound: -16.0,
-      upperBound: 16.0,
-      duration: const Duration(milliseconds: 300),
-    );
-    controller.animateTo(16.0, duration: Duration.zero);
-    if (widget.movie != null) {
-      Future.delayed(const Duration(milliseconds: 300), () {
-        if (!disposed) animatePosterToSide();
-      });
-    }
   }
 
   void animatePosterToSide() {
@@ -76,6 +65,10 @@ class MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    movie = ref
+        .watch(homePagePostsStateHolderProvider)?[widget.index]
+        .map((e) => e as PostMovieModel)
+        .toList();
     getInitData();
     widget.pageHolder.page = (pageController?.page ?? 0).round();
     return Container(
@@ -109,13 +102,14 @@ class MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
                 child: PageView.builder(
                   physics: physics,
                   controller: pageController,
-                  itemCount: widget.movie?.length ?? 1,
+                  itemCount: movie?.length ?? 1,
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: EdgeInsets.only(
                         left: controller.value < 0 ? 0 : controller.value,
                       ),
                       child: _MovieCardPageViewContent(
+                        index: widget.index,
                         likeCommentController: likeCommentController,
                         controller: controller,
                         onPosterTap: () {
@@ -131,18 +125,17 @@ class MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
                         textHeight: textHeight!,
                         titleHeight: titleHeight!,
                         description:
-                            (widget.movie?[index].description ?? '').length >
-                                    280
-                                ? (widget.movie?[index].description ?? '')
+                            (movie?[index].description ?? '').length > 280
+                                ? (movie?[index].description ?? '')
                                     .substring(0, 280)
-                                : (widget.movie?[index].description ?? ''),
-                        movie: widget.movie?[index],
+                                : (movie?[index].description ?? ''),
+                        movie: movie?[index],
                       ),
                     );
                   },
                 ),
               ),
-              if (widget.movie != null && widget.movie!.length > 1)
+              if (movie != null && movie!.length > 1)
                 AnimatedBuilder(
                     animation: likeCommentController,
                     builder: (context, child) {
@@ -160,11 +153,11 @@ class MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
                             color: context.colors.backgroundsSecondary,
                             borderRadius: BorderRadius.circular(16.0),
                           ),
-                          child: Text('${page + 1}/${widget.movie?.length}'),
+                          child: Text('${page + 1}/${movie?.length}'),
                         ),
                       );
                     }),
-              if (widget.movie != null && widget.movie!.length > 1)
+              if (movie != null && movie!.length > 1)
                 AnimatedBuilder(
                     animation: likeCommentController,
                     builder: (context, child) {
@@ -172,7 +165,7 @@ class MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
                         bottom: 27,
                         left: 68,
                         child: CurrentPostShower(
-                          length: widget.movie!.length,
+                          length: movie!.length,
                           current: (likeCommentController.value -
                                       likeCommentController.value.toInt()) >
                                   0.5
@@ -191,9 +184,27 @@ class MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
   void getInitData() {
     if (firstRun) {
       firstRun = false;
-      var description = (widget.movie?[0].description ?? '').length > 280
-          ? (widget.movie?[0].description ?? '').substring(0, 280)
-          : (widget.movie?[0].description ?? '');
+      likeCommentController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 0),
+        lowerBound: 0.0,
+        upperBound: movie?.length.toDouble() ?? 1.0,
+      );
+      controller = AnimationController(
+        vsync: this,
+        lowerBound: -16.0,
+        upperBound: 16.0,
+        duration: const Duration(milliseconds: 300),
+      );
+      controller.animateTo(16.0, duration: Duration.zero);
+      if (movie != null) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (!disposed) animatePosterToSide();
+        });
+      }
+      var description = (movie?[0].description ?? '').length > 280
+          ? (movie?[0].description ?? '').substring(0, 280)
+          : (movie?[0].description ?? '');
       textHeight = TextInfoService.textSize(
                       description,
                       context.textStyles.subheadline!,
@@ -206,8 +217,8 @@ class MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
                   context.textStyles.subheadline!,
                   MediaQuery.of(context).size.width - 84)
               .height;
-      if ((widget.movie?.length ?? 1) > 1) {
-        for (PostMovieModel i in widget.movie!) {
+      if ((movie?.length ?? 1) > 1) {
+        for (PostMovieModel i in movie!) {
           var size = TextInfoService.textSize(
               (i.description ?? '').length > 280
                   ? (i.description?.substring(0, 280) ?? '')
@@ -222,14 +233,14 @@ class MovieCardState extends State<MovieCard> with TickerProviderStateMixin {
       }
     }
     titleHeight = TextInfoService.textSize(
-      widget.movie?[0].name ?? '',
+      movie?[0].name ?? '',
       context.textStyles.subheadlineBold!,
       MediaQuery.of(context).size.width - 134,
     ).height;
   }
 }
 
-class _MovieCardPageViewContent extends StatelessWidget {
+class _MovieCardPageViewContent extends ConsumerWidget {
   const _MovieCardPageViewContent({
     Key? key,
     required this.likeCommentController,
@@ -239,17 +250,20 @@ class _MovieCardPageViewContent extends StatelessWidget {
     required this.textHeight,
     required this.titleHeight,
     required this.description,
+    required this.index,
   }) : super(key: key);
   final AnimationController likeCommentController;
   final AnimationController controller;
   final void Function() onPosterTap;
   final PostMovieModel? movie;
+  final int index;
   final double textHeight;
   final double titleHeight;
   final String description;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final likes = ref.watch(homePageLikesStateHolderProvider);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -263,6 +277,9 @@ class _MovieCardPageViewContent extends StatelessWidget {
                 ? Image.network(
                     movie!.imagePath,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, obj, trace) {
+                      return Image.asset('assets/images/could_not_load.jpg');
+                    },
                   )
                 : const SizedBox(),
           ),
@@ -338,10 +355,12 @@ class _MovieCardPageViewContent extends StatelessWidget {
                   child: Row(
                     children: [
                       const Spacer(),
-                      ReactionButton(
-                        iconPath: 'assets/icons/ic_heart.svg',
-                        iconColor: context.colors.iconsDisabled!,
-                        amount: movie?.likes.length,
+                      LikeButton(
+                        liked: likes?[index].$1 ?? false,
+                        amount: likes?[index].$2 ?? 0,
+                        onTap: () {
+                          ref.read(homePagePostsControllerProvider).setLike(index);
+                        },
                       ),
                       const SizedBox(
                         width: 12,
@@ -349,7 +368,7 @@ class _MovieCardPageViewContent extends StatelessWidget {
                       ReactionButton(
                         iconPath: 'assets/icons/ic_comment2.svg',
                         iconColor: context.colors.iconsDisabled!,
-                        amount: movie?.comments.length,
+                        amount: movie?.comments,
                       ),
                     ],
                   ),
@@ -358,6 +377,30 @@ class _MovieCardPageViewContent extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class LikeButton extends ConsumerWidget {
+  const LikeButton({
+    super.key,
+    required this.liked,
+    required this.amount,
+    required this.onTap,
+  });
+
+  final bool liked;
+  final int amount;
+  final void Function() onTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ReactionButton(
+      iconPath: liked ? 'assets/icons/ic_heart_filled.svg' : 'assets/icons/ic_heart.svg',
+      iconColor:
+          liked ? context.colors.buttonsError! : context.colors.iconsDisabled!,
+      amount: amount,
+      onTap: onTap,
     );
   }
 }

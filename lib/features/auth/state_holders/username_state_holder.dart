@@ -8,8 +8,9 @@ final usernameStateHolderProvider =
 class UsernameStateHolder extends StateNotifier<String> {
   UsernameStateHolder() : super('');
 
-  void updateState(String username) {
+  Future<void> updateState(String username) async{
     state = username;
+    return;
   }
 
   void clearState() {

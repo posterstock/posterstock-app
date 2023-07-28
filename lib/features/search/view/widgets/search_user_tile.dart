@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -12,7 +13,7 @@ class SearchUserTile extends StatelessWidget {
     Key? key,
     required this.user,
   }) : super(key: key);
-  final UserDetailsModel user;
+  final UserModel user;
   static const List<Color> avatar = [
     Color(0xfff09a90),
     Color(0xfff3d376),
@@ -86,7 +87,8 @@ class SearchUserTile extends StatelessWidget {
                       SizedBox(
                         width: 51,
                         child: Text(
-                          user.posters.toString(),
+                          //TODO
+                          '0', //user.posters.toString(),
                           style: context.textStyles.caption1!
                               .copyWith(color: context.colors.textsPrimary),
                         ),
@@ -108,7 +110,8 @@ class SearchUserTile extends StatelessWidget {
                       SizedBox(
                         width: 51,
                         child: Text(
-                          user.lists.toString(),
+                          //TODO
+                          '0', //user.lists.toString(),
                           style: context.textStyles.caption1!
                               .copyWith(color: context.colors.textsPrimary),
                         ),

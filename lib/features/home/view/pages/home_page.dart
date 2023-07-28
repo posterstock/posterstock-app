@@ -48,6 +48,12 @@ class HomePage extends ConsumerWidget {
         ),
         NotificationListener<ScrollUpdateNotification>(
           onNotification: (n) {
+            print("S${controller.position.maxScrollExtent}");
+            if (n.metrics.pixels >= controller.position.maxScrollExtent - MediaQuery.of(context).size.height) {
+              ref
+                  .read(homePagePostsControllerProvider)
+                  .getPosts();
+            }
             if (n.metrics.pixels <= -120 && n.metrics.axis == Axis.vertical) {
               controller.animateTo(
                 -50,
@@ -59,7 +65,7 @@ class HomePage extends ConsumerWidget {
               });
               ref
                   .read(homePagePostsControllerProvider)
-                  .getPosts()
+                  .getPosts(getNewPosts: true)
                   .then((value) {
                 keepOffset = false;
               });
@@ -102,17 +108,15 @@ class HomePage extends ConsumerWidget {
                           if (posts != null && posts.length > index) {
                             if (posts[index][0] is MultiplePostModel) {
                               return PostBase(
-                                multPost: posts[index][0] as MultiplePostModel,
+                                index: index,
                               );
                             } else {
                               return PostBase(
-                                post: (posts[index])
-                                    .map((e) => (e as PostMovieModel))
-                                    .toList(),
+                                index: index,
                               );
                             }
                           }
-                          return PostBase();
+                          return PostBase(index: index,);
                         },
                       ),
                       Divider(

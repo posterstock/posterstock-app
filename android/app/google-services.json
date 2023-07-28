@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "405674784124",
+    "project_id": "posterstock-td",
+    "storage_bucket": "posterstock-td.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:405674784124:android:489ccce8f1b8819e1420f9",
+        "android_client_info": {
+          "package_name": "com.thedirection.posterstock"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "405674784124-d5duv0tpgj9q88sd08bu1md6plu0hj6b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_A5x91wx7KR1n3K_17J76YOFY0W8GsN8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "405674784124-d5duv0tpgj9q88sd08bu1md6plu0hj6b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

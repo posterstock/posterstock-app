@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,8 +14,8 @@ import 'package:poster_stock/features/auth/state_holders/name_state_holder.dart'
 import 'package:poster_stock/features/auth/state_holders/sign_up_username_error_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/username_state_holder.dart';
 import 'package:poster_stock/features/auth/view/widgets/auth_button.dart';
+import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../../common/widgets/custom_scaffold.dart';
@@ -56,6 +57,35 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
 
     check();
     return completer.future;
+  }
+
+  void setName(String value) async {
+    ref.read(signUpControllerProvider).setName(value);
+    if (value.length > 32) {
+      ref.read(signUpControllerProvider).setTooLongErrorName();
+    } else {
+      ref.read(signUpControllerProvider).removeNameError();
+    }
+  }
+
+  void setUsername(String value) async {
+    if (value.length < 5 && value.isNotEmpty) {
+      ref.read(signUpControllerProvider).setTooShortErrorUserName();
+      return;
+    }
+    if (value.length > 32) {
+      ref.read(signUpControllerProvider).setTooLongErrorUserName();
+      return;
+    }
+    final validCharacters = RegExp(r'[a-zA-Z0-9_.]+$');
+    ref.read(signUpControllerProvider).setUsername(value);
+    for (int i = 0; i < value.length; i++) {
+      if (!validCharacters.hasMatch(value[i])) {
+        ref.read(signUpControllerProvider).setWrongSymbolsErrorUsername();
+        return;
+      }
+    }
+    ref.read(signUpControllerProvider).removeUsernameError();
   }
 
   @override
@@ -113,14 +143,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         animateScrollTo(0, controller);
                       },
                       onChanged: (value) {
-                        ref.read(signUpControllerProvider).setName(value);
-                        if (value.length > 32) {
-                          ref
-                              .read(signUpControllerProvider)
-                              .setTooLongErrorName();
-                        } else {
-                          ref.read(signUpControllerProvider).removeNameError();
-                        }
+                        setName(value);
                       },
                       onRemoved: () {
                         ref.read(signUpControllerProvider).setName('');
@@ -151,31 +174,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         animateScrollTo(120, controller);
                       },
                       onChanged: (value) {
-                        if (value.length < 5 && value.isNotEmpty) {
-                          ref
-                              .read(signUpControllerProvider)
-                              .setTooShortErrorUserName();
-                          return;
-                        }
-                        if (value.length > 32) {
-                          ref
-                              .read(signUpControllerProvider)
-                              .setTooLongErrorUserName();
-                          return;
-                        }
-                        final validCharacters = RegExp(r'[a-zA-Z0-9_.]+$');
-                        ref.read(signUpControllerProvider).setUsername(value);
-                        for (int i = 0; i < value.length; i++) {
-                          if (!validCharacters.hasMatch(value[i])) {
-                            ref
-                                .read(signUpControllerProvider)
-                                .setWrongSymbolsErrorUsername();
-                            return;
-                          }
-                        }
-                        ref
-                            .read(signUpControllerProvider)
-                            .removeUsernameError();
+                        setUsername(value);
                       },
                       onRemoved: () {
                         ref
@@ -252,7 +251,16 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                       textStyle: context.textStyles.calloutBold!.copyWith(
                         color: context.colors.textsAction!,
                       ),
-                      onTap: () {},
+                      onTap: () async {
+                        bool success = await ref
+                            .read(signUpControllerProvider)
+                            .processAuth();
+                        if (success && context.mounted) {
+                          AutoRouter.of(context).push(
+                            const NavigationRoute(),
+                          );
+                        }
+                      },
                     ),
                     ExpandChecker(
                       expand: screenHeight >= 700,
@@ -289,7 +297,8 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () => launchUrlString(
-                                  "https://thedirection.org/posterstock_privacy"),
+                                    "https://thedirection.org/posterstock_privacy",
+                                  ),
                           ),
                           TextSpan(
                             text: AppLocalizations.of(context)!
@@ -328,7 +337,8 @@ class ColumnOrList extends StatelessWidget {
       return ListView(
         controller: controller,
         physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics()),
+          parent: BouncingScrollPhysics(),
+        ),
         children: children,
       );
     }

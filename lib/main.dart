@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -10,12 +14,19 @@ import 'package:poster_stock/common/helpers/custom_scroll_behavior.dart';
 import 'package:poster_stock/features/settings/controllers/app_language_controller.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
+import 'package:supertokens_flutter/supertokens.dart';
 
+import 'firebase_options.dart';
 import 'navigation/app_router.gr.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SuperTokens.init(apiDomain: 'https://posterstock.co/');
+
   PhotoManager.clearFileCache();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   //TODO
   PackageInfo.setMockInitialValues(
     appName: 'Posterstock',
@@ -49,7 +60,7 @@ class App extends ConsumerWidget {
     if (appLocale == null) {
       Future(() {
         if (locales.contains(systemLocale)) {
-          for (int i = 0; i< locales.length;i++) {
+          for (int i = 0; i < locales.length; i++) {
             if (locales[i] == systemLocale) {
               ref.read(appLanguageControllerProvider).updateLanguage(langs[i]);
             }

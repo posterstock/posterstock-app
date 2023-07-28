@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
+import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/search/view/widgets/search_user_tile.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -14,7 +15,7 @@ class UsersListPage extends StatelessWidget {
   });
 
   final bool following;
-  final List<UserDetailsModel> user;
+  final List<UserModel> user;
 
   @override
   Widget build(BuildContext context) {

@@ -17,6 +17,8 @@ import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
+import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
+import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/peek_pop/peek_and_pop_dialog.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
@@ -31,13 +33,13 @@ import '../../../../common/services/text_info_service.dart';
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({
     Key? key,
-    this.user,
+    required this.user,
   }) : super(key: key);
+
+  final UserModel user;
 
   @override
   ConsumerState<ProfilePage> createState() => _ProfilePageState();
-
-  final UserDetailsModel? user;
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage>
@@ -55,7 +57,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
       vsync: this,
       lowerBound: 0,
       upperBound: 1,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
     );
   }
 
@@ -69,14 +71,19 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   Widget build(BuildContext context) {
     var profile = ref.watch(profileInfoStateHolderProvider);
     final photo = ref.watch(avatarStateHolderProvider);
-    if (widget.user != null) {
-      profile = widget.user;
-    } else if (profile == null) {
-      ref.read(profileControllerProvider).getUserInfo();
+    if (profile == null) {
+      ref.read(profileControllerProvider).getUserInfo(widget.user.id);
     }
-    if (profile?.mySelf != null) {
-      tabController ??= TabController(
-          length: (profile?.mySelf ?? false) ? 3 : 2, vsync: this);
+    if (profile?.mySelf == false && tabController?.length != 3) {
+      tabController = TabController(
+        length: 3,
+        vsync: this,
+      );
+    } else if (tabController?.length != 2) {
+      tabController = TabController(
+        length: 2,
+        vsync: this,
+      );
     }
     return CustomScaffold(
       child: NotificationListener<ScrollUpdateNotification>(
@@ -224,29 +231,34 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                           ),
                           Row(
                             children: [
-                              CircleAvatar(
-                                radius: 40,
-                                backgroundImage:
-                                    photo == null || profile?.mySelf != true
-                                        ? null
-                                        : Image.memory(
-                                            photo,
-                                            fit: BoxFit.cover,
-                                            cacheWidth: 150,
-                                          ).image,
-                                backgroundColor: avatar[Random().nextInt(3)],
-                                child: profile?.imagePath == null &&
-                                            profile?.name != null ||
-                                        photo == null && profile?.mySelf == true
-                                    ? Text(
-                                        getAvatarName(profile!.name)
-                                            .toUpperCase(),
-                                        style:
-                                            context.textStyles.title3!.copyWith(
-                                          color: context.colors.textsBackground,
-                                        ),
-                                      )
-                                    : const SizedBox(),
+                              ShimmerLoader(
+                                loaded: profile != null,
+                                child: CircleAvatar(
+                                  radius: 40,
+                                  backgroundImage:
+                                      photo == null || profile?.mySelf != true
+                                          ? null
+                                          : Image.memory(
+                                              photo,
+                                              fit: BoxFit.cover,
+                                              cacheWidth: 150,
+                                            ).image,
+                                  backgroundColor: avatar[Random().nextInt(3)],
+                                  child: profile?.imagePath == null &&
+                                              profile?.name != null ||
+                                          photo == null &&
+                                              profile?.mySelf == true
+                                      ? Text(
+                                          getAvatarName(profile!.name)
+                                              .toUpperCase(),
+                                          style: context.textStyles.title3!
+                                              .copyWith(
+                                            color:
+                                                context.colors.textsBackground,
+                                          ),
+                                        )
+                                      : const SizedBox(),
+                                ),
                               ),
                               const SizedBox(
                                 width: 38,
@@ -257,15 +269,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                     UsersListRoute(
                                       user: List.generate(
                                         20,
-                                        (index) => UserDetailsModel(
+                                        (index) => UserModel(
+                                          id: 1,
                                           name: 'Name $index',
                                           username: 'username$index',
-                                          following: 12,
-                                          followers: 11,
-                                          lists: 10,
                                           followed: false,
-                                          posters: 123,
-                                          mySelf: false,
                                           imagePath: index % 2 == 0
                                               ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
                                               : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
@@ -280,9 +288,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        profile?.followers.toString() ?? '0',
-                                        style: context.textStyles.headline,
+                                      ShimmerLoader(
+                                        loaded: profile != null,
+                                        child: TextOrContainer(
+                                          text: profile?.followers == null
+                                              ? null
+                                              : profile!.followers.toString(),
+                                          style: context.textStyles.headline,
+                                          emptyWidth: 35,
+                                          emptyHeight: 20,
+                                        ),
                                       ),
                                       const SizedBox(
                                         height: 3,
@@ -308,15 +323,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                       following: true,
                                       user: List.generate(
                                         20,
-                                        (index) => UserDetailsModel(
+                                        (index) => UserModel(
+                                          id: 1,
                                           name: 'Name $index',
                                           username: 'username$index',
-                                          following: 12,
-                                          followers: 11,
-                                          lists: 10,
                                           followed: false,
-                                          posters: 123,
-                                          mySelf: false,
                                           imagePath: index % 2 == 0
                                               ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
                                               : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
@@ -331,9 +342,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        profile?.following.toString() ?? '0',
-                                        style: context.textStyles.headline,
+                                      ShimmerLoader(
+                                        loaded: profile != null,
+                                        child: TextOrContainer(
+                                          text: profile?.following == null
+                                              ? null
+                                              : profile!.followers.toString(),
+                                          style: context.textStyles.headline,
+                                          emptyWidth: 35,
+                                          emptyHeight: 20,
+                                        ),
                                       ),
                                       const SizedBox(
                                         height: 3,
@@ -352,56 +370,70 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                               const Spacer(),
                             ],
                           ),
-                          const SizedBox(
-                            height: 12,
+                          SizedBox(
+                            height: profile == null ? 20 : 12,
                           ),
                           Row(
                             children: [
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    profile?.name ?? '',
-                                    style: context.textStyles.headline,
+                                  ShimmerLoader(
+                                    loaded: profile != null,
+                                    child: TextOrContainer(
+                                      text: profile?.name,
+                                      style: context.textStyles.headline,
+                                      emptyWidth: 150,
+                                      emptyHeight: 20,
+                                    ),
                                   ),
                                   const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        'assets/icons/ic_collection.svg',
-                                        colorFilter: ColorFilter.mode(
-                                          context.colors.iconsDefault!,
-                                          BlendMode.srcIn,
+                                  if (profile == null)
+                                    const ShimmerLoader(
+                                        child: TextOrContainer(
+                                      text: null,
+                                      emptyWidth: 80,
+                                      emptyHeight: 20,
+                                    )),
+                                  if (profile != null)
+                                    Row(
+                                      children: [
+                                        SvgPicture.asset(
+                                          'assets/icons/ic_collection.svg',
+                                          colorFilter: ColorFilter.mode(
+                                            context.colors.iconsDefault!,
+                                            BlendMode.srcIn,
+                                          ),
+                                          width: 16,
                                         ),
-                                        width: 16,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        profile?.posters.toString() ?? '0',
-                                        style: context.textStyles.caption1!
-                                            .copyWith(
-                                                color: context
-                                                    .colors.textsPrimary),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      SvgPicture.asset(
-                                        'assets/icons/ic_lists.svg',
-                                        colorFilter: ColorFilter.mode(
-                                          context.colors.iconsDefault!,
-                                          BlendMode.srcIn,
+                                        const SizedBox(width: 4),
+                                        //TODO
+                                        /*Text(
+                                          profile?.posters.toString() ?? '0',
+                                          style: context.textStyles.caption1!
+                                              .copyWith(
+                                                  color: context
+                                                      .colors.textsPrimary),
+                                        ),*/
+                                        const SizedBox(width: 12),
+                                        SvgPicture.asset(
+                                          'assets/icons/ic_lists.svg',
+                                          colorFilter: ColorFilter.mode(
+                                            context.colors.iconsDefault!,
+                                            BlendMode.srcIn,
+                                          ),
+                                          width: 16,
                                         ),
-                                        width: 16,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        profile?.lists.toString() ?? '0',
-                                        style: context.textStyles.caption1!
-                                            .copyWith(
-                                                color: context
-                                                    .colors.textsPrimary),
-                                      ),
-                                    ],
-                                  ),
+                                        const SizedBox(width: 4),
+                                        /*Text(
+                                          profile?.lists.toString() ?? '0',
+                                          style: context.textStyles.caption1!
+                                              .copyWith(
+                                                  color: context
+                                                      .colors.textsPrimary),
+                                        ),*/
+                                      ],
+                                    ),
                                 ],
                               ),
                               const Spacer(),
@@ -547,9 +579,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
               ? const SizedBox()
               : ProfileTabs(
                   controller: tabController!,
-                  username: widget.user?.mySelf == true
-                      ? null
-                      : widget.user?.username,
+                  //TODO
+                  name: null,
                 ),
         ),
       ),
@@ -572,10 +603,10 @@ class ProfileTabs extends ConsumerStatefulWidget {
   const ProfileTabs({
     Key? key,
     required this.controller,
-    this.username,
+    this.name,
   }) : super(key: key);
   final TabController controller;
-  final String? username;
+  final String? name;
 
   @override
   ConsumerState<ProfileTabs> createState() => _ProfileTabsState();
@@ -583,43 +614,9 @@ class ProfileTabs extends ConsumerStatefulWidget {
 
 class _ProfileTabsState extends ConsumerState<ProfileTabs>
     with SingleTickerProviderStateMixin {
-  final lists = List.generate(
-    20,
-    (index) => MultiplePostModel(
-        posters: [
-          'https://m.media-amazon.com/images/I/61YwNp4JaPL._AC_UF1000,1000_QL80_.jpg',
-          'https://upload.wikimedia.org/wikipedia/commons/5/51/This_Gun_for_Hire_%281942%29_poster.jpg',
-          'https://media1.popsugar-assets.com/files/thumbor/1TbaTW9g1m1b4wQ3eMvy1dzsv14/fit-in/728xorig/filters:format_auto-!!-:strip_icc-!!-/2023/04/04/606/n/1922283/d37d2acbdda350b9_BARBIE_Character_RYAN_InstaVert_1638x2048_DOM/i/Ryan-Gosling-Barbie-Poster.jpg',
-          if (index % 2 == 0)
-            'https://m.media-amazon.com/images/I/51ifcV+yjPL._AC_.jpg',
-          if (index % 3 == 0)
-            'https://i.etsystatic.com/27817007/r/il/64df86/3235749828/il_1080xN.3235749828_oy85.jpg',
-          if (index % 4 == 0)
-            'https://creativereview.imgix.net/content/uploads/2018/12/Unknown-5.jpeg?auto=compress,format&q=60&w=2024&h=3000',
-        ],
-        posterNames: [
-          'Joker',
-          'Random',
-          'Barbie',
-          if (index % 2 == 0) 'The Walking Dead',
-          if (index % 3 == 0) 'JAWS',
-          if (index % 4 == 0) 'Spider-Man',
-        ],
-        name: 'Some random list number $index',
-        author: UserModel(
-          name: 'Name $index',
-          username: 'username$index',
-          followed: index % 2 == 0,
-          imagePath: index % 2 == 0
-              ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
-              : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
-        ),
-        time: '12:00',
-        description:
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."),
-  );
+  final lists = [];
 
-  final posters = List.generate(
+  /*final posters = List.generate(
     300,
     (index) => PostMovieModel(
         year: 2000 + index,
@@ -638,7 +635,8 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
         time: '12:00',
         description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."),
-  );
+  );*/
+  final List<PostMovieModel> bookmarks = [];
   final List<PostMovieModel> movies = [];
 
   @override
@@ -661,11 +659,12 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
       children: [
         PostsCollectionView(
           movies: movies,
-          username: widget.username,
+          name: widget.name,
         ),
         if (widget.controller.length == 3)
           PostsCollectionView(
-            movies: posters,
+            movies: bookmarks,
+            bookmark: true,
             customOnItemTap: (post, index) {
               AutoRouter.of(context).push(
                 BookmarksRoute(startIndex: index),
@@ -697,12 +696,14 @@ class PostsCollectionView extends ConsumerWidget {
     required this.movies,
     this.customOnItemTap,
     this.customOnLongTap,
-    this.username,
+    this.name,
+    this.bookmark = false,
   }) : super(key: key);
   final List<PostMovieModel> movies;
   final void Function(PostMovieModel, int)? customOnItemTap;
   final void Function()? customOnLongTap;
-  final String? username;
+  final String? name;
+  final bool bookmark;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -713,9 +714,10 @@ class PostsCollectionView extends ConsumerWidget {
             height: (MediaQuery.of(context).size.height - 480 - 56) / 2,
           ),
           SizedBox(
-            width: username == null ? 170 : 250,
+            width: name == null ? 170 : 250,
             child: EmptyCollectionWidget(
-              profileName: username,
+              profileName: name,
+              bookmark: bookmark,
             ),
           ),
         ],
@@ -725,7 +727,7 @@ class PostsCollectionView extends ConsumerWidget {
       physics: const NeverScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
       ),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         crossAxisSpacing: 12.5,
         mainAxisSpacing: 15,
@@ -773,7 +775,10 @@ class PostsCollectionTile extends StatelessWidget {
           if (customOnItemTap == null) {
             AutoRouter.of(context).push(
               PosterRoute(
+                index: 1,
                 post: PostMovieModel(
+                  liked: false,
+                  id: 1,
                   year: post!.year,
                   imagePath: post!.imagePath,
                   name: post!.name,

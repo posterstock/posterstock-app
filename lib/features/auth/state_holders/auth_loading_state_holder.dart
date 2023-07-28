@@ -6,6 +6,7 @@ final authLoadingStateHolderProvider =
     LoadingStates(
       loadingApple: false,
       loadingGoogle: false,
+      loadingEmail: false,
     ),
   ),
 );
@@ -17,6 +18,7 @@ class AuthLoadingStateHolder extends StateNotifier<LoadingStates> {
     state = LoadingStates(
       loadingApple: false,
       loadingGoogle: true,
+      loadingEmail: false,
     );
   }
 
@@ -24,6 +26,15 @@ class AuthLoadingStateHolder extends StateNotifier<LoadingStates> {
     state = LoadingStates(
       loadingApple: true,
       loadingGoogle: false,
+      loadingEmail: false,
+    );
+  }
+
+  void loadEmail() {
+    state = LoadingStates(
+      loadingApple: false,
+      loadingGoogle: false,
+      loadingEmail: true,
     );
   }
 
@@ -31,6 +42,7 @@ class AuthLoadingStateHolder extends StateNotifier<LoadingStates> {
     state = LoadingStates(
       loadingApple: false,
       loadingGoogle: false,
+      loadingEmail: false,
     );
   }
 }
@@ -38,6 +50,11 @@ class AuthLoadingStateHolder extends StateNotifier<LoadingStates> {
 class LoadingStates {
   bool loadingApple;
   bool loadingGoogle;
+  bool loadingEmail;
 
-  LoadingStates({required this.loadingApple, required this.loadingGoogle});
+  LoadingStates({
+    required this.loadingApple,
+    required this.loadingGoogle,
+    required this.loadingEmail,
+  });
 }

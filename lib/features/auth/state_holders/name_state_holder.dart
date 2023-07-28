@@ -7,8 +7,9 @@ final nameStateHolderProvider = StateNotifierProvider<NameStateHolder, String>(
 class NameStateHolder extends StateNotifier<String> {
   NameStateHolder() : super('');
 
-  void updateState(String name) {
+  Future<void> updateState(String name) async{
     state = name;
+    return;
   }
 
   void clearState() {

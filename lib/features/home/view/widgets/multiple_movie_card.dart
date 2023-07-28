@@ -28,7 +28,7 @@ class MultipleMovieCard extends StatelessWidget {
                     height: 163,
                     color: context.colors.backgroundsSecondary,
                     child: Image.network(
-                      post.posters[index],
+                      post.posters[index].image,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) =>
                           const SizedBox(),
@@ -68,7 +68,7 @@ class MultipleMovieCard extends StatelessWidget {
               ReactionButton(
                 iconPath: 'assets/icons/ic_heart.svg',
                 iconColor: context.colors.iconsDisabled!,
-                amount: post.likes.length,
+                amount: post.likes,
               ),
               const SizedBox(
                 width: 12,
@@ -76,7 +76,7 @@ class MultipleMovieCard extends StatelessWidget {
               ReactionButton(
                 iconPath: 'assets/icons/ic_comment2.svg',
                 iconColor: context.colors.iconsDisabled!,
-                amount: post.comments.length,
+                amount: post.comments,
               ),
             ],
           ),

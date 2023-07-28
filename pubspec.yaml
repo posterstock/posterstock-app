@@ -31,6 +31,12 @@ dependencies:
   vibration: ^1.8.1
   flutter_keyboard_visibility: ^5.4.1
   image_picker: ^1.0.0
+  supertokens_flutter: ^0.2.5
+  dio: ^4.0.6
+  sign_in_with_apple: ^5.0.0
+  google_sign_in: ^6.1.4
+  firebase_core: ^2.15.0
+  logger: ^1.4.0
 
 
 dev_dependencies:
