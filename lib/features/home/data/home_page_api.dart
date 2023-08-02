@@ -23,9 +23,8 @@ class HomePageApi implements IHomePageApi {
   }
 
   @override
-  Future<Map<String, dynamic>?> getPosts(String token,
+  Future<(Map<String, dynamic>?, bool)?> getPosts(String token,
       {bool getNewPosts = false}) async {
-    print(1);
     if (loadedAll && !getNewPosts) return null;
     try {
       final response = await _dio.get('api/feed',
@@ -40,7 +39,7 @@ class HomePageApi implements IHomePageApi {
       }
       if (!getNewPosts) postsCursor = response.data['next_cursor'] as String?;
       print(response);
-      return response.data;
+      return (response.data as Map<String, dynamic>?, loadedAll);
     } on DioError catch (e) {
       print(e.response);
       rethrow;

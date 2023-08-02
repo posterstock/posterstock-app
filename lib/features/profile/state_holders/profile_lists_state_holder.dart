@@ -9,8 +9,8 @@ final profileListsStateHolderProvider =
 class ProfileListsStateHolder extends StateNotifier<List<MultiplePostModel>?> {
   ProfileListsStateHolder(super.state);
 
-  void updateState(List<MultiplePostModel> list) {
-    state = [...(state ?? []), ...list];
+  void updateState(List<MultiplePostModel>? list) {
+    state = [...(state ?? []), ...?list];
   }
 
   void clearState() {

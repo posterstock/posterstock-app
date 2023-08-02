@@ -13,23 +13,36 @@ import 'package:poster_stock/features/home/state_holders/home_page_posts_state_h
 import 'package:poster_stock/features/home/view/helpers/custom_bounce_physic.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
+import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
+import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
+import 'package:poster_stock/features/poster/controller/comments_controller.dart';
+import 'package:poster_stock/features/poster/model/comment.dart';
+import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
+import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../../../../common/helpers/hero_dialog_route.dart';
 import '../../../../../common/widgets/app_text_button.dart';
 import '../../../../home/view/widgets/movie_card.dart';
 
-class PosterPage extends StatefulWidget {
-  const PosterPage({Key? key, required this.post, required this.index}) : super(key: key);
+class PosterPage extends ConsumerStatefulWidget {
+  const PosterPage({
+    Key? key,
+    required this.postId,
+    this.index,
+    this.index2,
+  }) : super(key: key);
 
-  final PostMovieModel post;
-  final int index;
+  final int postId;
+  final int? index;
+  final int? index2;
 
   @override
-  State<PosterPage> createState() => _PosterPageState();
+  ConsumerState<PosterPage> createState() => _PosterPageState();
 }
 
-class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
+class _PosterPageState extends ConsumerState<PosterPage>
+    with TickerProviderStateMixin {
   AnimationController? posterController;
   late final AnimationController iconsController = AnimationController(
     vsync: this,
@@ -38,8 +51,17 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
     duration: Duration.zero,
   );
   final ScrollController scrollController = ScrollController();
+  PostMovieModel? post;
   double? imageHeight;
   double velocity = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    Future(() {
+      ref.read(commentsControllerProvider).clearComments();
+    });
+  }
 
   void jumpToEnd({bool? up}) {
     if (scrollController.offset == 0 ||
@@ -84,6 +106,14 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    post = ref.watch(posterStateHolderProvider);
+    final comments = ref.watch(commentsStateHolderProvider);
+    if (comments == null) {
+      ref.read(commentsControllerProvider).updateComments(widget.postId);
+    }
+    if (post == null) {
+      ref.read(commentsControllerProvider).getPost(widget.postId);
+    }
     if (posterController == null) {
       imageHeight = MediaQuery.of(context).size.height * 0.66;
       posterController = AnimationController(
@@ -162,7 +192,7 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                                 builder: (context, child) {
                                   return PosterInfo(
                                     index: widget.index,
-                                    post: widget.post,
+                                    index2: widget.index2,
                                   );
                                 },
                               ),
@@ -177,24 +207,24 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                               height: 8,
                             ),
                             ...List<Widget>.generate(
-                              widget.post.comments,
+                              comments?.length ?? 0,
                               (index) => Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 6.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    /*Padding(
+                                    Padding(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 16.0,
                                       ),
                                       child: UserInfoTile(
                                         showFollowButton: false,
-                                        user: widget.post.comments[index].user,
-                                        time: widget.post.comments[index].time,
+                                        user: comments?[index].model,
+                                        time: comments?[index].time,
                                         behavior: HitTestBehavior.translucent,
                                       ),
-                                    ),*/
+                                    ),
                                     const SizedBox(height: 12),
                                     Row(
                                       children: [
@@ -206,16 +236,13 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              /*Text(
-                                                widget.post.comments[index]
-                                                    .comment,
+                                              Text(
+                                                comments?[index].text ?? '',
                                                 style: context
                                                     .textStyles.subheadline,
-                                              ),*/
+                                              ),
                                               const SizedBox(height: 12),
-                                              if (index !=
-                                                  widget.post.comments -
-                                                      1)
+                                              if (index != comments!.length - 1)
                                                 Divider(
                                                   height: 0.5,
                                                   thickness: 0.5,
@@ -233,10 +260,11 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                             ),
                             SizedBox(
                               height: getEmptySpaceHeightForSingleMovie(
-                                          context) <
+                                          context, comments) <
                                       56 + MediaQuery.of(context).padding.bottom
                                   ? 56 + MediaQuery.of(context).padding.bottom
-                                  : getEmptySpaceHeightForSingleMovie(context),
+                                  : getEmptySpaceHeightForSingleMovie(
+                                      context, comments),
                             ),
                           ],
                         )
@@ -275,39 +303,48 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                                 borderRadius: BorderRadius.circular(
                                     (imageHeight! - posterController!.value) *
                                         0.1),
-                                child: SizedBox(
-                                  height: imageHeight! +
-                                      MediaQuery.of(context).padding.top,
-                                  width: double.infinity,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      if (FocusScope.of(context)
-                                              .focusedChild
-                                              ?.hasPrimaryFocus ??
-                                          false) {
-                                        FocusScope.of(context).unfocus();
-                                      } else {
-                                        Navigator.push(
-                                          context,
-                                          HeroDialogRoute(builder: (context) {
-                                            return ImageDialog(
-                                              image: Image.network(
-                                                widget.post.imagePath,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            );
-                                          }),
-                                        );
-                                      }
-                                    },
-                                    behavior: HitTestBehavior.translucent,
-                                    child: IgnorePointer(
-                                      ignoring: true,
-                                      child: Hero(
-                                        tag: 'image',
-                                        child: Image.network(
-                                          widget.post.imagePath,
-                                          fit: BoxFit.cover,
+                                child: ShimmerLoader(
+                                  loaded: post != null,
+                                  child: Container(
+                                    color: context.colors.backgroundsSecondary,
+                                    height: imageHeight! +
+                                        MediaQuery.of(context).padding.top,
+                                    width: double.infinity,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        if (FocusScope.of(context)
+                                                .focusedChild
+                                                ?.hasPrimaryFocus ??
+                                            false) {
+                                          FocusScope.of(context).unfocus();
+                                        } else {
+                                          if (post == null) return;
+                                          Navigator.push(
+                                            context,
+                                            HeroDialogRoute(builder: (context) {
+                                              if (post == null)
+                                                return SizedBox();
+                                              return ImageDialog(
+                                                image: Image.network(
+                                                  post!.imagePath,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              );
+                                            }),
+                                          );
+                                        }
+                                      },
+                                      behavior: HitTestBehavior.translucent,
+                                      child: IgnorePointer(
+                                        ignoring: true,
+                                        child: Hero(
+                                          tag: 'image',
+                                          child: post == null
+                                              ? SizedBox()
+                                              : Image.network(
+                                                  post!.imagePath,
+                                                  fit: BoxFit.cover,
+                                                ),
                                         ),
                                       ),
                                     ),
@@ -391,13 +428,15 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                     ),
                   );
                 },
-                child: UserInfoTile(
-                  user: widget.post.author,
-                  time: widget.post.time,
-                  darkBackground: true,
-                  showSettings: false,
-                  showFollowButton: false,
-                ),
+                child: post == null
+                    ? const SizedBox()
+                    : UserInfoTile(
+                        user: post!.author,
+                        time: post!.time,
+                        darkBackground: true,
+                        showSettings: false,
+                        showFollowButton: false,
+                      ),
               ),
               SafeArea(
                 child: SizedBox(
@@ -506,12 +545,13 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
                   );
                 },
               ),
-              const Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: CommentTextField(),
-              )
+              if (post != null)
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: CommentTextField(id: post!.id),
+                )
             ],
           ),
         ),
@@ -519,53 +559,58 @@ class _PosterPageState extends State<PosterPage> with TickerProviderStateMixin {
     );
   }
 
-  double getEmptySpaceHeightForSingleMovie(BuildContext context) {
+  double getEmptySpaceHeightForSingleMovie(
+      BuildContext context, List<Comment>? comments) {
     double result =
-        widget.post.comments * 80 + MediaQuery.of(context).padding.top;
+        (comments?.length ?? 0) * 80 + MediaQuery.of(context).padding.top;
     result += 42 + 8 + 44;
     result += TextInfoService.textSize(
-      widget.post.name,
+      post?.name ?? '',
       context.textStyles.title3!,
       MediaQuery.of(context).size.width - 112,
     ).height;
     result += 6;
     result += TextInfoService.textSize(
-      widget.post.year.toString(),
+      post?.year.toString() ?? '',
       context.textStyles.subheadline!,
       MediaQuery.of(context).size.width,
     ).height;
     result += 24;
-    result += TextInfoService.textSize(
-      (widget.post.description ?? '').length > 280
-          ? widget.post.description!.substring(0, 280)
-          : (widget.post.description ?? ''),
-      context.textStyles.subheadline!,
-      MediaQuery.of(context).size.width - 32,
-    ).height;
-    result += 24;
-    /*for (var comment in widget.post.comments) {
+    if (post != null)
       result += TextInfoService.textSize(
-        comment.comment,
+        (post!.description ?? '').length > 280
+            ? post!.description!.substring(0, 280)
+            : (post!.description ?? ''),
+        context.textStyles.subheadline!,
+        MediaQuery.of(context).size.width - 32,
+      ).height;
+    result += 24;
+    for (var comment in comments ?? <Comment>[]) {
+      result += TextInfoService.textSize(
+        comment.text,
         context.textStyles.subheadline!,
         MediaQuery.of(context).size.width - 84,
       ).height;
-    }*/
+    }
     return MediaQuery.of(context).size.height - result < 0
         ? 0
         : MediaQuery.of(context).size.height - result;
   }
 }
 
-class CommentTextField extends StatefulWidget {
+class CommentTextField extends ConsumerStatefulWidget {
   const CommentTextField({
     super.key,
+    required this.id,
   });
 
+  final int id;
+
   @override
-  State<CommentTextField> createState() => _CommentTextFieldState();
+  ConsumerState<CommentTextField> createState() => _CommentTextFieldState();
 }
 
-class _CommentTextFieldState extends State<CommentTextField> {
+class _CommentTextFieldState extends ConsumerState<CommentTextField> {
   final FocusNode focus = FocusNode();
   final GlobalKey key = GlobalKey();
   final TextEditingController controller = TextEditingController();
@@ -573,7 +618,6 @@ class _CommentTextFieldState extends State<CommentTextField> {
   @override
   Widget build(BuildContext context) {
     focus.addListener(() {
-      print(11);
       setState(() {});
     });
     return NotificationListener(
@@ -588,10 +632,10 @@ class _CommentTextFieldState extends State<CommentTextField> {
             color: context.colors.fieldsDefault,
           ),
           Container(
-            height: focus.hasFocus &&
-                    MediaQuery.of(context).viewInsets.bottom != 0
-                ? null
-                : 56 + MediaQuery.of(context).padding.bottom,
+            height:
+                focus.hasFocus && MediaQuery.of(context).viewInsets.bottom != 0
+                    ? null
+                    : 56 + MediaQuery.of(context).padding.bottom,
             color: context.colors.backgroundsPrimary,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -616,35 +660,43 @@ class _CommentTextFieldState extends State<CommentTextField> {
             ),
           ),
           if (focus.hasFocus)
-            KeyboardVisibilityBuilder(
-              builder: (context, visible) {
-                if (!visible) return SizedBox();
-                return Container(
-                  height: 56,
-                  color: context.colors.backgroundsPrimary,
-                  child: Row(
-                    children: [
-                      const Spacer(),
-                      Text(
-                        '${controller.text.length}/140',
-                        style: context.textStyles.footNote!.copyWith(
-                          color: controller.text.length > 140
-                              ? context.colors.textsError
-                              : context.colors.textsDisabled,
-                        ),
+            KeyboardVisibilityBuilder(builder: (context, visible) {
+              if (!visible) return SizedBox();
+              return Container(
+                height: 56,
+                color: context.colors.backgroundsPrimary,
+                child: Row(
+                  children: [
+                    const Spacer(),
+                    Text(
+                      '${controller.text.length}/140',
+                      style: context.textStyles.footNote!.copyWith(
+                        color: controller.text.length > 140
+                            ? context.colors.textsError
+                            : context.colors.textsDisabled,
                       ),
-                      const SizedBox(width: 12),
-                      AppTextButton(
-                        text: AppLocalizations.of(context)!.reply,
-                        disabled:
-                            controller.text.isEmpty || controller.text.length > 140,
-                      ),
-                      const SizedBox(width: 16),
-                    ],
-                  ),
-                );
-              }
-            )
+                    ),
+                    const SizedBox(width: 12),
+                    AppTextButton(
+                      text: AppLocalizations.of(context)!.reply,
+                      disabled: controller.text.isEmpty ||
+                          controller.text.length > 140,
+                      onTap: () {
+                        ref
+                            .read(commentsControllerProvider)
+                            .postComment(widget.id, controller.text);
+                        ref
+                            .read(homePagePostsControllerProvider)
+                            .addComment(widget.id);
+                        controller.clear();
+                        focus.unfocus();
+                      },
+                    ),
+                    const SizedBox(width: 16),
+                  ],
+                ),
+              );
+            })
         ],
       ),
     );
@@ -805,18 +857,23 @@ class PosterPageAppBar extends StatelessWidget {
 }
 
 class PosterInfo extends ConsumerWidget {
+  final int? index;
+  final int? index2;
+
   const PosterInfo({
     super.key,
-    required this.post,
-    required this.index,
+    this.index,
+    this.index2,
   });
-
-  final PostMovieModel post;
-  final int index;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final likes = ref.watch(homePageLikesStateHolderProvider)?[index];
+    final post = ref.watch(posterStateHolderProvider);
+    final likes = index == null || index2 == null
+        ? null
+        : ref.watch(homePageLikesStateHolderProvider)?[index!]
+            [index2!];
+    final comments = ref.watch(commentsStateHolderProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -824,10 +881,16 @@ class PosterInfo extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              width: MediaQuery.of(context).size.width - 112,
-              child: Text(
-                post.name,
-                style: context.textStyles.title3,
+              width:
+                  post == null ? null : MediaQuery.of(context).size.width - 112,
+              child: ShimmerLoader(
+                loaded: post != null,
+                child: TextOrContainer(
+                  emptyWidth: 160,
+                  emptyHeight: 20,
+                  text: post?.name,
+                  style: context.textStyles.title3,
+                ),
               ),
             ),
             const Spacer(),
@@ -836,19 +899,24 @@ class PosterInfo extends ConsumerWidget {
         const SizedBox(
           height: 6,
         ),
-        Text(
-          post.year.toString(),
-          style: context.textStyles.subheadline!.copyWith(
-            color: context.colors.textsSecondary,
+        ShimmerLoader(
+          loaded: post != null,
+          child: TextOrContainer(
+            emptyWidth: 100,
+            emptyHeight: 20,
+            text: post?.year.toString(),
+            style: context.textStyles.subheadline!.copyWith(
+              color: context.colors.textsSecondary,
+            ),
           ),
         ),
         const SizedBox(
           height: 16,
         ),
         Text(
-          (post.description ?? '').length > 280
-              ? post.description!.substring(0, 280)
-              : (post.description ?? ''),
+          (post?.description ?? '').length > 280
+              ? post!.description!.substring(0, 280)
+              : (post?.description ?? ''),
           style: context.textStyles.callout!.copyWith(
             color: context.colors.textsPrimary,
           ),
@@ -860,17 +928,29 @@ class PosterInfo extends ConsumerWidget {
           children: [
             const Spacer(),
             LikeButton(
-              liked: likes?.$1 ?? false,
-              amount: likes?.$2 ?? 0,
+              liked: likes?.$1 ?? (post?.liked ?? false),
+              amount: likes?.$2 ??
+                  (post?.likes == null
+                      ? 0
+                      : post!.likes),
               onTap: () {
-                ref.read(homePagePostsControllerProvider).setLike(index);
+                if (index != null && index2 != null) {
+                  ref
+                      .read(homePagePostsControllerProvider)
+                      .setLike(index!, index2!);
+                } else {
+                  ref
+                      .read(homePagePostsControllerProvider)
+                      .setLikeId(post!.id, !(post.liked));
+                  ref.read(posterStateHolderProvider.notifier).updateState(post.copyWith(liked: !(post.liked), likes: post.liked ? post.likes - 1 : post.likes + 1));
+                }
               },
             ),
             const SizedBox(width: 12),
             ReactionButton(
               iconPath: 'assets/icons/ic_comment2.svg',
               iconColor: context.colors.iconsDisabled!,
-              amount: post.comments,
+              amount: comments?.length ?? 0,
             ),
           ],
         ),

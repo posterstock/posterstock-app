@@ -38,7 +38,6 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
   @override
   Widget build(BuildContext context) {
     focus.addListener(() {
-      print(1);
       setState(() {});
     });
     final String searchText = ref.watch(createPosterSearchStateHolderNotifier);

@@ -1,15 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final homePageLikesStateHolderProvider =
-StateNotifierProvider<HomePageLikesStateHolder, List<(bool, int)>?>(
+StateNotifierProvider<HomePageLikesStateHolder, List<List<(bool, int)>>?>(
       (ref) => HomePageLikesStateHolder(null),
 );
 
 class HomePageLikesStateHolder
-    extends StateNotifier<List<(bool, int)>?> {
+    extends StateNotifier<List<List<(bool, int)>>?> {
   HomePageLikesStateHolder(super.state);
 
-  Future<void> setState(List<(bool, int)>? posts) async {
+  Future<void> setState(List<List<(bool, int)>>? posts) async {
     state = posts;
   }
 }

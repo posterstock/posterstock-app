@@ -51,6 +51,18 @@ class MenuController {
     pagesState.updatePage(page);
   }
 
+  void backToPage(BuildContext context) {
+    FocusScope.of(context).unfocus();
+    AutoRouter.of(context).popUntilRouteWithPath('navigation');
+    if (menuValue ==true) {
+      menuState.updateState(!menuValue);
+    }
+    final page = previousPageState.state.last;
+    previousPageState.removeLast();
+    routerState.updatePage(page);
+    pagesState.updatePage(page);
+  }
+
   Future<void> setRouter(TabsRouter router) async {
     await routerState.setRouter(router);
   }

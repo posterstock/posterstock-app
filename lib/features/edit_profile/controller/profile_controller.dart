@@ -19,6 +19,7 @@ class ProfileController {
     avatarStateHolder.setPhoto(photo);
   }
 
+
   void removePhoto() {
     avatarStateHolder.removePhoto();
   }

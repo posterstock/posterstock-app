@@ -1,14 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final previousPageStateHolderProvider = StateNotifierProvider<PreviousPageStateHolder, int>(
-  (ref) => PreviousPageStateHolder(0),
+final previousPageStateHolderProvider = StateNotifierProvider<PreviousPageStateHolder, List<int>>(
+  (ref) => PreviousPageStateHolder([]),
 );
 
-class PreviousPageStateHolder extends StateNotifier<int> {
+class PreviousPageStateHolder extends StateNotifier<List<int>> {
   PreviousPageStateHolder(super.state);
 
   void updatePage(int page) {
-    print(page);
-    state = page;
+    state.add(page);
+    state = [...state];
+  }
+
+  void removeLast() {
+    state.removeLast();
+    state = [...state];
   }
 }

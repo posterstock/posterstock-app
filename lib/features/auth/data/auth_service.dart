@@ -19,7 +19,6 @@ class AuthService {
   }
 
   Future<int> getId(String token) async {
-    print(12);
     try {
       final response = await _dio.post(
         'api/profiles',

@@ -278,7 +278,7 @@ class _ListPageState extends State<ListPage>
               bottom: 0,
               left: 0,
               right: 0,
-              child: CommentTextField(),
+              child: CommentTextField(id: 0),
             )
           ],
         ),

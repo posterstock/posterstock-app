@@ -256,8 +256,11 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                             .read(signUpControllerProvider)
                             .processAuth();
                         if (success && context.mounted) {
-                          AutoRouter.of(context).push(
+                          AutoRouter.of(context).pushAndPopUntil(
                             const NavigationRoute(),
+                            predicate: (route) {
+                              return false;
+                            }
                           );
                         }
                       },

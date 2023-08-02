@@ -27,11 +27,11 @@ class UserDetailsModel {
       name: json['name'] as String,
       username: json['username'] as String,
       imagePath: json['image'] as String?,
-      followed: (json['followed'] as bool?) ?? false,
+      followed: (json['followed'] as bool?) ?? true,
       description: json['description'] as String?,
       following: json['following'] as int,
       followers: json['followers'] as int,
-      mySelf: true,
+      mySelf: json['myself'] as bool? ?? false,
     );
   }
 }

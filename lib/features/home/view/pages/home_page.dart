@@ -48,7 +48,6 @@ class HomePage extends ConsumerWidget {
         ),
         NotificationListener<ScrollUpdateNotification>(
           onNotification: (n) {
-            print("S${controller.position.maxScrollExtent}");
             if (n.metrics.pixels >= controller.position.maxScrollExtent - MediaQuery.of(context).size.height) {
               ref
                   .read(homePagePostsControllerProvider)
@@ -106,6 +105,7 @@ class HomePage extends ConsumerWidget {
                         future: postsFuture,
                         builder: (context, snapshot) {
                           if (posts != null && posts.length > index) {
+                            if (posts[index].isEmpty) return const SizedBox();
                             if (posts[index][0] is MultiplePostModel) {
                               return PostBase(
                                 index: index,
@@ -119,6 +119,7 @@ class HomePage extends ConsumerWidget {
                           return PostBase(index: index,);
                         },
                       ),
+                      if (posts?[index].isEmpty == false)
                       Divider(
                         color: context.colors.fieldsDefault,
                         height: 1,

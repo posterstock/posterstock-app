@@ -37,6 +37,7 @@ class MultiplePostModel extends PostBaseModel {
     required String time,
     required int id,
     required bool liked,
+    required DateTime timeDate,
     int likes = 0,
     int comments = 0,
     String? description,
@@ -45,6 +46,7 @@ class MultiplePostModel extends PostBaseModel {
           name: name,
           author: author,
           time: time,
+          timeDate: timeDate,
           likes: likes,
           liked: liked,
           comments: comments,
@@ -57,7 +59,10 @@ class MultiplePostModel extends PostBaseModel {
       name: json['title'] as String,
       liked: json['has_liked'] as bool,
       author: UserModel.fromJson(json['user'] as Map<String, Object?>),
-      time: json['time'] as String,
+      time: _getTimeString(
+          DateTime.fromMillisecondsSinceEpoch((json['created_at'] as int) * 1000)),
+      timeDate:
+          DateTime.fromMillisecondsSinceEpoch((json['created_at'] as int) * 1000),
       likes: json['likes_count'] as int,
       comments: json['comments_count'] as int,
       description: json['description'] as String,
@@ -69,12 +74,28 @@ class MultiplePostModel extends PostBaseModel {
     );
   }
 
+  static String _getTimeString(DateTime date) {
+    DateTime now = DateTime.now();
+    Duration diff = now.difference(date);
+    if (diff.inDays > 30) {
+      return "${diff.inDays / ~30} month${diff.inDays / ~30 > 1 ? "s" : ''} ago";
+    } else if (diff.inDays > 0) {
+      return "${diff.inDays} day${diff.inDays > 1 ? "s" : ''} ago";
+    } else if (diff.inHours > 0) {
+      return "${diff.inHours} hour${diff.inHours > 1 ? "s" : ''} ago";
+    } else if (diff.inMinutes > 0) {
+      return "${diff.inMinutes} minute${diff.inMinutes > 1 ? "s" : ''} ago";
+    }
+    return "Less than a minute ago";
+  }
+
   @override
   MultiplePostModel copyWith(
       {int? id,
       String? name,
       UserModel? author,
       String? time,
+      DateTime? timeDate,
       String? description,
       int? likes,
       int? comments,
@@ -85,6 +106,7 @@ class MultiplePostModel extends PostBaseModel {
       name: name ?? this.name,
       author: author ?? this.author,
       time: time ?? this.time,
+      timeDate: timeDate ?? this.timeDate,
       description: description ?? this.description,
       likes: likes ?? this.likes,
       comments: comments ?? this.comments,

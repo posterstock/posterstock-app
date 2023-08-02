@@ -54,8 +54,9 @@ class PostBase extends ConsumerWidget {
           if (post != null) {
             AutoRouter.of(context).push(
               PosterRoute(
-                post: post![pageHolder.page],
+                postId: post[pageHolder.page].id,
                 index: index ?? 0,
+                index2: pageHolder.page,
               ),
             );
           }
@@ -121,7 +122,7 @@ class PostBase extends ConsumerWidget {
 }
 
 class UserInfoTile extends StatelessWidget {
-  const UserInfoTile({
+  UserInfoTile({
     Key? key,
     this.loading = false,
     this.user,
@@ -143,11 +144,6 @@ class UserInfoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //TODO move avatar generation from view layer
-    const List<Color> avatar = [
-      Color(0xfff09a90),
-      Color(0xfff3d376),
-      Color(0xff92bdf4),
-    ];
     return ShimmerLoader(
       loaded: !loading,
       child: GestureDetector(
@@ -155,14 +151,7 @@ class UserInfoTile extends StatelessWidget {
         onTap: () {
           if (user == null) return;
           AutoRouter.of(context).push(ProfileRoute(
-            user: UserModel(
-              id: 11,
-              username: user!.username,
-              name: user!.name,
-              followed: user!.followed,
-              description: user!.description,
-              imagePath: user!.imagePath,
-            ),
+            user: user!,
           ));
         },
         child: Container(
@@ -177,7 +166,7 @@ class UserInfoTile extends StatelessWidget {
                   backgroundImage: user?.imagePath != null
                       ? NetworkImage(user!.imagePath!)
                       : null,
-                  backgroundColor: avatar[Random().nextInt(3)],
+                  backgroundColor: user?.color,
                   child: user?.imagePath == null && !loading
                       ? Text(
                     getAvatarName(user!.name).toUpperCase(),
@@ -204,15 +193,15 @@ class UserInfoTile extends StatelessWidget {
                             height: 3,
                           ),
                           SizedBox(
-                            width: MediaQuery
+                            width:(showFollowButton) && (!(user?.followed ?? true)) ? MediaQuery
                                 .of(context)
                                 .size
-                                .width - 68 - 179 + 42,
+                                .width - 68 - 179 + 42 : null,
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 ExpandChecker(
-                                  expand: !(user?.followed ?? true),
+                                  expand: (showFollowButton) && (!(user?.followed ?? true)),
                                   child: TextOrContainer(
                                     text: user?.name,
                                     style: context.textStyles.calloutBold!
@@ -228,8 +217,7 @@ class UserInfoTile extends StatelessWidget {
                                 const SizedBox(
                                   width: 12,
                                 ),
-                                if ((user?.followed ?? true) ||
-                                    !showFollowButton)
+                                if (!((showFollowButton) && (!(user?.followed ?? true))))
                                   Text(
                                     time ?? '',
                                     style: context.textStyles.footNote!

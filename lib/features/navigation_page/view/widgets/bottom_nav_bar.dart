@@ -2,10 +2,12 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/features/edit_profile/controller/profile_controller.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_scroll_controller_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/navigation_route_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/view/widgets/plus_button.dart';
+import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../controller/menu_controller.dart';
@@ -139,6 +141,7 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                   ),
                   BottomNavBarItem(
                     onTap: () {
+                      ref.read(profileControllerApiProvider).clearUser();
                       ref.read(menuControllerProvider).jumpToPage(3, context);
                     },
                     //TODO check if has avatar

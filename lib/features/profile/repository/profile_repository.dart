@@ -11,20 +11,34 @@ class ProfileRepository implements IProfileRepository {
   final profileService = ProfileService();
 
   @override
-  Future<UserDetailsModel> getProfileInfo(String token, int id) async {
+  Future<UserDetailsModel> getProfileInfo(String token, int? id) async {
     final result = (await profileService.getProfileInfo(token, id));
     return UserDetailsModel.fromJson(result);
   }
 
   @override
-  Future<List<MultiplePostModel>?> getProfileLists(String token, int id) async {
-    // TODO: implement getProfileLists
-    throw UnimplementedError();
+  Future<List<PostMovieModel>> getProfilePosts(String token, int? id) async {
+    try {
+      final result = (await profileService.getUserPosts(token, id));
+      return result.map(
+            (e) => PostMovieModel.fromJson(e),
+      ).toList();
+    } catch (e) {
+      print(e);
+    }
+    return [];
   }
 
   @override
-  Future<List<PostMovieModel>?> getProfilePosts(String token, int id) async {
-    // TODO: implement getProfilePosts
-    throw UnimplementedError();
+  Future<List<MultiplePostModel>?> getProfileLists(String token, int? id) async {
+    try {
+      final result = (await profileService.getUserLists(token, id));
+      return result.map(
+            (e) => MultiplePostModel.fromJson(e),
+      ).toList();
+    } catch (e) {
+      print(e);
+    }
+    return [];
   }
 }

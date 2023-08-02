@@ -84,8 +84,7 @@ class MovieCardState extends ConsumerState<MovieCard>
                     MediaQuery.of(context).size.width),
           )..addListener(() {
               widget.pageHolder.page = (pageController?.page ?? 0).round();
-              if (pageController?.page == null ||
-                  pageController!.page! < 0.05) {
+              if (pageController?.page == null) {
                 return;
               }
               likeCommentController.animateTo((pageController?.page?.toInt() ??
@@ -109,7 +108,8 @@ class MovieCardState extends ConsumerState<MovieCard>
                         left: controller.value < 0 ? 0 : controller.value,
                       ),
                       child: _MovieCardPageViewContent(
-                        index: widget.index,
+                        index1: widget.index,
+                        index2: index,
                         likeCommentController: likeCommentController,
                         controller: controller,
                         onPosterTap: () {
@@ -250,13 +250,15 @@ class _MovieCardPageViewContent extends ConsumerWidget {
     required this.textHeight,
     required this.titleHeight,
     required this.description,
-    required this.index,
+    required this.index1,
+    required this.index2,
   }) : super(key: key);
   final AnimationController likeCommentController;
   final AnimationController controller;
   final void Function() onPosterTap;
   final PostMovieModel? movie;
-  final int index;
+  final int index1;
+  final int index2;
   final double textHeight;
   final double titleHeight;
   final String description;
@@ -341,7 +343,7 @@ class _MovieCardPageViewContent extends ConsumerWidget {
                     opacity = ((likeCommentController.value -
                                 likeCommentController.value.toInt()) -
                             0.8) *
-                        5;
+                        6;
                   }
                   if (opacity < 0) opacity = 0;
                   if (opacity > 1) opacity = 1;
@@ -356,10 +358,10 @@ class _MovieCardPageViewContent extends ConsumerWidget {
                     children: [
                       const Spacer(),
                       LikeButton(
-                        liked: likes?[index].$1 ?? false,
-                        amount: likes?[index].$2 ?? 0,
+                        liked: likes?[index1][index2].$1 ?? false,
+                        amount: likes?[index1][index2].$2 ?? 0,
                         onTap: () {
-                          ref.read(homePagePostsControllerProvider).setLike(index);
+                          ref.read(homePagePostsControllerProvider).setLike(index1, index2);
                         },
                       ),
                       const SizedBox(

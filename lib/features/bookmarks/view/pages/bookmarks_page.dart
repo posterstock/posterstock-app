@@ -11,6 +11,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 final posters = List.generate(
   300,
   (index) => PostMovieModel(
+    timeDate: DateTime.now(),
       liked: false,
       id: 1,
       year: '2020',

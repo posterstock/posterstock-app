@@ -46,7 +46,6 @@ class CustomBackButton extends StatelessWidget {
     return InkWell(
       highlightColor: Colors.transparent,
       onTap: () {
-        print(1);
         AutoRouter.of(context).pop();
       },
       child: SizedBox(

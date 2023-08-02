@@ -17,6 +17,7 @@ class HomePagePostsController {
   final IHomePagePostsRepository repository;
   final String token;
   bool gettingPosts = false;
+  bool gotAll = false;
 
   HomePagePostsController({
     required this.homePagePostsState,
@@ -26,20 +27,29 @@ class HomePagePostsController {
 
   Future<void> getPosts({bool getNewPosts = false}) async {
     if (gettingPosts) return;
+    if (!getNewPosts && gotAll) return;
     gettingPosts = true;
     final result = await repository.getPosts(token, getNesPosts: getNewPosts);
+    gotAll = result?.$2 ?? false;
     if (getNewPosts) {
-      print("GETTING NEW");
-      await homePagePostsState.updateState(result);
+      await homePagePostsState.updateState(result?.$1);
     } else {
-      await homePagePostsState.updateStateEnd(result);
+      await homePagePostsState.updateStateEnd(result?.$1);
     }
     gettingPosts = false;
   }
 
-  Future<void> setLike(int index) async {
-    homePagePostsState.setLike(index);
-    repository.setLike(token, homePagePostsState.state?[index][0].id,
-        (homePagePostsState.state?[index][0].liked ?? false));
+  Future<void> setLike(int index, int index2) async {
+    homePagePostsState.setLike(index, index2);
+    repository.setLike(token, homePagePostsState.state?[index][index2].id,
+        (homePagePostsState.state?[index][index2].liked ?? false));
+  }
+
+  Future<void> setLikeId(int id, bool value) async {
+    repository.setLike(token, id, value);
+  }
+
+  Future<void> addComment(int id) async {
+    homePagePostsState.addComment(id);
   }
 }

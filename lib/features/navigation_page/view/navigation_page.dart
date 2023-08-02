@@ -12,6 +12,7 @@ import 'package:poster_stock/features/create_poster/view/create_poster_dialog.da
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/menu_state_holder.dart';
+import 'package:poster_stock/features/navigation_page/state_holder/previous_page_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/view/widgets/bottom_nav_bar.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -27,48 +28,50 @@ class NavigationPage extends ConsumerWidget {
         const HomeRoute(),
         SearchRoute(),
         const NotificationsRoute(),
-        ProfileRoute(
-          user: UserModel(
-            id: ref.watch(authIdStateHolderProvider) ?? 0,
-            name: '',
-            username: '',
-          ),
-        ),
+        ProfileRoute(),
       ],
       builder: (context, child, _) {
-        return Stack(
-          children: [
-            CustomScaffold(
-              bottomNavBar: const SafeArea(child: AppNavigationBar()),
-              child: AnnotatedRegion<SystemUiOverlayStyle>(
-                value: SystemUiOverlayStyle(
-                  statusBarColor: Colors.transparent,
-                  statusBarIconBrightness:
-                      Theme.of(context).brightness == Brightness.light
-                          ? Brightness.dark
-                          : Brightness.light,
-                  statusBarBrightness: Theme.of(context).brightness,
-                ),
-                child: SafeArea(
-                  child: child,
-                ),
-              ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: 57 + MediaQuery.of(context).padding.bottom,
-                ),
-                child: const Material(
-                  color: Colors.transparent,
-                  child: MenuWidget(),
+        return WillPopScope(
+          onWillPop: () async {
+            final pages = ref.watch(previousPageStateHolderProvider);
+            if (pages.isEmpty) return true;
+            ref.read(menuControllerProvider).backToPage(context);
+            return false;
+          },
+          child: Stack(
+            children: [
+              CustomScaffold(
+                bottomNavBar: const SafeArea(child: AppNavigationBar()),
+                child: AnnotatedRegion<SystemUiOverlayStyle>(
+                  value: SystemUiOverlayStyle(
+                    statusBarColor: Colors.transparent,
+                    statusBarIconBrightness:
+                        Theme.of(context).brightness == Brightness.light
+                            ? Brightness.dark
+                            : Brightness.light,
+                    statusBarBrightness: Theme.of(context).brightness,
+                  ),
+                  child: SafeArea(
+                    child: child,
+                  ),
                 ),
               ),
-            )
-          ],
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    bottom: 57 + MediaQuery.of(context).padding.bottom,
+                  ),
+                  child: const Material(
+                    color: Colors.transparent,
+                    child: MenuWidget(),
+                  ),
+                ),
+              )
+            ],
+          ),
         );
       },
     );

@@ -9,8 +9,8 @@ final profilePostsStateHolderProvider =
 class ProfilePostsStateHolder extends StateNotifier<List<PostMovieModel>?> {
   ProfilePostsStateHolder(super.state);
 
-  void updateState(List<PostMovieModel> list) {
-    state = [...(state ?? []), ...list];
+  void updateState(List<PostMovieModel>? list) {
+    state = [...(state ?? []), ...?list];
   }
 
   void clearState() {

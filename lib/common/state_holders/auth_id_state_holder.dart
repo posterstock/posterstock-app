@@ -12,7 +12,6 @@ class AuthIdStateHolder extends StateNotifier<int?> {
   Future<void> updateState(int id) async{
     //state = await SuperTokens.();
     state = id;
-    print(state);
   }
 
   void clearState() {

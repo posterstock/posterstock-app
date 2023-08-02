@@ -76,8 +76,9 @@ class AppRouter extends _i18.RootStackRouter {
         routeData: routeData,
         child: _i5.PosterPage(
           key: args.key,
-          post: args.post,
+          postId: args.postId,
           index: args.index,
+          index2: args.index2,
         ),
       );
     },
@@ -336,15 +337,17 @@ class NavigationRoute extends _i18.PageRouteInfo<void> {
 class PosterRoute extends _i18.PageRouteInfo<PosterRouteArgs> {
   PosterRoute({
     _i19.Key? key,
-    required _i20.PostMovieModel post,
-    required int index,
+    required int postId,
+    int? index,
+    int? index2,
   }) : super(
           PosterRoute.name,
           path: 'poster',
           args: PosterRouteArgs(
             key: key,
-            post: post,
+            postId: postId,
             index: index,
+            index2: index2,
           ),
         );
 
@@ -354,19 +357,22 @@ class PosterRoute extends _i18.PageRouteInfo<PosterRouteArgs> {
 class PosterRouteArgs {
   const PosterRouteArgs({
     this.key,
-    required this.post,
-    required this.index,
+    required this.postId,
+    this.index,
+    this.index2,
   });
 
   final _i19.Key? key;
 
-  final _i20.PostMovieModel post;
+  final int postId;
 
-  final int index;
+  final int? index;
+
+  final int? index2;
 
   @override
   String toString() {
-    return 'PosterRouteArgs{key: $key, post: $post}';
+    return 'PosterRouteArgs{key: $key, post: $postId}';
   }
 }
 
@@ -409,7 +415,7 @@ class ListRouteArgs {
 class ProfileRoute extends _i18.PageRouteInfo<ProfileRouteArgs> {
   ProfileRoute({
     _i19.Key? key,
-    required _i23.UserModel user,
+    _i23.UserModel? user,
   }) : super(
           ProfileRoute.name,
           path: 'profile',
@@ -425,12 +431,12 @@ class ProfileRoute extends _i18.PageRouteInfo<ProfileRouteArgs> {
 class ProfileRouteArgs {
   const ProfileRouteArgs({
     this.key,
-    required this.user,
+    this.user,
   });
 
   final _i19.Key? key;
 
-  final _i23.UserModel user;
+  final _i23.UserModel? user;
 
   @override
   String toString() {

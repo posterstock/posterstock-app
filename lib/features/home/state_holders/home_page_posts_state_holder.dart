@@ -19,35 +19,71 @@ class HomePagePostsStateHolder
   final HomePageLikesStateHolder homePageLikesStateHolder;
 
   Future<void> updateState(List<List<PostBaseModel>>? posts) async {
+    for (int i = 0; i < (posts?.length ?? 0); i++) {
+      for (int j = 0; j < (posts?.length ?? 0); j++) {
+        if (i == j) continue;
+        if (posts![i][0].author.id == posts[j][0].author.id && posts[i][0].timeDate.difference(posts[j][0].timeDate).inDays < 1) {
+          posts[i].add(posts[j][0]);
+          posts.removeAt(j);
+          j--;
+        }
+      }
+    }
     if (state == null) {
       state = posts;
     } else {
       if (state != null && posts != null) {
         for (var statePost in posts) {
-          state!.removeWhere((element) => element[0].id == statePost[0].id);
+          for (var st in statePost) {
+            state!.map((e) => e.removeWhere((element) => element.id == st.id)).toList();
+          }
         }
       }
-      print("EEE$posts");
       state = [...?posts, ...state!];
-      await homePageLikesStateHolder.setState(state?.map((e) => (e[0].liked, e[0].likes)).toList());
+      await homePageLikesStateHolder
+          .setState(state?.map((e) => e.map((e) => (e.liked, e.likes)).toList()).toList());
     }
   }
 
-  Future<void> setLike(int index) async {
-    state?[index][0] = (state?[index][0].copyWith(
-        liked: state?[index][0].liked == false ? true : false,
-        likes: state?[index][0].liked == false
-            ? (state?[index][0].likes ?? 0) + 1
-            : (state?[index][0].likes ?? 0) - 1))!;
-    await homePageLikesStateHolder.setState(state?.map((e) => (e[0].liked, e[0].likes)).toList());
+  Future<void> setLike(int index, int index2) async {
+    state?[index][index2] = (state?[index][index2].copyWith(
+        liked: state?[index][index2].liked == false ? true : false,
+        likes: state?[index][index2].liked == false
+            ? (state?[index][index2].likes ?? 0) + 1
+            : (state?[index][index2].likes ?? 0) - 1))!;
+    await homePageLikesStateHolder
+        .setState(state?.map((e) => e.map((e) => (e.liked, e.likes)).toList()).toList());
+  }
+
+  Future<void> addComment(int id) async {
+    if (state == null) return;
+    for (int i = 0; i < state!.length; i++) {
+      for (int j = 0; j < state![i].length; j++) {
+        if (state![i][j].id == id) {
+          state![i][j] = state![i][j].copyWith(comments: state![i][j].comments+1);
+        }
+      }
+    }
+    state = [...?state];
   }
 
   Future<void> updateStateEnd(List<List<PostBaseModel>>? posts) async {
+    for (int i = 0; i < (posts?.length ?? 0); i++) {
+      for (int j = 0; j < (posts?.length ?? 0); j++) {
+        if (i == j) continue;
+        if (posts![i][0].author.id == posts[j][0].author.id && posts[i][0].timeDate.difference(posts[j][0].timeDate).inDays < 1) {
+          posts[i].add(posts[j][0]);
+          posts.removeAt(j);
+          j--;
+        }
+      }
+    }
     if (state == null) {
       state = posts;
     } else {
       state = [...state!, ...?posts];
     }
-    await homePageLikesStateHolder.setState(state?.map((e) => (e[0].liked, e[0].likes)).toList());
+    await homePageLikesStateHolder
+        .setState(state?.map((e) => e.map((e) => (e.liked, e.likes)).toList()).toList());
   }
 }

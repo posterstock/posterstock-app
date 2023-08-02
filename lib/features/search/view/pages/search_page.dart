@@ -72,18 +72,15 @@ class SearchPage extends ConsumerWidget {
                     onPressed: () {
                       ref.read(searchControllerProvider).updateSearch('');
                       textController.text = '';
-                      ref.read(menuControllerProvider).jumpToPage(
-                            ref.watch(previousPageStateHolderProvider),
-                            context,
-                          );
+                      ref.read(menuControllerProvider).backToPage(context);
                     },
                   ),
                 ],
               ),
             ),
           ),
-          Expanded(
-            child: const SearchPageContent(),
+          const Expanded(
+            child: SearchPageContent(),
           ),
         ],
       ),
@@ -135,6 +132,7 @@ class SearchTabViewState extends State<SearchTabView>
     final posters = List.generate(
       20,
       (index) => PostMovieModel(
+          timeDate: DateTime.now(),
           liked: false,
           id: 1,
           year: '2020',
