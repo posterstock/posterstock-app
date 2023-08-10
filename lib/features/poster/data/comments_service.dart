@@ -2,11 +2,12 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:supertokens_flutter/dio.dart';
+import 'package:supertokens_flutter/supertokens.dart';
 
 class PostService {
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: 'https://posterstock.co/',
+      baseUrl: 'https://api.posterstock.co/',
       connectTimeout: 10000,
       receiveTimeout: 10000,
     ),
@@ -75,6 +76,7 @@ class PostService {
       print(response.data);
       return response.data;
     } on DioError catch (e) {
+      print(18);
       print(e.response);
       rethrow;
     }

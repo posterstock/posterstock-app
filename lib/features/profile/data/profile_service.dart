@@ -8,9 +8,10 @@ import 'package:supertokens_flutter/supertokens.dart';
 class ProfileService implements IProfileService {
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: 'https://posterstock.co/',
+      baseUrl: 'https://api.posterstock.co/',
       connectTimeout: 10000,
       receiveTimeout: 10000,
+      maxRedirects: 5,
     ),
   );
 
@@ -47,15 +48,18 @@ class ProfileService implements IProfileService {
     try {
       if (id == null) {
         try {
-          final response = await _dio.post(
+          print(17);
+          final response = await _dio.get(
             'api/profiles/',
-            options: Options(headers: {'Authorization': 'Bearer $token'}),
-            data: jsonEncode({
-              'id': await SuperTokens.getUserId(),
-            }),
+            options: Options(
+              headers: {
+                'Authorization': 'Bearer $token',
+              },
+            ),
           );
-          (response.data as Map<String, dynamic>).addAll({'myself' : true});
           return response.data;
+        } on DioError catch (e) {
+          print(e.response);
         } catch (e) {
           rethrow;
         }
@@ -67,7 +71,48 @@ class ProfileService implements IProfileService {
       print(response);
       return response.data;
     } on DioError catch (e) {
-      //print(e.response);
+      print(e.response);
+      rethrow;
+    }
+  }
+
+  Future<void> follow(String token, int? id, bool follow) async {
+    try {
+      if (follow) {
+        print(1);
+        try {
+          final response = await _dio.post(
+            '/api/users/$id/follow/',
+            options: Options(
+              headers: {
+                'Authorization': 'Bearer $token',
+              },
+            ),
+          );
+          print(12);
+          print(response.statusCode);
+          return response.data;
+        } on DioError catch (e) {
+          print(e.response?.headers);
+        } catch (e) {
+          rethrow;
+        }
+      }
+      print(2);
+      final response = await _dio.post(
+        '/api/users/$id/unfollow/',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+      print(11);
+      print(response.statusCode);
+      return response.data;
+    } on DioError catch (e) {
+      print(e.response?.headers);
+      print(e.response);
       rethrow;
     }
   }

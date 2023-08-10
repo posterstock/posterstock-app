@@ -157,11 +157,14 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
             MenuButton(
               width: width,
               bottomPaddingMul: 0.24,
-              color: context.colors.backgroundsDropAction!,
+              color: context.colors.backgroundsPrimary!,
               hightlightColor: context.colors.textsPrimary!.withOpacity(0.2),
-              iconColor: context.colors.iconsBackground!,
-              picturePath: 'assets/icons/ic_collection.svg',
-              label: AppLocalizations.of(context)!.addPoster,
+              iconColor: context.colors.iconsActive!,
+              border: Border.all(
+                color: context.colors.fieldsHover!,
+              ),
+              picturePath: 'assets/icons/ic_lists.svg',
+              label: AppLocalizations.of(context)!.createList,
               animationValue: controller.value,
               onTap: () {
                 showModalBottomSheet(
@@ -169,7 +172,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                   backgroundColor: Colors.transparent,
                   isScrollControlled: true,
                   useSafeArea: true,
-                  builder: (context) => const CreatePosterDialog(),
+                  builder: (context) => const CreateListDialog(),
                 );
               },
             ),
@@ -200,14 +203,11 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
             MenuButton(
               width: width,
               bottomPaddingMul: 0.745,
-              color: context.colors.backgroundsPrimary!,
+              color: context.colors.backgroundsDropAction!,
               hightlightColor: context.colors.textsPrimary!.withOpacity(0.2),
-              iconColor: context.colors.iconsActive!,
-              border: Border.all(
-                color: context.colors.fieldsHover!,
-              ),
-              picturePath: 'assets/icons/ic_lists.svg',
-              label: AppLocalizations.of(context)!.createList,
+              iconColor: context.colors.iconsBackground!,
+              picturePath: 'assets/icons/ic_collection.svg',
+              label: AppLocalizations.of(context)!.addPoster,
               animationValue: controller.value,
               onTap: () {
                 showModalBottomSheet(
@@ -215,7 +215,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                   backgroundColor: Colors.transparent,
                   isScrollControlled: true,
                   useSafeArea: true,
-                  builder: (context) => const CreateListDialog(),
+                  builder: (context) => const CreatePosterDialog(),
                 );
               },
             ),

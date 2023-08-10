@@ -13,7 +13,6 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i18;
 import 'package:flutter/material.dart' as _i19;
-import 'package:poster_stock/features/home/models/user_model.dart' as _i23;
 
 import '../features/auth/view/pages/auth_page.dart' as _i1;
 import '../features/auth/view/pages/login_page.dart' as _i3;
@@ -21,14 +20,12 @@ import '../features/auth/view/pages/sign_up_page.dart' as _i2;
 import '../features/bookmarks/view/pages/bookmarks_page.dart' as _i13;
 import '../features/edit_profile/view/view/pages/edit_profile_page.dart'
     as _i12;
-import '../features/home/models/multiple_post_model.dart' as _i21;
-import '../features/home/models/post_movie_model.dart' as _i20;
+import '../features/home/models/multiple_post_model.dart' as _i20;
 import '../features/home/view/pages/home_page.dart' as _i15;
 import '../features/list/view/list_page.dart' as _i6;
 import '../features/navigation_page/view/navigation_page.dart' as _i4;
 import '../features/notifications/view/pages/notifications_page.dart' as _i17;
 import '../features/poster/view/pages/poster_page/poster_page.dart' as _i5;
-import '../features/profile/models/user_details_model.dart' as _i22;
 import '../features/profile/view/pages/profile_page.dart' as _i7;
 import '../features/search/view/pages/search_page.dart' as _i16;
 import '../features/settings/view/screens/change_email_%20code_screen.dart'
@@ -93,12 +90,13 @@ class AppRouter extends _i18.RootStackRouter {
       );
     },
     ProfileRoute.name: (routeData) {
-      final args = routeData.argsAs<ProfileRouteArgs>();
+      final args = routeData.argsAs<ProfileRouteArgs>(
+          orElse: () => const ProfileRouteArgs());
       return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i7.ProfilePage(
           key: args.key,
-          user: args.user,
+          userId: args.userId,
         ),
       );
     },
@@ -150,13 +148,13 @@ class AppRouter extends _i18.RootStackRouter {
       );
     },
     UsersListRoute.name: (routeData) {
-      final args = routeData.argsAs<UsersListRouteArgs>();
+      final args = routeData.argsAs<UsersListRouteArgs>(
+          orElse: () => const UsersListRouteArgs());
       return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i14.UsersListPage(
           key: args.key,
           following: args.following,
-          user: args.user,
         ),
       );
     },
@@ -372,7 +370,7 @@ class PosterRouteArgs {
 
   @override
   String toString() {
-    return 'PosterRouteArgs{key: $key, post: $postId}';
+    return 'PosterRouteArgs{key: $key, postId: $postId, index: $index, index2: $index2}';
   }
 }
 
@@ -381,7 +379,7 @@ class PosterRouteArgs {
 class ListRoute extends _i18.PageRouteInfo<ListRouteArgs> {
   ListRoute({
     _i19.Key? key,
-    required _i21.MultiplePostModel post,
+    required _i20.MultiplePostModel post,
   }) : super(
           ListRoute.name,
           path: 'collection',
@@ -402,7 +400,7 @@ class ListRouteArgs {
 
   final _i19.Key? key;
 
-  final _i21.MultiplePostModel post;
+  final _i20.MultiplePostModel post;
 
   @override
   String toString() {
@@ -415,13 +413,13 @@ class ListRouteArgs {
 class ProfileRoute extends _i18.PageRouteInfo<ProfileRouteArgs> {
   ProfileRoute({
     _i19.Key? key,
-    _i23.UserModel? user,
+    int? userId,
   }) : super(
           ProfileRoute.name,
           path: 'profile',
           args: ProfileRouteArgs(
             key: key,
-            user: user,
+            userId: userId,
           ),
         );
 
@@ -431,16 +429,16 @@ class ProfileRoute extends _i18.PageRouteInfo<ProfileRouteArgs> {
 class ProfileRouteArgs {
   const ProfileRouteArgs({
     this.key,
-    this.user,
+    this.userId,
   });
 
   final _i19.Key? key;
 
-  final _i23.UserModel? user;
+  final int? userId;
 
   @override
   String toString() {
-    return 'ProfileRouteArgs{key: $key, user: $user}';
+    return 'ProfileRouteArgs{key: $key, userId: $userId}';
   }
 }
 
@@ -581,14 +579,12 @@ class UsersListRoute extends _i18.PageRouteInfo<UsersListRouteArgs> {
   UsersListRoute({
     _i19.Key? key,
     bool following = false,
-    required List<_i23.UserModel> user,
   }) : super(
           UsersListRoute.name,
           path: 'users_list',
           args: UsersListRouteArgs(
             key: key,
             following: following,
-            user: user,
           ),
         );
 
@@ -599,18 +595,15 @@ class UsersListRouteArgs {
   const UsersListRouteArgs({
     this.key,
     this.following = false,
-    required this.user,
   });
 
   final _i19.Key? key;
 
   final bool following;
 
-  final List<_i23.UserModel> user;
-
   @override
   String toString() {
-    return 'UsersListRouteArgs{key: $key, following: $following, user: $user}';
+    return 'UsersListRouteArgs{key: $key, following: $following}';
   }
 }
 

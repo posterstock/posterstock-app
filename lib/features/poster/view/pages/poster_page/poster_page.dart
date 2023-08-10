@@ -306,7 +306,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                 child: ShimmerLoader(
                                   loaded: post != null,
                                   child: Container(
-                                    color: context.colors.backgroundsSecondary,
+                                    color: post == null ? context.colors.backgroundsSecondary : null,
                                     height: imageHeight! +
                                         MediaQuery.of(context).padding.top,
                                     width: double.infinity,

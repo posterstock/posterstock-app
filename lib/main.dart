@@ -12,9 +12,11 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:poster_stock/common/constants/languages.dart';
 import 'package:poster_stock/common/helpers/custom_scroll_behavior.dart';
+import 'package:poster_stock/common/state_holders/auth_token_state_holder.dart';
 import 'package:poster_stock/features/settings/controllers/app_language_controller.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supertokens_flutter/supertokens.dart';
 
 import 'firebase_options.dart';
@@ -22,7 +24,7 @@ import 'navigation/app_router.gr.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SuperTokens.init(apiDomain: 'https://posterstock.co/');
+  SuperTokens.init(apiDomain: 'https://api.posterstock.co/',);
 
   PhotoManager.clearFileCache();
   await Firebase.initializeApp(
@@ -43,6 +45,7 @@ class App extends ConsumerWidget {
   App({Key? key}) : super(key: key);
 
   final _appRouter = AppRouter();
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -71,6 +74,11 @@ class App extends ConsumerWidget {
         }
       });
     }
+    Future(() async {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+      //ref.read(authTokenStateHolderProvider.notifier).updateState(token);
+    });
     return MaterialApp.router(
       routerDelegate: _appRouter.delegate(),
       routeInformationParser: _appRouter.defaultRouteParser(),

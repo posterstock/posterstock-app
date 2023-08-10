@@ -26,7 +26,7 @@ class Comment {
     DateTime now = DateTime.now();
     Duration diff = now.difference(date);
     if (diff.inDays > 30) {
-      return "${diff.inDays / ~30} month${diff.inDays / ~30 > 1 ? "s" : ''} ago";
+      return "${diff.inDays ~/ 30} month${diff.inDays ~/ 30 > 1 ? "s" : ''} ago";
     } else if (diff.inDays > 0) {
       return "${diff.inDays} day${diff.inDays > 1 ? "s" : ''} ago";
     } else if (diff.inHours > 0) {

@@ -13,7 +13,7 @@ class SearchUserTile extends StatelessWidget {
     Key? key,
     required this.user,
   }) : super(key: key);
-  final UserModel user;
+  final UserDetailsModel user;
   static const List<Color> avatar = [
     Color(0xfff09a90),
     Color(0xfff3d376),
@@ -22,10 +22,11 @@ class SearchUserTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(user.id);
     return InkWell(
       onTap: () {
         AutoRouter.of(context).push(
-          ProfileRoute(user: user),
+          ProfileRoute(userId: user.id),
         );
       },
       child: Padding(
@@ -33,6 +34,7 @@ class SearchUserTile extends StatelessWidget {
         child: SizedBox(
           height: 72,
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
                 radius: 24,
@@ -53,19 +55,20 @@ class SearchUserTile extends StatelessWidget {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    const Spacer(flex: 3,),
                     Text(
                       user.name,
                       style: context.textStyles.subheadline,
                     ),
-                    const SizedBox(height: 4),
+                    const Spacer(),
                     Text(
                       '@${user.username}',
                       style: context.textStyles.caption1!.copyWith(
                         color: context.colors.textsSecondary,
                       ),
                     ),
+                    const Spacer(flex: 4,),
                   ],
                 ),
               ),
@@ -87,8 +90,7 @@ class SearchUserTile extends StatelessWidget {
                       SizedBox(
                         width: 51,
                         child: Text(
-                          //TODO
-                          '0', //user.posters.toString(),
+                          user.posters.toString(),
                           style: context.textStyles.caption1!
                               .copyWith(color: context.colors.textsPrimary),
                         ),
@@ -110,8 +112,7 @@ class SearchUserTile extends StatelessWidget {
                       SizedBox(
                         width: 51,
                         child: Text(
-                          //TODO
-                          '0', //user.lists.toString(),
+                          user.lists.toString(),
                           style: context.textStyles.caption1!
                               .copyWith(color: context.colors.textsPrimary),
                         ),

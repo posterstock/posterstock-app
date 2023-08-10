@@ -42,8 +42,10 @@ class MenuController {
 
   void jumpToPage(int page, BuildContext context) {
     FocusScope.of(context).unfocus();
-    AutoRouter.of(context).popUntilRouteWithPath('navigation');
-    if (menuValue ==true) {
+    if (previousPageState.state.isNotEmpty) {
+      AutoRouter.of(context).popUntilRouteWithPath('navigation');
+    }
+    if (menuValue == true) {
       menuState.updateState(!menuValue);
     }
     previousPageState.updatePage(routerValue?.activeIndex ?? 0);

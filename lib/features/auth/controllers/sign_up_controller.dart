@@ -109,6 +109,21 @@ class SignUpController {
     await usernameState.updateState(value);
   }
 
+  Future<bool> processSignIn() async {
+    try {
+      final token = await repository.confirmCode(
+        code: code,
+        sessionId: sessionId,
+        deviceId: deviceId,
+        email: email
+      );
+      authTokenState.updateState(token);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<bool> processAuth() async {
     try {
       final token = await repository.confirmCode(

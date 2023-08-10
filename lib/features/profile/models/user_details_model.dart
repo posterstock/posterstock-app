@@ -8,6 +8,8 @@ class UserDetailsModel {
   final int followers;
   final bool followed;
   final bool mySelf;
+  final int posters;
+  final int lists;
 
   UserDetailsModel({
     required this.id,
@@ -17,21 +19,54 @@ class UserDetailsModel {
     required this.followers,
     required this.followed,
     required this.mySelf,
+    this.posters = 0,
+    this.lists = 0,
     this.description,
     this.imagePath,
   });
 
   factory UserDetailsModel.fromJson(Map<String, Object?> json) {
+    print(json['id']);
     return UserDetailsModel(
       id: json['id'] as int,
       name: json['name'] as String,
       username: json['username'] as String,
       imagePath: json['image'] as String?,
-      followed: (json['followed'] as bool?) ?? true,
+      followed: (json['is_following'] as bool?) ?? false,
       description: json['description'] as String?,
-      following: json['following'] as int,
-      followers: json['followers'] as int,
+      following: json['following'] as int? ?? 0,
+      followers: json['followers'] as int? ?? 0,
       mySelf: json['myself'] as bool? ?? false,
+      posters: json['posters'] as int? ?? 0,
+      lists: json['lists'] as int? ?? 0,
+    );
+  }
+
+  UserDetailsModel copyWith({
+    int? id,
+    String? username,
+    String? name,
+    String? description,
+    String? imagePath,
+    int? following,
+    int? followers,
+    bool? followed,
+    bool? mySelf,
+    int? posters,
+    int? lists,
+  }) {
+    return UserDetailsModel(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      imagePath: imagePath ?? this.imagePath,
+      following: following ?? this.following,
+      followers: followers ?? this.followers,
+      followed: followed ?? this.followed,
+      mySelf: mySelf ?? this.mySelf,
+      posters: posters ?? this.posters,
+      lists: lists ?? this.lists,
     );
   }
 }

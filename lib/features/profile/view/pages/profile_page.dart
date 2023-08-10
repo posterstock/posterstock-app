@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_native_splash/cli_commands.dart';
@@ -11,12 +12,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
-import 'package:poster_stock/common/widgets/list_grid_widget.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/avatar_state_holder.dart';
-import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
-import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/peek_pop/peek_and_pop_dialog.dart';
@@ -25,7 +23,6 @@ import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_posts_state_holder.dart';
 import 'package:poster_stock/features/profile/view/empty_collection_widget.dart';
-import 'package:poster_stock/features/users_list/view/users_list_page.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -34,10 +31,10 @@ import '../../../../common/services/text_info_service.dart';
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({
     Key? key,
-    this.user,
+    this.userId,
   }) : super(key: key);
 
-  final UserModel? user;
+  final int? userId;
 
   @override
   ConsumerState<ProfilePage> createState() => _ProfilePageState();
@@ -60,8 +57,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
       upperBound: 1,
       duration: const Duration(milliseconds: 300),
     );
-    Future(() {
-      ref.read(profileControllerApiProvider).clearUser();
+    Future(() async {
+      await ref.read(profileControllerApiProvider).clearUser();
+      ref.read(profileControllerApiProvider).getUserInfo(widget.userId);
     });
   }
 
@@ -75,18 +73,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   Widget build(BuildContext context) {
     var profile = ref.watch(profileInfoStateHolderProvider);
     final photo = ref.watch(avatarStateHolderProvider);
-    bool myself = widget.user?.id == null;
-    //TODO
-    print(profile == null);
-    if (profile == null || widget.user?.name != profile.name) {
-      ref.read(profileControllerApiProvider).getUserInfo(widget.user?.id);
+    bool myself = widget.userId == null;
+    if (profile == null) {
+      ref.read(profileControllerApiProvider).getUserInfo(widget.userId);
     }
     if (myself == true && tabController?.length != 3) {
       tabController = TabController(
         length: 3,
         vsync: this,
       );
-    } else if (tabController?.length != 2) {
+    } else if (myself == false && tabController?.length != 2) {
       tabController = TabController(
         length: 2,
         vsync: this,
@@ -117,33 +113,39 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                 pinned: false,
                 floating: true,
                 elevation: 0,
-                expandedHeight: 225 +
-                    ((profile?.description != null)
-                        ? TextInfoService.textSize(
-                                profile?.description ?? '',
-                                context.textStyles.footNote!,
-                                MediaQuery.of(context).size.width - 32)
-                            .height
-                        : 0),
-                toolbarHeight: 225 +
-                    ((profile?.description != null)
-                        ? TextInfoService.textSize(
-                                profile?.description ?? '',
-                                context.textStyles.footNote!,
-                                MediaQuery.of(context).size.width - 32)
-                            .height
-                        : 0),
-                collapsedHeight: 225 +
-                    ((profile?.description != null)
-                        ? TextInfoService.textSize(
-                                profile?.description ?? '',
-                                context.textStyles.footNote!,
-                                MediaQuery.of(context).size.width - 32)
-                            .height
-                        : 0),
+                expandedHeight: profile == null
+                    ? 50
+                    : 225 +
+                        ((profile?.description != null)
+                            ? TextInfoService.textSize(
+                                    profile?.description ?? '',
+                                    context.textStyles.footNote!,
+                                    MediaQuery.of(context).size.width - 32)
+                                .height
+                            : 0),
+                toolbarHeight: profile == null
+                    ? 50
+                    : 225 +
+                        ((profile?.description != null)
+                            ? TextInfoService.textSize(
+                                    profile?.description ?? '',
+                                    context.textStyles.footNote!,
+                                    MediaQuery.of(context).size.width - 32)
+                                .height
+                            : 0),
+                collapsedHeight: profile == null
+                    ? 50
+                    : 225 +
+                        ((profile?.description != null)
+                            ? TextInfoService.textSize(
+                                    profile?.description ?? '',
+                                    context.textStyles.footNote!,
+                                    MediaQuery.of(context).size.width - 32)
+                                .height
+                            : 0),
                 backgroundColor: context.colors.backgroundsPrimary,
                 centerTitle: true,
-                leading: SizedBox(),
+                leading: const SizedBox(),
                 title: const SizedBox(),
                 flexibleSpace: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,361 +229,371 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(
-                            height: 18,
-                          ),
-                          Row(
-                            children: [
-                              ShimmerLoader(
-                                loaded: profile != null,
-                                child: CircleAvatar(
-                                  radius: 40,
-                                  backgroundImage: profile?.imagePath != null
-                                      ? Image.network(profile!.imagePath!,
-                                              fit: BoxFit.cover)
-                                          .image
-                                      : (photo == null || myself != true
-                                          ? null
-                                          : Image.memory(
-                                              photo,
-                                              fit: BoxFit.cover,
-                                              cacheWidth: 150,
-                                            ).image),
-                                  backgroundColor: avatar[Random().nextInt(3)],
-                                  child: profile?.imagePath == null &&
-                                              profile?.name != null ||
-                                          photo == null && myself == true
-                                      ? Text(
-                                          getAvatarName(profile?.name ?? '')
-                                              .toUpperCase(),
-                                          style: context.textStyles.title3!
-                                              .copyWith(
-                                            color:
-                                                context.colors.textsBackground,
-                                          ),
-                                        )
-                                      : const SizedBox(),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 38,
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  AutoRouter.of(context).push(
-                                    UsersListRoute(
-                                      user: List.generate(
-                                        20,
-                                        (index) => UserModel(
-                                          id: 1,
-                                          name: 'Name $index',
-                                          username: 'username$index',
-                                          followed: false,
-                                          imagePath: index % 2 == 0
-                                              ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
-                                              : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  color: Colors.transparent,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      ShimmerLoader(
-                                        loaded: profile != null,
-                                        child: TextOrContainer(
-                                          text: profile?.followers == null
-                                              ? null
-                                              : profile!.followers.toString(),
-                                          style: context.textStyles.headline,
-                                          emptyWidth: 35,
-                                          emptyHeight: 20,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 3,
-                                      ),
-                                      Text(
-                                        AppLocalizations.of(context)!.followers,
-                                        style: context.textStyles.caption1!
-                                            .copyWith(
-                                          color: context.colors.textsSecondary,
-                                        ),
-                                      ),
-                                    ],
+                    if (profile != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(
+                              height: 18,
+                            ),
+                            Row(
+                              children: [
+                                ShimmerLoader(
+                                  loaded: profile != null,
+                                  child: CircleAvatar(
+                                    radius: 40,
+                                    backgroundImage: profile?.imagePath != null
+                                        ? Image.network(profile!.imagePath!,
+                                                fit: BoxFit.cover)
+                                            .image
+                                        : (photo == null || myself != true
+                                            ? null
+                                            : Image.memory(
+                                                photo,
+                                                fit: BoxFit.cover,
+                                                cacheWidth: 150,
+                                              ).image),
+                                    backgroundColor:
+                                        avatar[Random().nextInt(3)],
+                                    child: profile?.imagePath == null &&
+                                            profile?.name != null
+                                        ? Text(
+                                            getAvatarName(profile?.name ?? '')
+                                                .toUpperCase(),
+                                            style: context.textStyles.title3!
+                                                .copyWith(
+                                              color: context
+                                                  .colors.textsBackground,
+                                            ),
+                                          )
+                                        : const SizedBox(),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(
-                                width: 36,
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  AutoRouter.of(context).push(
-                                    UsersListRoute(
-                                      following: true,
-                                      user: List.generate(
-                                        20,
-                                        (index) => UserModel(
-                                          id: 1,
-                                          name: 'Name $index',
-                                          username: 'username$index',
-                                          followed: false,
-                                          imagePath: index % 2 == 0
-                                              ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
-                                              : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  color: Colors.transparent,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      ShimmerLoader(
-                                        loaded: profile != null,
-                                        child: TextOrContainer(
-                                          text: profile?.following == null
-                                              ? null
-                                              : profile!.followers.toString(),
-                                          style: context.textStyles.headline,
-                                          emptyWidth: 35,
-                                          emptyHeight: 20,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 3,
-                                      ),
-                                      Text(
-                                        AppLocalizations.of(context)!.following,
-                                        style: context.textStyles.caption1!
-                                            .copyWith(
-                                          color: context.colors.textsSecondary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                const SizedBox(
+                                  width: 38,
                                 ),
-                              ),
-                              const Spacer(),
-                            ],
-                          ),
-                          SizedBox(
-                            height: profile == null ? 20 : 12,
-                          ),
-                          Row(
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ShimmerLoader(
-                                    loaded: profile != null,
-                                    child: TextOrContainer(
-                                      text: profile?.name,
-                                      style: context.textStyles.headline,
-                                      emptyWidth: 150,
-                                      emptyHeight: 20,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  if (profile == null)
-                                    const ShimmerLoader(
-                                        child: TextOrContainer(
-                                      text: null,
-                                      emptyWidth: 80,
-                                      emptyHeight: 20,
-                                    )),
-                                  if (profile != null)
-                                    Row(
+                                GestureDetector(
+                                  onTap: () {
+                                    AutoRouter.of(context).push(
+                                      UsersListRoute(),
+                                    );
+                                  },
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        SvgPicture.asset(
-                                          'assets/icons/ic_collection.svg',
-                                          colorFilter: ColorFilter.mode(
-                                            context.colors.iconsDefault!,
-                                            BlendMode.srcIn,
+                                        ShimmerLoader(
+                                          loaded: profile != null,
+                                          child: TextOrContainer(
+                                            text: profile?.followers == null
+                                                ? null
+                                                : profile!.followers.toString(),
+                                            style: context.textStyles.headline,
+                                            emptyWidth: 35,
+                                            emptyHeight: 20,
                                           ),
-                                          width: 16,
                                         ),
-                                        const SizedBox(width: 4),
-                                        //TODO
-                                        /*Text(
-                                          profile?.posters.toString() ?? '0',
+                                        const SizedBox(
+                                          height: 3,
+                                        ),
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .followers,
                                           style: context.textStyles.caption1!
                                               .copyWith(
-                                                  color: context
-                                                      .colors.textsPrimary),
-                                        ),*/
-                                        const SizedBox(width: 12),
-                                        SvgPicture.asset(
-                                          'assets/icons/ic_lists.svg',
-                                          colorFilter: ColorFilter.mode(
-                                            context.colors.iconsDefault!,
-                                            BlendMode.srcIn,
+                                            color:
+                                                context.colors.textsSecondary,
                                           ),
-                                          width: 16,
                                         ),
-                                        const SizedBox(width: 4),
-                                        /*Text(
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 36,
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    AutoRouter.of(context).push(
+                                      UsersListRoute(
+                                        following: true,
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ShimmerLoader(
+                                          loaded: profile != null,
+                                          child: TextOrContainer(
+                                            text: profile?.following == null
+                                                ? null
+                                                : profile!.following.toString(),
+                                            style: context.textStyles.headline,
+                                            emptyWidth: 35,
+                                            emptyHeight: 20,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 3,
+                                        ),
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .following,
+                                          style: context.textStyles.caption1!
+                                              .copyWith(
+                                            color:
+                                                context.colors.textsSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const Spacer(),
+                              ],
+                            ),
+                            SizedBox(
+                              height: profile == null ? 20 : 12,
+                            ),
+                            Row(
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ShimmerLoader(
+                                      loaded: profile != null,
+                                      child: TextOrContainer(
+                                        text: profile?.name,
+                                        style: context.textStyles.headline,
+                                        emptyWidth: 150,
+                                        emptyHeight: 20,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    if (profile == null)
+                                      const ShimmerLoader(
+                                          child: TextOrContainer(
+                                        text: null,
+                                        emptyWidth: 80,
+                                        emptyHeight: 20,
+                                      )),
+                                    if (profile != null)
+                                      Row(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/icons/ic_collection.svg',
+                                            colorFilter: ColorFilter.mode(
+                                              context.colors.iconsDefault!,
+                                              BlendMode.srcIn,
+                                            ),
+                                            width: 16,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            profile.posters.toString(),
+                                            style: context.textStyles.caption1!
+                                                .copyWith(
+                                                    color: context
+                                                        .colors.textsPrimary),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          SvgPicture.asset(
+                                            'assets/icons/ic_lists.svg',
+                                            colorFilter: ColorFilter.mode(
+                                              context.colors.iconsDefault!,
+                                              BlendMode.srcIn,
+                                            ),
+                                            width: 16,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          /*Text(
                                           profile?.lists.toString() ?? '0',
                                           style: context.textStyles.caption1!
                                               .copyWith(
                                                   color: context
                                                       .colors.textsPrimary),
                                         ),*/
-                                      ],
-                                    ),
-                                ],
-                              ),
-                              const Spacer(),
-                              AppTextButton(
-                                onTap: () {
-                                  if (myself ?? false) {
-                                    AutoRouter.of(context)
-                                        .push(EditProfileRoute());
-                                  }
-                                },
-                                text: (myself ?? false)
-                                    ? 'Edit'
-                                    : ((profile?.followed ?? false)
-                                        ? AppLocalizations.of(context)!
-                                            .following
-                                            .capitalize()
-                                        : AppLocalizations.of(context)!.follow),
-                                backgroundColor: ((myself ?? false) ||
-                                        (profile?.followed ?? false))
-                                    ? context.colors.fieldsDefault
-                                    : null,
-                                textColor: ((myself ?? false) ||
-                                        (profile?.followed ?? false))
-                                    ? context.colors.textsPrimary
-                                    : null,
-                              ),
-                            ],
-                          ),
-                          if (profile?.description != null)
-                            const SizedBox(
-                              height: 12,
-                            ),
-                          if (profile?.description != null)
-                            Text(
-                              profile!.description!,
-                              style: context.textStyles.footNote,
-                            ),
-                          if (profile?.description != null)
-                            const SizedBox(
-                              height: 16,
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SliverAppBar(
-                backgroundColor: context.colors.backgroundsPrimary,
-                elevation: 0,
-                expandedHeight: 48,
-                collapsedHeight: 48,
-                toolbarHeight: 48,
-                pinned: true,
-                leading: const SizedBox(),
-                flexibleSpace:
-                    tabController == null || tabController?.animation == null
-                        ? const SizedBox()
-                        : ProfileTabBar(
-                            animation: tabController!.animation!,
-                            tabController: tabController,
-                            profile: profile,
-                            myself: myself,
-                          ),
-              ),
-              SliverToBoxAdapter(
-                child: AnimatedBuilder(
-                    animation: animationController,
-                    builder: (context, child) {
-                      return Opacity(
-                        opacity: animationController.value,
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(
-                            16.0,
-                            16.0 * animationController.value,
-                            16.0,
-                            0.0,
-                          ),
-                          child: SizedBox(
-                            height: animationController.value * 34 + 2,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: AppTextField(
-                                    controller: searchController,
-                                    searchField: true,
-                                    hint: 'Search',
-                                    removableWhenNotEmpty: true,
-                                    crossPadding: const EdgeInsets.all(8.0),
-                                    crossButton: SvgPicture.asset(
-                                      'assets/icons/search_cross.svg',
-                                    ),
-                                    style: context.textStyles.callout!.copyWith(
-                                      fontSize: context.textStyles.callout!
-                                                      .fontSize! *
-                                                  animationController.value <
-                                              1
-                                          ? 1
-                                          : context.textStyles.callout!
-                                                  .fontSize! *
-                                              animationController.value,
-                                    ),
-                                    focus: focusNode,
-                                    onRemoved: () {
-                                      searchController.clear();
-                                    },
-                                  ),
+                                        ],
+                                      ),
+                                  ],
                                 ),
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                CupertinoButton(
-                                  padding: EdgeInsets.zero,
-                                  child: Text(
-                                    'Cancel',
-                                    style: context.textStyles.bodyRegular!
-                                        .copyWith(
-                                      color: context.colors.textsAction,
-                                      fontSize: context.textStyles.bodyRegular!
-                                                      .fontSize! *
-                                                  animationController.value <
-                                              1
-                                          ? 1
-                                          : context.textStyles.bodyRegular!
-                                                  .fontSize! *
-                                              animationController.value,
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    animationController.animateTo(0);
-                                    focusNode.unfocus();
+                                const Spacer(),
+                                AppTextButton(
+                                  onTap: () {
+                                    if (myself) {
+                                      AutoRouter.of(context).push(
+                                        EditProfileRoute(),
+                                      );
+                                    } else {
+                                      ref
+                                          .read(profileControllerApiProvider)
+                                          .follow(
+                                            widget.userId!,
+                                            profile!.followed,
+                                          );
+                                    }
                                   },
+                                  text: (myself ?? false)
+                                      ? 'Edit'
+                                      : ((profile?.followed ?? true)
+                                          ? AppLocalizations.of(context)!
+                                              .following
+                                              .capitalize()
+                                          : AppLocalizations.of(context)!
+                                              .follow),
+                                  backgroundColor: ((myself ?? false) ||
+                                          (profile?.followed ?? true))
+                                      ? context.colors.fieldsDefault
+                                      : null,
+                                  textColor: ((myself ?? false) ||
+                                          (profile?.followed ?? true))
+                                      ? context.colors.textsPrimary
+                                      : null,
                                 ),
                               ],
                             ),
-                          ),
+                            if (profile?.description != null)
+                              const SizedBox(
+                                height: 12,
+                              ),
+                            if (profile?.description != null)
+                              Text(
+                                profile!.description!,
+                                style: context.textStyles.footNote,
+                              ),
+                            if (profile?.description != null)
+                              const SizedBox(
+                                height: 16,
+                              ),
+                          ],
                         ),
-                      );
-                    }),
+                      ),
+                  ],
+                ),
               ),
+              if (profile == null)
+                SliverFillRemaining(
+                  child: Center(
+                    child: defaultTargetPlatform != TargetPlatform.android
+                        ? const CupertinoActivityIndicator(
+                      radius: 10,
+                    )
+                        : SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: context.colors.iconsDisabled!,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  ),
+                ),
+              if (profile != null)
+                SliverAppBar(
+                  backgroundColor: context.colors.backgroundsPrimary,
+                  elevation: 0,
+                  expandedHeight: 48,
+                  collapsedHeight: 48,
+                  toolbarHeight: 48,
+                  pinned: true,
+                  leading: const SizedBox(),
+                  flexibleSpace:
+                      tabController == null || tabController?.animation == null
+                          ? const SizedBox()
+                          : ProfileTabBar(
+                              animation: tabController!.animation!,
+                              tabController: tabController,
+                              profile: profile,
+                              myself: myself,
+                            ),
+                ),
+              if (profile != null)
+                SliverToBoxAdapter(
+                  child: AnimatedBuilder(
+                      animation: animationController,
+                      builder: (context, child) {
+                        return Opacity(
+                          opacity: animationController.value,
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(
+                              16.0,
+                              16.0 * animationController.value,
+                              16.0,
+                              0.0,
+                            ),
+                            child: SizedBox(
+                              height: animationController.value * 34 + 2,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: AppTextField(
+                                      controller: searchController,
+                                      searchField: true,
+                                      hint: 'Search',
+                                      removableWhenNotEmpty: true,
+                                      crossPadding: const EdgeInsets.all(8.0),
+                                      crossButton: SvgPicture.asset(
+                                        'assets/icons/search_cross.svg',
+                                      ),
+                                      style:
+                                          context.textStyles.callout!.copyWith(
+                                        fontSize: context.textStyles.callout!
+                                                        .fontSize! *
+                                                    animationController.value <
+                                                1
+                                            ? 1
+                                            : context.textStyles.callout!
+                                                    .fontSize! *
+                                                animationController.value,
+                                      ),
+                                      focus: focusNode,
+                                      onRemoved: () {
+                                        searchController.clear();
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
+                                  CupertinoButton(
+                                    padding: EdgeInsets.zero,
+                                    child: Text(
+                                      'Cancel',
+                                      style: context.textStyles.bodyRegular!
+                                          .copyWith(
+                                        color: context.colors.textsAction,
+                                        fontSize: context
+                                                        .textStyles
+                                                        .bodyRegular!
+                                                        .fontSize! *
+                                                    animationController.value <
+                                                1
+                                            ? 1
+                                            : context.textStyles.bodyRegular!
+                                                    .fontSize! *
+                                                animationController.value,
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      animationController.animateTo(0);
+                                      focusNode.unfocus();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                ),
             ];
           },
           body: tabController == null
@@ -589,7 +601,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
               : ProfileTabs(
                   controller: tabController!,
                   //TODO
-                  name: widget.user?.name,
+                  name: profile?.name,
                 ),
         ),
       ),
@@ -1005,7 +1017,22 @@ class OtherProfileDialog extends ConsumerWidget {
                         color: context.colors.fieldsDefault,
                       ),
                       InkWell(
-                        onTap: () {},
+                        onTap: () async {
+                          if (user != null) {
+                            await ref.read(profileControllerApiProvider).follow(
+                                  user!.id,
+                                  user!.followed,
+                                );
+                          } else {
+                            await ref.read(profileControllerApiProvider).follow(
+                                  user1!.id,
+                                  user1!.followed,
+                                );
+                          }
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                          }
+                        },
                         child: SizedBox(
                           height: 52,
                           width: double.infinity,
@@ -1013,7 +1040,9 @@ class OtherProfileDialog extends ConsumerWidget {
                             children: [
                               const SizedBox(width: 16),
                               Text(
-                                'Unfollow',
+                                (user?.followed ?? user1!.followed)
+                                    ? 'Unfollow'
+                                    : 'Follow',
                                 style: context.textStyles.bodyRegular,
                               ),
                               const Spacer(),
@@ -1109,8 +1138,9 @@ class MyProfileDialog extends ConsumerWidget {
                               child: InkWell(
                                 onTap: () {
                                   Navigator.pop(context);
-                                  AutoRouter.of(context)
-                                      .push(const SettingsRoute());
+                                  AutoRouter.of(context).push(
+                                    const SettingsRoute(),
+                                  );
                                 },
                                 child: Center(
                                   child: Text(

@@ -15,6 +15,7 @@ import 'package:poster_stock/features/home/state_holders/home_page_posts_state_h
 import 'package:poster_stock/features/home/view/helpers/page_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
+import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
@@ -63,7 +64,7 @@ class PostBase extends ConsumerWidget {
           if (multPost != null) {
             AutoRouter.of(context).push(
               ListRoute(
-                post: multPost!,
+                post: multPost,
               ),
             );
           }
@@ -121,8 +122,8 @@ class PostBase extends ConsumerWidget {
   }
 }
 
-class UserInfoTile extends StatelessWidget {
-  UserInfoTile({
+class UserInfoTile extends ConsumerWidget {
+  const UserInfoTile({
     Key? key,
     this.loading = false,
     this.user,
@@ -142,7 +143,7 @@ class UserInfoTile extends StatelessWidget {
   final HitTestBehavior? behavior;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     //TODO move avatar generation from view layer
     return ShimmerLoader(
       loaded: !loading,
@@ -151,13 +152,13 @@ class UserInfoTile extends StatelessWidget {
         onTap: () {
           if (user == null) return;
           AutoRouter.of(context).push(ProfileRoute(
-            user: user!,
+            userId: user?.id,
           ));
         },
         child: Container(
           color: Colors.transparent,
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 4.0),
@@ -185,18 +186,15 @@ class UserInfoTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
-                      height: 42,
+                      height: 40,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(
-                            height: 3,
-                          ),
                           SizedBox(
                             width:(showFollowButton) && (!(user?.followed ?? true)) ? MediaQuery
                                 .of(context)
                                 .size
-                                .width - 68 - 179 + 42 : null,
+                                .width - 70 - 179 + 42 : null,
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
@@ -258,10 +256,15 @@ class UserInfoTile extends StatelessWidget {
               ),
               if (!(user?.followed ?? true) && (!loading) && showFollowButton)
                 SizedBox(
-                  width: 81,
+                  width: 83,
                   child: AppTextButton(
                     text: AppLocalizations.of(context)!.follow,
-                    onTap: () {},
+                    onTap: () async {
+                      await ref.read(profileControllerApiProvider).follow(
+                        user!.id,
+                        user!.followed,
+                      );
+                    },
                   ),
                 ),
               if (!loading && showSettings)

@@ -64,6 +64,12 @@ class _AuthButtonState extends State<AuthButton>
   }
 
   @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (widget.loading) {
       controller.repeat(

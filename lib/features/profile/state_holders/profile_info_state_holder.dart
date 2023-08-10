@@ -14,6 +14,10 @@ class ProfileInfoStateHolder extends StateNotifier<UserDetailsModel?> {
     state = user;
   }
 
+  void setFollow(bool value) {
+    state = state?.copyWith(followed: value);
+  }
+
   void clearState() {
     state = null;
   }

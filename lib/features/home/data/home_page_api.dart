@@ -9,7 +9,7 @@ import 'package:supertokens_flutter/dio.dart';
 class HomePageApi implements IHomePageApi {
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: 'https://posterstock.co/',
+      baseUrl: 'https://api.posterstock.co/',
       connectTimeout: 10000,
       receiveTimeout: 10000,
     ),
@@ -42,6 +42,7 @@ class HomePageApi implements IHomePageApi {
       return (response.data as Map<String, dynamic>?, loadedAll);
     } on DioError catch (e) {
       print(e.response);
+      print(e.response?.headers);
       rethrow;
     }
   }

@@ -87,9 +87,11 @@ class MovieCardState extends ConsumerState<MovieCard>
               if (pageController?.page == null) {
                 return;
               }
-              likeCommentController.animateTo((pageController?.page?.toInt() ??
-                      0) +
-                  (((pageController!.page ?? 0) * 100).toInt() % 100) / 100);
+              Future(() {
+                likeCommentController.animateTo((pageController?.page?.toInt() ??
+                    0) +
+                    (((pageController!.page ?? 0) * 100).toInt() % 100) / 100);
+              });
             });
 
           return Stack(
@@ -280,7 +282,7 @@ class _MovieCardPageViewContent extends ConsumerWidget {
                     movie!.imagePath,
                     fit: BoxFit.cover,
                     errorBuilder: (context, obj, trace) {
-                      return Image.asset('assets/images/could_not_load.jpg');
+                      return SizedBox();
                     },
                   )
                 : const SizedBox(),

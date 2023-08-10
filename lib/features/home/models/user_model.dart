@@ -42,4 +42,25 @@ class UserModel {
   String toString() {
     return '$name $username $followed';
   }
+
+  UserModel copyWith({
+    int? id,
+    String? name,
+    String? username,
+    String? imagePath,
+    bool? followed,
+    String? description,
+    Color? color,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      username: username ?? this.username,
+      imagePath: imagePath ?? this.imagePath,
+      followed: followed ?? this.followed,
+      description: description ?? this.description,
+      color: color ?? this.color,
+    );
+  }
+
 }

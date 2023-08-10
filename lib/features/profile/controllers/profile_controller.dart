@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/state_holders/auth_token_state_holder.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
+import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
 import 'package:poster_stock/features/profile/repository/i_profile_repository.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_lists_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_posts_state_holder.dart';
@@ -14,7 +15,10 @@ final profileControllerApiProvider = Provider<ProfileControllerApi>(
     profileInfoStateHolder: ref.watch(profileInfoStateHolderProvider.notifier),
     profilePostsStateHolder:
         ref.watch(profilePostsStateHolderProvider.notifier),
-    profileListsStateHolder: ref.watch(profileListsStateHolderProvider.notifier),
+    profileListsStateHolder:
+        ref.watch(profileListsStateHolderProvider.notifier),
+    homePagePostsStateHolder:
+        ref.watch(homePagePostsStateHolderProvider.notifier),
     token: ref.watch(authTokenStateHolderProvider)!,
   ),
 );
@@ -24,6 +28,7 @@ class ProfileControllerApi {
   final ProfileInfoStateHolder profileInfoStateHolder;
   final ProfilePostsStateHolder profilePostsStateHolder;
   final ProfileListsStateHolder profileListsStateHolder;
+  final HomePagePostsStateHolder homePagePostsStateHolder;
   final String? token;
   bool gettingUser = false;
 
@@ -31,6 +36,7 @@ class ProfileControllerApi {
     required this.profileInfoStateHolder,
     required this.profilePostsStateHolder,
     required this.profileListsStateHolder,
+    required this.homePagePostsStateHolder,
     required this.token,
   });
 
@@ -43,26 +49,33 @@ class ProfileControllerApi {
     profilePostsStateHolder.clearState();
   }
 
+  Future<void> follow(int id, bool follow) async {
+    profileInfoStateHolder.setFollow(!follow);
+    homePagePostsStateHolder.setFollow(id, !follow);
+    await repo.follow(token!, id, !follow);
+  }
+
   Future<void> getUserInfo(int? id) async {
     if (gettingUser) return;
     try {
       gettingUser = true;
       final user = await repo.getProfileInfo(token!, id);
       profileInfoStateHolder.updateState(user);
-      var posts = await repo.getProfilePosts(token!, id);
-      var lists = await repo.getProfileLists(token!, id);
+      var posts = await repo.getProfilePosts(token!, user.id);
+      var lists = await repo.getProfileLists(token!, user.id);
       lists = lists
           ?.map(
             (e) => e = e.copyWith(
-          author: UserModel(
-            id: user.id,
-            name: user.name,
-            username: user.username,
-            imagePath: user.imagePath,
-            followed: user.followed,
-          ),
-        ),
-      ).toList();
+              author: UserModel(
+                id: user.id,
+                name: user.name,
+                username: user.username,
+                imagePath: user.imagePath,
+                followed: user.followed,
+              ),
+            ),
+          )
+          .toList();
       posts = posts
           ?.map(
             (e) => e = e.copyWith(
@@ -76,13 +89,13 @@ class ProfileControllerApi {
             ),
           )
           .toList();
-      profilePostsStateHolder
-          .updateState(posts);
+      profilePostsStateHolder.updateState(posts);
       profileListsStateHolder.updateState(lists);
       //print(profilePostsStateHolder.state);
       gettingUser = false;
     } catch (e) {
       gettingUser = false;
     }
+    gettingUser = false;
   }
 }

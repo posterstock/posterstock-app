@@ -260,7 +260,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                             const NavigationRoute(),
                             predicate: (route) {
                               return false;
-                            }
+                            },
                           );
                         }
                       },

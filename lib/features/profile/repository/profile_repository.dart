@@ -17,6 +17,11 @@ class ProfileRepository implements IProfileRepository {
   }
 
   @override
+  Future<void> follow(String token, int? id, bool follow) async {
+    await profileService.follow(token, id, follow);
+  }
+
+  @override
   Future<List<PostMovieModel>> getProfilePosts(String token, int? id) async {
     try {
       final result = (await profileService.getUserPosts(token, id));

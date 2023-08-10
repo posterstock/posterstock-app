@@ -119,7 +119,7 @@ class SearchTabViewState extends State<SearchTabView>
   @override
   Widget build(BuildContext context) {
     final users = List.generate(
-      20,
+      0,
       (index) => UserModel(
         id: 12,
         name: 'Name $index',
@@ -130,7 +130,7 @@ class SearchTabViewState extends State<SearchTabView>
       ),
     );
     final posters = List.generate(
-      20,
+      0,
       (index) => PostMovieModel(
           timeDate: DateTime.now(),
           liked: false,
@@ -196,7 +196,8 @@ class SearchTabViewState extends State<SearchTabView>
                   ),
                   itemCount: users.length,
                   itemBuilder: (context, index) {
-                    return SearchUserTile(user: users[index]);
+                    return SizedBox();
+                    //return SearchUserTile(user: users[index]);
                   },
                   separatorBuilder: (BuildContext context, int index) {
                     return Padding(

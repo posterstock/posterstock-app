@@ -1,9 +1,11 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
+import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -92,7 +94,19 @@ class LoginPage extends ConsumerWidget {
                     textStyle: context.textStyles.calloutBold!.copyWith(
                       color: context.colors.textsAction!,
                     ),
-                    onTap: () {},
+                    onTap: () async {
+                      bool success = await ref
+                          .read(signUpControllerProvider)
+                          .processSignIn();
+                      if (success && context.mounted) {
+                        AutoRouter.of(context).pushAndPopUntil(
+                          const NavigationRoute(),
+                          predicate: (route) {
+                            return false;
+                          },
+                        );
+                      }
+                    },
                   ),
                   const Spacer(),
                   RichText(

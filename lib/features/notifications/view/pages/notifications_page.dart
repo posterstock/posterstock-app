@@ -166,14 +166,7 @@ class NotificationTile extends StatelessWidget {
                 onTap: () {
                   AutoRouter.of(context).push(
                     ProfileRoute(
-                      user: UserModel(
-                        id: 1,
-                        name: notification.user.name,
-                        username: notification.user.username,
-                        followed: notification.user.followed,
-                        imagePath: notification.user.imagePath,
-                        description: notification.user.description,
-                      ),
+                      userId: 1,
                     ),
                   );
                 },

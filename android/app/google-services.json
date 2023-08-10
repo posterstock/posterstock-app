@@ -29,6 +29,13 @@
             {
               "client_id": "405674784124-d5duv0tpgj9q88sd08bu1md6plu0hj6b.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.thedirection.posterstock"
+              }
             }
           ]
         }

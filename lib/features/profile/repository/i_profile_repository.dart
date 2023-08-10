@@ -9,4 +9,6 @@ abstract class IProfileRepository {
   Future<List<PostMovieModel>?> getProfilePosts(String token, int? id);
 
   Future<List<MultiplePostModel>?> getProfileLists(String token, int? id);
+
+  Future<void> follow(String token, int? id, bool follow);
 }

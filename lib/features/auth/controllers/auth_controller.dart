@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/common/state_holders/auth_token_state_holder.dart';
 import 'package:poster_stock/common/state_holders/intl_state_holder.dart';
 import 'package:poster_stock/features/auth/repository/auth_repository.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_error_state_holder.dart';
@@ -7,6 +8,7 @@ import 'package:poster_stock/features/auth/state_holders/device_id_state_holder.
 import 'package:poster_stock/features/auth/state_holders/email_state_holder.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poster_stock/features/auth/state_holders/session_id_state_holder.dart';
+import 'package:supertokens_flutter/supertokens.dart';
 
 final authControllerProvider = Provider(
   (ref) => AuthController(
@@ -16,6 +18,7 @@ final authControllerProvider = Provider(
     sessionIdState: ref.watch(sessionIdStateHolderProvider.notifier),
     deviceIdState: ref.watch(deviceIdStateHolderProvider.notifier),
     localizations: ref.watch(localizations),
+    authTokenState: ref.watch(authTokenStateHolderProvider.notifier),
   ),
 );
 
@@ -27,6 +30,7 @@ class AuthController {
   final DeviceIdStateHolder deviceIdState;
   final AppLocalizations? localizations;
   final AuthRepository repository = AuthRepository();
+  final AuthTokenStateHolder authTokenState;
 
   AuthController({
     required this.loadingState,
@@ -35,6 +39,7 @@ class AuthController {
     required this.sessionIdState,
     required this.deviceIdState,
     required this.localizations,
+    required this.authTokenState,
   });
 
   void loadEmail() {
@@ -61,10 +66,56 @@ class AuthController {
     errorState.clearState();
   }
 
-  Future<void> setEmail(String email) async {
+  Future<bool> _getRegistered(String email) async {
+    return repository.getRegistered(email);
+  }
+
+  Future<bool> setEmail(String email) async {
     emailState.updateState(email);
-    final response = await repository.sendEmail(email);
+    bool registered = await _getRegistered(email);
+    final response = await repository.signUpSendEmail(email);
     deviceIdState.updateState(response.$1);
     sessionIdState.updateState(response.$2);
+    return registered;
+  }
+
+  Future<bool> authApple({
+    String? name,
+    String? surname,
+    String? email,
+    String? code,
+    String? state,
+    String? clientId,
+  }) async {
+    await repository.authApple(
+      name: name,
+      surname: surname,
+      email: email,
+      code: code,
+      clientId: clientId,
+      state: state,
+    );
+    if (!(await SuperTokens.doesSessionExist())) return false;
+    authTokenState.updateState(
+      await SuperTokens.getAccessToken(),
+    );
+    return true;
+  }
+
+  Future<bool> authGoogle({
+    String? accessToken,
+    String? idToken,
+    String? code,
+  }) async {
+    await repository.authGoogle(
+      accessToken: accessToken,
+      idToken: idToken,
+      code: code,
+    );
+    if (!(await SuperTokens.doesSessionExist())) return false;
+    authTokenState.updateState(
+      await SuperTokens.getAccessToken(),
+    );
+    return true;
   }
 }

@@ -8,6 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:poster_stock/common/state_holders/auth_token_state_holder.dart';
 import 'package:poster_stock/features/auth/controllers/auth_controller.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_error_state_holder.dart';
@@ -18,6 +19,7 @@ import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_ho
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:supertokens_flutter/supertokens.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../../common/state_holders/intl_state_holder.dart';
@@ -43,6 +45,17 @@ class AuthPage extends ConsumerWidget {
     final loadingState = ref.watch(authLoadingStateHolderProvider);
     final errorState = ref.watch(authErrorStateHolderProvider);
     final theme = ref.watch(themeStateHolderProvider);
+    final token = ref.watch(authTokenStateHolderProvider);
+    if (token != null && AutoRouter.of(context).stack.last is AuthRoute) {
+      Future(() {
+        AutoRouter.of(context).pushAndPopUntil(
+          const NavigationRoute(),
+          predicate: (route) {
+            return false;
+          },
+        );
+      });
+    }
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -133,7 +146,6 @@ class AuthPage extends ConsumerWidget {
                             .watch(authLoadingStateHolderProvider)
                             .loadingEmail,
                         onTap: () {
-                          ref.read(authControllerProvider).loadEmail();
                           checkEmail(ref, textEditingController.text, context);
                         },
                         child: Text(
@@ -148,28 +160,29 @@ class AuthPage extends ConsumerWidget {
                           style: context.textStyles.callout,
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      AuthButton(
-                        onTap: () {
-                          loadApple(ref, context);
-                        },
-                        loading: loadingState.loadingApple,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.apple,
-                              color: context.colors.iconsDefault!,
-                              size: 24,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              AppLocalizations.of(context)!.contWithApple,
-                              style: context.textStyles.calloutBold,
-                            ),
-                          ],
+                      if (!Platform.isAndroid) const SizedBox(height: 20),
+                      if (!Platform.isAndroid)
+                        AuthButton(
+                          onTap: () {
+                            loadApple(ref, context);
+                          },
+                          loading: loadingState.loadingApple,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.apple,
+                                color: context.colors.iconsDefault!,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                AppLocalizations.of(context)!.contWithApple,
+                                style: context.textStyles.calloutBold,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
                       const SizedBox(height: 20),
                       AuthButton(
                         onTap: () {
@@ -264,21 +277,28 @@ class AuthPage extends ConsumerWidget {
     });*/
     try {
       final credential = await SignInWithApple.getAppleIDCredential(
-        webAuthenticationOptions: Platform.isIOS
-            ? null
-            : WebAuthenticationOptions(
-                clientId: 'com.thedirection.posterstock.singin',
-                redirectUri:
-                    Uri.parse('https://posterstock.co/auth/callback/apple'),
-              ),
         scopes: [
           AppleIDAuthorizationScopes.email,
           AppleIDAuthorizationScopes.fullName,
         ],
-      ).then((value) {
-        ref.read(authControllerProvider).stopLoading();
-      });
-      print(credential.email?.split('@'));
+      );
+      bool success = await ref.read(authControllerProvider).authApple(
+            email: credential.email,
+            name: credential.givenName,
+            surname: credential.familyName,
+            code: credential.authorizationCode,
+            state: credential.state,
+            clientId: credential.identityToken,
+          );
+      if (success && context.mounted) {
+        AutoRouter.of(context).pushAndPopUntil(
+          const NavigationRoute(),
+          predicate: (route) {
+            return false;
+          },
+        );
+      }
+      ref.read(authControllerProvider).stopLoading();
     } catch (e) {
       print(e);
       ref.read(authControllerProvider).stopLoading();
@@ -287,24 +307,38 @@ class AuthPage extends ConsumerWidget {
 
   void loadGoogle(WidgetRef ref, BuildContext context) async {
     ref.read(authControllerProvider).loadGoogle();
-    GoogleSignIn googleSignIn = GoogleSignIn(
-      scopes: [
-        'email',
-      ],
-    );
     try {
-      var response = await googleSignIn.signIn();
-      if (context.mounted) {
-        ref.read(signUpControllerProvider)
-          ..setName(response!.displayName!)
-          ..setUsername(response.email.split('@')[0])
-          ..removeCode();
-        ref.read(authControllerProvider).setEmail(response.email);
-        AutoRouter.of(context).push(const SignUpRoute());
+      final googleSignIn = GoogleSignIn(
+        clientId:
+            '405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com',
+        serverClientId:
+            '405674784124-k6n0rjpfh2n5vc9m682tmj1i7af1h3hl.apps.googleusercontent.com',
+        scopes: [
+          'openid',
+          'https://www.googleapis.com/auth/userinfo.profile',
+          'https://www.googleapis.com/auth/userinfo.email',
+        ],
+      );
+      var result = await googleSignIn.signIn();
+      var tokens = await result?.authentication;
+      print(tokens?.accessToken);
+      bool success = await ref.read(authControllerProvider).authGoogle(
+            accessToken: tokens?.accessToken,
+            idToken: tokens?.idToken,
+            code: result?.serverAuthCode,
+            //code: tokens.,
+          );
+      if (success && context.mounted) {
+        AutoRouter.of(context).pushAndPopUntil(
+          const NavigationRoute(),
+          predicate: (route) {
+            return false;
+          },
+        );
       }
+    } catch (e) {
+      print(e);
       ref.read(authControllerProvider).stopLoading();
-    } catch (error) {
-      print(error);
     }
     ref.read(authControllerProvider).stopLoading();
   }
@@ -313,21 +347,33 @@ class AuthPage extends ConsumerWidget {
     RegExp regExp = RegExp(
       r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$',
     );
+    ref.read(authControllerProvider).loadEmail();
     if (!regExp.hasMatch(value)) {
       ref.read(authControllerProvider).setError();
       ref.read(authControllerProvider).stopLoading();
     } else {
       ref.read(authControllerProvider).removeError();
 
-      ref.read(authControllerProvider).setEmail(value).then((value) {
-        AutoRouter.of(context).pushNamed('sign_up').then((value) {
-          ref.read(authControllerProvider).stopLoading();
-          ref.read(signUpControllerProvider)
-            ..setName('')
-            ..setUsername('')
-            ..removeCode()
-            ..removeUsernameError();
-        });
+      ref.read(authControllerProvider).setEmail(value).then((exists) {
+        if (!exists) {
+          AutoRouter.of(context).pushNamed('sign_up').then((value) {
+            ref.read(authControllerProvider).stopLoading();
+            ref.read(signUpControllerProvider)
+              ..setName('')
+              ..setUsername('')
+              ..removeCode()
+              ..removeUsernameError();
+          });
+        } else {
+          AutoRouter.of(context).push(const LoginRoute()).then((value) {
+            ref.read(authControllerProvider).stopLoading();
+            ref.read(signUpControllerProvider)
+              ..setName('')
+              ..setUsername('')
+              ..removeCode()
+              ..removeUsernameError();
+          });
+        }
       });
     }
   }

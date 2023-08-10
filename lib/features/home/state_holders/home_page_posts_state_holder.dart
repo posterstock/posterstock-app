@@ -22,12 +22,19 @@ class HomePagePostsStateHolder
     for (int i = 0; i < (posts?.length ?? 0); i++) {
       for (int j = 0; j < (posts?.length ?? 0); j++) {
         if (i == j) continue;
-        if (posts![i][0].author.id == posts[j][0].author.id && posts[i][0].timeDate.difference(posts[j][0].timeDate).inDays < 1) {
+        if (posts![i][0].author.id == posts[j][0].author.id &&
+            posts[i][0].timeDate.difference(posts[j][0].timeDate).inDays < 1) {
           posts[i].add(posts[j][0]);
           posts.removeAt(j);
-          j--;
+          j = 0;
+          i = 0;
         }
       }
+    }
+    for (int i = 0; i < (posts?.length ?? 0); i++) {
+      posts?[i].sort((first, second) {
+        return first.timeDate.isAfter(second.timeDate) ? 1 : -1;
+      });
     }
     if (state == null) {
       state = posts;
@@ -35,13 +42,16 @@ class HomePagePostsStateHolder
       if (state != null && posts != null) {
         for (var statePost in posts) {
           for (var st in statePost) {
-            state!.map((e) => e.removeWhere((element) => element.id == st.id)).toList();
+            state!
+                .map((e) => e.removeWhere((element) => element.id == st.id))
+                .toList();
           }
         }
       }
       state = [...?posts, ...state!];
-      await homePageLikesStateHolder
-          .setState(state?.map((e) => e.map((e) => (e.liked, e.likes)).toList()).toList());
+      await homePageLikesStateHolder.setState(state
+          ?.map((e) => e.map((e) => (e.liked, e.likes)).toList())
+          .toList());
     }
   }
 
@@ -51,8 +61,24 @@ class HomePagePostsStateHolder
         likes: state?[index][index2].liked == false
             ? (state?[index][index2].likes ?? 0) + 1
             : (state?[index][index2].likes ?? 0) - 1))!;
-    await homePageLikesStateHolder
-        .setState(state?.map((e) => e.map((e) => (e.liked, e.likes)).toList()).toList());
+    await homePageLikesStateHolder.setState(
+        state?.map((e) => e.map((e) => (e.liked, e.likes)).toList()).toList());
+  }
+
+  Future<void> setFollow(int id, bool follow) async {
+    for (int i = 0; i < (state?.length ?? 0); i++) {
+      for (int j = 0; j < (state?[i].length ?? 0); j++) {
+        if (state![i][j].author.id == id) {
+          if (!follow) {
+            state?.removeAt(i);
+            homePageLikesStateHolder.setState(
+              homePageLikesStateHolder.state?..removeAt(i),
+            );
+          }
+        }
+      }
+    }
+    state = [...?state];
   }
 
   Future<void> addComment(int id) async {
@@ -60,7 +86,8 @@ class HomePagePostsStateHolder
     for (int i = 0; i < state!.length; i++) {
       for (int j = 0; j < state![i].length; j++) {
         if (state![i][j].id == id) {
-          state![i][j] = state![i][j].copyWith(comments: state![i][j].comments+1);
+          state![i][j] =
+              state![i][j].copyWith(comments: state![i][j].comments + 1);
         }
       }
     }
@@ -71,19 +98,26 @@ class HomePagePostsStateHolder
     for (int i = 0; i < (posts?.length ?? 0); i++) {
       for (int j = 0; j < (posts?.length ?? 0); j++) {
         if (i == j) continue;
-        if (posts![i][0].author.id == posts[j][0].author.id && posts[i][0].timeDate.difference(posts[j][0].timeDate).inDays < 1) {
+        if (posts![i][0].author.id == posts[j][0].author.id &&
+            posts[i][0].timeDate.difference(posts[j][0].timeDate).inDays < 1) {
           posts[i].add(posts[j][0]);
           posts.removeAt(j);
-          j--;
+          j = 0;
+          i = 0;
         }
       }
+    }
+    for (int i = 0; i < (posts?.length ?? 0); i++) {
+      posts?[i].sort((first, second) {
+        return first.timeDate.isAfter(second.timeDate) ? 1 : -1;
+      });
     }
     if (state == null) {
       state = posts;
     } else {
       state = [...state!, ...?posts];
     }
-    await homePageLikesStateHolder
-        .setState(state?.map((e) => e.map((e) => (e.liked, e.likes)).toList()).toList());
+    await homePageLikesStateHolder.setState(
+        state?.map((e) => e.map((e) => (e.liked, e.likes)).toList()).toList());
   }
 }
