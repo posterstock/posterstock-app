@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
@@ -11,6 +12,8 @@ import 'package:poster_stock/features/theme_switcher/state_holder/theme_value_st
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/app_themes.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supertokens_flutter/supertokens.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -159,8 +162,9 @@ class SettingsPage extends ConsumerWidget {
                           },
                           child: Container(
                             color: Colors.transparent,
-                            child: const AreYouSureDialog(
+                            child: AreYouSureDialog(
                               actionText: 'Disconnect Google account',
+                              onTap: () {},
                             ),
                           ),
                         ),
@@ -276,15 +280,18 @@ class SettingsPage extends ConsumerWidget {
                     height: 24,
                   ),
                   MultipleSettingsButton(
-                    onTaps: [() {
-                      launchUrlString(
-                        "https://thedirection.org/posterstock_terms",
-                      );
-                    }, () {
-                      launchUrlString(
-                        "https://thedirection.org/posterstock_privacy",
-                      );
-                    }],
+                    onTaps: [
+                      () {
+                        launchUrlString(
+                          "https://thedirection.org/posterstock_terms",
+                        );
+                      },
+                      () {
+                        launchUrlString(
+                          "https://thedirection.org/posterstock_privacy",
+                        );
+                      }
+                    ],
                     children: [
                       Row(
                         children: [
@@ -327,15 +334,30 @@ class SettingsPage extends ConsumerWidget {
                     onTap: () {
                       showModalBottomSheet(
                         context: context,
-                        builder: (context) => GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            color: Colors.transparent,
-                            child: const AreYouSureDialog(
-                              actionText: 'Logout',
-                            ),
+                        builder: (context) => Container(
+                          color: Colors.transparent,
+                          child: AreYouSureDialog(
+                            actionText: 'Logout',
+                            onTap: () async {
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              await SuperTokens.signOut();
+                              print(await SuperTokens.getAccessToken());
+                              TokenKeeper.token = null;
+                              prefs.remove('token');
+                              if (context.mounted) {
+                                AutoRouter.of(context)
+                                    .pushAndPopUntil(
+                                  AuthRoute(),
+                                  predicate: (value) => false,
+                                )
+                                    .then(
+                                  (value) {
+                                    Navigator.pop(context);
+                                  },
+                                );
+                              }
+                            },
                           ),
                         ),
                         backgroundColor: Colors.transparent,
@@ -396,9 +418,13 @@ class SettingsPage extends ConsumerWidget {
 
   void changeTheme(WidgetRef ref, Themes theme) {
     if (theme == Themes.dark) {
-      ref.read(themeControllerProvider).updateTheme(AppThemes.darkThemeData, theme);
+      ref
+          .read(themeControllerProvider)
+          .updateTheme(AppThemes.darkThemeData, theme);
     } else if (theme == Themes.light) {
-      ref.read(themeControllerProvider).updateTheme(AppThemes.lightThemeData, theme);
+      ref
+          .read(themeControllerProvider)
+          .updateTheme(AppThemes.lightThemeData, theme);
     } else {
       var systemBrightness =
           SchedulerBinding.instance.window.platformBrightness;
@@ -581,9 +607,11 @@ class AreYouSureDialog extends ConsumerWidget {
   const AreYouSureDialog({
     Key? key,
     required this.actionText,
+    required this.onTap,
   }) : super(key: key);
 
   final String actionText;
+  final void Function() onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -621,9 +649,7 @@ class AreYouSureDialog extends ConsumerWidget {
                         ),
                         Expanded(
                           child: InkWell(
-                            onTap: () {
-                              print(1);
-                            },
+                            onTap: onTap,
                             child: Center(
                               child: Text(
                                 actionText,

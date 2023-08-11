@@ -1,6 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:poster_stock/common/state_holders/auth_token_state_holder.dart';
-import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
 import 'package:poster_stock/features/profile/repository/i_profile_repository.dart';
@@ -19,7 +17,6 @@ final profileControllerApiProvider = Provider<ProfileControllerApi>(
         ref.watch(profileListsStateHolderProvider.notifier),
     homePagePostsStateHolder:
         ref.watch(homePagePostsStateHolderProvider.notifier),
-    token: ref.watch(authTokenStateHolderProvider)!,
   ),
 );
 
@@ -29,7 +26,6 @@ class ProfileControllerApi {
   final ProfilePostsStateHolder profilePostsStateHolder;
   final ProfileListsStateHolder profileListsStateHolder;
   final HomePagePostsStateHolder homePagePostsStateHolder;
-  final String? token;
   bool gettingUser = false;
 
   ProfileControllerApi({
@@ -37,7 +33,6 @@ class ProfileControllerApi {
     required this.profilePostsStateHolder,
     required this.profileListsStateHolder,
     required this.homePagePostsStateHolder,
-    required this.token,
   });
 
   Future<void> getUserPosts() async {}
@@ -52,17 +47,17 @@ class ProfileControllerApi {
   Future<void> follow(int id, bool follow) async {
     profileInfoStateHolder.setFollow(!follow);
     homePagePostsStateHolder.setFollow(id, !follow);
-    await repo.follow(token!, id, !follow);
+    await repo.follow(id, !follow);
   }
 
   Future<void> getUserInfo(int? id) async {
     if (gettingUser) return;
     try {
       gettingUser = true;
-      final user = await repo.getProfileInfo(token!, id);
+      final user = await repo.getProfileInfo(id);
       profileInfoStateHolder.updateState(user);
-      var posts = await repo.getProfilePosts(token!, user.id);
-      var lists = await repo.getProfileLists(token!, user.id);
+      var posts = await repo.getProfilePosts(user.id);
+      var lists = await repo.getProfileLists(user.id);
       lists = lists
           ?.map(
             (e) => e = e.copyWith(

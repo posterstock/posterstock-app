@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:flutter/material.dart';
 import 'package:poster_stock/features/home/models/comment_model.dart';
 import 'package:poster_stock/features/home/models/post_base_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
@@ -31,6 +34,11 @@ class PostMovieModel extends PostBaseModel {
         );
 
   factory PostMovieModel.fromJson(Map<String, Object?> json) {
+    const List<Color> avatar = [
+      Color(0xfff09a90),
+      Color(0xfff3d376),
+      Color(0xff92bdf4),
+    ];
     return PostMovieModel(
       id: json['id'] as int,
       liked: json['has_liked'] as bool? ?? false,
@@ -45,8 +53,9 @@ class PostMovieModel extends PostBaseModel {
               id: json['user_id'] as int? ?? 0,
               name: json['name'] as String? ?? '',
               username: json['username'] as String? ?? '',
-              imagePath: json['profile_image'] as String? ?? '',
+              imagePath:(json['profile_image'] as String?) == "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp" ? null : json['profile_image'] as String?,
               followed: !(json['is_suggested'] as bool? ?? true),
+              color: avatar[Random().nextInt(3)],
             )
           : UserModel.fromJson(json['user'] as Map<String, dynamic>),
       timeDate: json['created_at'] == null

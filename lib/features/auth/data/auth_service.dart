@@ -114,28 +114,6 @@ class AuthService {
     }
   }
 
-  Future<int> getId(String token) async {
-    try {
-      final response = await _dio.post(
-        'api/profiles',
-        data: json.encode({}),
-        options: Options(
-          contentType: 'application/json',
-          headers: {
-            'Authorization': 'Bearer $token',
-            'accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-        ),
-      );
-      print(response.data);
-      return response.data['id'];
-    } on DioError catch (e) {
-      print(e.response);
-      rethrow;
-    }
-  }
-
   Future<(String, String)> signUpSendEmail(String email) async {
     try {
       final response = await _dio.post(

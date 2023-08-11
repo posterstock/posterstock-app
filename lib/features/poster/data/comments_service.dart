@@ -1,36 +1,21 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:supertokens_flutter/dio.dart';
-import 'package:supertokens_flutter/supertokens.dart';
-
+import 'package:poster_stock/common/data/dio_keeper.dart';
 class PostService {
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: 'https://api.posterstock.co/',
-      connectTimeout: 10000,
-      receiveTimeout: 10000,
-    ),
-  );
+  final Dio _dio = DioKeeper.getDio();
 
-  CommentsService() {
-    _dio.interceptors.add(SuperTokensInterceptorWrapper(client: _dio));
-  }
-
-  Future<Map<String, dynamic>> postComment(String token, int id, String text) async {
+  Future<Map<String, dynamic>> postComment(int id, String text) async {
     try {
-      final response = await _dio.post(
-        'api/posters/$id/comment/',
-        options: Options(
-          contentType: 'application/json',
-          headers: {
-            'Authorization': 'Bearer $token',
-            'accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-        ),
-        data: jsonEncode({'text' : text})
-      );
+      final response = await _dio.post('api/posters/$id/comment/',
+          options: Options(
+            contentType: 'application/json',
+            headers: {
+              'accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+          ),
+          data: jsonEncode({'text': text}));
       print(response.data);
       return response.data;
     } on DioError catch (e) {
@@ -39,14 +24,13 @@ class PostService {
     }
   }
 
-  Future<List> getComments(String token, int id) async {
+  Future<List> getComments(int id) async {
     try {
       final response = await _dio.get(
         'api/posters/$id/comments',
         options: Options(
           contentType: 'application/json',
           headers: {
-            'Authorization': 'Bearer $token',
             'accept': 'application/json',
             'Content-Type': 'application/json'
           },
@@ -60,14 +44,13 @@ class PostService {
     }
   }
 
-  Future<Map<String, dynamic>> getPost(String token, int id) async {
+  Future<Map<String, dynamic>> getPost(int id) async {
     try {
       final response = await _dio.get(
         'api/posters/$id/',
         options: Options(
           contentType: 'application/json',
           headers: {
-            'Authorization': 'Bearer $token',
             'accept': 'application/json',
             'Content-Type': 'application/json'
           },

@@ -1,28 +1,13 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
-import 'package:poster_stock/features/profile/data/i_profile_service.dart';
-import 'package:supertokens_flutter/dio.dart';
-import 'package:supertokens_flutter/supertokens.dart';
+import 'package:poster_stock/common/data/dio_keeper.dart';
 
-class ProfileService implements IProfileService {
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: 'https://api.posterstock.co/',
-      connectTimeout: 10000,
-      receiveTimeout: 10000,
-      maxRedirects: 5,
-    ),
-  );
+class ProfileService {
+  final Dio _dio = DioKeeper.getDio();
 
-  ProfileService() {
-    _dio.interceptors.add(SuperTokensInterceptorWrapper(client: _dio));
-  }
-
-  Future<List<Map<String, dynamic>>> getUserPosts(String token, int? id) async {
+  Future<List<Map<String, dynamic>>> getUserPosts(int? id) async {
     final response = await _dio.get(
       'api/posters/users/$id',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: Options(headers: {}),
     );
     final List<Map<String, dynamic>> result = [];
     for (var a in response.data) {
@@ -31,10 +16,10 @@ class ProfileService implements IProfileService {
     return result;
   }
 
-  Future<List<Map<String, dynamic>>> getUserLists(String token, int? id) async {
+  Future<List<Map<String, dynamic>>> getUserLists(int? id) async {
     final response = await _dio.get(
       'api/lists/users/$id',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: Options(headers: {}),
     );
     final List<Map<String, dynamic>> result = [];
     for (var a in response.data) {
@@ -44,7 +29,7 @@ class ProfileService implements IProfileService {
   }
 
   @override
-  Future<Map<String, dynamic>> getProfileInfo(String token, int? id) async {
+  Future<Map<String, dynamic>> getProfileInfo(int? id) async {
     try {
       if (id == null) {
         try {
@@ -52,21 +37,19 @@ class ProfileService implements IProfileService {
           final response = await _dio.get(
             'api/profiles/',
             options: Options(
-              headers: {
-                'Authorization': 'Bearer $token',
-              },
             ),
           );
           return response.data;
         } on DioError catch (e) {
           print(e.response);
+          print(e.response?.headers);
         } catch (e) {
           rethrow;
         }
       }
       final response = await _dio.get(
         'api/users/$id',
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
+        options: Options(headers: {}),
       );
       print(response);
       return response.data;
@@ -76,18 +59,13 @@ class ProfileService implements IProfileService {
     }
   }
 
-  Future<void> follow(String token, int? id, bool follow) async {
+  Future<void> follow(int? id, bool follow) async {
     try {
       if (follow) {
         print(1);
         try {
           final response = await _dio.post(
             '/api/users/$id/follow/',
-            options: Options(
-              headers: {
-                'Authorization': 'Bearer $token',
-              },
-            ),
           );
           print(12);
           print(response.statusCode);
@@ -101,11 +79,6 @@ class ProfileService implements IProfileService {
       print(2);
       final response = await _dio.post(
         '/api/users/$id/unfollow/',
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        ),
       );
       print(11);
       print(response.statusCode);

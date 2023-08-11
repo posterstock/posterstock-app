@@ -8,10 +8,6 @@ class AuthRepository {
     return await _service.signUpSendEmail(email);
   }
 
-  Future<int> getId(String token) async {
-    return await _service.getId(token);
-  }
-
   Future<bool> getRegistered(String email) async {
     return await _service.getRegistered(email);
   }

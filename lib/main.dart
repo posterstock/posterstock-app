@@ -11,8 +11,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:poster_stock/common/constants/languages.dart';
+import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/helpers/custom_scroll_behavior.dart';
-import 'package:poster_stock/common/state_holders/auth_token_state_holder.dart';
 import 'package:poster_stock/features/settings/controllers/app_language_controller.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
@@ -30,6 +30,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  final prefs = await SharedPreferences.getInstance();
+  TokenKeeper.token = prefs.getString('token') == '' ? null : prefs.getString('token');
   //TODO
   PackageInfo.setMockInitialValues(
     appName: 'Posterstock',

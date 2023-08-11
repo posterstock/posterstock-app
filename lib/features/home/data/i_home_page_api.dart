@@ -1,5 +1,5 @@
 abstract class IHomePageApi {
-  Future<(Map<String, dynamic>?, bool)?> getPosts(String token, {bool getNewPosts = false});
+  Future<(Map<String, dynamic>?, bool)?> getPosts({bool getNewPosts = false});
 
-  Future<void> setLike(String token, int id, bool like);
+  Future<void> setLike(int id, bool like);
 }

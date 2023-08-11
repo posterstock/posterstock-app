@@ -8,7 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:poster_stock/common/state_holders/auth_token_state_holder.dart';
+import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/features/auth/controllers/auth_controller.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_error_state_holder.dart';
@@ -45,8 +45,7 @@ class AuthPage extends ConsumerWidget {
     final loadingState = ref.watch(authLoadingStateHolderProvider);
     final errorState = ref.watch(authErrorStateHolderProvider);
     final theme = ref.watch(themeStateHolderProvider);
-    final token = ref.watch(authTokenStateHolderProvider);
-    if (token != null && AutoRouter.of(context).stack.last is AuthRoute) {
+    if (TokenKeeper.token != null) {
       Future(() {
         AutoRouter.of(context).pushAndPopUntil(
           const NavigationRoute(),
@@ -310,7 +309,7 @@ class AuthPage extends ConsumerWidget {
     try {
       final googleSignIn = GoogleSignIn(
         clientId:
-            '405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com',
+            Platform.isIOS ? '405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com' : '405674784124-buqlusrif3nur8sqk7li6u1ruq6votji.apps.googleusercontent.com',
         serverClientId:
             '405674784124-k6n0rjpfh2n5vc9m682tmj1i7af1h3hl.apps.googleusercontent.com',
         scopes: [

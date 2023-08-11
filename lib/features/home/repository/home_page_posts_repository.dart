@@ -9,9 +9,10 @@ class HomePagePostsRepository implements IHomePagePostsRepository {
   final IHomePageApi api = HomePageApi();
 
   @override
-  Future<(List<List<PostBaseModel>>?, bool)?> getPosts(String token, {bool getNesPosts = false}) async {
+  Future<(List<List<PostBaseModel>>?, bool)?> getPosts(
+      {bool getNesPosts = false}) async {
     try {
-      final apiResult = await api.getPosts(token, getNewPosts: getNesPosts);
+      final apiResult = await api.getPosts(getNewPosts: getNesPosts);
       if (apiResult == null) return null;
       List<List<PostBaseModel>> result = [];
       final list = apiResult.$1?['entries'];
@@ -20,8 +21,7 @@ class HomePagePostsRepository implements IHomePagePostsRepository {
           result.add([PostMovieModel.fromJson(element)]);
         } else if (element['type'] == 'list') {
           result.add([MultiplePostModel.fromJson(element)]);
-        } else {
-        }
+        } else {}
       }
       return (result, apiResult.$2);
     } catch (e) {
@@ -30,10 +30,10 @@ class HomePagePostsRepository implements IHomePagePostsRepository {
   }
 
   @override
-  Future<void> setLike(String token, int? id, bool like) async {
+  Future<void> setLike(int? id, bool like) async {
     if (id == null) return;
     try {
-      await api.setLike(token, id, like);
+      await api.setLike(id, like);
     } catch (e) {
       print(e);
     }

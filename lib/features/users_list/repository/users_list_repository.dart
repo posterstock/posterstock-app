@@ -5,12 +5,10 @@ class UsersListRepository {
   final UsersListService _api = UsersListService();
 
   Future<List<UserDetailsModel>?> getPosts({
-    required String token,
     required bool followers,
     required int id,
   }) async {
     return (await _api.getPosts(
-      token: token,
       followers: followers,
       id: id,
     ))

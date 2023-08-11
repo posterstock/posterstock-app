@@ -1,7 +1,6 @@
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/state_holders/auth_id_state_holder.dart';
-import 'package:poster_stock/common/state_holders/auth_token_state_holder.dart';
 import 'package:poster_stock/features/auth/repository/auth_repository.dart';
 import 'package:poster_stock/features/auth/state_holders/device_id_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/email_code_state_holder.dart';
@@ -23,7 +22,6 @@ final signUpControllerProvider = Provider<SignUpController>(
     nameState: ref.watch(nameStateHolderProvider.notifier),
     usernameState: ref.watch(usernameStateHolderProvider.notifier),
     codeState: ref.watch(emailCodeStateHolderProvider.notifier),
-    authTokenState: ref.watch(authTokenStateHolderProvider.notifier),
     authIdStateHolder: ref.watch(authIdStateHolderProvider.notifier),
     localizations: ref.watch(localizations),
     username: ref.watch(usernameStateHolderProvider),
@@ -41,7 +39,6 @@ class SignUpController {
   final NameStateHolder nameState;
   final UsernameStateHolder usernameState;
   final EmailCodeStateHolder codeState;
-  final AuthTokenStateHolder authTokenState;
   final AuthIdStateHolder authIdStateHolder;
   final AppLocalizations? localizations;
   final AuthRepository repository = AuthRepository();
@@ -58,7 +55,6 @@ class SignUpController {
     required this.nameState,
     required this.usernameState,
     required this.codeState,
-    required this.authTokenState,
     required this.authIdStateHolder,
     required this.localizations,
     required this.username,
@@ -111,13 +107,12 @@ class SignUpController {
 
   Future<bool> processSignIn() async {
     try {
-      final token = await repository.confirmCode(
+      await repository.confirmCode(
         code: code,
         sessionId: sessionId,
         deviceId: deviceId,
         email: email
       );
-      authTokenState.updateState(token);
       return true;
     } catch (e) {
       return false;
@@ -126,7 +121,7 @@ class SignUpController {
 
   Future<bool> processAuth() async {
     try {
-      final token = await repository.confirmCode(
+     await repository.confirmCode(
         code: code,
         sessionId: sessionId,
         deviceId: deviceId,
@@ -134,7 +129,6 @@ class SignUpController {
         login: username,
         email: email,
       );
-      authTokenState.updateState(token);
       //final int id = await repository.getId(token!);
       //await authIdStateHolder.updateState(id);
       return true;

@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:poster_stock/common/state_holders/auth_token_state_holder.dart';
 import 'package:poster_stock/common/state_holders/intl_state_holder.dart';
 import 'package:poster_stock/features/auth/repository/auth_repository.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_error_state_holder.dart';
@@ -18,7 +17,6 @@ final authControllerProvider = Provider(
     sessionIdState: ref.watch(sessionIdStateHolderProvider.notifier),
     deviceIdState: ref.watch(deviceIdStateHolderProvider.notifier),
     localizations: ref.watch(localizations),
-    authTokenState: ref.watch(authTokenStateHolderProvider.notifier),
   ),
 );
 
@@ -30,7 +28,6 @@ class AuthController {
   final DeviceIdStateHolder deviceIdState;
   final AppLocalizations? localizations;
   final AuthRepository repository = AuthRepository();
-  final AuthTokenStateHolder authTokenState;
 
   AuthController({
     required this.loadingState,
@@ -39,7 +36,6 @@ class AuthController {
     required this.sessionIdState,
     required this.deviceIdState,
     required this.localizations,
-    required this.authTokenState,
   });
 
   void loadEmail() {
@@ -95,10 +91,6 @@ class AuthController {
       clientId: clientId,
       state: state,
     );
-    if (!(await SuperTokens.doesSessionExist())) return false;
-    authTokenState.updateState(
-      await SuperTokens.getAccessToken(),
-    );
     return true;
   }
 
@@ -111,10 +103,6 @@ class AuthController {
       accessToken: accessToken,
       idToken: idToken,
       code: code,
-    );
-    if (!(await SuperTokens.doesSessionExist())) return false;
-    authTokenState.updateState(
-      await SuperTokens.getAccessToken(),
     );
     return true;
   }
