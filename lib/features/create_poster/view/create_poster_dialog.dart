@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,9 +7,11 @@ import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/features/create_list/view/create_list_dialog.dart';
 import 'package:poster_stock/features/create_poster/controller/create_poster_controller.dart';
+import 'package:poster_stock/features/create_poster/model/media_model.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_chosen_movie_state_holder.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_chosen_poster_state_holder.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_images_state_holder.dart';
+import 'package:poster_stock/features/create_poster/state_holder/create_poster_search_list.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_search_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -40,6 +44,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
       setState(() {});
     });
     final String searchText = ref.watch(createPosterSearchStateHolderNotifier);
+    final List<MediaModel>? results =
+        ref.watch(createPosterSearchListStateHolderProvider);
     final (String, String)? chosenMovie =
         ref.watch(createPosterChoseMovieStateHolderProvider);
     final List<String> images =
@@ -75,7 +81,9 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
         }
       });
     }
-    searchController.text = chosenMovie?.$1 ?? searchController.text;
+    if (chosenMovie?.$1 != null) {
+      searchController.text = chosenMovie!.$1;
+    }
     double constValue = 540;
     if (widget.bookmark) constValue = 480;
     return WillPopScope(
@@ -145,10 +153,10 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                             slivers: [
                               SliverPersistentHeader(
                                 delegate: AppDialogHeaderDelegate(
-                                  extent:
-                                      searchText.isNotEmpty && chosenMovie == null
-                                          ? 125
-                                          : 150,
+                                  extent: searchText.isNotEmpty &&
+                                          chosenMovie == null
+                                      ? 125
+                                      : 150,
                                   content: Column(
                                     children: [
                                       const SizedBox(height: 14),
@@ -174,6 +182,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                         child: Stack(
                                           children: [
                                             AppTextField(
+                                              controller: searchController,
                                               searchField: true,
                                               focus: focus,
                                               hint: 'Movie or TV Series',
@@ -191,16 +200,17 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                     .updateSearch('');
                                               },
                                               onChanged: (value) {
-                                                ref
-                                                    .read(
-                                                        createPosterControllerProvider)
-                                                    .chooseMovie(null);
+                                                if (chosenMovie != null) {
+                                                  ref
+                                                      .read(
+                                                          createPosterControllerProvider)
+                                                      .chooseMovie(null);
+                                                }
                                                 ref
                                                     .read(
                                                         createPosterControllerProvider)
                                                     .updateSearch(value);
                                               },
-                                              controller: searchController,
                                             ),
                                             if (chosenMovie?.$2 != null)
                                               Positioned(
@@ -208,22 +218,25 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                 top: 0,
                                                 bottom: 0,
                                                 child: Align(
-                                                  alignment: Alignment.centerLeft,
+                                                  alignment:
+                                                      Alignment.centerLeft,
                                                   child: Row(
                                                     children: [
                                                       Text(
                                                         chosenMovie!.$1,
-                                                        style: context.textStyles
+                                                        style: context
+                                                            .textStyles
                                                             .bodyRegular!
                                                             .copyWith(
-                                                          color:
-                                                              Colors.transparent,
+                                                          color: Colors
+                                                              .transparent,
                                                         ),
                                                       ),
                                                       Text(
                                                         chosenMovie!.$2,
                                                         style: context
-                                                            .textStyles.caption1!
+                                                            .textStyles
+                                                            .caption1!
                                                             .copyWith(
                                                           color: context.colors
                                                               .textsSecondary,
@@ -238,7 +251,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                       ),
                                       if (searchText.isEmpty ||
                                           chosenMovie != null)
-                                        SizedBox(height: 16),
+                                        const SizedBox(height: 16),
                                     ],
                                   ),
                                 ),
@@ -276,16 +289,40 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                     ),
                                   ),
                                 ),
-                              if (searchText.isNotEmpty && chosenMovie == null)
+                              if (searchText.isNotEmpty && results == null)
+                                SliverFillRemaining(
+                                  child: Center(
+                                    child: defaultTargetPlatform !=
+                                            TargetPlatform.android
+                                        ? const CupertinoActivityIndicator(
+                                            radius: 10,
+                                          )
+                                        : SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              color:
+                                                  context.colors.iconsDisabled!,
+                                              strokeWidth: 2,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              if (searchText.isNotEmpty && results != null)
                                 SliverList.builder(
+                                  itemCount: results.length,
                                   itemBuilder: (context, index) => Material(
                                     color: context.colors.backgroundsPrimary,
                                     child: InkWell(
                                       onTap: () {
                                         ref
-                                            .read(createPosterControllerProvider)
+                                            .read(
+                                                createPosterControllerProvider)
                                             .chooseMovie(
-                                          ('Jay and Silent bob', '1999'),
+                                          (
+                                            results[index].title,
+                                            results[index].startYear.toString()
+                                          ),
                                         );
                                         focus.unfocus();
                                       },
@@ -299,19 +336,22 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                         child: Row(
                                           children: [
                                             Text(
-                                              'Jay and Silent bob',
-                                              style:
-                                                  context.textStyles.bodyRegular,
+                                              results[index].title,
+                                              style: context
+                                                  .textStyles.bodyRegular,
                                             ),
                                             const SizedBox(
                                               width: 8,
                                             ),
                                             Text(
-                                              '1999',
-                                              style: context.textStyles.caption1!
+                                              results[index]
+                                                  .startYear
+                                                  .toString(),
+                                              style: context
+                                                  .textStyles.caption1!
                                                   .copyWith(
-                                                color:
-                                                    context.colors.textsSecondary,
+                                                color: context
+                                                    .colors.textsSecondary,
                                               ),
                                             ),
                                           ],
@@ -323,7 +363,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                               SliverToBoxAdapter(
                                 child: SizedBox(
                                   height:
-                                      MediaQuery.of(context).padding.bottom + 130,
+                                      MediaQuery.of(context).padding.bottom +
+                                          130,
                                 ),
                               )
                             ],

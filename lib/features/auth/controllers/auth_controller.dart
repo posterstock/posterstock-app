@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/common/data/exceptions.dart';
 import 'package:poster_stock/common/state_holders/intl_state_holder.dart';
 import 'package:poster_stock/features/auth/repository/auth_repository.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_error_state_holder.dart';
@@ -66,13 +67,21 @@ class AuthController {
     return repository.getRegistered(email);
   }
 
-  Future<bool> setEmail(String email) async {
+  Future<bool?> setEmail(String email) async {
     emailState.updateState(email);
     bool registered = await _getRegistered(email);
-    final response = await repository.signUpSendEmail(email);
-    deviceIdState.updateState(response.$1);
-    sessionIdState.updateState(response.$2);
-    return registered;
+    try {
+      final response = await repository.signUpSendEmail(email);
+      deviceIdState.updateState(response.$1);
+      sessionIdState.updateState(response.$2);
+      return registered;
+    } on AlreadyHasAccountException catch (e) {
+      errorState.updateState(e.message);
+      return null;
+    } catch (e) {
+      errorState.updateState('An error occured');
+      return null;
+    }
   }
 
   Future<bool> authApple({

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:poster_stock/common/data/exceptions.dart';
 import 'package:poster_stock/features/auth/data/handlers/auth_handler.dart';
 import 'package:supertokens_flutter/dio.dart';
 import 'package:supertokens_flutter/supertokens.dart';
@@ -41,8 +42,7 @@ class AuthService {
           "clientType": Platform.isIOS ? "ios" : "android",
           "code": code ?? '',
           "state": state ?? '',
-          "redirectURI":
-          "https://api.posterstock.co/auth/callback/apple",
+          "redirectURI": "https://api.posterstock.co/auth/callback/apple",
           "callback_apple_body": {
             "code": code ?? '',
             "state": state ?? '',
@@ -76,7 +76,7 @@ class AuthService {
           "clientType": Platform.isIOS ? "ios" : "android",
           "redirectURI": "https://api.posterstock.co/auth/callback/google",
           "clientId":
-          '405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com',
+              '405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com',
           'code': code,
           "authCodeResponse": {
             "access_token": accessToken,
@@ -128,9 +128,14 @@ class AuthService {
           },
         ),
       );
+      if (response.data['status'] == 'GENERAL_ERROR') {
+        throw AlreadyHasAccountException(
+          response.data['message'],
+        );
+      }
       return (
-      response.data['deviceId'] as String,
-      response.data['preAuthSessionId'] as String
+        response.data['deviceId'] as String? ?? '',
+        response.data['preAuthSessionId'] as String? ?? '',
       );
     } catch (e) {
       rethrow;

@@ -52,7 +52,7 @@ class HomePageApi implements IHomePageApi {
             'cursor': getNewPosts ? null : postsCursor,
           });
       print(2);
-      if (!getNewPosts && (response.data['has_more'] as bool)) {
+      if (!getNewPosts && !(response.data['has_more'] as bool)) {
         loadedAll = true;
       } else if (!getNewPosts) {
         loadedAll = false;

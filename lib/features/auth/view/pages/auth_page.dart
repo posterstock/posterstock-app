@@ -130,14 +130,12 @@ class AuthPage extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       SizedBox(
-                        height: 20,
                         width: double.infinity,
-                        child: errorState != null
-                            ? Text(
-                                AppLocalizations.of(context)!.emailError,
-                                style: context.textStyles.caption1!,
-                              )
-                            : null,
+                        child: Text(
+                          errorState ?? '',
+                          style: context.textStyles.caption1!,
+                          textAlign: TextAlign.start,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       AuthButton(
@@ -308,8 +306,9 @@ class AuthPage extends ConsumerWidget {
     ref.read(authControllerProvider).loadGoogle();
     try {
       final googleSignIn = GoogleSignIn(
-        clientId:
-            Platform.isIOS ? '405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com' : '405674784124-buqlusrif3nur8sqk7li6u1ruq6votji.apps.googleusercontent.com',
+        clientId: Platform.isIOS
+            ? '405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com'
+            : '405674784124-buqlusrif3nur8sqk7li6u1ruq6votji.apps.googleusercontent.com',
         serverClientId:
             '405674784124-k6n0rjpfh2n5vc9m682tmj1i7af1h3hl.apps.googleusercontent.com',
         scopes: [
@@ -354,6 +353,10 @@ class AuthPage extends ConsumerWidget {
       ref.read(authControllerProvider).removeError();
 
       ref.read(authControllerProvider).setEmail(value).then((exists) {
+        if (exists == null) {
+          ref.read(authControllerProvider).stopLoading();
+          return;
+        }
         if (!exists) {
           AutoRouter.of(context).pushNamed('sign_up').then((value) {
             ref.read(authControllerProvider).stopLoading();
