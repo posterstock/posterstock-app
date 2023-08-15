@@ -13,6 +13,10 @@ class ProfilePostsStateHolder extends StateNotifier<List<PostMovieModel>?> {
     state = [...(state ?? []), ...?list];
   }
 
+  void setState(List<PostMovieModel>? list) {
+    state = [...?list];
+  }
+
   void clearState() {
     state = null;
   }

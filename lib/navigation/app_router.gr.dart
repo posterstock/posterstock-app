@@ -20,7 +20,6 @@ import '../features/auth/view/pages/sign_up_page.dart' as _i2;
 import '../features/bookmarks/view/pages/bookmarks_page.dart' as _i13;
 import '../features/edit_profile/view/view/pages/edit_profile_page.dart'
     as _i12;
-import '../features/home/models/multiple_post_model.dart' as _i20;
 import '../features/home/view/pages/home_page.dart' as _i15;
 import '../features/list/view/list_page.dart' as _i6;
 import '../features/navigation_page/view/navigation_page.dart' as _i4;
@@ -67,18 +66,24 @@ class AppRouter extends _i18.RootStackRouter {
         child: const _i4.NavigationPage(),
       );
     },
-    Poster.name: (routeData) {
+    PosterRoute.name: (routeData) {
       final pathParams = routeData.inheritedPathParams;
-      final args = routeData.argsAs<PosterArgs>(
-          orElse: () => PosterArgs(
-                  postId: pathParams.getInt(
-                'id',
-                0,
-              )));
+      final args = routeData.argsAs<PosterRouteArgs>(
+          orElse: () => PosterRouteArgs(
+                postId: pathParams.getInt(
+                  'id',
+                  0,
+                ),
+                username: pathParams.getString(
+                  'username',
+                  'profile',
+                ),
+              ));
       return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i5.PosterPage(
           postId: args.postId,
+          username: args.username,
           key: args.key,
           index: args.index,
           index2: args.index2,
@@ -86,24 +91,31 @@ class AppRouter extends _i18.RootStackRouter {
       );
     },
     ListRoute.name: (routeData) {
-      final args = routeData.argsAs<ListRouteArgs>();
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<ListRouteArgs>(
+          orElse: () => ListRouteArgs(id: pathParams.getInt('id')));
       return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i6.ListPage(
+          id: args.id,
           key: args.key,
-          post: args.post,
         ),
       );
     },
     ProfileRoute.name: (routeData) {
+      final pathParams = routeData.inheritedPathParams;
       final args = routeData.argsAs<ProfileRouteArgs>(
-          orElse: () => const ProfileRouteArgs());
+          orElse: () => ProfileRouteArgs(
+                  username: pathParams.getString(
+                'username',
+                'profile',
+              )));
       return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i7.ProfilePage(
+          username: args.username,
           key: args.key,
           userId: args.userId,
-          username: args.username,
         ),
       );
     },
@@ -228,22 +240,22 @@ class AppRouter extends _i18.RootStackRouter {
             ),
             _i18.RouteConfig(
               ProfileRoute.name,
-              path: 'profile',
+              path: ':username',
               parent: NavigationRoute.name,
             ),
           ],
         ),
         _i18.RouteConfig(
-          Poster.name,
-          path: 'poster/:id',
+          PosterRoute.name,
+          path: ':username/:id',
         ),
         _i18.RouteConfig(
           ListRoute.name,
-          path: 'collection',
+          path: 'list/:id',
         ),
         _i18.RouteConfig(
           ProfileRoute.name,
-          path: 'profile',
+          path: ':username',
         ),
         _i18.RouteConfig(
           SettingsRoute.name,
@@ -339,36 +351,44 @@ class NavigationRoute extends _i18.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i5.PosterPage]
-class Poster extends _i18.PageRouteInfo<PosterArgs> {
-  Poster({
+class PosterRoute extends _i18.PageRouteInfo<PosterRouteArgs> {
+  PosterRoute({
     int postId = 0,
+    String username = 'profile',
     _i19.Key? key,
     int? index,
     int? index2,
   }) : super(
-          Poster.name,
-          path: 'poster/:id',
-          args: PosterArgs(
+          PosterRoute.name,
+          path: ':username/:id',
+          args: PosterRouteArgs(
             postId: postId,
+            username: username,
             key: key,
             index: index,
             index2: index2,
           ),
-          rawPathParams: {'id': postId},
+          rawPathParams: {
+            'id': postId,
+            'username': username,
+          },
         );
 
-  static const String name = 'Poster';
+  static const String name = 'PosterRoute';
 }
 
-class PosterArgs {
-  const PosterArgs({
+class PosterRouteArgs {
+  const PosterRouteArgs({
     this.postId = 0,
+    this.username = 'profile',
     this.key,
     this.index,
     this.index2,
   });
 
   final int postId;
+
+  final String username;
 
   final _i19.Key? key;
 
@@ -378,7 +398,7 @@ class PosterArgs {
 
   @override
   String toString() {
-    return 'PosterArgs{postId: $postId, key: $key, index: $index, index2: $index2}';
+    return 'PosterRouteArgs{postId: $postId, username: $username, key: $key, index: $index, index2: $index2}';
   }
 }
 
@@ -386,15 +406,16 @@ class PosterArgs {
 /// [_i6.ListPage]
 class ListRoute extends _i18.PageRouteInfo<ListRouteArgs> {
   ListRoute({
+    required int id,
     _i19.Key? key,
-    required _i20.MultiplePostModel post,
   }) : super(
           ListRoute.name,
-          path: 'collection',
+          path: 'list/:id',
           args: ListRouteArgs(
+            id: id,
             key: key,
-            post: post,
           ),
+          rawPathParams: {'id': id},
         );
 
   static const String name = 'ListRoute';
@@ -402,17 +423,17 @@ class ListRoute extends _i18.PageRouteInfo<ListRouteArgs> {
 
 class ListRouteArgs {
   const ListRouteArgs({
+    required this.id,
     this.key,
-    required this.post,
   });
+
+  final int id;
 
   final _i19.Key? key;
 
-  final _i20.MultiplePostModel post;
-
   @override
   String toString() {
-    return 'ListRouteArgs{key: $key, post: $post}';
+    return 'ListRouteArgs{id: $id, key: $key}';
   }
 }
 
@@ -420,17 +441,18 @@ class ListRouteArgs {
 /// [_i7.ProfilePage]
 class ProfileRoute extends _i18.PageRouteInfo<ProfileRouteArgs> {
   ProfileRoute({
+    String username = 'profile',
     _i19.Key? key,
     int? userId,
-    String? username,
   }) : super(
           ProfileRoute.name,
-          path: 'profile',
+          path: ':username',
           args: ProfileRouteArgs(
+            username: username,
             key: key,
             userId: userId,
-            username: username,
           ),
+          rawPathParams: {'username': username},
         );
 
   static const String name = 'ProfileRoute';
@@ -438,20 +460,20 @@ class ProfileRoute extends _i18.PageRouteInfo<ProfileRouteArgs> {
 
 class ProfileRouteArgs {
   const ProfileRouteArgs({
+    this.username = 'profile',
     this.key,
     this.userId,
-    this.username,
   });
+
+  final String username;
 
   final _i19.Key? key;
 
   final int? userId;
 
-  final String? username;
-
   @override
   String toString() {
-    return 'ProfileRouteArgs{key: $key, userId: $userId, username: $username}';
+    return 'ProfileRouteArgs{username: $username, key: $key, userId: $userId}';
   }
 }
 

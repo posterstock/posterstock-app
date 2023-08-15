@@ -1,6 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:poster_stock/features/home/models/list_base_model.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
+import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -9,15 +11,22 @@ class ListGridWidget extends StatelessWidget {
     Key? key,
     required this.post,
   }) : super(key: key);
-  final MultiplePostModel post;
+  final ListBaseModel? post;
 
   @override
   Widget build(BuildContext context) {
+    final shimmer = ShimmerLoader(
+      child: Container(
+        color: context.colors.backgroundsSecondary,
+      ),
+    );
     return GestureDetector(
       onTap: () {
-        AutoRouter.of(context).push(
-          ListRoute(post: post),
+        if (post?.id != null) {
+          AutoRouter.of(context).push(
+          ListRoute(id: post!.id),
         );
+        }
       },
       child: Column(
         children: [
@@ -26,7 +35,19 @@ class ListGridWidget extends StatelessWidget {
             child: Container(
               height: 92,
               color: context.colors.backgroundsSecondary,
-              child: Row(
+              child: Image.network(
+                post?.image ?? '',
+                fit: BoxFit.cover,
+                errorBuilder: (context, obj, trace) {
+                  return shimmer;
+                },
+                loadingBuilder: (context, child, event) {
+                  if (event?.cumulativeBytesLoaded != event?.expectedTotalBytes) {
+                    return shimmer;
+                  }
+                  return child;
+                },
+              ), /*Row(
                 children: List.generate(
                   post.posters.length,
                   (index) => Expanded(
@@ -37,14 +58,14 @@ class ListGridWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
+              ),*/
             ),
           ),
           const SizedBox(
             height: 8,
           ),
           Text(
-            post.name,
+            post?.title ?? '',
             style: context.textStyles.caption2!.copyWith(
               color: context.colors.textsPrimary,
             ),

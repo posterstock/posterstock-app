@@ -28,6 +28,7 @@ import '../../../../home/view/widgets/movie_card.dart';
 class PosterPage extends ConsumerStatefulWidget {
   const PosterPage({
     @PathParam('id') this.postId = 0,
+    @PathParam('username') this.username = 'profile',
     Key? key,
     this.index,
     this.index2,
@@ -36,6 +37,7 @@ class PosterPage extends ConsumerStatefulWidget {
   final int postId;
   final int? index;
   final int? index2;
+  final String username;
 
   @override
   ConsumerState<PosterPage> createState() => _PosterPageState();
@@ -125,7 +127,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
         var el = AutoRouter
             .of(context)
             .stackData
-            .lastWhere((element) => element.route.path.split('/').first == 'poster');
+            .lastWhere((element) => element.route.path == ':username/:id');
         ref.read(commentsControllerProvider).getPost(el.pathParams.getInt('id'));
       });
     }

@@ -31,9 +31,11 @@ class ProfileService {
   }
 
   @override
-  Future<Map<String, dynamic>> getProfileInfo(int? id) async {
+  Future<Map<String, dynamic>> getProfileInfo(String? id) async {
     try {
+      print('AA$id');
       if (id == null) {
+        print('ABOA');
         try {
           print(17);
           final response = await _dio.get(
@@ -50,7 +52,7 @@ class ProfileService {
         }
       }
       final response = await _dio.get(
-        'api/users/$id',
+        'api/users/u/$id',
         options: Options(headers: {}),
       );
       print(response);

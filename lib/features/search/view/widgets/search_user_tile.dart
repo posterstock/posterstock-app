@@ -26,7 +26,10 @@ class SearchUserTile extends StatelessWidget {
     return InkWell(
       onTap: () {
         AutoRouter.of(context).push(
-          ProfileRoute(userId: user.id),
+          ProfileRoute(
+            userId: user.id,
+            username: user.username,
+          ),
         );
       },
       child: Padding(
@@ -44,11 +47,11 @@ class SearchUserTile extends StatelessWidget {
                 backgroundColor: avatar[Random().nextInt(3)],
                 child: user.imagePath == null
                     ? Text(
-                  getAvatarName(user.name).toUpperCase(),
-                  style: context.textStyles.calloutBold!.copyWith(
-                    color: context.colors.textsBackground,
-                  ),
-                )
+                        getAvatarName(user.name).toUpperCase(),
+                        style: context.textStyles.calloutBold!.copyWith(
+                          color: context.colors.textsBackground,
+                        ),
+                      )
                     : const SizedBox(),
               ),
               const SizedBox(width: 16),
@@ -56,7 +59,9 @@ class SearchUserTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Spacer(flex: 3,),
+                    const Spacer(
+                      flex: 3,
+                    ),
                     Text(
                       user.name,
                       style: context.textStyles.subheadline,
@@ -68,7 +73,9 @@ class SearchUserTile extends StatelessWidget {
                         color: context.colors.textsSecondary,
                       ),
                     ),
-                    const Spacer(flex: 4,),
+                    const Spacer(
+                      flex: 4,
+                    ),
                   ],
                 ),
               ),

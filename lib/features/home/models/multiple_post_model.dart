@@ -17,21 +17,23 @@ class MultiplePostSingleModel {
 
   factory MultiplePostSingleModel.fromJson(Map<String, dynamic> json) {
     return MultiplePostSingleModel(
-      id: json['id'],
+      id: json['id'] as int,
       years: json['end_year'] == null
-          ? json['start_year']
+          ? json['start_year'].toString()
           : '${json['start_year']} - ${json['end_year']}',
-      image: json['preview_image'],
-      title: json['title'],
+      image: json['preview_image'] as String,
+      title: json['title'] as String,
     );
   }
 }
 
 class MultiplePostModel extends PostBaseModel {
   final List<MultiplePostSingleModel> posters;
+  final String? image;
 
   MultiplePostModel({
     required this.posters,
+    this.image,
     required String name,
     required UserModel author,
     required String time,
@@ -59,18 +61,19 @@ class MultiplePostModel extends PostBaseModel {
       name: json['title'] as String,
       liked: json['has_liked'] as bool,
       author: UserModel.fromJson(json['user'] as Map<String, Object?>),
-      time: _getTimeString(
-          DateTime.fromMillisecondsSinceEpoch((json['created_at'] as int) * 1000)),
-      timeDate:
-          DateTime.fromMillisecondsSinceEpoch((json['created_at'] as int) * 1000),
+      time: _getTimeString(DateTime.fromMillisecondsSinceEpoch(
+          (json['created_at'] as int? ?? DateTime.now().millisecondsSinceEpoch) * 1000)),
+      timeDate: DateTime.fromMillisecondsSinceEpoch(
+          (json['created_at'] as int? ?? DateTime.now().millisecondsSinceEpoch) * 1000),
       likes: json['likes_count'] as int,
       comments: json['comments_count'] as int,
-      description: json['description'] as String,
-      posters: (json['posters'] as List<Map<String, dynamic>>)
+      description: json['description'] as String?,
+      posters: (json['posters'] as List<dynamic>)
           .map(
             (e) => MultiplePostSingleModel.fromJson(e),
           )
           .toList(),
+      image: json['image'] as String?,
     );
   }
 
@@ -90,16 +93,18 @@ class MultiplePostModel extends PostBaseModel {
   }
 
   @override
-  MultiplePostModel copyWith(
-      {int? id,
-      String? name,
-      UserModel? author,
-      String? time,
-      DateTime? timeDate,
-      String? description,
-      int? likes,
-      int? comments,
-      bool? liked}) {
+  MultiplePostModel copyWith({
+    int? id,
+    String? name,
+    UserModel? author,
+    String? time,
+    DateTime? timeDate,
+    String? description,
+    int? likes,
+    int? comments,
+    bool? liked,
+    String? image,
+  }) {
     return MultiplePostModel(
       posters: posters,
       id: id ?? this.id,
@@ -111,6 +116,7 @@ class MultiplePostModel extends PostBaseModel {
       likes: likes ?? this.likes,
       comments: comments ?? this.comments,
       liked: liked ?? this.liked,
+      image: image ?? this.image,
     );
   }
 }

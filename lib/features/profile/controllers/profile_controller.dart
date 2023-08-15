@@ -26,7 +26,7 @@ class ProfileControllerApi {
   final ProfilePostsStateHolder profilePostsStateHolder;
   final ProfileListsStateHolder profileListsStateHolder;
   final HomePagePostsStateHolder homePagePostsStateHolder;
-  bool gettingUser = false;
+  String? gettingUser = 'profile';
 
   ProfileControllerApi({
     required this.profileInfoStateHolder,
@@ -50,18 +50,18 @@ class ProfileControllerApi {
     await repo.follow(id, !follow);
   }
 
-  Future<void> getUserInfo(int? id) async {
-    if (gettingUser) return;
+  Future<void> getUserInfo(String? username) async {
+    if (gettingUser == username) return;
     try {
-      gettingUser = true;
-      final user = await repo.getProfileInfo(id);
+      gettingUser = username;
+      final user = await repo.getProfileInfo(username);
       profileInfoStateHolder.updateState(user);
       var posts = await repo.getProfilePosts(user.id);
       var lists = await repo.getProfileLists(user.id);
       lists = lists
           ?.map(
             (e) => e = e.copyWith(
-              author: UserModel(
+              user: UserModel(
                 id: user.id,
                 name: user.name,
                 username: user.username,
@@ -84,13 +84,13 @@ class ProfileControllerApi {
             ),
           )
           .toList();
-      profilePostsStateHolder.updateState(posts);
-      profileListsStateHolder.updateState(lists);
+      profilePostsStateHolder.setState(posts);
+      profileListsStateHolder.setState(lists);
       //print(profilePostsStateHolder.state);
-      gettingUser = false;
+      gettingUser = 'profile';
     } catch (e) {
-      gettingUser = false;
+      gettingUser = 'profile';
     }
-    gettingUser = false;
+    gettingUser = 'profile';
   }
 }

@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -6,6 +7,8 @@ import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
+import 'package:poster_stock/features/list/controller/list_controller.dart';
+import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -14,9 +17,12 @@ import '../../poster/view/pages/poster_page/poster_page.dart';
 import '../../profile/view/pages/profile_page.dart';
 
 class ListPage extends ConsumerStatefulWidget {
-  const ListPage({Key? key, required this.post}) : super(key: key);
+  const ListPage({
+    @PathParam('id') required this.id,
+    Key? key,
+  }) : super(key: key);
 
-  final MultiplePostModel post;
+  final int id;
 
   @override
   ConsumerState<ListPage> createState() => _ListPageState();
@@ -43,6 +49,9 @@ class _ListPageState extends ConsumerState<ListPage>
       duration: Duration.zero,
     );
     animationController.animateTo(250);
+    Future(() async {
+      ref.read(listsControllerProvider).getPost(widget.id);
+    });
   }
 
   double velocity = 0;
@@ -86,241 +95,280 @@ class _ListPageState extends ConsumerState<ListPage>
 
   @override
   Widget build(BuildContext context) {
+    final posts = ref.watch(listsStateHolderProvider);
+    if (posts == null) {
+      Future(() async {
+        var el = AutoRouter.of(context)
+            .stackData
+            .lastWhere((element) => element.route.path == ':username/:id');
+        ref.read(listsControllerProvider).getPost(el.pathParams.getInt('id'));
+      });
+    }
     final comments = ref.watch(commentsStateHolderProvider);
-    return Listener(
-      onPointerUp: (details) {
-        if (scrollController.offset > 250) return;
-        if (scrollController.offset < 0) return;
-        if (velocity > 15) {
-          jumpToEnd(up: false);
-        } else if (velocity < -13) {
-          jumpToEnd(up: true);
-        } else {
-          jumpToEnd();
-        }
+    if (comments == null) {
+      ref.read(listsControllerProvider).updateComments(widget.id);
+    }
+    return WillPopScope(
+      onWillPop: () async {
+        await ref.read(listsControllerProvider).clear();
+        return true;
       },
-      child: Scaffold(
-        body: Stack(
-          children: [
-            NotificationListener<ScrollNotification>(
-              onNotification: (notification) {
-                if (notification is ScrollUpdateNotification) {
-                  velocity = notification.dragDetails?.delta.dy ?? 0;
-                  if (notification.metrics.pixels < 0) {
-                    animationController
-                        .animateTo(250 - notification.metrics.pixels);
-                  } else {
-                    animationController
-                        .animateTo(250 - notification.metrics.pixels);
+      child: Listener(
+        onPointerUp: (details) {
+          if (scrollController.offset > 250) return;
+          if (scrollController.offset < 0) return;
+          if (velocity > 15) {
+            jumpToEnd(up: false);
+          } else if (velocity < -13) {
+            jumpToEnd(up: true);
+          } else {
+            jumpToEnd();
+          }
+        },
+        child: Scaffold(
+          body: Stack(
+            children: [
+              NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  if (notification is ScrollUpdateNotification) {
+                    velocity = notification.dragDetails?.delta.dy ?? 0;
+                    if (notification.metrics.pixels < 0) {
+                      animationController
+                          .animateTo(250 - notification.metrics.pixels);
+                    } else {
+                      animationController
+                          .animateTo(250 - notification.metrics.pixels);
+                    }
                   }
-                }
-                if (notification is ScrollEndNotification) {
-                  if (notification.metrics.pixels > 250) return false;
-                  if (notification.metrics.pixels < 0) return false;
-                  jumpToEnd();
-                }
-                return true;
-              },
-              child: CustomScrollView(
-                physics: AlwaysScrollableScrollPhysics(
-                    parent: BouncingScrollPhysics()),
-                controller: scrollController,
-                slivers: [
-                  SliverAppBar(
-                    backgroundColor: context.colors.backgroundsPrimary,
-                    elevation: 0,
-                    leadingWidth: 130,
-                    toolbarHeight: 42,
-                    expandedHeight: 292,
-                    collapsedHeight: 42,
-                    pinned: true,
-                    leading: const CustomBackButton(),
-                    actions: [
-                      GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            backgroundColor: Colors.transparent,
-                            isScrollControlled: true,
-                            builder: (context) => GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                color: Colors.transparent,
-                                child: const ListActionsDialog(),
+                  if (notification is ScrollEndNotification) {
+                    if (notification.metrics.pixels > 250) return false;
+                    if (notification.metrics.pixels < 0) return false;
+                    jumpToEnd();
+                  }
+                  return true;
+                },
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  controller: scrollController,
+                  slivers: [
+                    SliverAppBar(
+                      backgroundColor: context.colors.backgroundsPrimary,
+                      elevation: 0,
+                      leadingWidth: 130,
+                      toolbarHeight: 42,
+                      expandedHeight: 292,
+                      collapsedHeight: 42,
+                      pinned: true,
+                      leading: const CustomBackButton(),
+                      actions: [
+                        GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              isScrollControlled: true,
+                              builder: (context) => GestureDetector(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                  color: Colors.transparent,
+                                  child: const ListActionsDialog(),
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 16),
-                          child: SvgPicture.asset(
-                            'assets/icons/ic_dots.svg',
-                            colorFilter: ColorFilter.mode(
-                              context.colors.iconsDefault!,
-                              BlendMode.srcIn,
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: SvgPicture.asset(
+                              'assets/icons/ic_dots.svg',
+                              colorFilter: ColorFilter.mode(
+                                context.colors.iconsDefault!,
+                                BlendMode.srcIn,
+                              ),
                             ),
                           ),
-                        ),
-                      )
-                    ],
-                  ),
-                  SliverPadding(
-                    padding: EdgeInsets.symmetric(vertical: 16.0),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        if (index == 0) {
-                          return CollectionInfoWidget(
-                            shimmer: shimmer,
-                            post: widget.post,
-                          );
-                        }
-                        /*if (index == widget.post.comments.length + 1) {
-                            return SizedBox(
-                              height: getEmptySpaceHeightForCollection(
-                                          context) <
-                                      56 + MediaQuery.of(context).padding.bottom
-                                  ? 56 + MediaQuery.of(context).padding.bottom
-                                  : getEmptySpaceHeightForCollection(context),
-                            );
-                          }*/
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0,
-                                ),
-                                child: UserInfoTile(
-                                  showFollowButton: false,
-                                  user: comments?[index - 1].model,
-                                  time: comments?[index - 1].time,
-                                  behavior: HitTestBehavior.translucent,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
+                        )
+                      ],
+                    ),
+                    SliverPadding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            if (index == 0) {
+                              return CollectionInfoWidget(
+                                shimmer: shimmer,
+                                post: posts,
+                              );
+                            }
+                            if (index == (comments?.length ?? 0) + 1) {
+                              return SizedBox(
+                                height: getEmptySpaceHeightForCollection(
+                                            context, posts) <
+                                        56 +
+                                            MediaQuery.of(context)
+                                                .padding
+                                                .bottom
+                                    ? 56 + MediaQuery.of(context).padding.bottom
+                                    : getEmptySpaceHeightForCollection(
+                                        context, posts),
+                              );
+                            }
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 6.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const SizedBox(
-                                    width: 68,
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        /*Text(
-                                            widget.post.comments[index - 1]
-                                                .comment,
-                                            style:
-                                                context.textStyles.subheadline,
-                                          ),*/
-                                        const SizedBox(height: 12),
-                                        /*if (index - 1 !=
-                                              widget.post.comments.length - 1)
-                                            Divider(
-                                              height: 0.5,
-                                              thickness: 0.5,
-                                              color:
-                                                  context.colors.fieldsDefault,
-                                            ),*/
-                                      ],
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0,
+                                    ),
+                                    child: UserInfoTile(
+                                      showFollowButton: false,
+                                      user: comments?[index - 1].model,
+                                      time: comments?[index - 1].time,
+                                      behavior: HitTestBehavior.translucent,
                                     ),
                                   ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 68,
+                                      ),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              comments![index - 1].text,
+                                              style: context
+                                                  .textStyles.subheadline!,
+                                            ),
+                                            SizedBox(height: 12),
+                                            if (index - 1 !=
+                                                comments.length - 1)
+                                              Divider(
+                                                height: 0.5,
+                                                thickness: 0.5,
+                                                color: context
+                                                    .colors.fieldsDefault,
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  )
                                 ],
-                              )
-                            ],
-                          ),
-                        );
-                      }, childCount: 2 //2 + widget.post.comments.length,
-                          ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SafeArea(
-              child: IgnorePointer(
-                ignoring: true,
-                child: AnimatedBuilder(
-                  animation: animationController,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(0,
-                          (animationController.value - 36) / (250 - 36) * 42),
-                      child: Transform.scale(
-                        alignment: Alignment.topCenter,
-                        scale: animationController.value / 250 > 1
-                            ? ((250 + (animationController.value - 250) * 0.8) /
-                                250)
-                            : animationController.value / 250,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular((1 -
-                                  (animationController.value - 36) /
-                                      (250 - 36)) *
-                              20),
-                          child: child,
+                              ),
+                            );
+                          },
+                          childCount: 2 + (comments?.length ?? 0),
                         ),
                       ),
-                    );
-                  },
-                  child: Row(
-                    children: List.generate(
-                      widget.post.posters.length,
-                      (index) => Expanded(
-                        child: Image.network(
-                          widget.post.posters[index].image,
-                          height: 250,
-                          fit: BoxFit.cover,
+                    ),
+                  ],
+                ),
+              ),
+              SafeArea(
+                child: IgnorePointer(
+                  ignoring: true,
+                  child: AnimatedBuilder(
+                    animation: animationController,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset: Offset(0,
+                            (animationController.value - 36) / (250 - 36) * 42),
+                        child: Transform.scale(
+                          alignment: Alignment.topCenter,
+                          scale: animationController.value / 250 > 1
+                              ? ((250 +
+                                      (animationController.value - 250) * 0.8) /
+                                  250)
+                              : animationController.value / 250,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular((1 -
+                                    (animationController.value - 36) /
+                                        (250 - 36)) *
+                                20),
+                            child: child,
+                          ),
                         ),
+                      );
+                    },
+                    child: ShimmerLoader(
+                      loaded: posts != null,
+                      child: Container(
+                        color: context.colors.backgroundsSecondary,
+                        height: 250,
+                        child: posts?.image != null
+                            ? Image.network(
+                                posts!.image!,
+                                fit: BoxFit.cover,
+                              )
+                            : Row(
+                                children: List.generate(
+                                  posts?.posters.length ?? 0,
+                                  (index) => Expanded(
+                                    child: Image.network(
+                                      posts?.posters[index].image ?? '',
+                                      height: 250,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-            const Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: CommentTextField(id: 0),
-            )
-          ],
+              const Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: CommentTextField(id: 0),
+              )
+            ],
+          ),
         ),
       ),
     );
   }
 
-  double getEmptySpaceHeightForCollection(BuildContext context) {
-    //double result = widget.post.comments.length * 80 + 180;\
-    double result = 180;
+  double getEmptySpaceHeightForCollection(
+      BuildContext context, MultiplePostModel? posts) {
+    final comments = ref.watch(commentsStateHolderProvider);
+    double result = (comments?.length ?? 0) * 80 + 245;
     result += TextInfoService.textSize(
-      widget.post.name,
+      posts?.name ?? '',
       context.textStyles.title3!,
       MediaQuery.of(context).size.width - 32,
     ).height;
     result += TextInfoService.textSize(
-      (widget.post.description ?? '').length > 280
-          ? widget.post.description!.substring(0, 280)
-          : (widget.post.description ?? ''),
+      (posts?.description ?? '').length > 280
+          ? posts!.description!.substring(0, 280)
+          : (posts?.description ?? ''),
       context.textStyles.subheadline!,
       MediaQuery.of(context).size.width - 32,
     ).height;
-    result += (widget.post.posters.length % 3 == 0
-            ? widget.post.posters.length / 3
-            : widget.post.posters.length ~/ 3 + 1) *
+    result += ((posts?.posters.length ?? 0) % 3 == 0
+            ? (posts?.posters.length ?? 0) / 3
+            : (posts?.posters.length ?? 0) ~/ 3 + 1) *
         212;
     result += 32;
-    /*for (var comment in widget.post.comments) {
+    for (var comment in comments ?? []) {
       result += TextInfoService.textSize(
-        comment.comment,
+        comment.text,
         context.textStyles.subheadline!,
         MediaQuery.of(context).size.width - 84,
       ).height;
-    }*/
+    }
     return MediaQuery.of(context).size.height - result < 0
         ? 0
         : MediaQuery.of(context).size.height - result;
@@ -330,11 +378,11 @@ class _ListPageState extends ConsumerState<ListPage>
 class CollectionInfoWidget extends StatelessWidget {
   const CollectionInfoWidget({
     Key? key,
-    required this.post,
+    this.post,
     required this.shimmer,
   }) : super(key: key);
 
-  final MultiplePostModel post;
+  final MultiplePostModel? post;
   final Widget shimmer;
 
   @override
@@ -345,37 +393,39 @@ class CollectionInfoWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           UserInfoTile(
-            user: post.author,
+            user: post?.author,
+            loading: post == null,
             showSettings: false,
-            time: post.time,
+            showFollowButton: false,
+            time: post?.time,
           ),
           const SizedBox(height: 16),
           Text(
-            post.name,
+            post?.name ?? '',
             style: context.textStyles.title3,
           ),
           const SizedBox(height: 20),
           Text(
-            (post.description ?? '').length > 140
-                ? post.description!.substring(0, 140)
-                : (post.description ?? ''),
+            (post?.description ?? '').length > 140
+                ? post!.description!.substring(0, 140)
+                : (post?.description ?? ''),
             style: context.textStyles.subheadline,
           ),
           const SizedBox(height: 16),
-          const Row(
+          Row(
             children: [
               Spacer(),
-              /*ReactionButton(
+              ReactionButton(
                 iconPath: 'assets/icons/ic_heart.svg',
                 iconColor: context.colors.iconsDisabled!,
-                amount: post.likes.length,
-              ),*/
+                amount: post?.likes,
+              ),
               SizedBox(width: 12),
-              /*ReactionButton(
+              ReactionButton(
                 iconPath: 'assets/icons/ic_comment2.svg',
                 iconColor: context.colors.iconsDisabled!,
-                amount: post.comments.length,
-              ),*/
+                amount: post?.comments,
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -386,9 +436,9 @@ class CollectionInfoWidget extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           SizedBox(
-            height: (post.posters.length % 3 == 0
-                    ? post.posters.length / 3
-                    : post.posters.length ~/ 3 + 1) *
+            height: ((post?.posters.length ?? 0) % 3 == 0
+                    ? (post?.posters.length ?? 0) / 3
+                    : (post?.posters.length ?? 0) ~/ 3 + 1) *
                 212,
             child: GridView.builder(
               padding: EdgeInsets.zero,
@@ -401,12 +451,12 @@ class CollectionInfoWidget extends StatelessWidget {
                 mainAxisSpacing: 15,
                 mainAxisExtent: 201,
               ),
-              itemCount: post.posters.length,
+              itemCount: post?.posters.length,
               itemBuilder: (context, index) {
                 return PostsCollectionTile(
                   shimmer: shimmer,
-                  imagePath: post.posters[index].image,
-                  name: post.posters[index].title,
+                  imagePath: post?.posters[index].image ?? '',
+                  name: post?.posters[index].title ?? '',
                   index: index,
                   year: '1999',
                 );

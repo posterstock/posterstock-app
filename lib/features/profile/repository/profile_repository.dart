@@ -1,3 +1,4 @@
+import 'package:poster_stock/features/home/models/list_base_model.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
@@ -9,9 +10,11 @@ class ProfileRepository implements IProfileRepository {
   final profileService = ProfileService();
 
   @override
-  Future<UserDetailsModel> getProfileInfo(int? id) async {
+  Future<UserDetailsModel> getProfileInfo(String? id) async {
     final result = (await profileService.getProfileInfo(id));
-    return UserDetailsModel.fromJson(result);
+    return UserDetailsModel.fromJson(result).copyWith(
+      mySelf: id == null,
+    );
   }
 
   @override
@@ -35,12 +38,12 @@ class ProfileRepository implements IProfileRepository {
   }
 
   @override
-  Future<List<MultiplePostModel>?> getProfileLists(int? id) async {
+  Future<List<ListBaseModel>?> getProfileLists(int? id) async {
     try {
       final result = (await profileService.getUserLists(id));
       return result
           .map(
-            (e) => MultiplePostModel.fromJson(e),
+            (e) => ListBaseModel.fromJson(e),
           )
           .toList();
     } catch (e) {

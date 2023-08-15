@@ -60,7 +60,7 @@ class PostBase extends ConsumerWidget {
         onTap: () {
           if (post != null) {
             AutoRouter.of(context).push(
-              Poster(
+              PosterRoute(
                 postId: post[pageHolder.page].id,
                 index: index ?? 0,
                 index2: pageHolder.page,
@@ -70,7 +70,7 @@ class PostBase extends ConsumerWidget {
           if (multPost != null) {
             AutoRouter.of(context).push(
               ListRoute(
-                post: multPost,
+                id: multPost.id,
               ),
             );
           }
@@ -159,8 +159,8 @@ class UserInfoTile extends ConsumerWidget {
           if (user == null) return;
           AutoRouter.of(context).push(
             ProfileRoute(
-              userId: user?.id,
-              username: user?.username,
+              userId: user!.id,
+              username: user!.username,
             ),
           );
         },
@@ -179,7 +179,7 @@ class UserInfoTile extends ConsumerWidget {
                   backgroundColor: user?.color,
                   child: user?.imagePath == null && !loading
                       ? Text(
-                          getAvatarName(user!.name).toUpperCase(),
+                          getAvatarName(user?.name ?? 'AA').toUpperCase(),
                           style: context.textStyles.subheadlineBold!.copyWith(
                             color: context.colors.textsBackground,
                           ),
