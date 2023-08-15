@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -8,8 +9,6 @@ import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
-import 'package:poster_stock/features/home/state_holders/home_page_likes_state_holder.dart';
-import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
 import 'package:poster_stock/features/home/view/helpers/custom_bounce_physic.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
@@ -19,6 +18,7 @@ import 'package:poster_stock/features/poster/controller/comments_controller.dart
 import 'package:poster_stock/features/poster/model/comment.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
+import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../../../../common/helpers/hero_dialog_route.dart';
@@ -27,8 +27,8 @@ import '../../../../home/view/widgets/movie_card.dart';
 
 class PosterPage extends ConsumerStatefulWidget {
   const PosterPage({
+    @PathParam('id') this.postId = 0,
     Key? key,
-    required this.postId,
     this.index,
     this.index2,
   }) : super(key: key);
@@ -58,20 +58,26 @@ class _PosterPageState extends ConsumerState<PosterPage>
   @override
   void initState() {
     super.initState();
-    Future(() {
-      ref.read(commentsControllerProvider).clearComments();
+    Future(() async {
+      ref.read(commentsControllerProvider).clear();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    print('upd');
+    super.didChangeDependencies();
   }
 
   void jumpToEnd({bool? up}) {
     if (scrollController.offset == 0 ||
         scrollController.offset == imageHeight! - 18) return;
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
+          (_) {
         int durationValue = (200 *
-                (1 -
-                    (posterController!.value - imageHeight! / 2).abs() /
-                        (imageHeight! / 2)))
+            (1 -
+                (posterController!.value - imageHeight! / 2).abs() /
+                    (imageHeight! / 2)))
             .round();
         if (durationValue < 150) durationValue = 150;
         if (up == false ||
@@ -104,18 +110,34 @@ class _PosterPageState extends ConsumerState<PosterPage>
     }
   }
 
+  final shimmer = ShimmerLoader(
+    loaded: false,
+    child: Container(
+      color: Colors.grey,
+    ),
+  );
   @override
   Widget build(BuildContext context) {
     post = ref.watch(posterStateHolderProvider);
+
+    if (post == null) {
+      Future(() async {
+        var el = AutoRouter
+            .of(context)
+            .stackData
+            .lastWhere((element) => element.route.path.split('/').first == 'poster');
+        ref.read(commentsControllerProvider).getPost(el.pathParams.getInt('id'));
+      });
+    }
     final comments = ref.watch(commentsStateHolderProvider);
     if (comments == null) {
       ref.read(commentsControllerProvider).updateComments(widget.postId);
     }
-    if (post == null) {
-      ref.read(commentsControllerProvider).getPost(widget.postId);
-    }
     if (posterController == null) {
-      imageHeight = MediaQuery.of(context).size.height * 0.66;
+      imageHeight = MediaQuery
+          .of(context)
+          .size
+          .height * 0.66;
       posterController = AnimationController(
           vsync: this,
           duration: Duration.zero,
@@ -123,198 +145,222 @@ class _PosterPageState extends ConsumerState<PosterPage>
           upperBound: 2000);
       posterController!.animateTo(imageHeight!);
     }
-    return Listener(
-      onPointerUp: (details) {
-        if (scrollController.offset > imageHeight!) return;
-        if (scrollController.offset < 0) return;
-        if (velocity > 15) {
-          jumpToEnd(up: false);
-        } else if (velocity < -13) {
-          jumpToEnd(up: true);
-        } else {
-          jumpToEnd();
-        }
+    return WillPopScope(
+      onWillPop: () async {
+        ref.read(commentsControllerProvider).clear();
+        return true;
       },
-      child: Scaffold(
-        body: NotificationListener<ScrollNotification>(
-          onNotification: (notification) {
-            FocusScope.of(context).unfocus();
-            if (notification is ScrollUpdateNotification) {
-              velocity = notification.dragDetails?.delta.dy ?? 0;
-              iconsController
-                  .animateTo(notification.metrics.pixels - imageHeight! + 18);
-              if (notification.metrics.pixels < 0) {
-                posterController!
-                    .animateTo(imageHeight! - notification.metrics.pixels);
-              } else {
-                posterController!
-                    .animateTo(imageHeight! - notification.metrics.pixels);
+      child: Listener(
+        onPointerUp: (details) {
+          if (scrollController.offset > imageHeight!) return;
+          if (scrollController.offset < 0) return;
+          if (velocity > 15) {
+            jumpToEnd(up: false);
+          } else if (velocity < -13) {
+            jumpToEnd(up: true);
+          } else {
+            jumpToEnd();
+          }
+        },
+        child: Scaffold(
+          body: NotificationListener<ScrollNotification>(
+            onNotification: (notification) {
+              FocusScope.of(context).unfocus();
+              if (notification is ScrollUpdateNotification) {
+                velocity = notification.dragDetails?.delta.dy ?? 0;
+                iconsController
+                    .animateTo(notification.metrics.pixels - imageHeight! + 18);
+                if (notification.metrics.pixels < 0) {
+                  posterController!
+                      .animateTo(imageHeight! - notification.metrics.pixels);
+                } else {
+                  posterController!
+                      .animateTo(imageHeight! - notification.metrics.pixels);
+                }
               }
-            }
-            if (notification is ScrollEndNotification) {
-              if (notification.metrics.pixels > imageHeight!) return false;
-              if (notification.metrics.pixels < 0) return false;
-              jumpToEnd();
-            }
-            return true;
-          },
-          child: Stack(
-            children: [
-              CustomScrollView(
-                controller: scrollController,
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
-                slivers: [
-                  AnimatedBuilder(
-                    animation: posterController!,
-                    builder: (context, child) {
-                      return PosterPageAppBar(
-                        posterController: posterController,
-                        imageHeight: imageHeight,
-                      );
-                    },
+              if (notification is ScrollEndNotification) {
+                if (notification.metrics.pixels > imageHeight!) return false;
+                if (notification.metrics.pixels < 0) return false;
+                jumpToEnd();
+              }
+              return true;
+            },
+            child: Stack(
+              children: [
+                CustomScrollView(
+                  controller: scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
                   ),
-                  SliverList(
-                    delegate: SliverChildListDelegate(
-                      [
-                        Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(
-                                16.0,
-                                24.0,
-                                16.0,
-                                16.0,
-                              ),
-                              child: AnimatedBuilder(
-                                animation: posterController!,
-                                builder: (context, child) {
-                                  return PosterInfo(
-                                    index: widget.index,
-                                    index2: widget.index2,
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Divider(
-                              height: 0.5,
-                              thickness: 0.5,
-                              color: context.colors.fieldsDefault,
-                            ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            ...List<Widget>.generate(
-                              comments?.length ?? 0,
-                              (index) => Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 6.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16.0,
-                                      ),
-                                      child: UserInfoTile(
-                                        showFollowButton: false,
-                                        user: comments?[index].model,
-                                        time: comments?[index].time,
-                                        behavior: HitTestBehavior.translucent,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Row(
-                                      children: [
-                                        const SizedBox(
-                                          width: 68,
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                comments?[index].text ?? '',
-                                                style: context
-                                                    .textStyles.subheadline,
-                                              ),
-                                              const SizedBox(height: 12),
-                                              if (index != comments!.length - 1)
-                                                Divider(
-                                                  height: 0.5,
-                                                  thickness: 0.5,
-                                                  color: context
-                                                      .colors.fieldsDefault,
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  ],
+                  slivers: [
+                    AnimatedBuilder(
+                      animation: posterController!,
+                      builder: (context, child) {
+                        return PosterPageAppBar(
+                          posterController: posterController,
+                          imageHeight: imageHeight,
+                        );
+                      },
+                    ),
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16.0,
+                                  24.0,
+                                  16.0,
+                                  16.0,
+                                ),
+                                child: AnimatedBuilder(
+                                  animation: posterController!,
+                                  builder: (context, child) {
+                                    return PosterInfo();
+                                  },
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              height: getEmptySpaceHeightForSingleMovie(
-                                          context, comments) <
-                                      56 + MediaQuery.of(context).padding.bottom
-                                  ? 56 + MediaQuery.of(context).padding.bottom
-                                  : getEmptySpaceHeightForSingleMovie(
-                                      context, comments),
-                            ),
-                          ],
-                        )
-                      ],
+                              const SizedBox(height: 16),
+                              Divider(
+                                height: 0.5,
+                                thickness: 0.5,
+                                color: context.colors.fieldsDefault,
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              ...List<Widget>.generate(
+                                comments?.length ?? 0,
+                                    (index) =>
+                                    Padding(
+                                      padding:
+                                      const EdgeInsets.symmetric(vertical: 6.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 16.0,
+                                            ),
+                                            child: UserInfoTile(
+                                              showFollowButton: false,
+                                              user: comments?[index].model,
+                                              time: comments?[index].time,
+                                              behavior: HitTestBehavior
+                                                  .translucent,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Row(
+                                            children: [
+                                              const SizedBox(
+                                                width: 68,
+                                              ),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      comments?[index].text ??
+                                                          '',
+                                                      style: context
+                                                          .textStyles
+                                                          .subheadline,
+                                                    ),
+                                                    const SizedBox(height: 12),
+                                                    if (index !=
+                                                        comments!.length - 1)
+                                                      Divider(
+                                                        height: 0.5,
+                                                        thickness: 0.5,
+                                                        color: context
+                                                            .colors
+                                                            .fieldsDefault,
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                              ),
+                              SizedBox(
+                                height: getEmptySpaceHeightForSingleMovie(
+                                    context, comments) <
+                                    56 +
+                                        MediaQuery
+                                            .of(context)
+                                            .padding
+                                            .bottom
+                                    ? 56 + MediaQuery
+                                    .of(context)
+                                    .padding
+                                    .bottom
+                                    : getEmptySpaceHeightForSingleMovie(
+                                    context, comments),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              AnimatedBuilder(
-                animation: posterController!,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(
-                        0,
-                        (MediaQuery.of(context).padding.top + 3) *
-                                    (1 -
-                                        posterController!.value /
-                                            imageHeight!) <
-                                0
-                            ? 0
-                            : (MediaQuery.of(context).padding.top + 3) *
-                                (1 - posterController!.value / imageHeight!)),
-                    child: Stack(
-                      children: [
-                        Transform.scale(
-                          alignment: Alignment.topCenter,
-                          scale: (posterController!.value / imageHeight! -
-                              (3 *
-                                      ((imageHeight! -
-                                              posterController!.value) /
-                                          imageHeight!)) /
-                                  imageHeight!),
-                          child: Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                    (imageHeight! - posterController!.value) *
-                                        0.1),
-                                child: ShimmerLoader(
-                                  loaded: post != null,
+                  ],
+                ),
+                AnimatedBuilder(
+                  animation: posterController!,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(
+                          0,
+                          (MediaQuery
+                              .of(context)
+                              .padding
+                              .top + 3) *
+                              (1 -
+                                  posterController!.value /
+                                      imageHeight!) <
+                              0
+                              ? 0
+                              : (MediaQuery
+                              .of(context)
+                              .padding
+                              .top + 3) *
+                              (1 - posterController!.value / imageHeight!)),
+                      child: Stack(
+                        children: [
+                          Transform.scale(
+                            alignment: Alignment.topCenter,
+                            scale: (posterController!.value / imageHeight! -
+                                (3 *
+                                    ((imageHeight! -
+                                        posterController!.value) /
+                                        imageHeight!)) /
+                                    imageHeight!),
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                      (imageHeight! - posterController!.value) *
+                                          0.1),
                                   child: Container(
-                                    color: post == null ? context.colors.backgroundsSecondary : null,
+                                    color: context.colors.backgroundsSecondary,
                                     height: imageHeight! +
-                                        MediaQuery.of(context).padding.top,
+                                        MediaQuery
+                                            .of(context)
+                                            .padding
+                                            .top,
                                     width: double.infinity,
                                     child: GestureDetector(
                                       onTap: () {
-                                        if (FocusScope.of(context)
-                                                .focusedChild
-                                                ?.hasPrimaryFocus ??
+                                        if (FocusScope
+                                            .of(context)
+                                            .focusedChild
+                                            ?.hasPrimaryFocus ??
                                             false) {
                                           FocusScope.of(context).unfocus();
                                         } else {
@@ -322,12 +368,39 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                           Navigator.push(
                                             context,
                                             HeroDialogRoute(builder: (context) {
-                                              if (post == null)
-                                                return SizedBox();
+                                              if (post == null) {
+                                                return SizedBox(
+                                                  width: 300,
+                                                  height: 400,
+                                                  child: shimmer,
+                                                );
+                                              }
                                               return ImageDialog(
                                                 image: Image.network(
                                                   post!.imagePath,
                                                   fit: BoxFit.cover,
+                                                  errorBuilder:
+                                                      (context, obj, trace) {
+                                                    return SizedBox(
+                                                      height: 300,
+                                                      width: 200,
+                                                      child: shimmer,
+                                                    );
+                                                  },
+                                                  loadingBuilder:
+                                                      (context, child, event) {
+                                                    if (event
+                                                        ?.cumulativeBytesLoaded !=
+                                                        event
+                                                            ?.expectedTotalBytes) {
+                                                      return SizedBox(
+                                                        height: 300,
+                                                        width: 200,
+                                                        child: shimmer,
+                                                      );
+                                                    }
+                                                    return child;
+                                                  },
                                                 ),
                                               );
                                             }),
@@ -339,262 +412,316 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                         ignoring: true,
                                         child: Hero(
                                           tag: 'image',
-                                          child: post == null
-                                              ? SizedBox()
-                                              : Image.network(
-                                                  post!.imagePath,
-                                                  fit: BoxFit.cover,
-                                                ),
+                                          child: Image.network(
+                                            post?.imagePath ?? '',
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, obj, trace) {
+                                              return shimmer;
+                                            },
+                                            loadingBuilder:
+                                                (context, child, event) {
+                                              if (event
+                                                  ?.cumulativeBytesLoaded !=
+                                                  event?.expectedTotalBytes)
+                                                return shimmer;
+                                              return child;
+                                            },
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                child: Opacity(
-                                  opacity: (posterController!.value /
-                                              imageHeight!) >
-                                          1
-                                      ? 1
-                                      : posterController!.value / imageHeight!,
-                                  child: IgnorePointer(
-                                    ignoring: true,
-                                    child: Container(
-                                      height: 130,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [
-                                              Colors.transparent,
-                                              Colors.black.withOpacity(0.5),
-                                            ]),
-                                        borderRadius: BorderRadius.circular(
-                                            (imageHeight! -
-                                                    posterController!.value) *
-                                                0.1),
+                                Positioned(
+                                  bottom: 0,
+                                  left: 0,
+                                  right: 0,
+                                  child: Opacity(
+                                    opacity: (posterController!.value /
+                                        imageHeight!) >
+                                        1
+                                        ? 1
+                                        : posterController!.value /
+                                        imageHeight!,
+                                    child: IgnorePointer(
+                                      ignoring: true,
+                                      child: Container(
+                                        height: 130,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                              colors: [
+                                                Colors.transparent,
+                                                Colors.black.withOpacity(0.5),
+                                              ]),
+                                          borderRadius: BorderRadius.circular(
+                                              (imageHeight! -
+                                                  posterController!.value) *
+                                                  0.1),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        Positioned(
-                          bottom: 20,
-                          left: 16,
-                          right: 16,
-                          child: SizedBox(
-                            //ignoring: true,
-                            child: Transform.translate(
-                              offset: Offset(
-                                  0, -imageHeight! + posterController!.value),
-                              child: Transform.scale(
-                                alignment: Alignment.topCenter,
-                                scale: (posterController!.value / imageHeight! -
-                                            (3 *
-                                                    ((imageHeight! -
-                                                            posterController!
-                                                                .value) /
-                                                        imageHeight!)) /
-                                                imageHeight!) >
-                                        1
-                                    ? 1
-                                    : (posterController!.value / imageHeight! -
-                                        (3 *
-                                                ((imageHeight! -
-                                                        posterController!
-                                                            .value) /
-                                                    imageHeight!)) /
-                                            imageHeight!),
-                                child: Opacity(
-                                  opacity: (posterController!.value /
-                                              imageHeight!) >
-                                          1
+                          Positioned(
+                            bottom: 20,
+                            left: 16,
+                            right: 16,
+                            child: SizedBox(
+                              //ignoring: true,
+                              child: Transform.translate(
+                                offset: Offset(
+                                    0, -imageHeight! + posterController!.value),
+                                child: Transform.scale(
+                                  alignment: Alignment.topCenter,
+                                  scale: (posterController!.value /
+                                      imageHeight! -
+                                      (3 *
+                                          ((imageHeight! -
+                                              posterController!
+                                                  .value) /
+                                              imageHeight!)) /
+                                          imageHeight!) >
+                                      1
                                       ? 1
-                                      : posterController!.value / imageHeight!,
-                                  child: child!,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                child: post == null
-                    ? const SizedBox()
-                    : UserInfoTile(
-                        user: post!.author,
-                        time: post!.time,
-                        darkBackground: true,
-                        showSettings: false,
-                        showFollowButton: false,
-                      ),
-              ),
-              SafeArea(
-                child: SizedBox(
-                  height: 42,
-                  child: AnimatedBuilder(
-                    animation: posterController!,
-                    builder: (context, child) {
-                      return Row(
-                        children: [
-                          CustomBackButton(
-                            color: Color.lerp(
-                              context.colors.iconsDefault,
-                              context.colors.iconsBackground,
-                              posterController!.value / imageHeight!,
-                            ),
-                          ),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (context) => GestureDetector(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Container(
-                                    color: Colors.transparent,
-                                    child: PosterActionsDialog(),
+                                      : (posterController!.value /
+                                      imageHeight! -
+                                      (3 *
+                                          ((imageHeight! -
+                                              posterController!
+                                                  .value) /
+                                              imageHeight!)) /
+                                          imageHeight!),
+                                  child: Opacity(
+                                    opacity: (posterController!.value /
+                                        imageHeight!) >
+                                        1
+                                        ? 1
+                                        : posterController!.value /
+                                        imageHeight!,
+                                    child: child!,
                                   ),
-                                ),
-                                backgroundColor: Colors.transparent,
-                                isScrollControlled: true,
-                              );
-                            },
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: SvgPicture.asset(
-                                'assets/icons/ic_dots.svg',
-                                colorFilter: ColorFilter.mode(
-                                  Color.lerp(
-                                    context.colors.iconsDefault,
-                                    context.colors.iconsBackground,
-                                    posterController!.value / imageHeight!,
-                                  )!,
-                                  BlendMode.srcIn,
                                 ),
                               ),
                             ),
                           ),
                         ],
-                      );
-                    },
+                      ),
+                    );
+                  },
+                  child: post == null
+                      ? const SizedBox()
+                      : UserInfoTile(
+                    user: post!.author,
+                    time: post!.time,
+                    darkBackground: true,
+                    showSettings: false,
+                    showFollowButton: false,
                   ),
                 ),
-              ),
-              AnimatedBuilder(
-                animation: iconsController,
-                builder: (context, child) {
-                  return AnimatedBuilder(
-                    animation: posterController!,
-                    builder: (context, child) {
-                      double iconAddition =
-                          ((imageHeight! - scrollController.offset) < 18
-                                  ? 18
-                                  : (imageHeight! - scrollController.offset)) -
-                              iconsController.value;
-                      return Positioned(
-                        right: 16 + iconsController.value * 1.2,
-                        top: 25 +
-                            MediaQuery.of(context).padding.top +
-                            iconAddition,
-                        child: Row(
+                SafeArea(
+                  child: SizedBox(
+                    height: 42,
+                    child: AnimatedBuilder(
+                      animation: posterController!,
+                      builder: (context, child) {
+                        return Row(
                           children: [
-                            GestureDetector(
-                              onTap: () {
-                                print(1);
-                              },
-                              child: SvgPicture.asset(
-                                'assets/icons/ic_bookmarks.svg',
-                                colorFilter: ColorFilter.mode(
-                                  context.colors.iconsDefault!,
-                                  BlendMode.srcIn,
-                                ),
+                            CustomBackButton(
+                              color: Color.lerp(
+                                context.colors.iconsDefault,
+                                context.colors.iconsBackground,
+                                posterController!.value / imageHeight!,
                               ),
+                              addOnTap: () async {
+                                await ref
+                                    .read(commentsControllerProvider)
+                                    .clear();
+                              },
                             ),
-                            const SizedBox(
-                              width: 20,
-                            ),
+                            const Spacer(),
                             GestureDetector(
                               onTap: () {
-                                //TODO dialog
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) =>
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Container(
+                                          color: Colors.transparent,
+                                          child: PosterActionsDialog(),
+                                        ),
+                                      ),
+                                  backgroundColor: Colors.transparent,
+                                  isScrollControlled: true,
+                                );
                               },
-                              child: SvgPicture.asset(
-                                'assets/icons/ic_collection.svg',
-                                colorFilter: ColorFilter.mode(
-                                  context.colors.iconsDefault!,
-                                  BlendMode.srcIn,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0),
+                                child: SvgPicture.asset(
+                                  'assets/icons/ic_dots.svg',
+                                  colorFilter: ColorFilter.mode(
+                                    Color.lerp(
+                                      context.colors.iconsDefault,
+                                      context.colors.iconsBackground,
+                                      posterController!.value / imageHeight!,
+                                    )!,
+                                    BlendMode.srcIn,
+                                  ),
                                 ),
                               ),
                             ),
                           ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-              if (post != null)
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: CommentTextField(id: post!.id),
-                )
-            ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                AnimatedBuilder(
+                  animation: iconsController,
+                  builder: (context, child) {
+                    return AnimatedBuilder(
+                      animation: posterController!,
+                      builder: (context, child) {
+                        double iconAddition =
+                            ((imageHeight! - scrollController.offset) < 18
+                                ? 18
+                                : (imageHeight! -
+                                scrollController.offset)) -
+                                iconsController.value;
+                        return Positioned(
+                          right: 16 + iconsController.value * 1.2,
+                          top: 25 +
+                              MediaQuery
+                                  .of(context)
+                                  .padding
+                                  .top +
+                              iconAddition,
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  print(1);
+                                },
+                                child: SvgPicture.asset(
+                                  'assets/icons/ic_bookmarks.svg',
+                                  colorFilter: ColorFilter.mode(
+                                    context.colors.iconsDefault!,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  //TODO dialog
+                                },
+                                child: SvgPicture.asset(
+                                  'assets/icons/ic_collection.svg',
+                                  colorFilter: ColorFilter.mode(
+                                    context.colors.iconsDefault!,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+                if (post != null)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: CommentTextField(id: post!.id),
+                  )
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  double getEmptySpaceHeightForSingleMovie(
-      BuildContext context, List<Comment>? comments) {
+  double getEmptySpaceHeightForSingleMovie(BuildContext context,
+      List<Comment>? comments) {
     double result =
-        (comments?.length ?? 0) * 80 + MediaQuery.of(context).padding.top;
-    result += 42 + 8 + 44;
-    result += TextInfoService.textSize(
+        (comments?.length ?? 0) * 80 + MediaQuery
+            .of(context)
+            .padding
+            .top;
+    result += 28 + 8 + 44;
+    result += TextInfoService
+        .textSize(
       post?.name ?? '',
       context.textStyles.title3!,
-      MediaQuery.of(context).size.width - 112,
-    ).height;
+      MediaQuery
+          .of(context)
+          .size
+          .width - 112,
+    )
+        .height;
     result += 6;
-    result += TextInfoService.textSize(
+    result += TextInfoService
+        .textSize(
       post?.year.toString() ?? '',
       context.textStyles.subheadline!,
-      MediaQuery.of(context).size.width,
-    ).height;
+      MediaQuery
+          .of(context)
+          .size
+          .width,
+    )
+        .height;
     result += 24;
-    if (post != null)
-      result += TextInfoService.textSize(
+    if (post != null) {
+      result += TextInfoService
+          .textSize(
         (post!.description ?? '').length > 280
             ? post!.description!.substring(0, 280)
             : (post!.description ?? ''),
         context.textStyles.subheadline!,
-        MediaQuery.of(context).size.width - 32,
-      ).height;
+        MediaQuery
+            .of(context)
+            .size
+            .width - 32,
+      )
+          .height;
+    }
     result += 24;
     for (var comment in comments ?? <Comment>[]) {
-      result += TextInfoService.textSize(
+      result += TextInfoService
+          .textSize(
         comment.text,
         context.textStyles.subheadline!,
-        MediaQuery.of(context).size.width - 84,
-      ).height;
+        MediaQuery
+            .of(context)
+            .size
+            .width - 84,
+      )
+          .height;
     }
-    return MediaQuery.of(context).size.height - result < 0
+    return MediaQuery
+        .of(context)
+        .size
+        .height - result < 0
         ? 0
-        : MediaQuery.of(context).size.height - result;
+        : MediaQuery
+        .of(context)
+        .size
+        .height - result;
   }
 }
 
@@ -633,9 +760,15 @@ class _CommentTextFieldState extends ConsumerState<CommentTextField> {
           ),
           Container(
             height:
-                focus.hasFocus && MediaQuery.of(context).viewInsets.bottom != 0
-                    ? null
-                    : 56 + MediaQuery.of(context).padding.bottom,
+            focus.hasFocus && MediaQuery
+                .of(context)
+                .viewInsets
+                .bottom != 0
+                ? null
+                : 56 + MediaQuery
+                .of(context)
+                .padding
+                .bottom,
             color: context.colors.backgroundsPrimary,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -746,7 +879,10 @@ class _ImageDialogState extends State<ImageDialog>
         behavior: HitTestBehavior.translucent,
         onPointerUp: (_) {
           if (controller!.offset.abs() >
-              (MediaQuery.of(context).size.height * 0.3)) {
+              (MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.3)) {
             Navigator.pop(context);
           }
         },
@@ -756,7 +892,10 @@ class _ImageDialogState extends State<ImageDialog>
               animController.animateTo(
                 1 -
                     (notification.metrics.pixels).abs() /
-                        (MediaQuery.of(context).size.height * 0.3),
+                        (MediaQuery
+                            .of(context)
+                            .size
+                            .height * 0.3),
               );
             }
             return true;
@@ -786,7 +925,10 @@ class _ImageDialogState extends State<ImageDialog>
                 controller: controller,
                 children: [
                   SizedBox(
-                    height: MediaQuery.of(context).size.height / 2,
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .height / 2,
                   )
                 ],
               ),
@@ -816,12 +958,16 @@ class PosterPageAppBar extends StatelessWidget {
       pinned: true,
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarBrightness: posterController!.value < imageHeight! * 0.5 &&
-                Theme.of(context).brightness == Brightness.light
+            Theme
+                .of(context)
+                .brightness == Brightness.light
             ? Brightness.light
             : Brightness.dark,
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: posterController!.value < imageHeight! * 0.5 &&
-                Theme.of(context).brightness == Brightness.light
+            Theme
+                .of(context)
+                .brightness == Brightness.light
             ? Brightness.dark
             : Brightness.light,
       ),
@@ -830,24 +976,30 @@ class PosterPageAppBar extends StatelessWidget {
       collapsedHeight: 42,
       toolbarHeight: 42,
       expandedHeight: (posterController!.value < imageHeight!
-                  ? imageHeight!
-                  : posterController!.value) >
-              imageHeight!
+          ? imageHeight!
+          : posterController!.value) >
+          imageHeight!
           ? imageHeight!
           : (posterController!.value < imageHeight!
-              ? imageHeight!
-              : posterController!.value),
+          ? imageHeight!
+          : posterController!.value),
       leading: const SizedBox(),
       flexibleSpace: FlexibleSpaceBarSettings(
         toolbarOpacity: 1,
         currentExtent: (posterController!.value < imageHeight!
-                ? imageHeight!
-                : posterController!.value) +
-            MediaQuery.of(context).viewPadding.top,
+            ? imageHeight!
+            : posterController!.value) +
+            MediaQuery
+                .of(context)
+                .viewPadding
+                .top,
         maxExtent: (posterController!.value < imageHeight!
-                ? imageHeight!
-                : posterController!.value) +
-            MediaQuery.of(context).viewPadding.top,
+            ? imageHeight!
+            : posterController!.value) +
+            MediaQuery
+                .of(context)
+                .viewPadding
+                .top,
         isScrolledUnder: false,
         minExtent: 42,
         child: child ?? const SizedBox(),
@@ -857,22 +1009,14 @@ class PosterPageAppBar extends StatelessWidget {
 }
 
 class PosterInfo extends ConsumerWidget {
-  final int? index;
-  final int? index2;
-
   const PosterInfo({
     super.key,
-    this.index,
-    this.index2,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final post = ref.watch(posterStateHolderProvider);
-    final likes = index == null || index2 == null
-        ? null
-        : ref.watch(homePageLikesStateHolderProvider)?[index!]
-            [index2!];
+    final likes = post?.likes;
     final comments = ref.watch(commentsStateHolderProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -882,7 +1026,10 @@ class PosterInfo extends ConsumerWidget {
           children: [
             SizedBox(
               width:
-                  post == null ? null : MediaQuery.of(context).size.width - 112,
+              post == null ? null : MediaQuery
+                  .of(context)
+                  .size
+                  .width - 112,
               child: ShimmerLoader(
                 loaded: post != null,
                 child: TextOrContainer(
@@ -928,22 +1075,16 @@ class PosterInfo extends ConsumerWidget {
           children: [
             const Spacer(),
             LikeButton(
-              liked: likes?.$1 ?? (post?.liked ?? false),
-              amount: likes?.$2 ??
-                  (post?.likes == null
-                      ? 0
-                      : post!.likes),
+              liked: (post?.liked ?? false),
+              amount: (post?.likes == null ? 0 : post!.likes),
               onTap: () {
-                if (index != null && index2 != null) {
-                  ref
-                      .read(homePagePostsControllerProvider)
-                      .setLike(index!, index2!);
-                } else {
-                  ref
-                      .read(homePagePostsControllerProvider)
-                      .setLikeId(post!.id, !(post.liked));
-                  ref.read(posterStateHolderProvider.notifier).updateState(post.copyWith(liked: !(post.liked), likes: post.liked ? post.likes - 1 : post.likes + 1));
-                }
+                ref
+                    .read(homePagePostsControllerProvider)
+                    .setLikeId(post!.id, !(post.liked));
+                ref.read(posterStateHolderProvider.notifier).updateState(
+                    post.copyWith(
+                        liked: !(post.liked),
+                        likes: post.liked ? post.likes - 1 : post.likes + 1));
               },
             ),
             const SizedBox(width: 12),

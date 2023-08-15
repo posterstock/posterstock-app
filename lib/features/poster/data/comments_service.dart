@@ -56,7 +56,7 @@ class PostService {
           },
         ),
       );
-      print(response.data);
+      print('$id ${response.data}');
       return response.data;
     } on DioError catch (e) {
       print(18);

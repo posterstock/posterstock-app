@@ -22,9 +22,9 @@ class CommentsController {
     required this.posterStateHolder,
   });
 
-  Future<void> clearComments() async {
+  Future<void> clear() async {
     commentsStateHolder.clearComments();
-    posterStateHolder.clearComments();
+    posterStateHolder.clear();
   }
 
   Future<void> postComment(final int id, final String text) async {
@@ -42,6 +42,7 @@ class CommentsController {
   }
 
   Future<void> getPost(final int id) async {
+    print('aa $id');
     if (loadingPost) return;
     loadingPost = true;
     final result = await postRepository.getPost( id);

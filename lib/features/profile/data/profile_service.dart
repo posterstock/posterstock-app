@@ -10,6 +10,7 @@ class ProfileService {
       options: Options(headers: {}),
     );
     final List<Map<String, dynamic>> result = [];
+    print(response);
     for (var a in response.data) {
       result.add(a);
     }
@@ -21,6 +22,7 @@ class ProfileService {
       'api/lists/users/$id',
       options: Options(headers: {}),
     );
+    print(response);
     final List<Map<String, dynamic>> result = [];
     for (var a in response.data) {
       result.add(a);

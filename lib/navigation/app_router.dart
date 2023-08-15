@@ -38,7 +38,11 @@ import '../features/list/view/list_page.dart';
         AutoRoute(page: ProfilePage, path: 'profile'),
       ],
     ),
-    AutoRoute(page: PosterPage, path: 'poster'),
+    AutoRoute(
+      page: PosterPage,
+      path: 'poster/:id',
+      name: 'poster',
+    ),
     AutoRoute(page: ListPage, path: 'collection'),
     AutoRoute(page: ProfilePage, path: 'profile'),
     AutoRoute(page: SettingsPage, path: 'settings'),

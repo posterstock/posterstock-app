@@ -67,13 +67,19 @@ class AppRouter extends _i18.RootStackRouter {
         child: const _i4.NavigationPage(),
       );
     },
-    PosterRoute.name: (routeData) {
-      final args = routeData.argsAs<PosterRouteArgs>();
+    Poster.name: (routeData) {
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<PosterArgs>(
+          orElse: () => PosterArgs(
+                  postId: pathParams.getInt(
+                'id',
+                0,
+              )));
       return _i18.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i5.PosterPage(
-          key: args.key,
           postId: args.postId,
+          key: args.key,
           index: args.index,
           index2: args.index2,
         ),
@@ -97,6 +103,7 @@ class AppRouter extends _i18.RootStackRouter {
         child: _i7.ProfilePage(
           key: args.key,
           userId: args.userId,
+          username: args.username,
         ),
       );
     },
@@ -227,8 +234,8 @@ class AppRouter extends _i18.RootStackRouter {
           ],
         ),
         _i18.RouteConfig(
-          PosterRoute.name,
-          path: 'poster',
+          Poster.name,
+          path: 'poster/:id',
         ),
         _i18.RouteConfig(
           ListRoute.name,
@@ -332,37 +339,38 @@ class NavigationRoute extends _i18.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i5.PosterPage]
-class PosterRoute extends _i18.PageRouteInfo<PosterRouteArgs> {
-  PosterRoute({
+class Poster extends _i18.PageRouteInfo<PosterArgs> {
+  Poster({
+    int postId = 0,
     _i19.Key? key,
-    required int postId,
     int? index,
     int? index2,
   }) : super(
-          PosterRoute.name,
-          path: 'poster',
-          args: PosterRouteArgs(
-            key: key,
+          Poster.name,
+          path: 'poster/:id',
+          args: PosterArgs(
             postId: postId,
+            key: key,
             index: index,
             index2: index2,
           ),
+          rawPathParams: {'id': postId},
         );
 
-  static const String name = 'PosterRoute';
+  static const String name = 'Poster';
 }
 
-class PosterRouteArgs {
-  const PosterRouteArgs({
+class PosterArgs {
+  const PosterArgs({
+    this.postId = 0,
     this.key,
-    required this.postId,
     this.index,
     this.index2,
   });
 
-  final _i19.Key? key;
-
   final int postId;
+
+  final _i19.Key? key;
 
   final int? index;
 
@@ -370,7 +378,7 @@ class PosterRouteArgs {
 
   @override
   String toString() {
-    return 'PosterRouteArgs{key: $key, postId: $postId, index: $index, index2: $index2}';
+    return 'PosterArgs{postId: $postId, key: $key, index: $index, index2: $index2}';
   }
 }
 
@@ -414,12 +422,14 @@ class ProfileRoute extends _i18.PageRouteInfo<ProfileRouteArgs> {
   ProfileRoute({
     _i19.Key? key,
     int? userId,
+    String? username,
   }) : super(
           ProfileRoute.name,
           path: 'profile',
           args: ProfileRouteArgs(
             key: key,
             userId: userId,
+            username: username,
           ),
         );
 
@@ -430,15 +440,18 @@ class ProfileRouteArgs {
   const ProfileRouteArgs({
     this.key,
     this.userId,
+    this.username,
   });
 
   final _i19.Key? key;
 
   final int? userId;
 
+  final String? username;
+
   @override
   String toString() {
-    return 'ProfileRouteArgs{key: $key, userId: $userId}';
+    return 'ProfileRouteArgs{key: $key, userId: $userId, username: $username}';
   }
 }
 

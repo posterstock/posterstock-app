@@ -43,12 +43,15 @@ class HomePagePostsStateHolder
         for (var statePost in posts) {
           for (var st in statePost) {
             state!
-                .map((e) => e.removeWhere((element) => element.id == st.id))
+                .map((e) => e.removeWhere((element) {
+                      return element.id == st.id;
+                    }))
                 .toList();
           }
         }
       }
-      state = [...?posts, ...state!];
+      if (posts == null || posts.isEmpty) return;
+      state = [...posts, ...state!];
       await homePageLikesStateHolder.setState(state
           ?.map((e) => e.map((e) => (e.liked, e.likes)).toList())
           .toList());
@@ -115,7 +118,8 @@ class HomePagePostsStateHolder
     if (state == null) {
       state = posts;
     } else {
-      state = [...state!, ...?posts];
+      if (posts == null) return;
+      state = [...state!, ...posts];
     }
     await homePageLikesStateHolder.setState(
         state?.map((e) => e.map((e) => (e.liked, e.likes)).toList()).toList());

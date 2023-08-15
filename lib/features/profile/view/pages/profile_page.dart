@@ -32,9 +32,11 @@ class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({
     Key? key,
     this.userId,
+    this.username,
   }) : super(key: key);
 
   final int? userId;
+  final String? username;
 
   @override
   ConsumerState<ProfilePage> createState() => _ProfilePageState();
@@ -47,6 +49,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   final scrollController = ScrollController();
   final searchController = TextEditingController();
   final focusNode = FocusNode();
+  final shimmer = ShimmerLoader(
+    loaded: false,
+    child: Container(
+      color: Colors.grey,
+    ),
+  );
 
   @override
   void initState() {
@@ -181,7 +189,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                         ),
                         const Spacer(),
                         Text(
-                          profile?.username ?? 'Profile',
+                          profile?.username ?? widget.username ?? 'Profile',
                           style: context.textStyles.bodyBold,
                         ),
                         const Spacer(),
@@ -414,13 +422,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                             width: 16,
                                           ),
                                           const SizedBox(width: 4),
-                                          /*Text(
-                                          profile?.lists.toString() ?? '0',
-                                          style: context.textStyles.caption1!
-                                              .copyWith(
-                                                  color: context
-                                                      .colors.textsPrimary),
-                                        ),*/
+                                          Text(
+                                            profile.lists.toString() ?? '0',
+                                            style: context.textStyles.caption1!
+                                                .copyWith(
+                                                    color: context
+                                                        .colors.textsPrimary),
+                                          ),
                                         ],
                                       ),
                                   ],
@@ -484,16 +492,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                   child: Center(
                     child: defaultTargetPlatform != TargetPlatform.android
                         ? const CupertinoActivityIndicator(
-                      radius: 10,
-                    )
+                            radius: 10,
+                          )
                         : SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        color: context.colors.iconsDisabled!,
-                        strokeWidth: 2,
-                      ),
-                    ),
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: context.colors.iconsDisabled!,
+                              strokeWidth: 2,
+                            ),
+                          ),
                   ),
                 ),
               if (profile != null)
@@ -599,6 +607,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
           body: tabController == null
               ? const SizedBox()
               : ProfileTabs(
+                  shimmer: shimmer,
                   controller: tabController!,
                   //TODO
                   name: profile?.name,
@@ -626,9 +635,11 @@ class ProfileTabs extends ConsumerStatefulWidget {
     Key? key,
     required this.controller,
     this.name,
+    required this.shimmer,
   }) : super(key: key);
   final TabController controller;
   final String? name;
+  final Widget shimmer;
 
   @override
   ConsumerState<ProfileTabs> createState() => _ProfileTabsState();
@@ -644,11 +655,13 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
       children: [
         PostsCollectionView(
           movies: posters,
+          shimmer: widget.shimmer,
           name: widget.name,
         ),
         if (widget.controller.length == 3)
           PostsCollectionView(
             movies: [],
+            shimmer: widget.shimmer,
             bookmark: true,
             customOnItemTap: (post, index) {
               AutoRouter.of(context).push(
@@ -683,12 +696,14 @@ class PostsCollectionView extends ConsumerWidget {
     this.customOnLongTap,
     this.name,
     this.bookmark = false,
+    required this.shimmer,
   }) : super(key: key);
   final List<PostMovieModel>? movies;
   final void Function(PostMovieModel, int)? customOnItemTap;
   final void Function()? customOnLongTap;
   final String? name;
   final bool bookmark;
+  final Widget shimmer;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -721,43 +736,9 @@ class PostsCollectionView extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       itemCount: movies == null ? 30 : movies!.length,
       itemBuilder: (context, index) {
-        if (movies == null) {
-          return ShimmerLoader(
-            loaded: false,
-            child: Column(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Container(
-                    color: context.colors.backgroundsSecondary,
-                    height: 160,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '',
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textStyles.caption2!.copyWith(
-                    color: context.colors.textsPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textStyles.caption1!.copyWith(
-                    color: context.colors.textsDisabled,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
         return PostsCollectionTile(
-          post: movies![index],
+          post: movies?[index],
+          shimmer: shimmer,
           customOnItemTap: customOnItemTap,
           customOnLongTap: customOnLongTap,
           index: index,
@@ -773,6 +754,7 @@ class PostsCollectionTile extends StatelessWidget {
     this.post,
     this.customOnItemTap,
     required this.index,
+    required this.shimmer,
     this.imagePath,
     this.name,
     this.customOnLongTap,
@@ -785,6 +767,7 @@ class PostsCollectionTile extends StatelessWidget {
   final String? year;
   final void Function(PostMovieModel, int)? customOnItemTap;
   final void Function()? customOnLongTap;
+  final Widget shimmer;
 
   @override
   Widget build(BuildContext context) {
@@ -794,7 +777,7 @@ class PostsCollectionTile extends StatelessWidget {
         if (post != null) {
           if (customOnItemTap == null) {
             AutoRouter.of(context).push(
-              PosterRoute(
+              Poster(
                 postId: post!.id,
               ),
             );
@@ -806,7 +789,7 @@ class PostsCollectionTile extends StatelessWidget {
       dialog: Material(
         color: Colors.transparent,
         child: PosterImageDialog(
-          imagePath: imagePath ?? post!.imagePath,
+          imagePath: imagePath ?? post?.imagePath ?? '',
           name: post == null ? null : post!.name,
           year: post == null ? null : post!.year.toString(),
           description: post == null ? null : post!.description,
@@ -820,14 +803,22 @@ class PostsCollectionTile extends StatelessWidget {
               color: context.colors.backgroundsSecondary,
               height: 160,
               child: Image.network(
-                post == null ? imagePath! : post!.imagePath,
+                (post == null ? imagePath : post?.imagePath) ?? '',
                 fit: BoxFit.cover,
+                errorBuilder: (context, obj, trace) {
+                  return shimmer;
+                },
+                loadingBuilder: (context, child, event) {
+                  if (event?.cumulativeBytesLoaded != event?.expectedTotalBytes)
+                    return shimmer;
+                  return child;
+                },
               ),
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            post == null ? name! : post!.name,
+            (post == null ? name : post?.name) ?? '',
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -871,6 +862,12 @@ class PosterImageDialog extends StatefulWidget {
 class _PosterImageDialogState extends State<PosterImageDialog>
     with SingleTickerProviderStateMixin {
   late final AnimationController controller;
+  final shimmer = ShimmerLoader(
+    loaded: false,
+    child: Container(
+      color: Colors.grey,
+    ),
+  );
 
   @override
   void initState() {
@@ -915,6 +912,14 @@ class _PosterImageDialogState extends State<PosterImageDialog>
                     child: Image.network(
                       widget.imagePath,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, obj, trace) {
+                        return shimmer;
+                      },
+                      loadingBuilder: (context, child, event) {
+                        if (event?.cumulativeBytesLoaded !=
+                            event?.expectedTotalBytes) return shimmer;
+                        return child;
+                      },
                     ),
                   ),
                 ),

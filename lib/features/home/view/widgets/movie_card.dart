@@ -6,8 +6,11 @@ import 'package:poster_stock/features/home/controller/home_page_posts_controller
 import 'package:poster_stock/features/home/state_holders/home_page_likes_state_holder.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
+import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
+import 'package:poster_stock/themes/app_colors.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../models/post_movie_model.dart';
 import '../helpers/custom_bounce_physic.dart';
@@ -88,9 +91,10 @@ class MovieCardState extends ConsumerState<MovieCard>
                 return;
               }
               Future(() {
-                likeCommentController.animateTo((pageController?.page?.toInt() ??
-                    0) +
-                    (((pageController!.page ?? 0) * 100).toInt() % 100) / 100);
+                likeCommentController.animateTo(
+                    (pageController?.page?.toInt() ?? 0) +
+                        (((pageController!.page ?? 0) * 100).toInt() % 100) /
+                            100);
               });
             });
 
@@ -267,25 +271,35 @@ class _MovieCardPageViewContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final shimmer = ShimmerLoader(
+      loaded: false,
+      child: Container(
+        color: Colors.grey,
+      ),
+    );
     final likes = ref.watch(homePageLikesStateHolderProvider);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(10.0),
-          child: Container(
+          child: SizedBox(
             width: 128,
             height: 193,
-            color: context.colors.backgroundsSecondary,
             child: movie?.imagePath != null
                 ? Image.network(
                     movie!.imagePath,
                     fit: BoxFit.cover,
                     errorBuilder: (context, obj, trace) {
-                      return SizedBox();
+                      return shimmer;
+                    },
+                    loadingBuilder: (context, child, event) {
+                      if (event?.cumulativeBytesLoaded !=
+                          event?.expectedTotalBytes) return shimmer;
+                      return child;
                     },
                   )
-                : const SizedBox(),
+                : shimmer,
           ),
         ),
         const SizedBox(
@@ -363,7 +377,9 @@ class _MovieCardPageViewContent extends ConsumerWidget {
                         liked: likes?[index1][index2].$1 ?? false,
                         amount: likes?[index1][index2].$2 ?? 0,
                         onTap: () {
-                          ref.read(homePagePostsControllerProvider).setLike(index1, index2);
+                          ref
+                              .read(homePagePostsControllerProvider)
+                              .setLike(index1, index2);
                         },
                       ),
                       const SizedBox(
@@ -400,7 +416,9 @@ class LikeButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ReactionButton(
-      iconPath: liked ? 'assets/icons/ic_heart_filled.svg' : 'assets/icons/ic_heart.svg',
+      iconPath: liked
+          ? 'assets/icons/ic_heart_filled.svg'
+          : 'assets/icons/ic_heart.svg',
       iconColor:
           liked ? context.colors.buttonsError! : context.colors.iconsDisabled!,
       amount: amount,

@@ -36,17 +36,24 @@ class CustomAppBar extends StatelessWidget {
 class CustomBackButton extends StatelessWidget {
   const CustomBackButton({
     this.color,
+    this.addOnTap,
     super.key,
   });
 
   final Color? color;
+  final Future<void> Function()? addOnTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       highlightColor: Colors.transparent,
-      onTap: () {
-        AutoRouter.of(context).pop();
+      onTap: () async {
+        if (addOnTap != null) {
+          await addOnTap!();
+        }
+        if (context.mounted) {
+          AutoRouter.of(context).pop();
+        }
       },
       child: SizedBox(
         height: double.infinity,

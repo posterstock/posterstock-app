@@ -5,25 +5,33 @@ import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
+import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
+import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../../common/services/text_info_service.dart';
 import '../../poster/view/pages/poster_page/poster_page.dart';
 import '../../profile/view/pages/profile_page.dart';
 
-class ListPage extends StatefulWidget {
+class ListPage extends ConsumerStatefulWidget {
   const ListPage({Key? key, required this.post}) : super(key: key);
 
   final MultiplePostModel post;
 
   @override
-  State<ListPage> createState() => _ListPageState();
+  ConsumerState<ListPage> createState() => _ListPageState();
 }
 
-class _ListPageState extends State<ListPage>
+class _ListPageState extends ConsumerState<ListPage>
     with SingleTickerProviderStateMixin {
   late final AnimationController animationController;
   final ScrollController scrollController = ScrollController();
+  final shimmer = ShimmerLoader(
+    loaded: false,
+    child: Container(
+      color: Colors.grey,
+    ),
+  );
 
   @override
   void initState() {
@@ -78,6 +86,7 @@ class _ListPageState extends State<ListPage>
 
   @override
   Widget build(BuildContext context) {
+    final comments = ref.watch(commentsStateHolderProvider);
     return Listener(
       onPointerUp: (details) {
         if (scrollController.offset > 250) return;
@@ -160,14 +169,14 @@ class _ListPageState extends State<ListPage>
                   SliverPadding(
                     padding: EdgeInsets.symmetric(vertical: 16.0),
                     sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          if (index == 0) {
-                            return CollectionInfoWidget(
-                              post: widget.post,
-                            );
-                          }
-                          /*if (index == widget.post.comments.length + 1) {
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        if (index == 0) {
+                          return CollectionInfoWidget(
+                            shimmer: shimmer,
+                            post: widget.post,
+                          );
+                        }
+                        /*if (index == widget.post.comments.length + 1) {
                             return SizedBox(
                               height: getEmptySpaceHeightForCollection(
                                           context) <
@@ -176,41 +185,41 @@ class _ListPageState extends State<ListPage>
                                   : getEmptySpaceHeightForCollection(context),
                             );
                           }*/
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 6.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                /*Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0,
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0,
+                                ),
+                                child: UserInfoTile(
+                                  showFollowButton: false,
+                                  user: comments?[index - 1].model,
+                                  time: comments?[index - 1].time,
+                                  behavior: HitTestBehavior.translucent,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  const SizedBox(
+                                    width: 68,
                                   ),
-                                  child: UserInfoTile(
-                                    showFollowButton: false,
-                                    user: widget.post.comments[index - 1].user,
-                                    time: widget.post.comments[index - 1].time,
-                                    behavior: HitTestBehavior.translucent,
-                                  ),
-                                ),*/
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    const SizedBox(
-                                      width: 68,
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          /*Text(
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        /*Text(
                                             widget.post.comments[index - 1]
                                                 .comment,
                                             style:
                                                 context.textStyles.subheadline,
                                           ),*/
-                                          const SizedBox(height: 12),
-                                          /*if (index - 1 !=
+                                        const SizedBox(height: 12),
+                                        /*if (index - 1 !=
                                               widget.post.comments.length - 1)
                                             Divider(
                                               height: 0.5,
@@ -218,17 +227,16 @@ class _ListPageState extends State<ListPage>
                                               color:
                                                   context.colors.fieldsDefault,
                                             ),*/
-                                        ],
-                                      ),
+                                      ],
                                     ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          );
-                        },
-                        childCount: 2//2 + widget.post.comments.length,
-                      ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        );
+                      }, childCount: 2 //2 + widget.post.comments.length,
+                          ),
                     ),
                   ),
                 ],
@@ -320,9 +328,14 @@ class _ListPageState extends State<ListPage>
 }
 
 class CollectionInfoWidget extends StatelessWidget {
-  const CollectionInfoWidget({Key? key, required this.post}) : super(key: key);
+  const CollectionInfoWidget({
+    Key? key,
+    required this.post,
+    required this.shimmer,
+  }) : super(key: key);
 
   final MultiplePostModel post;
+  final Widget shimmer;
 
   @override
   Widget build(BuildContext context) {
@@ -349,15 +362,15 @@ class CollectionInfoWidget extends StatelessWidget {
             style: context.textStyles.subheadline,
           ),
           const SizedBox(height: 16),
-          Row(
+          const Row(
             children: [
-              const Spacer(),
+              Spacer(),
               /*ReactionButton(
                 iconPath: 'assets/icons/ic_heart.svg',
                 iconColor: context.colors.iconsDisabled!,
                 amount: post.likes.length,
               ),*/
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               /*ReactionButton(
                 iconPath: 'assets/icons/ic_comment2.svg',
                 iconColor: context.colors.iconsDisabled!,
@@ -382,7 +395,7 @@ class CollectionInfoWidget extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
               ),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 crossAxisSpacing: 12.5,
                 mainAxisSpacing: 15,
@@ -391,6 +404,7 @@ class CollectionInfoWidget extends StatelessWidget {
               itemCount: post.posters.length,
               itemBuilder: (context, index) {
                 return PostsCollectionTile(
+                  shimmer: shimmer,
                   imagePath: post.posters[index].image,
                   name: post.posters[index].title,
                   index: index,

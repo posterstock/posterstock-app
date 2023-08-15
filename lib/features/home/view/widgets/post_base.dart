@@ -39,9 +39,15 @@ class PostBase extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final anyPost = index == null ? null : ref.watch(homePagePostsStateHolderProvider)?[index!];
-    List<PostMovieModel>? post = anyPost?[0] is PostMovieModel ? anyPost?.map((e) => e as PostMovieModel).toList() : null;
-    MultiplePostModel? multPost  = anyPost?[0] is MultiplePostModel ? (anyPost?[0]) as MultiplePostModel : null;
+    final anyPost = index == null
+        ? null
+        : ref.watch(homePagePostsStateHolderProvider)?[index!];
+    List<PostMovieModel>? post = anyPost?[0] is PostMovieModel
+        ? anyPost?.map((e) => e as PostMovieModel).toList()
+        : null;
+    MultiplePostModel? multPost = anyPost?[0] is MultiplePostModel
+        ? (anyPost?[0]) as MultiplePostModel
+        : null;
     UserModel? user;
     if (post != null) {
       user = post[0].author;
@@ -54,7 +60,7 @@ class PostBase extends ConsumerWidget {
         onTap: () {
           if (post != null) {
             AutoRouter.of(context).push(
-              PosterRoute(
+              Poster(
                 postId: post[pageHolder.page].id,
                 index: index ?? 0,
                 index2: pageHolder.page,
@@ -151,9 +157,12 @@ class UserInfoTile extends ConsumerWidget {
         behavior: behavior,
         onTap: () {
           if (user == null) return;
-          AutoRouter.of(context).push(ProfileRoute(
-            userId: user?.id,
-          ));
+          AutoRouter.of(context).push(
+            ProfileRoute(
+              userId: user?.id,
+              username: user?.username,
+            ),
+          );
         },
         child: Container(
           color: Colors.transparent,
@@ -170,11 +179,11 @@ class UserInfoTile extends ConsumerWidget {
                   backgroundColor: user?.color,
                   child: user?.imagePath == null && !loading
                       ? Text(
-                    getAvatarName(user!.name).toUpperCase(),
-                    style: context.textStyles.subheadlineBold!.copyWith(
-                      color: context.colors.textsBackground,
-                    ),
-                  )
+                          getAvatarName(user!.name).toUpperCase(),
+                          style: context.textStyles.subheadlineBold!.copyWith(
+                            color: context.colors.textsBackground,
+                          ),
+                        )
                       : const SizedBox(),
                 ),
               ),
@@ -191,22 +200,27 @@ class UserInfoTile extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(
-                            width:(showFollowButton) && (!(user?.followed ?? true)) ? MediaQuery
-                                .of(context)
-                                .size
-                                .width - 70 - 179 + 42 : null,
+                            width: (showFollowButton) &&
+                                    (!(user?.followed ?? true))
+                                ? MediaQuery.of(context).size.width -
+                                    70 -
+                                    179 +
+                                    42
+                                : null,
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 ExpandChecker(
-                                  expand: (showFollowButton) && (!(user?.followed ?? true)),
+                                  expand: (showFollowButton) &&
+                                      (!(user?.followed ?? true)),
                                   child: TextOrContainer(
                                     text: user?.name,
                                     style: context.textStyles.calloutBold!
                                         .copyWith(
-                                        color: darkBackground
-                                            ? context.colors.textsBackground!
-                                            : context.colors.textsPrimary),
+                                            color: darkBackground
+                                                ? context
+                                                    .colors.textsBackground!
+                                                : context.colors.textsPrimary),
                                     emptyWidth: 146,
                                     emptyHeight: 17,
                                     overflow: TextOverflow.ellipsis,
@@ -215,14 +229,15 @@ class UserInfoTile extends ConsumerWidget {
                                 const SizedBox(
                                   width: 12,
                                 ),
-                                if (!((showFollowButton) && (!(user?.followed ?? true))))
+                                if (!((showFollowButton) &&
+                                    (!(user?.followed ?? true))))
                                   Text(
                                     time ?? '',
-                                    style: context.textStyles.footNote!
-                                        .copyWith(
+                                    style:
+                                        context.textStyles.footNote!.copyWith(
                                       color: darkBackground
                                           ? context.colors.textsBackground!
-                                          .withOpacity(0.8)
+                                              .withOpacity(0.8)
                                           : context.colors.textsDisabled,
                                     ),
                                   ),
@@ -233,8 +248,7 @@ class UserInfoTile extends ConsumerWidget {
                             SizedBox(
                               height: 3,
                             ),
-                          if (!loading)
-                            Spacer(),
+                          if (!loading) Spacer(),
                           TextOrContainer(
                             text: user?.username == null
                                 ? null
@@ -242,7 +256,7 @@ class UserInfoTile extends ConsumerWidget {
                             style: context.textStyles.caption1!.copyWith(
                               color: darkBackground
                                   ? context.colors.textsBackground!
-                                  .withOpacity(0.8)
+                                      .withOpacity(0.8)
                                   : context.colors.textsSecondary,
                             ),
                             emptyWidth: 120,
@@ -261,9 +275,9 @@ class UserInfoTile extends ConsumerWidget {
                     text: AppLocalizations.of(context)!.follow,
                     onTap: () async {
                       await ref.read(profileControllerApiProvider).follow(
-                        user!.id,
-                        user!.followed,
-                      );
+                            user!.id,
+                            user!.followed,
+                          );
                     },
                   ),
                 ),
@@ -274,18 +288,17 @@ class UserInfoTile extends ConsumerWidget {
                       context: context,
                       backgroundColor: Colors.transparent,
                       isScrollControlled: true,
-                      builder: (context) =>
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              color: Colors.transparent,
-                              child: OtherProfileDialog(
-                                user1: user!,
-                              ),
-                            ),
+                      builder: (context) => GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          color: Colors.transparent,
+                          child: OtherProfileDialog(
+                            user1: user!,
                           ),
+                        ),
+                      ),
                     );
                   },
                   child: Container(

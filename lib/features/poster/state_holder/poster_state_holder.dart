@@ -13,7 +13,7 @@ class PosterStateHolder extends StateNotifier<PostMovieModel?> {
     state = post;
   }
 
-  Future<void> clearComments() async {
+  Future<void> clear() async {
     state = null;
   }
 }
