@@ -3,16 +3,25 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
+import 'package:poster_stock/features/create_list/state_holders/chosen_cover_state_holder.dart';
 import 'package:poster_stock/features/create_list/view/create_list_dialog.dart';
 import 'package:poster_stock/features/create_poster/controller/create_poster_controller.dart';
 import 'package:poster_stock/features/create_poster/model/media_model.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_chosen_movie_state_holder.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_chosen_poster_state_holder.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_images_state_holder.dart';
+import 'package:poster_stock/features/create_poster/state_holder/create_poster_loading_state_holder.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_search_list.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_search_state_holder.dart';
+import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
+import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
+import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
+import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
+import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
+import 'package:poster_stock/features/profile/state_holders/profile_posts_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class CreatePosterDialog extends ConsumerStatefulWidget {
@@ -29,7 +38,9 @@ class CreatePosterDialog extends ConsumerStatefulWidget {
 class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
   final dragController = DraggableScrollableController();
   final searchController = TextEditingController();
+  final descController = TextEditingController();
   final focus = FocusNode();
+  final focusSec = FocusNode();
   bool disposed = false;
 
   @override
@@ -43,13 +54,17 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
     focus.addListener(() {
       setState(() {});
     });
+    focusSec.addListener(() {
+      setState(() {});
+    });
     final String searchText = ref.watch(createPosterSearchStateHolderNotifier);
     final List<MediaModel>? results =
         ref.watch(createPosterSearchListStateHolderProvider);
-    final (String, String)? chosenMovie =
+    final MediaModel? chosenMovie =
         ref.watch(createPosterChoseMovieStateHolderProvider);
     final List<String> images =
         ref.watch(createPosterImagesStateHolderProvider);
+    final chosenCover = ref.watch(createPosterChosenPosterStateHolderProvider);
     if (searchText != searchController.text) {
       searchController.text = searchText;
     }
@@ -64,7 +79,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
         disposed = true;
       }
     });
-    if (focus.hasFocus) {
+    if (focus.hasFocus || focusSec.hasFocus) {
       dragController
           .animateTo(
         1,
@@ -81,8 +96,12 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
         }
       });
     }
-    if (chosenMovie?.$1 != null) {
-      searchController.text = chosenMovie!.$1;
+    if (chosenMovie != null && chosenMovie.title != searchController.text) {
+      searchController.text = chosenMovie.title;
+      searchController.selection = TextSelection(
+        baseOffset: searchController.text.length,
+        extentOffset: searchController.text.length,
+      );
     }
     double constValue = 540;
     if (widget.bookmark) constValue = 480;
@@ -125,7 +144,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                 initialChildSize: constValue /
                     (MediaQuery.of(context).size.height -
                         MediaQuery.of(context).padding.bottom),
-                maxChildSize: focus.hasFocus
+                maxChildSize: focus.hasFocus || focusSec.hasFocus
                     ? 1
                     : constValue /
                         (MediaQuery.of(context).size.height -
@@ -157,101 +176,132 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                           chosenMovie == null
                                       ? 125
                                       : 150,
-                                  content: Column(
+                                  content: Stack(
                                     children: [
-                                      const SizedBox(height: 14),
-                                      Container(
-                                        height: 4,
-                                        width: 36,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(2.0),
-                                          color: context.colors.fieldsDefault,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 22),
-                                      Text(
-                                        widget.bookmark
-                                            ? 'Add bookmark'
-                                            : 'Add poster',
-                                        style: context.textStyles.bodyBold,
-                                      ),
-                                      const SizedBox(height: 17),
-                                      SizedBox(
-                                        height: 36,
-                                        child: Stack(
-                                          children: [
-                                            AppTextField(
-                                              controller: searchController,
-                                              searchField: true,
-                                              focus: focus,
-                                              hint: 'Movie or TV Series',
-                                              removableWhenNotEmpty: true,
-                                              crossPadding:
-                                                  const EdgeInsets.all(8.0),
-                                              crossButton: SvgPicture.asset(
-                                                'assets/icons/search_cross.svg',
-                                              ),
-                                              onRemoved: () {
-                                                searchController.clear();
-                                                ref
-                                                    .read(
-                                                        createPosterControllerProvider)
-                                                    .updateSearch('');
-                                              },
-                                              onChanged: (value) {
-                                                if (chosenMovie != null) {
-                                                  ref
-                                                      .read(
-                                                          createPosterControllerProvider)
-                                                      .chooseMovie(null);
-                                                }
-                                                ref
-                                                    .read(
-                                                        createPosterControllerProvider)
-                                                    .updateSearch(value);
-                                              },
+                                      Column(
+                                        children: [
+                                          const SizedBox(height: 14),
+                                          Container(
+                                            height: 4,
+                                            width: 36,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(2.0),
+                                              color: context.colors.fieldsDefault,
                                             ),
-                                            if (chosenMovie?.$2 != null)
-                                              Positioned(
-                                                left: 50,
-                                                top: 0,
-                                                bottom: 0,
-                                                child: Align(
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  child: Row(
-                                                    children: [
-                                                      Text(
-                                                        chosenMovie!.$1,
-                                                        style: context
-                                                            .textStyles
-                                                            .bodyRegular!
-                                                            .copyWith(
-                                                          color: Colors
-                                                              .transparent,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        chosenMovie!.$2,
-                                                        style: context
-                                                            .textStyles
-                                                            .caption1!
-                                                            .copyWith(
-                                                          color: context.colors
-                                                              .textsSecondary,
-                                                        ),
-                                                      ),
-                                                    ],
+                                          ),
+                                          const SizedBox(height: 22),
+                                          Text(
+                                            widget.bookmark
+                                                ? 'Add bookmark'
+                                                : 'Add poster',
+                                            style: context.textStyles.bodyBold,
+                                          ),
+                                          const SizedBox(height: 17),
+                                          SizedBox(
+                                            height: 36,
+                                            child: Stack(
+                                              children: [
+                                                AppTextField(
+                                                  controller: searchController,
+                                                  searchField: true,
+                                                  focus: focus,
+                                                  hint: 'Movie or TV Series',
+                                                  removableWhenNotEmpty: true,
+                                                  crossPadding:
+                                                      const EdgeInsets.all(8.0),
+                                                  crossButton: SvgPicture.asset(
+                                                    'assets/icons/search_cross.svg',
                                                   ),
+                                                  onRemoved: () {
+                                                    searchController.clear();
+                                                    ref
+                                                        .read(
+                                                            createPosterControllerProvider)
+                                                        .updateSearch('');
+                                                  },
+                                                  onChanged: (value) {
+                                                    if (chosenMovie != null) {
+                                                      ref
+                                                          .read(
+                                                              createPosterControllerProvider)
+                                                          .chooseMovie(null);
+                                                    }
+                                                    ref
+                                                        .read(
+                                                            createPosterControllerProvider)
+                                                        .updateSearch(value);
+                                                  },
                                                 ),
-                                              ),
-                                          ],
+                                                if (chosenMovie?.startYear != null)
+                                                  Positioned(
+                                                    left: 50,
+                                                    top: 0,
+                                                    bottom: 0,
+                                                    child: IgnorePointer(
+                                                      ignoring: true,
+                                                      child: Align(
+                                                        alignment:
+                                                            Alignment.centerLeft,
+                                                        child: Row(
+                                                          children: [
+                                                            Text(
+                                                              chosenMovie!.title,
+                                                              style: context
+                                                                  .textStyles
+                                                                  .bodyRegular!
+                                                                  .copyWith(
+                                                                color: Colors
+                                                                    .transparent,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              chosenMovie.startYear
+                                                                  .toString(),
+                                                              style: context
+                                                                  .textStyles
+                                                                  .caption1!
+                                                                  .copyWith(
+                                                                color: context
+                                                                    .colors
+                                                                    .textsSecondary,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                          if (searchText.isEmpty ||
+                                              chosenMovie != null)
+                                            const SizedBox(height: 16),
+                                        ],
+                                      ),
+                                      Positioned(
+                                        right: 0,
+                                        top: 70,
+                                        bottom: searchController.text.isEmpty ? 30: 0,
+                                        child: GestureDetector(
+                                          behavior: HitTestBehavior.opaque,
+                                          onTap: () {
+                                            searchController.clear();
+                                            ref
+                                                .read(
+                                                createPosterControllerProvider)
+                                                .updateSearch('');
+                                          },
+                                          child: Container(
+                                            color: Colors.transparent,
+                                            width: 60,
+                                          ),
                                         ),
                                       ),
-                                      if (searchText.isEmpty ||
-                                          chosenMovie != null)
-                                        const SizedBox(height: 16),
                                     ],
                                   ),
                                 ),
@@ -308,7 +358,9 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                           ),
                                   ),
                                 ),
-                              if (searchText.isNotEmpty && results != null)
+                              if (searchText.isNotEmpty &&
+                                  results != null &&
+                                  chosenMovie == null)
                                 SliverList.builder(
                                   itemCount: results.length,
                                   itemBuilder: (context, index) => Material(
@@ -319,11 +371,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                             .read(
                                                 createPosterControllerProvider)
                                             .chooseMovie(
-                                          (
-                                            results[index].title,
-                                            results[index].startYear.toString()
-                                          ),
-                                        );
+                                              (results[index]),
+                                            );
                                         focus.unfocus();
                                       },
                                       child: Padding(
@@ -335,18 +384,63 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                         ),
                                         child: Row(
                                           children: [
-                                            Text(
-                                              results[index].title,
-                                              style: context
-                                                  .textStyles.bodyRegular,
+                                            SizedBox(
+                                              width: TextInfoService
+                                                          .textSizeNoWidth(
+                                                        results[index].title,
+                                                        context.textStyles
+                                                            .bodyRegular!,
+                                                      ).width >
+                                                      (MediaQuery.of(context)
+                                                              .size
+                                                              .width -
+                                                          54 -
+                                                          TextInfoService.textSizeNoWidth(
+                                                                  results[index].endYear ==
+                                                                          null
+                                                                      ? results[index]
+                                                                          .startYear
+                                                                          .toString()
+                                                                      : '${results[index].startYear} - ${results[index].endYear}',
+                                                                  context
+                                                                      .textStyles
+                                                                      .caption1!)
+                                                              .width)
+                                                  ? (MediaQuery.of(context)
+                                                          .size
+                                                          .width -
+                                                      54 -
+                                                      TextInfoService.textSizeNoWidth(
+                                                              results[index].endYear ==
+                                                                      null
+                                                                  ? results[index]
+                                                                      .startYear
+                                                                      .toString()
+                                                                  : '${results[index].startYear} - ${results[index].endYear}',
+                                                              context.textStyles
+                                                                  .caption1!)
+                                                          .width)
+                                                  : TextInfoService.textSizeNoWidth(
+                                                      results[index].title,
+                                                      context.textStyles
+                                                          .bodyRegular!,
+                                                    ).width,
+                                              child: Text(
+                                                results[index].title,
+                                                style: context
+                                                    .textStyles.bodyRegular,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
                                             ),
                                             const SizedBox(
                                               width: 8,
                                             ),
                                             Text(
-                                              results[index]
-                                                  .startYear
-                                                  .toString(),
+                                              results[index].endYear == null
+                                                  ? results[index]
+                                                      .startYear
+                                                      .toString()
+                                                  : '${results[index].startYear} - ${results[index].endYear}',
                                               style: context
                                                   .textStyles.caption1!
                                                   .copyWith(
@@ -396,12 +490,33 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                     if (!widget.bookmark)
                       Container(
                         color: context.colors.backgroundsPrimary,
-                        child: const DescriptionTextField(
+                        child: DescriptionTextField(
+                          focus: focusSec,
                           hint:
                               'Share your one-line review with your audience, it matters for them.',
                           showDivider: false,
                           button: 'Add poster',
+                          buttonAddCheck: chosenCover != null,
+                          buttonLoading: ref.watch(createPosterLoadingStateHolderProvider),
                           maxSymbols: 280,
+                          controller: descController,
+                          onTap: () async {
+                            try {
+                              ref.read(createPosterLoadingStateHolderProvider
+                                  .notifier).updateValue(true);
+                              await ref
+                                  .read(createPosterControllerProvider)
+                                  .createPoster(descController.text);
+                            } catch (e) {
+                              print(e);
+                            }
+                            ref.read(createPosterLoadingStateHolderProvider
+                                .notifier).updateValue(false);
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                              ref.read(menuControllerProvider).switchMenu();
+                            }
+                          },
                         ),
                       ),
                     if (widget.bookmark)
@@ -447,17 +562,25 @@ class ChoosePosterRadio extends ConsumerWidget {
     required this.index,
   });
 
-  final (String, String)? chosenMovie;
+  final MediaModel? chosenMovie;
   final List<String> images;
   final int index;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final chosenPoster = ref.watch(createPosterChosenPosterStateHolderProvider);
+    final shimmer = ShimmerLoader(
+      child: Container(
+        color: context.colors.backgroundsSecondary,
+      ),
+    );
     return Stack(
       children: [
         GestureDetector(
           onTap: () {
+            if (chosenMovie == null || images.isEmpty) {
+              return;
+            }
             if (images.length > index) {
               ref
                   .read(createPosterControllerProvider)
@@ -476,6 +599,14 @@ class ChoosePosterRadio extends ConsumerWidget {
                       images[index],
                       fit: BoxFit.cover,
                       cacheWidth: 200,
+                      errorBuilder: (context, obj, trace) {
+                        return shimmer;
+                      },
+                      loadingBuilder: (context, child, event) {
+                        if (event?.cumulativeBytesLoaded !=
+                            event?.expectedTotalBytes) return shimmer;
+                        return child;
+                      },
                     ),
             ),
           ),

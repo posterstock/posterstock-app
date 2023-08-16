@@ -13,6 +13,7 @@ import 'package:poster_stock/features/navigation_page/controller/menu_controller
 import 'package:poster_stock/features/navigation_page/state_holder/previous_page_state_holder.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/search/controller/search_controller.dart';
+import 'package:poster_stock/features/search/state_holders/search_users_state_holder.dart';
 import 'package:poster_stock/features/search/state_holders/search_value_state_holder.dart';
 import 'package:poster_stock/features/search/view/widgets/search_user_tile.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -99,14 +100,14 @@ class SearchPageContent extends ConsumerWidget {
   }
 }
 
-class SearchTabView extends StatefulWidget {
+class SearchTabView extends ConsumerStatefulWidget {
   const SearchTabView({Key? key}) : super(key: key);
 
   @override
   SearchTabViewState createState() => SearchTabViewState();
 }
 
-class SearchTabViewState extends State<SearchTabView>
+class SearchTabViewState extends ConsumerState<SearchTabView>
     with SingleTickerProviderStateMixin {
   late final TabController controller;
 
@@ -118,17 +119,7 @@ class SearchTabViewState extends State<SearchTabView>
 
   @override
   Widget build(BuildContext context) {
-    final users = List.generate(
-      0,
-      (index) => UserModel(
-        id: 12,
-        name: 'Name $index',
-        username: 'username$index',
-        imagePath: index % 2 == 0
-            ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
-            : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
-      ),
-    );
+    final users = ref.watch(searchUsersStateHolderProvider);
     final posters = List.generate(
       0,
       (index) => PostMovieModel(
@@ -194,10 +185,9 @@ class SearchTabViewState extends State<SearchTabView>
                   physics: const AlwaysScrollableScrollPhysics(
                     parent: BouncingScrollPhysics(),
                   ),
-                  itemCount: users.length,
+                  itemCount: users?.length ?? 0,
                   itemBuilder: (context, index) {
-                    return SizedBox();
-                    //return SearchUserTile(user: users[index]);
+                    return SearchUserTile(user: users![index]);
                   },
                   separatorBuilder: (BuildContext context, int index) {
                     return Padding(

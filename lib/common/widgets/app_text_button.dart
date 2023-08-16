@@ -4,13 +4,15 @@ import 'package:poster_stock/themes/build_context_extension.dart';
 class AppTextButton extends StatelessWidget {
   const AppTextButton({
     Key? key,
-    required this.text,
+    this.text = '',
     this.disabled = false,
     this.onTap,
     this.backgroundColor,
     this.textColor,
+    this.child,
   }) : super(key: key);
   final String text;
+  final Widget? child;
   final bool disabled;
   final void Function()? onTap;
   final Color? backgroundColor;
@@ -33,7 +35,7 @@ class AppTextButton extends StatelessWidget {
               horizontal: 16.0,
               vertical: 5.5,
             ),
-            child: Text(
+            child: child ?? Text(
               text,
               style: context.textStyles.calloutBold!.copyWith(
                 color: textColor ?? context.colors.textsBackground,

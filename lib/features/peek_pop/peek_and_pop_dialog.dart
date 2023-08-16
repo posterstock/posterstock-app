@@ -62,7 +62,7 @@ class _PeekAndPopDialogState extends State<PeekAndPopDialog> {
                   }
                   context.read<PeekAndPopDialogCubit>().updateState(true);
                   if (Platform.isIOS) {
-                    Vibration.vibrate(duration: 50, amplitude: 50);
+                    Vibration.vibrate(duration: 20, amplitude: 50);
                   } else {
                     Vibration.vibrate(duration: 50, amplitude: 100);
                   }

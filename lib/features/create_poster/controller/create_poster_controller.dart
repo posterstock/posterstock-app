@@ -1,10 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/features/create_poster/model/media_model.dart';
 import 'package:poster_stock/features/create_poster/repository/create_poster_repository.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_chosen_movie_state_holder.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_chosen_poster_state_holder.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_images_state_holder.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_search_list.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_search_state_holder.dart';
+import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
+import 'package:poster_stock/features/profile/models/user_details_model.dart';
+import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 
 final createPosterControllerProvider = Provider<CreatePosterController>(
   (ref) => CreatePosterController(
@@ -23,6 +27,8 @@ final createPosterControllerProvider = Provider<CreatePosterController>(
     createPosterSearchListStateHolder: ref.watch(
       createPosterSearchListStateHolderProvider.notifier,
     ),
+    profileControllerApi: ref.read(profileControllerApiProvider),
+    profileInfoStateHolder: ref.watch(profileInfoStateHolderProvider),
   ),
 );
 
@@ -32,6 +38,8 @@ class CreatePosterController {
   final CreatePosterImagesStateHolder createPosterImagesStateHolder;
   final CreatePosterChosenPosterStateHolder createPosterChosenPosterStateHolder;
   final CreatePosterSearchListStateHolder createPosterSearchListStateHolder;
+  final ProfileControllerApi profileControllerApi;
+  final UserDetailsModel? profileInfoStateHolder;
   final CreatePosterRepository createPosterRepository =
       CreatePosterRepository();
 
@@ -41,11 +49,14 @@ class CreatePosterController {
     required this.createPosterImagesStateHolder,
     required this.createPosterChosenPosterStateHolder,
     required this.createPosterSearchListStateHolder,
+    required this.profileControllerApi,
+    required this.profileInfoStateHolder,
   });
 
   void updateSearch(String value) async {
     createPosterChoseMovieStateHolder.updateValue(null);
     createPosterChosenPosterStateHolder.updateValue(null);
+    createPosterImagesStateHolder.setValue([]);
     createPosterSearchStateHolder.updateValue(value);
     createPosterSearchListStateHolder.setValue(
       null,
@@ -53,15 +64,43 @@ class CreatePosterController {
     createPosterSearchListStateHolder.updateValue(
       await createPosterRepository.getSearchMedia(value),
     );
-    createPosterImagesStateHolder.setValue([]);
   }
 
-  void chooseMovie((String, String)? movie) {
+  void chooseMovie(MediaModel? movie) async {
     createPosterChoseMovieStateHolder.updateValue(movie);
     createPosterChosenPosterStateHolder.updateValue(null);
+    var chosenMovie = createPosterChoseMovieStateHolder.state;
+    var images = await createPosterRepository.getMediaPosters(
+        chosenMovie!.type.name, chosenMovie.id);
+    createPosterImagesStateHolder.setValue(images ?? []);
   }
 
   void choosePoster((int, String)? poster) {
     createPosterChosenPosterStateHolder.updateValue(poster);
+  }
+
+  Future<void> createPoster(String description) async {
+    var mediaState = createPosterChoseMovieStateHolder.state;
+    var image = createPosterChosenPosterStateHolder.state;
+    try {
+      await createPosterRepository.createPoster(
+        mediaState!.id,
+        mediaState.type.name,
+        image!.$2,
+        description,
+      );
+      if (profileInfoStateHolder != null) {
+        profileControllerApi.getUserInfo(profileInfoStateHolder!.username);
+      }
+    } catch (e) {
+      print(e);
+    }
+    createPosterChoseMovieStateHolder.updateValue(null);
+    createPosterChosenPosterStateHolder.updateValue(null);
+    createPosterSearchStateHolder.updateValue('');
+    createPosterSearchListStateHolder.setValue(
+      null,
+    );
+    createPosterImagesStateHolder.setValue([]);
   }
 }

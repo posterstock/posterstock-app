@@ -1,9 +1,14 @@
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 class UserDetailsModel {
   final int id;
   final String username;
   final String name;
   final String? description;
   final String? imagePath;
+  final Color? color;
   final int following;
   final int followers;
   final bool followed;
@@ -19,6 +24,7 @@ class UserDetailsModel {
     required this.followers,
     required this.followed,
     required this.mySelf,
+    this.color,
     this.posters = 0,
     this.lists = 0,
     this.description,
@@ -26,7 +32,11 @@ class UserDetailsModel {
   });
 
   factory UserDetailsModel.fromJson(Map<String, Object?> json) {
-    print(json['id']);
+    const List<Color> avatar = [
+      Color(0xfff09a90),
+      Color(0xfff3d376),
+      Color(0xff92bdf4),
+    ];
     return UserDetailsModel(
       id: json['id'] as int,
       name: json['name'] as String,
@@ -39,6 +49,7 @@ class UserDetailsModel {
       mySelf: json['myself'] as bool? ?? false,
       posters: json['posters'] as int? ?? 0,
       lists: json['lists'] as int? ?? 0,
+      color: avatar[Random().nextInt(3)],
     );
   }
 
@@ -67,6 +78,7 @@ class UserDetailsModel {
       mySelf: mySelf ?? this.mySelf,
       posters: posters ?? this.posters,
       lists: lists ?? this.lists,
+      color: color,
     );
   }
 }

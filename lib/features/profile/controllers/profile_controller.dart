@@ -35,10 +35,6 @@ class ProfileControllerApi {
     required this.homePagePostsStateHolder,
   });
 
-  Future<void> getUserPosts() async {}
-
-  Future<void> getUserLists() async {}
-
   Future<void> clearUser() async {
     profileInfoStateHolder.clearState();
     profilePostsStateHolder.clearState();

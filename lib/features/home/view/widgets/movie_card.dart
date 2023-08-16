@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
+import 'package:poster_stock/features/bookmarks/view/pages/bookmarks_page.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_likes_state_holder.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
@@ -53,6 +54,12 @@ class MovieCardState extends ConsumerState<MovieCard>
   }
 
   @override
+  void didUpdateWidget(covariant MovieCard oldWidget) {
+    print(oldWidget.index == widget.index);
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void initState() {
     super.initState();
     physics = const HorizontalBlockedScrollPhysics();
@@ -72,6 +79,7 @@ class MovieCardState extends ConsumerState<MovieCard>
         .watch(homePagePostsStateHolderProvider)?[widget.index]
         .map((e) => e as PostMovieModel)
         .toList();
+
     getInitData();
     widget.pageHolder.page = (pageController?.page ?? 0).round();
     return Container(
@@ -114,20 +122,8 @@ class MovieCardState extends ConsumerState<MovieCard>
                         left: controller.value < 0 ? 0 : controller.value,
                       ),
                       child: _MovieCardPageViewContent(
-                        index1: widget.index,
-                        index2: index,
                         likeCommentController: likeCommentController,
-                        controller: controller,
-                        onPosterTap: () {
-                          if (controller.value != 16.0) {
-                            controller.animateTo(
-                              16.0,
-                              duration: const Duration(milliseconds: 300),
-                            );
-                          } else {
-                            animatePosterToSide();
-                          }
-                        },
+                        onPosterTap: () {},
                         textHeight: textHeight!,
                         titleHeight: titleHeight!,
                         description:
@@ -250,21 +246,16 @@ class _MovieCardPageViewContent extends ConsumerWidget {
   const _MovieCardPageViewContent({
     Key? key,
     required this.likeCommentController,
-    required this.controller,
     required this.onPosterTap,
     this.movie,
     required this.textHeight,
     required this.titleHeight,
     required this.description,
-    required this.index1,
-    required this.index2,
   }) : super(key: key);
   final AnimationController likeCommentController;
-  final AnimationController controller;
   final void Function() onPosterTap;
   final PostMovieModel? movie;
-  final int index1;
-  final int index2;
+
   final double textHeight;
   final double titleHeight;
   final String description;
@@ -277,7 +268,6 @@ class _MovieCardPageViewContent extends ConsumerWidget {
         color: Colors.grey,
       ),
     );
-    final likes = ref.watch(homePageLikesStateHolderProvider);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -374,12 +364,14 @@ class _MovieCardPageViewContent extends ConsumerWidget {
                     children: [
                       const Spacer(),
                       LikeButton(
-                        liked: likes?[index1][index2].$1 ?? false,
-                        amount: likes?[index1][index2].$2 ?? 0,
+                        liked: movie?.liked ?? false,
+                        amount: movie?.likes ?? 0,
                         onTap: () {
-                          ref
+                          if (movie != null) {
+                            ref
                               .read(homePagePostsControllerProvider)
-                              .setLike(index1, index2);
+                              .setLikeId(movie!.id, !movie!.liked);
+                          }
                         },
                       ),
                       const SizedBox(

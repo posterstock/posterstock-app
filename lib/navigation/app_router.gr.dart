@@ -85,8 +85,9 @@ class AppRouter extends _i18.RootStackRouter {
           postId: args.postId,
           username: args.username,
           key: args.key,
-          index: args.index,
-          index2: args.index2,
+          likes: args.likes,
+          liked: args.liked,
+          comments: args.comments,
         ),
       );
     },
@@ -115,7 +116,6 @@ class AppRouter extends _i18.RootStackRouter {
         child: _i7.ProfilePage(
           username: args.username,
           key: args.key,
-          userId: args.userId,
         ),
       );
     },
@@ -356,8 +356,9 @@ class PosterRoute extends _i18.PageRouteInfo<PosterRouteArgs> {
     int postId = 0,
     String username = 'profile',
     _i19.Key? key,
-    int? index,
-    int? index2,
+    int likes = 0,
+    bool liked = false,
+    int comments = 0,
   }) : super(
           PosterRoute.name,
           path: ':username/:id',
@@ -365,8 +366,9 @@ class PosterRoute extends _i18.PageRouteInfo<PosterRouteArgs> {
             postId: postId,
             username: username,
             key: key,
-            index: index,
-            index2: index2,
+            likes: likes,
+            liked: liked,
+            comments: comments,
           ),
           rawPathParams: {
             'id': postId,
@@ -382,8 +384,9 @@ class PosterRouteArgs {
     this.postId = 0,
     this.username = 'profile',
     this.key,
-    this.index,
-    this.index2,
+    this.likes = 0,
+    this.liked = false,
+    this.comments = 0,
   });
 
   final int postId;
@@ -392,13 +395,15 @@ class PosterRouteArgs {
 
   final _i19.Key? key;
 
-  final int? index;
+  final int likes;
 
-  final int? index2;
+  final bool liked;
+
+  final int comments;
 
   @override
   String toString() {
-    return 'PosterRouteArgs{postId: $postId, username: $username, key: $key, index: $index, index2: $index2}';
+    return 'PosterRouteArgs{postId: $postId, username: $username, key: $key, likes: $likes, liked: $liked, comments: $comments}';
   }
 }
 
@@ -443,14 +448,12 @@ class ProfileRoute extends _i18.PageRouteInfo<ProfileRouteArgs> {
   ProfileRoute({
     String username = 'profile',
     _i19.Key? key,
-    int? userId,
   }) : super(
           ProfileRoute.name,
           path: ':username',
           args: ProfileRouteArgs(
             username: username,
             key: key,
-            userId: userId,
           ),
           rawPathParams: {'username': username},
         );
@@ -462,18 +465,15 @@ class ProfileRouteArgs {
   const ProfileRouteArgs({
     this.username = 'profile',
     this.key,
-    this.userId,
   });
 
   final String username;
 
   final _i19.Key? key;
 
-  final int? userId;
-
   @override
   String toString() {
-    return 'ProfileRouteArgs{username: $username, key: $key, userId: $userId}';
+    return 'ProfileRouteArgs{username: $username, key: $key}';
   }
 }
 

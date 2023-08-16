@@ -64,6 +64,10 @@ class ProfileService {
   }
 
   Future<void> follow(int? id, bool follow) async {
+    print(12);
+    print(follow);
+    print(id);
+    print(13);
     try {
       if (follow) {
         print(1);

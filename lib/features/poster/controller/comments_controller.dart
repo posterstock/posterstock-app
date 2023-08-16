@@ -33,6 +33,7 @@ class CommentsController {
   }
 
   Future<void> updateComments(final int id) async {
+    print('comm$id');
     if (loadingComments) return;
     loadingComments = true;
     final result =
@@ -42,8 +43,10 @@ class CommentsController {
   }
 
   Future<void> getPost(final int id) async {
+    print('comm$id');
     print('aa $id');
     if (loadingPost) return;
+    await Future.delayed(Duration(milliseconds: 500));
     loadingPost = true;
     final result = await postRepository.getPost( id);
     print(result);

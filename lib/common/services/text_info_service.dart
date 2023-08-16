@@ -11,4 +11,11 @@ class TextInfoService {
       );
     return textPainter.size;
   }
+  static Size textSizeNoWidth(String text, TextStyle style) {
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    return textPainter.size;
+  }
 }

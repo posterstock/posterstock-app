@@ -353,7 +353,9 @@ class SettingsPage extends ConsumerWidget {
                                 )
                                     .then(
                                   (value) {
-                                    Navigator.pop(context);
+                                    if (context.mounted) {
+                                      Navigator.pop(context);
+                                    }
                                   },
                                 );
                               }

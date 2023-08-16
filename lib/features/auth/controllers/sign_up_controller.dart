@@ -2,10 +2,12 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/state_holders/auth_id_state_holder.dart';
 import 'package:poster_stock/features/auth/repository/auth_repository.dart';
+import 'package:poster_stock/features/auth/state_holders/code_error_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/device_id_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/email_code_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/email_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/session_id_state_holder.dart';
+import 'package:poster_stock/features/auth/state_holders/sign_up_loading_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/sign_up_name_error_state_holdeer.dart';
 import 'package:poster_stock/features/auth/state_holders/sign_up_username_error_state_holder.dart';
 import 'package:supertokens_flutter/supertokens.dart';
@@ -18,6 +20,7 @@ final signUpControllerProvider = Provider<SignUpController>(
   (ref) => SignUpController(
     usernameErrorState:
         ref.watch(signUpUsernameErrorStateHolderProvider.notifier),
+    signUpLoadingStateHolder: ref.watch(signupLoadingStateHolderProvider.notifier),
     nameErrorState: ref.watch(signUpNameErrorStateHolderProvider.notifier),
     nameState: ref.watch(nameStateHolderProvider.notifier),
     usernameState: ref.watch(usernameStateHolderProvider.notifier),
@@ -30,11 +33,14 @@ final signUpControllerProvider = Provider<SignUpController>(
     email: ref.watch(emailStateHolderProvider) ?? '',
     sessionId: ref.watch(sessionIdStateHolderProvider),
     deviceId: ref.watch(deviceIdStateHolderProvider),
+    codeErrorStateHolder: ref.watch(codeErrorStateHolderProvider.notifier),
   ),
 );
 
 class SignUpController {
   final SignUpUsernameErrorStateHolder usernameErrorState;
+  final CodeErrorStateHolder codeErrorStateHolder;
+  final SignUpLoadingStateHolder signUpLoadingStateHolder;
   final SignUpNameErrorStateHolder nameErrorState;
   final NameStateHolder nameState;
   final UsernameStateHolder usernameState;
@@ -51,6 +57,8 @@ class SignUpController {
 
   SignUpController({
     required this.usernameErrorState,
+    required this.signUpLoadingStateHolder,
+    required this.codeErrorStateHolder,
     required this.nameErrorState,
     required this.nameState,
     required this.usernameState,
@@ -106,6 +114,8 @@ class SignUpController {
   }
 
   Future<bool> processSignIn() async {
+    codeErrorStateHolder.setValue(null);
+    signUpLoadingStateHolder.setValue(true);
     try {
       await repository.confirmCode(
         code: code,
@@ -113,8 +123,11 @@ class SignUpController {
         deviceId: deviceId,
         email: email
       );
+      signUpLoadingStateHolder.setValue(false);
       return true;
     } catch (e) {
+      codeErrorStateHolder.setValue("Wrong code");
+      signUpLoadingStateHolder.setValue(false);
       return false;
     }
   }

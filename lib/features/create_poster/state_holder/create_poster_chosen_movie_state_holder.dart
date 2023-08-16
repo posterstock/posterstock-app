@@ -1,15 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/features/create_poster/model/media_model.dart';
 
 final createPosterChoseMovieStateHolderProvider =
-    StateNotifierProvider<CreatePosterChoseMovieStateHolder, (String, String)?>(
+    StateNotifierProvider<CreatePosterChoseMovieStateHolder, MediaModel?>(
   (ref) => CreatePosterChoseMovieStateHolder(null),
 );
 
 class CreatePosterChoseMovieStateHolder
-    extends StateNotifier<(String, String)?> {
+    extends StateNotifier<MediaModel?> {
   CreatePosterChoseMovieStateHolder(super.state);
 
-  void updateValue((String, String)? value) {
+  void updateValue(MediaModel? value) {
     state = value;
   }
 }

@@ -17,18 +17,20 @@ class SearchService {
   }
 
   Future<List<dynamic>> searchUsers(String searchValue) async {
+    if (searchValue.isEmpty) return [];
     token = await SuperTokens.getAccessToken();
     try {
       var response = await _dio.get(
           'api/users/search',
           options: Options(
             headers: {'Authorization': 'Bearer $token'},
+            receiveTimeout: 10000,
           ),
           queryParameters: {
             'query' : searchValue,
           }
       );
-      print(response.data);
+      print('344${response.data}');
       return response.data;
     } on DioError catch (e) {
       print(e.response);

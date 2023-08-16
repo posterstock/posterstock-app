@@ -10,7 +10,7 @@ class CommentsStateHolder extends StateNotifier<List<Comment>?> {
   CommentsStateHolder(super.state);
 
   Future<void> updateComments(List<Comment>? comments) async {
-    state = [...?state, ...?comments];
+    state = [...?comments];
   }
 
   Future<void> clearComments() async {

@@ -27,7 +27,6 @@ class SearchUserTile extends StatelessWidget {
       onTap: () {
         AutoRouter.of(context).push(
           ProfileRoute(
-            userId: user.id,
             username: user.username,
           ),
         );

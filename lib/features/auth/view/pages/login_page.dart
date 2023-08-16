@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
+import 'package:poster_stock/features/auth/state_holders/code_error_state_holder.dart';
+import 'package:poster_stock/features/auth/state_holders/sign_up_loading_state_holder.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -23,7 +25,9 @@ class LoginPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final emailState = ref.watch(emailStateHolderProvider);
+    final loading = ref.watch(signupLoadingStateHolderProvider);
     final codeState = ref.watch(emailCodeStateHolderProvider);
+    final codeErrorState = ref.watch(codeErrorStateHolderProvider);
     return CustomScaffold(
       child: Column(
         children: [
@@ -79,9 +83,24 @@ class LoginPage extends ConsumerWidget {
                     },
                   ),
                   const SizedBox(
-                    height: 24,
+                    height: 4,
+                  ),
+                  SizedBox(
+                    height: 13,
+                    width: double.infinity,
+                    child: Text(
+                      codeErrorState ?? '',
+                      style: context.textStyles.caption2!.copyWith(
+                        color: context.colors.textsError,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 8,
                   ),
                   AuthButton(
+                    loading: loading,
+                    loadingBorderColor: context.colors.fieldsActive!,
                     text: AppLocalizations.of(context)!.contWithLoginCode,
                     disabled: codeState.isEmpty,
                     fillColor: context.colors.buttonsDisabled,

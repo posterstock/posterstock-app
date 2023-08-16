@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/search/repository/search_repository.dart';
 import 'package:poster_stock/features/search/state_holders/search_users_state_holder.dart';
@@ -20,11 +22,26 @@ class SearchController {
     required this.searchUsersState,
   });
 
+  String searchValue = '';
+
   Future<void> updateSearch(String value) async {
+    searchValue = value;
+    bool stop = false;
+    await Future.delayed(const Duration(milliseconds: 300), () {
+      if (searchValue != value) stop = true;
+    });
+    if (stop) return;
+    print(value);
     searchValueState.updateState(value);
     searchUsersState.setState(null);
-    searchUsersState.updateState(
-      await searchRepository.searchUsers(value),
-    );
+    try {
+      var users = await searchRepository.searchUsers(value);
+      users.forEach((element) {print('12${element.id}');});
+      searchUsersState.setState(
+        users,
+      );
+    } catch (e) {
+      print(e);
+    }
   }
 }

@@ -6,17 +6,14 @@ final homePagePostsStateHolderProvider =
     StateNotifierProvider<HomePagePostsStateHolder, List<List<PostBaseModel>>?>(
   (ref) => HomePagePostsStateHolder(
     null,
-    homePageLikesStateHolder:
-        ref.watch(homePageLikesStateHolderProvider.notifier),
   ),
 );
 
 class HomePagePostsStateHolder
     extends StateNotifier<List<List<PostBaseModel>>?> {
-  HomePagePostsStateHolder(super.state,
-      {required this.homePageLikesStateHolder});
-
-  final HomePageLikesStateHolder homePageLikesStateHolder;
+  HomePagePostsStateHolder(
+    super.state,
+  );
 
   Future<void> updateState(List<List<PostBaseModel>>? posts) async {
     for (int i = 0; i < (posts?.length ?? 0); i++) {
@@ -52,9 +49,6 @@ class HomePagePostsStateHolder
       }
       if (posts == null || posts.isEmpty) return;
       state = [...posts, ...state!];
-      await homePageLikesStateHolder.setState(state
-          ?.map((e) => e.map((e) => (e.liked, e.likes)).toList())
-          .toList());
     }
   }
 
@@ -64,8 +58,23 @@ class HomePagePostsStateHolder
         likes: state?[index][index2].liked == false
             ? (state?[index][index2].likes ?? 0) + 1
             : (state?[index][index2].likes ?? 0) - 1))!;
-    await homePageLikesStateHolder.setState(
-        state?.map((e) => e.map((e) => (e.liked, e.likes)).toList()).toList());
+    state = [...?state];
+  }
+
+  Future<void> setLikeId(int id, bool value) async {
+    for (int i = 0; i < (state?.length ?? 0); i++) {
+      for (int j = 0; j < (state?[i].length ?? 0); j++) {
+        if (state![i][j].id == id) {
+          print("ABOBA");
+          print(value);
+          var likes = state![i][j].likes;
+          state![i][j] = state![i][j]
+              .copyWith(liked: value, likes: value ? likes + 1 : likes - 1);
+          state = [...?state];
+          return;
+        }
+      }
+    }
   }
 
   Future<void> setFollow(int id, bool follow) async {
@@ -74,9 +83,6 @@ class HomePagePostsStateHolder
         if (state![i][j].author.id == id) {
           if (!follow) {
             state?.removeAt(i);
-            homePageLikesStateHolder.setState(
-              homePageLikesStateHolder.state?..removeAt(i),
-            );
           }
         }
       }
@@ -121,7 +127,5 @@ class HomePagePostsStateHolder
       if (posts == null) return;
       state = [...state!, ...posts];
     }
-    await homePageLikesStateHolder.setState(
-        state?.map((e) => e.map((e) => (e.liked, e.likes)).toList()).toList());
   }
 }

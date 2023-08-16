@@ -1,7 +1,10 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
@@ -107,7 +110,8 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                       height: 4,
                                       width: 36,
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(2.0),
+                                        borderRadius:
+                                            BorderRadius.circular(2.0),
                                         color: context.colors.fieldsDefault,
                                       ),
                                     ),
@@ -176,9 +180,9 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                         ),
                       ),
                       if (!focus.hasFocus)
-                      SizedBox(
-                        height: 146,
-                      ),
+                        SizedBox(
+                          height: 146,
+                        ),
                       Container(
                         color: context.colors.backgroundsPrimary,
                         height: MediaQuery.of(context).padding.bottom,
@@ -189,131 +193,133 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
               },
             ),
             if (!focus.hasFocus)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Column(
-                children: [
-                  Divider(
-                    height: 0.5,
-                    thickness: 0.5,
-                    color: context.colors.fieldsDefault,
-                  ),
-                  Container(
-                    color: context.colors.backgroundsPrimary,
-                    height: 56,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'List name',
-                              hintStyle: context.textStyles.callout!.copyWith(
-                                color: context.colors.textsDisabled,
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Column(
+                  children: [
+                    Divider(
+                      height: 0.5,
+                      thickness: 0.5,
+                      color: context.colors.fieldsDefault,
+                    ),
+                    Container(
+                      color: context.colors.backgroundsPrimary,
+                      height: 56,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: 'List name',
+                                hintStyle: context.textStyles.callout!.copyWith(
+                                  color: context.colors.textsDisabled,
+                                ),
+                                filled: true,
+                                fillColor: context.colors.backgroundsPrimary,
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 20.0,
+                                  vertical: 12.0,
+                                ),
                               ),
-                              filled: true,
-                              fillColor: context.colors.backgroundsPrimary,
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 20.0,
-                                vertical: 12.0,
+                              style: context.textStyles.callout!.copyWith(
+                                color: context.colors.textsPrimary,
                               ),
-                            ),
-                            style: context.textStyles.callout!.copyWith(
-                              color: context.colors.textsPrimary,
                             ),
                           ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            dragController
-                                .animateTo(
-                                  0.7,
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.linear,
-                                )
-                                .then(
-                                  (value) => showModalBottomSheet(
-                                    context: context,
-                                    backgroundColor: Colors.transparent,
-                                    isScrollControlled: true,
-                                    useSafeArea: true,
-                                    builder: (context) => PickCoverDialog(
-                                      onItemTap: (BuildContext context,
-                                          WidgetRef ref, Uint8List image) {
-                                        ref
-                                            .read(pickCoverControllerProvider)
-                                            .setImage(image);
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ),
-                                );
-                          },
-                          child: Container(
-                            color: context.colors.backgroundsPrimary,
-                            child: image == null
-                                ? Row(
-                                    children: [
-                                      Text(
-                                        'Upload cover',
-                                        style:
-                                            context.textStyles.caption2!.copyWith(
-                                          color: context.colors.textsDisabled,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      SvgPicture.asset(
-                                        'assets/icons/ic_pick_photo.svg',
-                                        width: 24,
-                                      ),
-                                      //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
-                                      const SizedBox(width: 16),
-                                    ],
+                          GestureDetector(
+                            onTap: () {
+                              dragController
+                                  .animateTo(
+                                    0.7,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.linear,
                                   )
-                                : Row(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(2.0),
-                                        child: SizedBox(
-                                          width: 36,
-                                          height: 24,
-                                          child: Image.memory(
-                                            image,
-                                            fit: BoxFit.cover,
-                                            cacheWidth: 24,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      GestureDetector(
-                                        onTap: () {
+                                  .then(
+                                    (value) => showModalBottomSheet(
+                                      context: context,
+                                      backgroundColor: Colors.transparent,
+                                      isScrollControlled: true,
+                                      useSafeArea: true,
+                                      builder: (context) => PickCoverDialog(
+                                        onItemTap: (BuildContext context,
+                                            WidgetRef ref, Uint8List image) {
                                           ref
                                               .read(pickCoverControllerProvider)
-                                              .removeImage();
+                                              .setImage(image);
+                                          Navigator.pop(context);
                                         },
-                                        child: SvgPicture.asset(
-                                          'assets/icons/ic_trash.svg',
+                                      ),
+                                    ),
+                                  );
+                            },
+                            child: Container(
+                              color: context.colors.backgroundsPrimary,
+                              child: image == null
+                                  ? Row(
+                                      children: [
+                                        Text(
+                                          'Upload cover',
+                                          style: context.textStyles.caption2!
+                                              .copyWith(
+                                            color: context.colors.textsDisabled,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        SvgPicture.asset(
+                                          'assets/icons/ic_pick_photo.svg',
                                           width: 24,
                                         ),
-                                      ),
-                                      //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
-                                      const SizedBox(width: 16),
-                                    ],
-                                  ),
-                          ),
-                        )
-                      ],
+                                        //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
+                                        const SizedBox(width: 16),
+                                      ],
+                                    )
+                                  : Row(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(2.0),
+                                          child: SizedBox(
+                                            width: 36,
+                                            height: 24,
+                                            child: Image.memory(
+                                              image,
+                                              fit: BoxFit.cover,
+                                              cacheWidth: 24,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        GestureDetector(
+                                          onTap: () {
+                                            ref
+                                                .read(
+                                                    pickCoverControllerProvider)
+                                                .removeImage();
+                                          },
+                                          child: SvgPicture.asset(
+                                            'assets/icons/ic_trash.svg',
+                                            width: 24,
+                                          ),
+                                        ),
+                                        //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
+                                        const SizedBox(width: 16),
+                                      ],
+                                    ),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
                     Container(
                       color: context.colors.backgroundsPrimary,
                       child: const DescriptionTextField(),
                     ),
-                ],
+                  ],
+                ),
               ),
-            ),
           ],
         ),
       ),
@@ -367,22 +373,33 @@ class DescriptionTextField extends StatefulWidget {
     this.showDivider = true,
     this.button,
     this.maxSymbols = 140,
+    this.buttonAddCheck = true,
+    this.controller,
+    this.buttonLoading = false,
+    this.onTap,
+    this.focus,
   });
 
   final String? hint;
   final bool showDivider;
   final String? button;
   final int maxSymbols;
+  final bool buttonAddCheck;
+  final bool buttonLoading;
+  final FocusNode? focus;
+  final TextEditingController? controller;
+  final void Function()? onTap;
 
   @override
   State<DescriptionTextField> createState() => _DescriptionTextFieldState();
 }
 
 class _DescriptionTextFieldState extends State<DescriptionTextField> {
-  final TextEditingController descriptionController = TextEditingController();
+  TextEditingController? descriptionController;
 
   @override
   Widget build(BuildContext context) {
+    descriptionController ??= widget.controller ?? TextEditingController();
     return Column(
       children: [
         if (widget.showDivider)
@@ -394,6 +411,7 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: TextField(
+            focusNode: widget.focus,
             maxLines: null,
             controller: descriptionController,
             cursorWidth: 1,
@@ -421,20 +439,53 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
           child: Row(
             children: [
               const Spacer(),
-              if (descriptionController.text.isNotEmpty)
+              if (descriptionController!.text.isNotEmpty)
                 Text(
-                  '${descriptionController.text.length}/${widget.maxSymbols}',
+                  '${descriptionController!.text.length}/${widget.maxSymbols}',
                   style: context.textStyles.footNote!.copyWith(
-                    color: descriptionController.text.length > widget.maxSymbols
-                        ? context.colors.textsError
-                        : context.colors.textsDisabled,
+                    color:
+                        descriptionController!.text.length > widget.maxSymbols
+                            ? context.colors.textsError
+                            : context.colors.textsDisabled,
                   ),
                 ),
               const SizedBox(width: 12),
-              AppTextButton(
-                text: widget.button ?? "Create list",
-                disabled: descriptionController.text.isEmpty ||
-                    descriptionController.text.length > widget.maxSymbols,
+              SizedBox(
+                height: 32,
+                width:  TextInfoService.textSizeNoWidth(widget.button ?? "Create list", context.textStyles.calloutBold!.copyWith(
+                  color: context.colors.textsBackground,
+                ),).width + 32,
+                child: AppTextButton(
+                  disabled: (descriptionController!.text.isEmpty ||
+                          descriptionController!.text.length >
+                              widget.maxSymbols) ||
+                      !widget.buttonAddCheck,
+                  onTap: widget.onTap,
+                  child: widget.buttonLoading
+                      ? Center(
+
+                          child: defaultTargetPlatform != TargetPlatform.android
+                              ? CupertinoActivityIndicator(
+                            radius: 10.0,
+                            color: context.colors.textsBackground!,
+                          )
+                              : SizedBox(
+                            width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                    color: context.colors.textsBackground!,
+                                    strokeWidth: 2,
+                                  ),
+                              ),
+                        )
+                      : Text(
+                          widget.button ?? "Create list",
+                          style: context.textStyles.calloutBold!.copyWith(
+                            color: context.colors.textsBackground,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                ),
               ),
               const SizedBox(width: 16),
             ],

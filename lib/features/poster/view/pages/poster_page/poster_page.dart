@@ -9,6 +9,7 @@ import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
+import 'package:poster_stock/features/home/state_holders/home_page_likes_state_holder.dart';
 import 'package:poster_stock/features/home/view/helpers/custom_bounce_physic.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
@@ -30,13 +31,15 @@ class PosterPage extends ConsumerStatefulWidget {
     @PathParam('id') this.postId = 0,
     @PathParam('username') this.username = 'profile',
     Key? key,
-    this.index,
-    this.index2,
+    this.likes = 0,
+    this.liked = false,
+    this.comments = 0,
   }) : super(key: key);
 
   final int postId;
-  final int? index;
-  final int? index2;
+  final int likes;
+  final int comments;
+  final bool liked;
   final String username;
 
   @override
@@ -118,22 +121,23 @@ class _PosterPageState extends ConsumerState<PosterPage>
       color: Colors.grey,
     ),
   );
+
   @override
   Widget build(BuildContext context) {
-    post = ref.watch(posterStateHolderProvider);
-
+    final post = ref.watch(posterStateHolderProvider);
+    final comments = ref.watch(commentsStateHolderProvider);
     if (post == null) {
       Future(() async {
         var el = AutoRouter
             .of(context)
             .stackData
             .lastWhere((element) => element.route.path == ':username/:id');
-        ref.read(commentsControllerProvider).getPost(el.pathParams.getInt('id'));
+        ref
+            .read(commentsControllerProvider)
+            .getPost(el.pathParams.getInt('id'));
+        ref.read(commentsControllerProvider).updateComments(
+            el.pathParams.getInt('id'));
       });
-    }
-    final comments = ref.watch(commentsStateHolderProvider);
-    if (comments == null) {
-      ref.read(commentsControllerProvider).updateComments(widget.postId);
     }
     if (posterController == null) {
       imageHeight = MediaQuery
@@ -219,7 +223,11 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                 child: AnimatedBuilder(
                                   animation: posterController!,
                                   builder: (context, child) {
-                                    return PosterInfo();
+                                    return PosterInfo(
+                                      likes: widget.likes,
+                                      comments: widget.comments,
+                                      liked: widget.liked,
+                                    );
                                   },
                                 ),
                               ),
@@ -600,24 +608,29 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                 scrollController.offset)) -
                                 iconsController.value;
                         return Positioned(
-                          right: 16 + iconsController.value * 1.2,
-                          top: 25 +
+                          right: (16 + iconsController.value * 1.2)
+                              .toInt()
+                              .toDouble(),
+                          top: (25 +
                               MediaQuery
                                   .of(context)
                                   .padding
                                   .top +
-                              iconAddition,
+                              iconAddition).toInt().toDouble(),
                           child: Row(
                             children: [
                               GestureDetector(
                                 onTap: () {
                                   print(1);
                                 },
-                                child: SvgPicture.asset(
-                                  'assets/icons/ic_bookmarks.svg',
-                                  colorFilter: ColorFilter.mode(
-                                    context.colors.iconsDefault!,
-                                    BlendMode.srcIn,
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: Image.asset(
+                                      'assets/images/ic_bookmarks.png',
+                                      color:
+                                      context.colors.iconsDefault!,
+                                      colorBlendMode: BlendMode.srcIn,
                                   ),
                                 ),
                               ),
@@ -628,11 +641,14 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                 onTap: () {
                                   //TODO dialog
                                 },
-                                child: SvgPicture.asset(
-                                  'assets/icons/ic_collection.svg',
-                                  colorFilter: ColorFilter.mode(
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: Image.asset(
+                                    'assets/images/ic_collection.png',
+                                    color:
                                     context.colors.iconsDefault!,
-                                    BlendMode.srcIn,
+                                    colorBlendMode: BlendMode.srcIn,
                                   ),
                                 ),
                               ),
@@ -1013,12 +1029,18 @@ class PosterPageAppBar extends StatelessWidget {
 class PosterInfo extends ConsumerWidget {
   const PosterInfo({
     super.key,
+    required this.likes,
+    required this.comments,
+    required this.liked,
   });
+
+  final int likes;
+  final int comments;
+  final bool liked;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final post = ref.watch(posterStateHolderProvider);
-    final likes = post?.likes;
     final comments = ref.watch(commentsStateHolderProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1077,23 +1099,30 @@ class PosterInfo extends ConsumerWidget {
           children: [
             const Spacer(),
             LikeButton(
-              liked: (post?.liked ?? false),
-              amount: (post?.likes == null ? 0 : post!.likes),
+              liked: (post?.liked ?? liked),
+              amount: (post?.likes == null ? likes : post!.likes),
               onTap: () {
                 ref
                     .read(homePagePostsControllerProvider)
                     .setLikeId(post!.id, !(post.liked));
                 ref.read(posterStateHolderProvider.notifier).updateState(
-                    post.copyWith(
-                        liked: !(post.liked),
-                        likes: post.liked ? post.likes - 1 : post.likes + 1));
+                  post.copyWith(
+                    liked: !(post.liked),
+                    likes: post.liked ? post.likes - 1 : post.likes + 1,
+                  ),
+                );
               },
             ),
             const SizedBox(width: 12),
             ReactionButton(
               iconPath: 'assets/icons/ic_comment2.svg',
               iconColor: context.colors.iconsDisabled!,
-              amount: comments?.length ?? 0,
+              amount: (comments?.length ?? this.comments),
+              onTap: () {
+                ref
+                    .read(homePagePostsControllerProvider)
+                    .addComment(post!.id);
+              },
             ),
           ],
         ),

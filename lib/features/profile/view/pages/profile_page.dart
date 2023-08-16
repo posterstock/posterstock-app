@@ -34,11 +34,9 @@ class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({
     @PathParam('username') this.username = 'profile',
     Key? key,
-    this.userId,
   }) : super(key: key);
 
   final String username;
-  final int? userId;
 
   @override
   ConsumerState<ProfilePage> createState() => _ProfilePageState();
@@ -292,8 +290,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                                   fit: BoxFit.cover,
                                                   cacheWidth: 150,
                                                 ).image),
-                                      backgroundColor:
-                                          avatar[Random().nextInt(3)],
+                                      backgroundColor: profile?.color,
                                       child: profile?.imagePath == null &&
                                               profile?.name != null
                                           ? Text(
@@ -480,7 +477,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                         ref
                                             .read(profileControllerApiProvider)
                                             .follow(
-                                              widget.userId!,
+                                              profile!.id!,
                                               profile!.followed,
                                             );
                                       }
@@ -647,8 +644,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                 : ProfileTabs(
                     shimmer: shimmer,
                     controller: tabController!,
-                    //TODO
-                    name: profile?.name,
+                    name: profile?.mySelf == true ? null : profile?.name,
                   ),
           ),
         ),

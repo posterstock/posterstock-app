@@ -8,9 +8,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
+import 'package:poster_stock/features/auth/state_holders/code_error_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/email_code_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/email_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/name_state_holder.dart';
+import 'package:poster_stock/features/auth/state_holders/sign_up_loading_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/sign_up_username_error_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/username_state_holder.dart';
 import 'package:poster_stock/features/auth/view/widgets/auth_button.dart';
@@ -34,6 +36,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   final GlobalKey text2 = GlobalKey();
   final GlobalKey text3 = GlobalKey();
   final ScrollController controller = ScrollController();
+
 
   void animateScrollTo(double value, ScrollController controller) async {
     await waitWhile(() => controller.hasClients);
@@ -90,7 +93,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    final codeErrorState = ref.watch(codeErrorStateHolderProvider);
     final emailState = ref.watch(emailStateHolderProvider);
+    final loading = ref.watch(signupLoadingStateHolderProvider);
     final nameState = ref.watch(nameStateHolderProvider);
     final codeState = ref.watch(emailCodeStateHolderProvider);
     final usernameState = ref.watch(usernameStateHolderProvider);
@@ -99,6 +104,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     final nameErrorState = ref.watch(signUpNameErrorStateHolderProvider);
     final screenHeight = (MediaQuery.of(context).size.height -
         MediaQuery.of(context).viewInsets.bottom);
+    final int fullContent = 500;
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -171,7 +177,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                       tickOnSuccess: true,
                       hasError: usernameErrorState != null,
                       onTap: () {
-                        animateScrollTo(120, controller);
+                        if (screenHeight - 600 < 0) {
+                          animateScrollTo(600 -screenHeight , controller);
+                        }
                       },
                       onChanged: (value) {
                         setUsername(value);
@@ -227,13 +235,30 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         ref.read(signUpControllerProvider).removeCode();
                       },
                       onTap: () {
-                        animateScrollTo(175, controller);
+                        if (screenHeight - 650 < 0) {
+                          animateScrollTo(650 - screenHeight , controller);
+                        }
                       },
                     ),
                     const SizedBox(
-                      height: 24,
+                      height: 4,
+                    ),
+                    SizedBox(
+                      height: 13,
+                      width: double.infinity,
+                      child: Text(
+                        codeErrorState ?? '',
+                        style: context.textStyles.caption2!.copyWith(
+                          color: context.colors.textsError,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 8,
                     ),
                     AuthButton(
+                      loading: loading,
+                      loadingBorderColor: context.colors.fieldsActive!,
                       text: AppLocalizations.of(context)!.createAccount,
                       disabled: usernameErrorState != null ||
                           usernameState.length < 2 ||

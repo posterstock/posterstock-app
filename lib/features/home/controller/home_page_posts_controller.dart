@@ -42,6 +42,7 @@ class HomePagePostsController {
   }
 
   Future<void> setLikeId(int id, bool value) async {
+    homePagePostsState.setLikeId(id, value);
     repository.setLike(id, value);
   }
 

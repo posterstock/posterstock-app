@@ -7,6 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
+import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/features/auth/view/pages/sign_up_page.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
@@ -35,10 +36,10 @@ class PostBase extends ConsumerWidget {
   final int? index;
   final PageHolder pageHolder = PageHolder();
   final bool showSuggestion;
-  final GlobalKey<MovieCardState> postKey = GlobalKey();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print(key);
     final anyPost = index == null
         ? null
         : ref.watch(homePagePostsStateHolderProvider)?[index!];
@@ -62,8 +63,9 @@ class PostBase extends ConsumerWidget {
             AutoRouter.of(context).push(
               PosterRoute(
                 postId: post[pageHolder.page].id,
-                index: index ?? 0,
-                index2: pageHolder.page,
+                likes: post[pageHolder.page].likes,
+                liked: post[pageHolder.page].liked,
+                comments: post[pageHolder.page].comments,
               ),
             );
           }
@@ -112,7 +114,7 @@ class PostBase extends ConsumerWidget {
               ),
               if (post == null && multPost == null || post != null)
                 MovieCard(
-                  key: postKey,
+                  key: key,
                   index: index!,
                   pageHolder: pageHolder,
                 ),
@@ -159,7 +161,6 @@ class UserInfoTile extends ConsumerWidget {
           if (user == null) return;
           AutoRouter.of(context).push(
             ProfileRoute(
-              userId: user!.id,
               username: user!.username,
             ),
           );
@@ -270,7 +271,10 @@ class UserInfoTile extends ConsumerWidget {
               ),
               if (!(user?.followed ?? true) && (!loading) && showFollowButton)
                 SizedBox(
-                  width: 83,
+                  width: TextInfoService.textSizeNoWidth(
+                          AppLocalizations.of(context)!.follow,
+                          context.textStyles.calloutBold!)
+                      .width + 32,
                   child: AppTextButton(
                     text: AppLocalizations.of(context)!.follow,
                     onTap: () async {

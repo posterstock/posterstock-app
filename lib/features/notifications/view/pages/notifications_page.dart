@@ -165,9 +165,7 @@ class NotificationTile extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   AutoRouter.of(context).push(
-                    ProfileRoute(
-                      userId: 1,
-                    ),
+                    ProfileRoute(),
                   );
                 },
                 child: CircleAvatar(

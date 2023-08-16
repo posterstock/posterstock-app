@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:supertokens_flutter/dio.dart';
 import 'package:supertokens_flutter/supertokens.dart';
@@ -16,17 +18,60 @@ class CreatePosterService {
     _dio.interceptors.add(SuperTokensInterceptorWrapper(client: _dio));
   }
 
-  Future<List<dynamic>> getSearchMedia(String searchValue) async {
+  Future<void> createPoster(
+      int mediaId, String mediaType, String image, String description) async {
     token = await SuperTokens.getAccessToken();
     try {
-      var response = await _dio.get(
-        'api/media/search',
+      var response = await _dio.post(
+        '/api/posters/',
         options: Options(
           headers: {'Authorization': 'Bearer $token'},
         ),
-        queryParameters: {
-          'query' : searchValue,
-        }
+        data: jsonEncode(
+          {
+            "description": description,
+            "media_id": mediaId,
+            "media_type": mediaType,
+            "poster_image": image,
+          },
+        ),
+      );
+      print(response.data);
+      return response.data;
+    } on DioError catch (e) {
+      print(e.response?.headers);
+      rethrow;
+    }
+  }
+
+  Future<List<dynamic>> getSearchMedia(String searchValue) async {
+    token = await SuperTokens.getAccessToken();
+    try {
+      var response = await _dio.get('api/media/search',
+          options: Options(
+            headers: {'Authorization': 'Bearer $token'},
+          ),
+          queryParameters: {
+            'query': searchValue,
+          });
+      print(response.data);
+      return response.data;
+    } on DioError catch (e) {
+      print(e.response);
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getMediaPosters(String mediaType, int mediaId) async {
+    print(mediaType);
+    print(mediaId);
+    token = await SuperTokens.getAccessToken();
+    try {
+      var response = await _dio.get(
+        'api/media/$mediaType/$mediaId',
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
       );
       print(response.data);
       return response.data;

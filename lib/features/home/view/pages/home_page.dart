@@ -48,10 +48,10 @@ class HomePage extends ConsumerWidget {
         ),
         NotificationListener<ScrollUpdateNotification>(
           onNotification: (n) {
-            if (n.metrics.pixels >= controller.position.maxScrollExtent - MediaQuery.of(context).size.height) {
-              ref
-                  .read(homePagePostsControllerProvider)
-                  .getPosts();
+            if (n.metrics.pixels >=
+                controller.position.maxScrollExtent -
+                    MediaQuery.of(context).size.height) {
+              ref.read(homePagePostsControllerProvider).getPosts();
             }
             if (n.metrics.pixels <= -120 && n.metrics.axis == Axis.vertical) {
               controller.animateTo(
@@ -104,27 +104,19 @@ class HomePage extends ConsumerWidget {
                       FutureBuilder(
                         future: postsFuture,
                         builder: (context, snapshot) {
-                          if (posts != null && posts.length > index) {
-                            if (posts[index].isEmpty) return const SizedBox();
-                            if (posts[index][0] is MultiplePostModel) {
-                              return PostBase(
-                                index: index,
-                              );
-                            } else {
-                              return PostBase(
-                                index: index,
-                              );
-                            }
-                          }
-                          return PostBase(index: index,);
+                          if (posts?[index].isEmpty ?? false) return const SizedBox();
+                          return PostBase(
+                            key: Key(posts?[index][0].id.toString() ?? index.toString()),
+                            index: index,
+                          );
                         },
                       ),
                       if (posts?[index].isEmpty == false)
-                      Divider(
-                        color: context.colors.fieldsDefault,
-                        height: 1,
-                        thickness: 1,
-                      ),
+                        Divider(
+                          color: context.colors.fieldsDefault,
+                          height: 1,
+                          thickness: 1,
+                        ),
                     ],
                   ),
                 ),

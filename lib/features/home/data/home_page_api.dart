@@ -43,24 +43,28 @@ class HomePageApi implements IHomePageApi {
   @override
   Future<(Map<String, dynamic>?, bool)?> getPosts(
       {bool getNewPosts = false}) async {
+    print(122324);
+    print(getNewPosts);
     if (loadedAll && !getNewPosts) return null;
     try {
-      print(1);
-      final response = await _dio.get('api/feed',
+      print(token);
+      final response = await _dio.get('api/feed/',
           options: Options(headers: {'Authorization': 'Bearer $token'}),
           queryParameters: {
             'cursor': getNewPosts ? null : postsCursor,
           });
-      print(2);
+      print(2123213);
       if (!getNewPosts && !(response.data['has_more'] as bool)) {
         loadedAll = true;
       } else if (!getNewPosts) {
         loadedAll = false;
       }
       if (!getNewPosts) postsCursor = response.data['next_cursor'] as String?;
-      print(response);
+      print(response.data['entries'][0].forEach((key, value) => print('$key:$value')));
+      print(response.data['entries'].forEach((el) => print('SS${el['is_suggested']}')));
       return (response.data as Map<String, dynamic>?, loadedAll);
     } on DioError catch (e) {
+      print(122314);
       print(e.response);
       print(e.response?.headers);
       rethrow;

@@ -16,7 +16,7 @@ dependencies:
 
   intl: ^0.18.0
   cupertino_icons: ^1.0.2
-  flutter_svg: ^2.0.2
+  flutter_svg: ^2.0.7
   flutter_riverpod: ^2.3.2
   auto_route: ^5.0.4
   shimmer: ^2.0.0

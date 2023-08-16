@@ -1,5 +1,6 @@
 enum MediaType {
   movie,
+  tv,
 }
 
 class MediaModel {
@@ -24,7 +25,7 @@ class MediaModel {
     return MediaModel(
       id: json['id'] as int,
       title: json['title'] as String,
-      type: MediaType.movie,
+      type: json['type'] == 'tv' ? MediaType.tv : MediaType.movie,
       startYear: json['start_year'] as int,
       endYear: json['end_year'] as int?,
       mainPoster: json['main_poster'] as String,

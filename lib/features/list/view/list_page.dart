@@ -344,7 +344,7 @@ class _ListPageState extends ConsumerState<ListPage>
   double getEmptySpaceHeightForCollection(
       BuildContext context, MultiplePostModel? posts) {
     final comments = ref.watch(commentsStateHolderProvider);
-    double result = (comments?.length ?? 0) * 80 + 245;
+    double result = (comments?.length ?? 0) * 80 + 200;
     result += TextInfoService.textSize(
       posts?.name ?? '',
       context.textStyles.title3!,
