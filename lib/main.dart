@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:auto_route/auto_route.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -19,8 +21,19 @@ import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_ho
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supertokens_flutter/supertokens.dart';
 
+import 'common/services/notifications_service.dart';
 import 'firebase_options.dart';
 import 'navigation/app_router.gr.dart';
+
+final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
+/// Тут логика по получению пушей в бэкграугнде
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  debugPrint("Handling a background message: ${message.messageId}${message.data}");
+  showPush(message);
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +43,11 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  initPushes();
   final prefs = await SharedPreferences.getInstance();
+  debugPrint("FCM TOKEN $fcmToken");
   TokenKeeper.token = prefs.getString('token') == '' ? null : prefs.getString('token');
   //TODO
   PackageInfo.setMockInitialValues(
@@ -40,6 +57,7 @@ void main() async {
     buildNumber: '1',
     buildSignature: 'Posterstock',
   );
+
   runApp(ProviderScope(child: App()));
 }
 
@@ -84,6 +102,7 @@ class App extends ConsumerWidget {
     return MaterialApp.router(
       routerDelegate: _appRouter.delegate(),
       routeInformationParser: _appRouter.defaultRouteParser(),
+      scaffoldMessengerKey: scaffoldMessengerKey,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
