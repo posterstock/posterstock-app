@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/data/exceptions.dart';
 import 'package:poster_stock/common/state_holders/intl_state_holder.dart';
@@ -84,6 +85,12 @@ class AuthController {
     }
   }
 
+  Future<void> registerNotification(String token) async {
+    final userToken = await SuperTokens.getAccessToken();
+    if (userToken == null) throw Exception();
+    await repository.registerNotification(token, userToken);
+  }
+
   Future<bool> authApple({
     String? name,
     String? surname,
@@ -100,6 +107,8 @@ class AuthController {
       clientId: clientId,
       state: state,
     );
+    final token = await FirebaseMessaging.instance.getToken();
+    await registerNotification(token!);
     return true;
   }
 
@@ -113,6 +122,8 @@ class AuthController {
       idToken: idToken,
       code: code,
     );
+    final token = await FirebaseMessaging.instance.getToken();
+    await registerNotification(token!);
     return true;
   }
 }

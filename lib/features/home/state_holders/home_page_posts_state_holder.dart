@@ -15,40 +15,54 @@ class HomePagePostsStateHolder
     super.state,
   );
 
-  Future<void> updateState(List<List<PostBaseModel>>? posts) async {
-    for (int i = 0; i < (posts?.length ?? 0); i++) {
-      for (int j = 0; j < (posts?.length ?? 0); j++) {
-        if (i == j) continue;
-        if (posts![i][0].author.id == posts[j][0].author.id &&
-            posts[i][0].timeDate.difference(posts[j][0].timeDate).inDays < 1) {
-          posts[i].add(posts[j][0]);
-          posts.removeAt(j);
-          j = 0;
-          i = 0;
-        }
-      }
+  Future<void> updateState(List<PostBaseModel>? posts) async {
+    if (posts == null) {
+      return;
     }
-    for (int i = 0; i < (posts?.length ?? 0); i++) {
-      posts?[i].sort((first, second) {
-        return first.timeDate.isAfter(second.timeDate) ? 1 : -1;
-      });
-    }
-    if (state == null) {
-      state = posts;
-    } else {
-      if (state != null && posts != null) {
-        for (var statePost in posts) {
-          for (var st in statePost) {
-            state!
-                .map((e) => e.removeWhere((element) {
-                      return element.id == st.id;
-                    }))
-                .toList();
+    List<List<PostBaseModel>>? newState = [];
+    for (int i = 0; i < posts.length; i++) {
+      newState.add([posts[i]]);
+      for (int j = i + 1; j < posts.length; j++) {
+        if (posts[i].author.username == posts[j].author.username) {
+          for (var post in newState[i]) {
+            if (post.timeDate.difference(posts[j].timeDate).inHours.abs() <
+                25) {
+              newState[i].add(posts[j]);
+              posts.removeAt(j);
+              j--;
+              break;
+            }
           }
         }
       }
-      if (posts == null || posts.isEmpty) return;
-      state = [...posts, ...state!];
+    }
+    for (int i = 0; i < newState.length; i++) {
+      newState[i].sort((first, second) {
+        return first.timeDate.isAfter(second.timeDate) ? -1 : 1;
+      });
+    }
+    if (state == null) {
+      state = newState;
+    } else {
+      if (state != null) {
+        for (var statePost in newState) {
+          for (var st in statePost) {
+            for (int i = 0; i < (state?.length ?? 0); i++) {
+              for (int j = 0; j < (state?[i].length ?? 0); j++) {
+                if (state![i][j].id == st.id) {
+                  state![i].removeAt(j);
+                  j--;
+                }
+              }
+              if (state![i].isEmpty) {
+                state!.removeAt(i);
+                i--;
+              }
+            }
+          }
+        }
+      }
+      state = [...newState, ...?state];
     }
   }
 
@@ -83,6 +97,13 @@ class HomePagePostsStateHolder
         if (state![i][j].author.id == id) {
           if (!follow) {
             state?.removeAt(i);
+            i--;
+          } else {
+            state![i][j] = state![i][j].copyWith(
+              author: state![i][j].author.copyWith(
+                    followed: true,
+                  ),
+            );
           }
         }
       }
@@ -103,29 +124,59 @@ class HomePagePostsStateHolder
     state = [...?state];
   }
 
-  Future<void> updateStateEnd(List<List<PostBaseModel>>? posts) async {
-    for (int i = 0; i < (posts?.length ?? 0); i++) {
-      for (int j = 0; j < (posts?.length ?? 0); j++) {
-        if (i == j) continue;
-        if (posts![i][0].author.id == posts[j][0].author.id &&
-            posts[i][0].timeDate.difference(posts[j][0].timeDate).inDays < 1) {
-          posts[i].add(posts[j][0]);
-          posts.removeAt(j);
-          j = 0;
-          i = 0;
+  Future<void> updateStateEnd(List<PostBaseModel>? posts) async {
+    if (posts == null) {
+      return;
+    }
+    List<List<PostBaseModel>>? newState = [];
+    for (int i = 0; i < posts.length; i++) {
+      newState.add([posts[i]]);
+      for (int j = i + 1; j < posts.length; j++) {
+        if (posts[i].author.username == posts[j].author.username) {
+          for (var post in newState[i]) {
+            if (post.timeDate.difference(posts[j].timeDate).inHours.abs() <
+                25) {
+              print(
+                  'suc${post.name} ${posts[j].name} ${post.timeDate} ${posts[j].timeDate} ${post.time} ${posts[j].time} ${post.timeDate.difference(posts[j].timeDate).inHours.abs()}');
+              newState[i].add(posts[j]);
+              posts.removeAt(j);
+              j--;
+              break;
+            } else {
+              print(
+                  '${post.name} ${posts[j].name} ${post.timeDate} ${posts[j].timeDate} ${post.time} ${posts[j].time} ${post.timeDate.difference(posts[j].timeDate).inHours.abs()}');
+            }
+          }
         }
       }
     }
-    for (int i = 0; i < (posts?.length ?? 0); i++) {
-      posts?[i].sort((first, second) {
-        return first.timeDate.isAfter(second.timeDate) ? 1 : -1;
+    for (int i = 0; i < newState.length; i++) {
+      newState[i].sort((first, second) {
+        return first.timeDate.isAfter(second.timeDate) ? -1 : 1;
       });
     }
     if (state == null) {
-      state = posts;
+      state = newState;
     } else {
-      if (posts == null) return;
-      state = [...state!, ...posts];
+      if (state != null) {
+        for (var statePost in newState) {
+          for (var st in statePost) {
+            for (int i = 0; i < (state?.length ?? 0); i++) {
+              for (int j = 0; j < (state?[i].length ?? 0); j++) {
+                if (state![i][j].id == st.id) {
+                  state![i].removeAt(j);
+                  j--;
+                }
+              }
+              if (state![i].isEmpty) {
+                state!.removeAt(i);
+                i--;
+              }
+            }
+          }
+        }
+      }
+      state = [...?state, ...newState];
     }
   }
 }

@@ -18,7 +18,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_svg: ^2.0.7
   flutter_riverpod: ^2.3.2
-  auto_route: ^5.0.4
+  auto_route: ^7.8.0
   shimmer: ^2.0.0
   package_info_plus: ^4.0.1
   scrollable_positioned_list: ^0.3.8
@@ -48,7 +48,7 @@ dev_dependencies:
 
   flutter_lints: ^2.0.0
   flutter_launcher_icons: ^0.13.1
-  auto_route_generator: ^5.0.3
+  auto_route_generator: ^7.3.1
   flutter_native_splash: ^2.2.19
   build_runner:
 

@@ -18,6 +18,9 @@ import 'package:poster_stock/features/profile/view/empty_collection_widget.dart'
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
+import '../../../../common/state_holders/router_state_holder.dart';
+
+@RoutePage()
 class NotificationsPage extends ConsumerWidget {
   const NotificationsPage({Key? key}) : super(key: key);
 
@@ -135,7 +138,7 @@ class NotificationsPage extends ConsumerWidget {
   }
 }
 
-class NotificationTile extends StatelessWidget {
+class NotificationTile extends ConsumerWidget {
   const NotificationTile({
     Key? key,
     required this.notification,
@@ -152,7 +155,7 @@ class NotificationTile extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Material(
       color: context.colors.backgroundsPrimary,
       child: CustomInkWell(
@@ -164,9 +167,9 @@ class NotificationTile extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () {
-                  AutoRouter.of(context).push(
+                  /*ref.watch(router)!.push(
                     ProfileRoute(),
-                  );
+                  );*/
                 },
                 child: CircleAvatar(
                   radius: 20,

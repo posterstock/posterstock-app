@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/state_holders/auth_id_state_holder.dart';
@@ -123,6 +124,8 @@ class SignUpController {
         deviceId: deviceId,
         email: email
       );
+      //final token = await FirebaseMessaging.instance.getToken();
+      //await registerNotification(token!);
       signUpLoadingStateHolder.setValue(false);
       return true;
     } catch (e) {
@@ -133,6 +136,7 @@ class SignUpController {
   }
 
   Future<bool> processAuth() async {
+    signUpLoadingStateHolder.setValue(true);
     try {
      await repository.confirmCode(
         code: code,
@@ -142,11 +146,22 @@ class SignUpController {
         login: username,
         email: email,
       );
-      //final int id = await repository.getId(token!);
-      //await authIdStateHolder.updateState(id);
+     final token = await FirebaseMessaging.instance.getToken();
+     await registerNotification(token!);
+     signUpLoadingStateHolder.setValue(false);
       return true;
     } catch (e) {
+      signUpLoadingStateHolder.setValue(false);
       return false;
     }
+  }
+
+  Future<void> registerNotification(String token) async {
+    print(330);
+    final userToken = await SuperTokens.getAccessToken();
+    print(560);
+    if (userToken == null) throw Exception();
+    print(34);
+    await repository.registerNotification(token, userToken);
   }
 }

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
 import 'package:poster_stock/features/auth/state_holders/code_error_state_holder.dart';
@@ -24,6 +25,7 @@ import '../../../../common/widgets/custom_scaffold.dart';
 import '../../state_holders/sign_up_name_error_state_holdeer.dart';
 import '../widgets/custom_app_bar.dart';
 
+@RoutePage()
 class SignUpPage extends ConsumerStatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
 
@@ -277,11 +279,12 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         color: context.colors.textsAction!,
                       ),
                       onTap: () async {
+                        print(23);
                         bool success = await ref
                             .read(signUpControllerProvider)
                             .processAuth();
                         if (success && context.mounted) {
-                          AutoRouter.of(context).pushAndPopUntil(
+                          ref.watch(router)!.pushAndPopUntil(
                             const NavigationRoute(),
                             predicate: (route) {
                               return false;

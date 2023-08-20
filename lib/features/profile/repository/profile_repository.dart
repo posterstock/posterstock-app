@@ -26,6 +26,7 @@ class ProfileRepository implements IProfileRepository {
   Future<List<PostMovieModel>> getProfilePosts(int? id) async {
     try {
       final result = (await profileService.getUserPosts(id));
+      print(result);
       return result
           .map(
             (e) => PostMovieModel.fromJson(e),

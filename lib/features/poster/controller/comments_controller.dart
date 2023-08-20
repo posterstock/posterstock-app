@@ -29,7 +29,7 @@ class CommentsController {
 
   Future<void> postComment(final int id, final String text) async {
     final result = await postRepository.postComment( id, text);
-    await commentsStateHolder.updateComments([result]);
+    await commentsStateHolder.updateMoreComments([result]);
   }
 
   Future<void> updateComments(final int id) async {

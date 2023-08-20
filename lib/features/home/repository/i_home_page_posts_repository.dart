@@ -1,7 +1,7 @@
 import 'package:poster_stock/features/home/models/post_base_model.dart';
 
 abstract class IHomePagePostsRepository {
-  Future<(List<List<PostBaseModel>>?, bool)?> getPosts(
+  Future<(List<PostBaseModel>?, bool)?> getPosts(
       {bool getNesPosts = false});
 
   Future<void> setLike(int? index, bool like);

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/auth/state_holders/code_error_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/sign_up_loading_state_holder.dart';
@@ -19,6 +20,7 @@ import '../../state_holders/email_state_holder.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/custom_app_bar.dart';
 
+@RoutePage()
 class LoginPage extends ConsumerWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -118,7 +120,7 @@ class LoginPage extends ConsumerWidget {
                           .read(signUpControllerProvider)
                           .processSignIn();
                       if (success && context.mounted) {
-                        AutoRouter.of(context).pushAndPopUntil(
+                        ref.watch(router)!.pushAndPopUntil(
                           const NavigationRoute(),
                           predicate: (route) {
                             return false;

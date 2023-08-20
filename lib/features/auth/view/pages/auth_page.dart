@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/features/auth/controllers/auth_controller.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_error_state_holder.dart';
@@ -25,6 +26,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import '../../../../common/state_holders/intl_state_holder.dart';
 import '../../../../common/widgets/app_text_field.dart';
 
+@RoutePage()
 class AuthPage extends ConsumerWidget {
   AuthPage({Key? key}) : super(key: key);
   final textEditingController = TextEditingController();
@@ -47,231 +49,222 @@ class AuthPage extends ConsumerWidget {
     final theme = ref.watch(themeStateHolderProvider);
     if (TokenKeeper.token != null) {
       Future(() {
-        AutoRouter.of(context).pushAndPopUntil(
-          const NavigationRoute(),
-          predicate: (route) {
-            return false;
-          },
+        ref.watch(router)!.replaceNamed(
+          '/',
         );
       });
     }
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-      },
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle(
-            statusBarBrightness: Brightness.dark,
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: Brightness.light,
-            systemNavigationBarColor: context.colors.backgroundsPrimary,
-            systemNavigationBarIconBrightness:
-                Theme.of(context).brightness == Brightness.light
-                    ? Brightness.dark
-                    : Brightness.light,
-          ),
-          child: Stack(
-            children: [
-              ListView(
-                padding: EdgeInsets.zero,
-                physics: MediaQuery.of(context).size.height < 812
-                    ? const AlwaysScrollableScrollPhysics(
-                        parent: BouncingScrollPhysics())
-                    : const NeverScrollableScrollPhysics(
-                        parent: BouncingScrollPhysics()),
-                controller: scrollController2,
+    return AutoRouter(
+      placeholder: (context) {
+        return GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            body: AnnotatedRegion<SystemUiOverlayStyle>(
+              value: SystemUiOverlayStyle(
+                statusBarBrightness: Brightness.dark,
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: Brightness.light,
+                systemNavigationBarColor: context.colors.backgroundsPrimary,
+                systemNavigationBarIconBrightness:
+                    Theme.of(context).brightness == Brightness.light
+                        ? Brightness.dark
+                        : Brightness.light,
+              ),
+              child: Stack(
                 children: [
-                  Image.asset(
-                    theme.brightness == Brightness.light
-                        ? 'assets/images/header_light.png'
-                        : 'assets/images/header_dark.png',
-                    fit: BoxFit.fitWidth,
+                  ListView(
+                    padding: EdgeInsets.zero,
+                    physics: MediaQuery.of(context).size.height < 812
+                        ? const AlwaysScrollableScrollPhysics(
+                            parent: BouncingScrollPhysics())
+                        : const NeverScrollableScrollPhysics(
+                            parent: BouncingScrollPhysics()),
+                    controller: scrollController2,
+                    children: [
+                      Image.asset(
+                        theme.brightness == Brightness.light
+                            ? 'assets/images/header_light.png'
+                            : 'assets/images/header_dark.png',
+                        fit: BoxFit.fitWidth,
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height,
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height,
+                  SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: ColumnOrList(
+                        controller: scrollController1,
+                        isList: MediaQuery.of(context).size.height < 812,
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.width / 375 * 220 -
+                                72 -
+                                MediaQuery.of(context).padding.top,
+                            width: double.infinity,
+                          ),
+                          SizedBox(
+                            width: 144,
+                            height: 144,
+                            child: Theme.of(context).brightness == Brightness.light
+                                ? SvgPicture.asset('assets/images/light_logo.svg')
+                                : SvgPicture.asset('assets/images/dark_logo.svg'),
+                          ),
+                          const SizedBox(height: 9),
+                          Text(
+                            AppLocalizations.of(context)!.welcome,
+                            style: context.textStyles.title2!,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 34),
+                          AppTextField(
+                            hint: AppLocalizations.of(context)!.enterEmail,
+                            onSubmitted: (value) {
+                              checkEmail(ref, value, context);
+                            },
+                            controller: textEditingController,
+                          ),
+                          const SizedBox(height: 4),
+                          SizedBox(
+                            width: double.infinity,
+                            child: Text(
+                              errorState ?? '',
+                              style: context.textStyles.caption1!,
+                              textAlign: TextAlign.start,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          AuthButton(
+                            loading: ref
+                                .watch(authLoadingStateHolderProvider)
+                                .loadingEmail,
+                            onTap: () {
+                              checkEmail(ref, textEditingController.text, context);
+                            },
+                            child: Text(
+                              AppLocalizations.of(context)!.contWithEmail,
+                              style: context.textStyles.calloutBold,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Center(
+                            child: Text(
+                              AppLocalizations.of(context)!.or,
+                              style: context.textStyles.callout,
+                            ),
+                          ),
+                          if (!Platform.isAndroid) const SizedBox(height: 20),
+                          if (!Platform.isAndroid)
+                            AuthButton(
+                              onTap: () {
+                                loadApple(ref, context);
+                              },
+                              loading: loadingState.loadingApple,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.apple,
+                                    color: context.colors.iconsDefault!,
+                                    size: 24,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    AppLocalizations.of(context)!.contWithApple,
+                                    style: context.textStyles.calloutBold,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          const SizedBox(height: 20),
+                          AuthButton(
+                            onTap: () {
+                              loadGoogle(ref, context);
+                            },
+                            loading: loadingState.loadingGoogle,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/ic_google.svg',
+                                  width: 24,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  AppLocalizations.of(context)!.contWithGoogle,
+                                  style: context.textStyles.calloutBold,
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (MediaQuery.of(context).size.height >= 812)
+                            const Spacer(),
+                          if (MediaQuery.of(context).size.height < 812)
+                            const SizedBox(height: 32.0),
+                          Center(
+                            child: RichText(
+                              textDirection: TextDirection.ltr,
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                text: AppLocalizations.of(context)!
+                                    .privacyPolicyText1,
+                                style: context.textStyles.caption2,
+                                children: <TextSpan>[
+                                  TextSpan(
+                                    text: AppLocalizations.of(context)!
+                                        .privacyPolicyLink1,
+                                    style: context.textStyles.caption2!.copyWith(
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () => launchUrlString(
+                                          "https://thedirection.org/posterstock_terms"),
+                                  ),
+                                  TextSpan(
+                                    text: AppLocalizations.of(context)!
+                                        .privacyPolicyText2,
+                                    style: context.textStyles.caption2,
+                                  ),
+                                  TextSpan(
+                                    text: AppLocalizations.of(context)!
+                                        .privacyPolicyLink2,
+                                    style: context.textStyles.caption2!.copyWith(
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () => launchUrlString(
+                                          "https://thedirection.org/posterstock_privacy"),
+                                  ),
+                                  TextSpan(
+                                    text: AppLocalizations.of(context)!
+                                        .privacyPolicyText3,
+                                    style: context.textStyles.caption2,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: ColumnOrList(
-                    controller: scrollController1,
-                    isList: MediaQuery.of(context).size.height < 812,
-                    children: [
-                      SizedBox(
-                        height: MediaQuery.of(context).size.width / 375 * 220 -
-                            72 -
-                            MediaQuery.of(context).padding.top,
-                        width: double.infinity,
-                      ),
-                      SizedBox(
-                        width: 144,
-                        height: 144,
-                        child: Theme.of(context).brightness == Brightness.light
-                            ? SvgPicture.asset('assets/images/light_logo.svg')
-                            : SvgPicture.asset('assets/images/dark_logo.svg'),
-                      ),
-                      const SizedBox(height: 9),
-                      Text(
-                        AppLocalizations.of(context)!.welcome,
-                        style: context.textStyles.title2!,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 34),
-                      AppTextField(
-                        hint: AppLocalizations.of(context)!.enterEmail,
-                        onSubmitted: (value) {
-                          checkEmail(ref, value, context);
-                        },
-                        controller: textEditingController,
-                      ),
-                      const SizedBox(height: 4),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Text(
-                          errorState ?? '',
-                          style: context.textStyles.caption1!,
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      AuthButton(
-                        loading: ref
-                            .watch(authLoadingStateHolderProvider)
-                            .loadingEmail,
-                        onTap: () {
-                          checkEmail(ref, textEditingController.text, context);
-                        },
-                        child: Text(
-                          AppLocalizations.of(context)!.contWithEmail,
-                          style: context.textStyles.calloutBold,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Center(
-                        child: Text(
-                          AppLocalizations.of(context)!.or,
-                          style: context.textStyles.callout,
-                        ),
-                      ),
-                      if (!Platform.isAndroid) const SizedBox(height: 20),
-                      if (!Platform.isAndroid)
-                        AuthButton(
-                          onTap: () {
-                            loadApple(ref, context);
-                          },
-                          loading: loadingState.loadingApple,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.apple,
-                                color: context.colors.iconsDefault!,
-                                size: 24,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                AppLocalizations.of(context)!.contWithApple,
-                                style: context.textStyles.calloutBold,
-                              ),
-                            ],
-                          ),
-                        ),
-                      const SizedBox(height: 20),
-                      AuthButton(
-                        onTap: () {
-                          loadGoogle(ref, context);
-                        },
-                        loading: loadingState.loadingGoogle,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/ic_google.svg',
-                              width: 24,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              AppLocalizations.of(context)!.contWithGoogle,
-                              style: context.textStyles.calloutBold,
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (MediaQuery.of(context).size.height >= 812)
-                        const Spacer(),
-                      if (MediaQuery.of(context).size.height < 812)
-                        const SizedBox(height: 32.0),
-                      Center(
-                        child: RichText(
-                          textDirection: TextDirection.ltr,
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            text: AppLocalizations.of(context)!
-                                .privacyPolicyText1,
-                            style: context.textStyles.caption2,
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: AppLocalizations.of(context)!
-                                    .privacyPolicyLink1,
-                                style: context.textStyles.caption2!.copyWith(
-                                  decoration: TextDecoration.underline,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () => launchUrlString(
-                                      "https://thedirection.org/posterstock_terms"),
-                              ),
-                              TextSpan(
-                                text: AppLocalizations.of(context)!
-                                    .privacyPolicyText2,
-                                style: context.textStyles.caption2,
-                              ),
-                              TextSpan(
-                                text: AppLocalizations.of(context)!
-                                    .privacyPolicyLink2,
-                                style: context.textStyles.caption2!.copyWith(
-                                  decoration: TextDecoration.underline,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () => launchUrlString(
-                                      "https://thedirection.org/posterstock_privacy"),
-                              ),
-                              TextSpan(
-                                text: AppLocalizations.of(context)!
-                                    .privacyPolicyText3,
-                                style: context.textStyles.caption2,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      }
     );
   }
 
   void loadApple(WidgetRef ref, BuildContext context) async {
     ref.read(authControllerProvider).loadApple();
-    /*Future.delayed(const Duration(seconds: 5), () {
-      AutoRouter.of(context).pushNamed('login').then((value) {
-        ref.read(signUpControllerProvider)
-          ..setName('')
-          ..setUsername('')
-          ..removeCode()
-          ..removeUsernameError();
-      });
-      ref.read(authControllerProvider).stopLoading();
-    });*/
     try {
       final credential = await SignInWithApple.getAppleIDCredential(
         scopes: [
@@ -288,7 +281,7 @@ class AuthPage extends ConsumerWidget {
             clientId: credential.identityToken,
           );
       if (success && context.mounted) {
-        AutoRouter.of(context).pushAndPopUntil(
+        ref.watch(router)!.pushAndPopUntil(
           const NavigationRoute(),
           predicate: (route) {
             return false;
@@ -327,7 +320,7 @@ class AuthPage extends ConsumerWidget {
             //code: tokens.,
           );
       if (success && context.mounted) {
-        AutoRouter.of(context).pushAndPopUntil(
+        ref.watch(router)!.pushAndPopUntil(
           const NavigationRoute(),
           predicate: (route) {
             return false;
@@ -358,7 +351,8 @@ class AuthPage extends ConsumerWidget {
           return;
         }
         if (!exists) {
-          AutoRouter.of(context).pushNamed('sign_up').then((value) {
+          ref.watch(router)!.pushNamed('/auth/sign_up').then((value) {
+            print(value);
             ref.read(authControllerProvider).stopLoading();
             ref.read(signUpControllerProvider)
               ..setName('')
@@ -367,7 +361,7 @@ class AuthPage extends ConsumerWidget {
               ..removeUsernameError();
           });
         } else {
-          AutoRouter.of(context).push(const LoginRoute()).then((value) {
+          ref.watch(router)!.pushNamed('/auth/login').then((value) {
             ref.read(authControllerProvider).stopLoading();
             ref.read(signUpControllerProvider)
               ..setName('')

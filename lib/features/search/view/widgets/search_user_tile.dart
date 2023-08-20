@@ -2,13 +2,16 @@ import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
-class SearchUserTile extends StatelessWidget {
+import '../../../../common/state_holders/router_state_holder.dart';
+
+class SearchUserTile extends ConsumerWidget {
   const SearchUserTile({
     Key? key,
     required this.user,
@@ -21,14 +24,12 @@ class SearchUserTile extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     print(user.id);
     return InkWell(
       onTap: () {
-        AutoRouter.of(context).push(
-          ProfileRoute(
-            username: user.username,
-          ),
+        ref.watch(router)!.pushNamed(
+          '/${user.username}'
         );
       },
       child: Padding(
@@ -46,7 +47,7 @@ class SearchUserTile extends StatelessWidget {
                 backgroundColor: avatar[Random().nextInt(3)],
                 child: user.imagePath == null
                     ? Text(
-                        getAvatarName(user.name).toUpperCase(),
+                        getAvatarName(user.name, user.username).toUpperCase(),
                         style: context.textStyles.calloutBold!.copyWith(
                           color: context.colors.textsBackground,
                         ),
@@ -134,7 +135,8 @@ class SearchUserTile extends StatelessWidget {
     );
   }
 
-  String getAvatarName(String name) {
+  String getAvatarName(String name, String username) {
+    if (name.isEmpty) return username[0];
     String result = name[0];
     for (int i = 0; i < name.length; i++) {
       if (name[i] == ' ' && i != name.length - 1) {

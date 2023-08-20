@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/create_list/view/pick_cover_dialog.dart';
 import 'package:poster_stock/features/edit_profile/controller/profile_controller.dart';
@@ -18,6 +19,7 @@ import 'package:poster_stock/features/edit_profile/view/state_holders/edit_profi
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
+@RoutePage()
 class EditProfilePage extends ConsumerWidget {
   EditProfilePage({Key? key}) : super(key: key);
 
@@ -63,7 +65,7 @@ class EditProfilePage extends ConsumerWidget {
                     alignment: Alignment.centerLeft,
                     child: GestureDetector(
                       onTap: () {
-                        AutoRouter.of(context).pop();
+                        ref.watch(router)!.pop();
                       },
                       child: Container(
                         color: Colors.transparent,
@@ -88,7 +90,7 @@ class EditProfilePage extends ConsumerWidget {
                   actions: [
                     CupertinoButton(
                       onPressed: () {
-                        AutoRouter.of(context).pop();
+                        ref.watch(router)!.pop();
                       },
                       child: const Text('Save'),
                     ),

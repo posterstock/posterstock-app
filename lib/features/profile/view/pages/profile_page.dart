@@ -9,6 +9,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_native_splash/cli_commands.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
@@ -30,6 +31,7 @@ import 'package:poster_stock/navigation/app_router.gr.dart';
 
 import '../../../../common/services/text_info_service.dart';
 
+@RoutePage()
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({
     @PathParam('username') this.username = 'profile',
@@ -59,15 +61,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   @override
   void initState() {
     super.initState();
+    print('DD${widget.username}');
     animationController = AnimationController(
       vsync: this,
       lowerBound: 0,
       upperBound: 1,
       duration: const Duration(milliseconds: 300),
     );
-    Future(() async {
-      await ref.read(profileControllerApiProvider).clearUser();
-    });
+    if (widget.username != 'profile') {
+      Future(() async {
+        await ref.read(profileControllerApiProvider).clearUser();
+      });
+    }
   }
 
   static const List<Color> avatar = [
@@ -83,16 +88,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     bool myself = profile?.mySelf ?? false;
     if (profile == null) {
       Future(() async {
-        for (var a in AutoRouter.of(context)
-            .stackData) {
+        for (var a in ref.watch(router)!.stackData) {
           print(a.path);
         }
         RouteData? el;
         try {
-          el = AutoRouter
-              .of(context)
+          el = ref.watch(router)!
               .stackData
-              .lastWhere((element) => element.route.path == ':username');
+              .lastWhere((element) => element.route.path == '/:username');
         } catch (e) {
           el = null;
         }
@@ -147,9 +150,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                   expandedHeight: profile == null
                       ? 50
                       : 225 +
-                          ((profile?.description != null)
+                          ((profile.description != null)
                               ? TextInfoService.textSize(
-                                      profile?.description ?? '',
+                                      profile.description ?? '',
                                       context.textStyles.footNote!,
                                       MediaQuery.of(context).size.width - 32)
                                   .height
@@ -157,9 +160,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                   toolbarHeight: profile == null
                       ? 50
                       : 225 +
-                          ((profile?.description != null)
+                          ((profile.description != null)
                               ? TextInfoService.textSize(
-                                      profile?.description ?? '',
+                                      profile.description ?? '',
                                       context.textStyles.footNote!,
                                       MediaQuery.of(context).size.width - 32)
                                   .height
@@ -167,9 +170,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                   collapsedHeight: profile == null
                       ? 50
                       : 225 +
-                          ((profile?.description != null)
+                          ((profile.description != null)
                               ? TextInfoService.textSize(
-                                      profile?.description ?? '',
+                                      profile.description ?? '',
                                       context.textStyles.footNote!,
                                       MediaQuery.of(context).size.width - 32)
                                   .height
@@ -195,7 +198,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                         await ref
                                             .read(profileControllerApiProvider)
                                             .clearUser();
-                                        AutoRouter.of(context).pop();
+                                        ref.watch(router)!.pop();
                                       },
                                       child: Container(
                                         color: Colors.transparent,
@@ -215,13 +218,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                           ),
                           const Spacer(),
                           Text(
-                            profile?.username ?? widget.username ?? 'Profile',
+                            profile?.username ?? widget.username,
                             style: context.textStyles.bodyBold,
                           ),
                           const Spacer(),
                           GestureDetector(
                             onTap: () {
-                              if (myself == true) {
+                              if (myself || widget.username == 'profile') {
                                 showModalBottomSheet(
                                   context: context,
                                   builder: (context) {
@@ -237,7 +240,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                 showModalBottomSheet(
                                   context: context,
                                   builder: (context) => OtherProfileDialog(
-                                    user: profile!,
+                                    user: profile,
                                   ),
                                   backgroundColor: Colors.transparent,
                                 );
@@ -274,43 +277,52 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                               ),
                               Row(
                                 children: [
-                                  ShimmerLoader(
-                                    loaded: profile != null,
-                                    child: CircleAvatar(
-                                      radius: 40,
-                                      backgroundImage: profile?.imagePath !=
-                                              null
-                                          ? Image.network(profile!.imagePath!,
-                                                  fit: BoxFit.cover)
-                                              .image
-                                          : (photo == null || myself != true
-                                              ? null
-                                              : Image.memory(
-                                                  photo,
-                                                  fit: BoxFit.cover,
-                                                  cacheWidth: 150,
-                                                ).image),
-                                      backgroundColor: profile?.color,
-                                      child: profile?.imagePath == null &&
-                                              profile?.name != null
-                                          ? Text(
-                                              getAvatarName(profile?.name ?? '')
-                                                  .toUpperCase(),
-                                              style: context.textStyles.title3!
-                                                  .copyWith(
-                                                color: context
-                                                    .colors.textsBackground,
-                                              ),
-                                            )
-                                          : const SizedBox(),
-                                    ),
+                                  CircleAvatar(
+                                    radius: 40,
+                                    backgroundImage: profile.imagePath != null
+                                        ? Image.network(
+                                            profile.imagePath!,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, obj, trace) {
+                                              return shimmer;
+                                            },
+                                            loadingBuilder:
+                                                (context, child, event) {
+                                              if (event
+                                                      ?.cumulativeBytesLoaded !=
+                                                  event?.expectedTotalBytes) {
+                                                return shimmer;
+                                              }
+                                              return child;
+                                            },
+                                          ).image
+                                        : null,
+                                    backgroundColor: profile.color,
+                                    child: profile.imagePath == null
+                                        ? Text(
+                                            getAvatarName(profile.name)
+                                                    .toUpperCase()
+                                                    .isEmpty
+                                                ? getAvatarName(
+                                                        profile.username)
+                                                    .toUpperCase()
+                                                : getAvatarName(profile.name)
+                                                    .toUpperCase(),
+                                            style: context.textStyles.title3!
+                                                .copyWith(
+                                              color: context
+                                                  .colors.textsBackground,
+                                            ),
+                                          )
+                                        : const SizedBox(),
                                   ),
                                   const SizedBox(
                                     width: 38,
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      AutoRouter.of(context).push(
+                                      ref.watch(router)!.push(
                                         UsersListRoute(),
                                       );
                                     },
@@ -323,7 +335,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                           ShimmerLoader(
                                             loaded: profile != null,
                                             child: TextOrContainer(
-                                              text: profile?.followers == null
+                                              text: profile.followers == null
                                                   ? null
                                                   : profile!.followers
                                                       .toString(),
@@ -354,7 +366,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      AutoRouter.of(context).push(
+                                      ref.watch(router)!.push(
                                         UsersListRoute(
                                           following: true,
                                         ),
@@ -369,7 +381,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                           ShimmerLoader(
                                             loaded: profile != null,
                                             child: TextOrContainer(
-                                              text: profile?.following == null
+                                              text: profile.following == null
                                                   ? null
                                                   : profile!.following
                                                       .toString(),
@@ -410,7 +422,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                       ShimmerLoader(
                                         loaded: profile != null,
                                         child: TextOrContainer(
-                                          text: profile?.name,
+                                          text: profile.name,
                                           style: context.textStyles.headline,
                                           emptyWidth: 150,
                                           emptyHeight: 20,
@@ -470,7 +482,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                   AppTextButton(
                                     onTap: () {
                                       if (myself) {
-                                        AutoRouter.of(context).push(
+                                        ref.watch(router)!.push(
                                           EditProfileRoute(),
                                         );
                                       } else {
@@ -484,33 +496,33 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                     },
                                     text: (myself ?? false)
                                         ? 'Edit'
-                                        : ((profile?.followed ?? true)
+                                        : ((profile.followed ?? true)
                                             ? AppLocalizations.of(context)!
                                                 .following
                                                 .capitalize()
                                             : AppLocalizations.of(context)!
                                                 .follow),
                                     backgroundColor: ((myself ?? false) ||
-                                            (profile?.followed ?? true))
+                                            (profile.followed ?? true))
                                         ? context.colors.fieldsDefault
                                         : null,
                                     textColor: ((myself ?? false) ||
-                                            (profile?.followed ?? true))
+                                            (profile.followed ?? true))
                                         ? context.colors.textsPrimary
                                         : null,
                                   ),
                                 ],
                               ),
-                              if (profile?.description != null)
+                              if (profile.description != null)
                                 const SizedBox(
                                   height: 12,
                                 ),
-                              if (profile?.description != null)
+                              if (profile.description != null)
                                 Text(
                                   profile!.description!,
                                   style: context.textStyles.footNote,
                                 ),
-                              if (profile?.description != null)
+                              if (profile.description != null)
                                 const SizedBox(
                                   height: 16,
                                 ),
@@ -700,7 +712,7 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
             shimmer: widget.shimmer,
             bookmark: true,
             customOnItemTap: (post, index) {
-              AutoRouter.of(context).push(
+              ref.watch(router)!.push(
                 BookmarksRoute(startIndex: index),
               );
             },
@@ -784,7 +796,7 @@ class PostsCollectionView extends ConsumerWidget {
   }
 }
 
-class PostsCollectionTile extends StatelessWidget {
+class PostsCollectionTile extends ConsumerWidget {
   const PostsCollectionTile({
     Key? key,
     this.post,
@@ -806,13 +818,15 @@ class PostsCollectionTile extends StatelessWidget {
   final Widget shimmer;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    print(post?.name);
+    print(post?.description);
     return PeekAndPopDialog(
       customOnLongTap: customOnLongTap,
       onTap: () {
         if (post != null) {
           if (customOnItemTap == null) {
-            AutoRouter.of(context).push(
+            ref.watch(router)!.push(
               PosterRoute(
                 postId: post!.id,
               ),
@@ -1179,7 +1193,7 @@ class MyProfileDialog extends ConsumerWidget {
                               child: InkWell(
                                 onTap: () {
                                   Navigator.pop(context);
-                                  AutoRouter.of(context).push(
+                                  ref.watch(router)!.push(
                                     const SettingsRoute(),
                                   );
                                 },

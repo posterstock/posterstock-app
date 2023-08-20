@@ -15,6 +15,7 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:poster_stock/common/constants/languages.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/helpers/custom_scroll_behavior.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/features/settings/controllers/app_language_controller.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
@@ -23,6 +24,7 @@ import 'package:supertokens_flutter/supertokens.dart';
 
 import 'common/services/notifications_service.dart';
 import 'firebase_options.dart';
+import 'navigation/app_router.dart';
 import 'navigation/app_router.gr.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -31,24 +33,29 @@ final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  debugPrint("Handling a background message: ${message.messageId}${message.data}");
+  debugPrint(
+      "Handling a background message: ${message.messageId}${message.data}");
   showPush(message);
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SuperTokens.init(apiDomain: 'https://api.posterstock.co/',);
+  SuperTokens.init(
+    apiDomain: 'https://api.posterstock.co/',
+  );
 
   PhotoManager.clearFileCache();
+  await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+      AndroidFlutterLocalNotificationsPlugin>()?.requestPermission();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   final fcmToken = await FirebaseMessaging.instance.getToken();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  initPushes();
   final prefs = await SharedPreferences.getInstance();
   debugPrint("FCM TOKEN $fcmToken");
-  TokenKeeper.token = prefs.getString('token') == '' ? null : prefs.getString('token');
+  TokenKeeper.token =
+      prefs.getString('token') == '' ? null : prefs.getString('token');
   //TODO
   PackageInfo.setMockInitialValues(
     appName: 'Posterstock',
@@ -64,23 +71,38 @@ void main() async {
 class App extends ConsumerWidget {
   App({Key? key}) : super(key: key);
 
-  final _appRouter = AppRouter();
-
+  AppRouter? _appRouter;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (_appRouter == null) {
+      _appRouter = AppRouter();
+      initPushes(_appRouter!);
+    }
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
     final theme = ref.watch(themeStateHolderProvider);
     final appLocale = ref.watch(chosenLanguageStateHolder);
+    final rtr = ref.watch(router);
     final Locale systemLocale = WidgetsBinding.instance.window.locale;
     List<Languages> langs = [
       Languages.english(),
       Languages.russian(),
     ];
     List<Locale> locales = langs.map((e) => e.locale).toList();
+    if (rtr == null) {
+      Future(() {
+        ref.read(router.notifier).setRouter(_appRouter);
+        if (initLink != null) {
+          print('i did');
+          _appRouter!.pushNamed(initLink!);
+          print(initLink);
+          initLink = null;
+        }
+      });
+    }
     if (appLocale == null) {
       Future(() {
         if (locales.contains(systemLocale)) {
@@ -94,14 +116,11 @@ class App extends ConsumerWidget {
         }
       });
     }
-    Future(() async {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('token');
-      //ref.read(authTokenStateHolderProvider.notifier).updateState(token);
-    });
     return MaterialApp.router(
-      routerDelegate: _appRouter.delegate(),
-      routeInformationParser: _appRouter.defaultRouteParser(),
+      routerConfig: _appRouter!.config(deepLinkBuilder: (deepLink) {
+        if(deepLink.path == '/') return DeepLink([AuthRoute()]);
+        return deepLink;
+      }),
       scaffoldMessengerKey: scaffoldMessengerKey,
       localizationsDelegates: const [
         AppLocalizations.delegate,

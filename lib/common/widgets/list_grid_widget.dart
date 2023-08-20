@@ -1,12 +1,14 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/features/home/models/list_base_model.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
-class ListGridWidget extends StatelessWidget {
+class ListGridWidget extends ConsumerWidget {
   const ListGridWidget({
     Key? key,
     required this.post,
@@ -14,7 +16,7 @@ class ListGridWidget extends StatelessWidget {
   final ListBaseModel? post;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final shimmer = ShimmerLoader(
       child: Container(
         color: context.colors.backgroundsSecondary,
@@ -23,7 +25,7 @@ class ListGridWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (post?.id != null) {
-          AutoRouter.of(context).push(
+          ref.watch(router)!.push(
           ListRoute(id: post!.id),
         );
         }

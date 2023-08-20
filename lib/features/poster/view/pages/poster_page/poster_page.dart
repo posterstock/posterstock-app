@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -26,6 +27,7 @@ import '../../../../../common/helpers/hero_dialog_route.dart';
 import '../../../../../common/widgets/app_text_button.dart';
 import '../../../../home/view/widgets/movie_card.dart';
 
+@RoutePage()
 class PosterPage extends ConsumerStatefulWidget {
   const PosterPage({
     @PathParam('id') this.postId = 0,
@@ -131,7 +133,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
         var el = AutoRouter
             .of(context)
             .stackData
-            .lastWhere((element) => element.route.path == ':username/:id');
+            .lastWhere((element) => element.route.path == '/:username/:id');
         ref
             .read(commentsControllerProvider)
             .getPost(el.pathParams.getInt('id'));
@@ -256,8 +258,9 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                             ),
                                             child: UserInfoTile(
                                               showFollowButton: false,
-                                              user: comments?[index].model,
-                                              time: comments?[index].time,
+                                              user: comments![index].model,
+                                              controller: scrollController,
+                                              time: comments[index].time,
                                               behavior: HitTestBehavior
                                                   .translucent,
                                             ),
@@ -274,7 +277,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                                   CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      comments?[index].text ??
+                                                      comments[index].text ??
                                                           '',
                                                       style: context
                                                           .textStyles
@@ -282,7 +285,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                                     ),
                                                     const SizedBox(height: 12),
                                                     if (index !=
-                                                        comments!.length - 1)
+                                                        comments.length - 1)
                                                       Divider(
                                                         height: 0.5,
                                                         thickness: 0.5,
@@ -357,8 +360,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                   borderRadius: BorderRadius.circular(
                                       (imageHeight! - posterController!.value) *
                                           0.1),
-                                  child: Container(
-                                    color: context.colors.backgroundsSecondary,
+                                  child: SizedBox(
                                     height: imageHeight! +
                                         MediaQuery
                                             .of(context)
@@ -529,6 +531,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                       : UserInfoTile(
                     user: post!.author,
                     time: post!.time,
+                    controller: scrollController,
                     darkBackground: true,
                     showSettings: false,
                     showFollowButton: false,

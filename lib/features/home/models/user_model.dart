@@ -34,7 +34,7 @@ class UserModel {
       imagePath: (json['image'] as String?) == "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp" ? null : json['image'] as String?,
       followed: (json['followed'] as bool?) ?? false,
       description: json['description'] as String?,
-      color: avatar[Random().nextInt(3)],
+      color: avatar[(json['id'] as int) % 4],
     );
   }
 

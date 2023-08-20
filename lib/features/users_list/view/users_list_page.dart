@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
@@ -13,6 +14,7 @@ import 'package:poster_stock/features/users_list/controllers/users_list_controll
 import 'package:poster_stock/features/users_list/state_hodlers/users_list_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
+@RoutePage()
 class UsersListPage extends ConsumerStatefulWidget {
   const UsersListPage({
     super.key,
@@ -54,7 +56,7 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
               alignment: Alignment.centerLeft,
               child: GestureDetector(
                 onTap: () {
-                  AutoRouter.of(context).pop();
+                  ref.watch(router)!.pop();
                 },
                 child: Container(
                   color: Colors.transparent,
@@ -109,7 +111,7 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
                     return Column(
                       children: [
                         SearchUserTile(
-                          user: users![index],
+                          user: users[index],
                         ),
                         Padding(
                           padding: const EdgeInsets.only(left: 80.0),
@@ -122,7 +124,7 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
                       ],
                     );
                   },
-                  childCount: users!.length,
+                  childCount: users.length,
                 ),
               ),
             ),

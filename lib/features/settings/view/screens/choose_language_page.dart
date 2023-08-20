@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:poster_stock/common/constants/languages.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/settings/view/screens/settings_page.dart';
@@ -10,6 +11,7 @@ import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../controllers/app_language_controller.dart';
 
+@RoutePage()
 class ChooseLanguagePage extends ConsumerWidget {
   const ChooseLanguagePage({Key? key}) : super(key: key);
 
@@ -36,7 +38,7 @@ class ChooseLanguagePage extends ConsumerWidget {
                   alignment: Alignment.centerLeft,
                   child: GestureDetector(
                     onTap: () {
-                      AutoRouter.of(context).pop();
+                      ref.watch(router)!.pop();
                     },
                     child: Container(
                       color: Colors.transparent,

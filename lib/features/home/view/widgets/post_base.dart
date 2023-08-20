@@ -8,7 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/features/auth/view/pages/sign_up_page.dart';
+import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
@@ -60,7 +62,7 @@ class PostBase extends ConsumerWidget {
       child: CustomInkWell(
         onTap: () {
           if (post != null) {
-            AutoRouter.of(context).push(
+            ref.watch(router)!.push(
               PosterRoute(
                 postId: post[pageHolder.page].id,
                 likes: post[pageHolder.page].likes,
@@ -70,7 +72,7 @@ class PostBase extends ConsumerWidget {
             );
           }
           if (multPost != null) {
-            AutoRouter.of(context).push(
+            ref.watch(router)!.push(
               ListRoute(
                 id: multPost.id,
               ),
@@ -140,6 +142,7 @@ class UserInfoTile extends ConsumerWidget {
     this.darkBackground = false,
     this.showSettings = true,
     this.behavior,
+    this.controller,
   }) : super(key: key);
 
   final bool loading;
@@ -149,20 +152,23 @@ class UserInfoTile extends ConsumerWidget {
   final bool darkBackground;
   final bool showSettings;
   final HitTestBehavior? behavior;
+  final ScrollController? controller;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    //TODO move avatar generation from view layer
     return ShimmerLoader(
       loaded: !loading,
       child: GestureDetector(
         behavior: behavior,
+        onVerticalDragUpdate: (v) {
+          if (controller != null) {
+            controller!.jumpTo((controller!.offset ?? 0) - v.delta.dy);
+          }
+        },
         onTap: () {
           if (user == null) return;
-          AutoRouter.of(context).push(
-            ProfileRoute(
-              username: user!.username,
-            ),
+          ref.watch(router)!.pushNamed(
+              '/${user!.username}'
           );
         },
         child: Container(
@@ -180,7 +186,7 @@ class UserInfoTile extends ConsumerWidget {
                   backgroundColor: user?.color,
                   child: user?.imagePath == null && !loading
                       ? Text(
-                          getAvatarName(user?.name ?? 'AA').toUpperCase(),
+                          getAvatarName(user?.name ?? 'AA', user?.username ?? '').toUpperCase(),
                           style: context.textStyles.subheadlineBold!.copyWith(
                             color: context.colors.textsBackground,
                           ),
@@ -272,12 +278,18 @@ class UserInfoTile extends ConsumerWidget {
               if (!(user?.followed ?? true) && (!loading) && showFollowButton)
                 SizedBox(
                   width: TextInfoService.textSizeNoWidth(
-                          AppLocalizations.of(context)!.follow,
-                          context.textStyles.calloutBold!)
-                      .width + 32,
+                              AppLocalizations.of(context)!.follow,
+                              context.textStyles.calloutBold!)
+                          .width +
+                      32,
                   child: AppTextButton(
                     text: AppLocalizations.of(context)!.follow,
                     onTap: () async {
+                      print(1);
+                      ref.read(homePagePostsControllerProvider).setFollowId(
+                            user!.id,
+                            user!.followed,
+                          );
                       await ref.read(profileControllerApiProvider).follow(
                             user!.id,
                             user!.followed,
@@ -325,7 +337,8 @@ class UserInfoTile extends ConsumerWidget {
     );
   }
 
-  String getAvatarName(String name) {
+  String getAvatarName(String name, String username) {
+    if (name.isEmpty) return username[0];
     String result = name[0];
     for (int i = 0; i < name.length; i++) {
       if (name[i] == ' ' && i != name.length - 1) {

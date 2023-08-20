@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
@@ -16,6 +17,7 @@ import '../../../common/services/text_info_service.dart';
 import '../../poster/view/pages/poster_page/poster_page.dart';
 import '../../profile/view/pages/profile_page.dart';
 
+@RoutePage()
 class ListPage extends ConsumerStatefulWidget {
   const ListPage({
     @PathParam('id') required this.id,
@@ -98,9 +100,9 @@ class _ListPageState extends ConsumerState<ListPage>
     final posts = ref.watch(listsStateHolderProvider);
     if (posts == null) {
       Future(() async {
-        var el = AutoRouter.of(context)
+        var el = ref.watch(router)!
             .stackData
-            .lastWhere((element) => element.route.path == ':username/:id');
+            .lastWhere((element) => element.route.path == '/list/:id');
         ref.read(listsControllerProvider).getPost(el.pathParams.getInt('id'));
       });
     }

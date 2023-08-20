@@ -9,18 +9,18 @@ class HomePagePostsRepository implements IHomePagePostsRepository {
   final IHomePageApi api = HomePageApi();
 
   @override
-  Future<(List<List<PostBaseModel>>?, bool)?> getPosts(
+  Future<(List<PostBaseModel>?, bool)?> getPosts(
       {bool getNesPosts = false}) async {
     try {
       final apiResult = await api.getPosts(getNewPosts: getNesPosts);
       if (apiResult == null) return null;
-      List<List<PostBaseModel>> result = [];
+      List<PostBaseModel> result = [];
       final list = apiResult.$1?['entries'];
       for (var element in list) {
         if (element['type'] == 'poster') {
-          result.add([PostMovieModel.fromJson(element)]);
+          result.add(PostMovieModel.fromJson(element));
         } else if (element['type'] == 'list') {
-          result.add([MultiplePostModel.fromJson(element)]);
+          result.add(MultiplePostModel.fromJson(element));
         } else {}
       }
       return (result, apiResult.$2);

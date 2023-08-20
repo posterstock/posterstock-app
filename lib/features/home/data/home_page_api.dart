@@ -60,8 +60,10 @@ class HomePageApi implements IHomePageApi {
         loadedAll = false;
       }
       if (!getNewPosts) postsCursor = response.data['next_cursor'] as String?;
-      print(response.data['entries'][0].forEach((key, value) => print('$key:$value')));
-      print(response.data['entries'].forEach((el) => print('SS${el['is_suggested']}')));
+      print(response.data['entries'].forEach(
+          (value) => value.forEach((key, value) => print('$key:$value'))));
+      print(response.data['entries']
+          .forEach((el) => print('SS${el['is_suggested']}')));
       return (response.data as Map<String, dynamic>?, loadedAll);
     } on DioError catch (e) {
       print(122314);

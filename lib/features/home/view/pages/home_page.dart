@@ -1,3 +1,4 @@
+import 'package:auto_route/annotations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../state_holders/home_page_scroll_controller_state_holder.dart';
 
+@RoutePage()
 class HomePage extends ConsumerWidget {
   const HomePage({Key? key}) : super(key: key);
 

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
@@ -16,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supertokens_flutter/supertokens.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+@RoutePage()
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
@@ -41,7 +43,7 @@ class SettingsPage extends ConsumerWidget {
                 alignment: Alignment.centerLeft,
                 child: GestureDetector(
                   onTap: () {
-                    AutoRouter.of(context).pop();
+                    ref.watch(router)!.pop();
                   },
                   child: Container(
                     color: Colors.transparent,
@@ -70,7 +72,7 @@ class SettingsPage extends ConsumerWidget {
                   ),
                   SettingsButton(
                     onTap: () {
-                      AutoRouter.of(context).push(
+                      ref.watch(router)!.push(
                         const ChooseLanguageRoute(),
                       );
                     },
@@ -114,8 +116,8 @@ class SettingsPage extends ConsumerWidget {
                   ),
                   SettingsButton(
                     onTap: () {
-                      AutoRouter.of(context).push(
-                        ChangeEmailScreen(),
+                      ref.watch(router)!.push(
+                        ChangeEmailRoute(),
                       );
                     },
                     child: Row(
@@ -342,11 +344,12 @@ class SettingsPage extends ConsumerWidget {
                               final prefs =
                                   await SharedPreferences.getInstance();
                               await SuperTokens.signOut();
+                              print(90);
                               print(await SuperTokens.getAccessToken());
                               TokenKeeper.token = null;
                               prefs.remove('token');
                               if (context.mounted) {
-                                AutoRouter.of(context)
+                                ref.watch(router)!
                                     .pushAndPopUntil(
                                   AuthRoute(),
                                   predicate: (value) => false,

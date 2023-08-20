@@ -27,10 +27,14 @@ class HomePagePostsController {
     gettingPosts = true;
     final result = await repository.getPosts(getNesPosts: getNewPosts);
     gotAll = result?.$2 ?? false;
-    if (getNewPosts) {
-      await homePagePostsState.updateState(result?.$1);
-    } else {
-      await homePagePostsState.updateStateEnd(result?.$1);
+    try {
+      if (getNewPosts) {
+        await homePagePostsState.updateState(result?.$1);
+      } else {
+        await homePagePostsState.updateStateEnd(result?.$1);
+      }
+    } catch (e) {
+      print("ss$e");
     }
     gettingPosts = false;
   }
@@ -44,6 +48,10 @@ class HomePagePostsController {
   Future<void> setLikeId(int id, bool value) async {
     homePagePostsState.setLikeId(id, value);
     repository.setLike(id, value);
+  }
+
+  Future<void> setFollowId(int id, bool value) async {
+    homePagePostsState.setFollow(id, !value);
   }
 
   Future<void> addComment(int id) async {

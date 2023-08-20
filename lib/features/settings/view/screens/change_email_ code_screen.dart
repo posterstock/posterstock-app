@@ -4,13 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/settings/controllers/change_email_controller.dart';
 import 'package:poster_stock/features/settings/state_holders/change_email_code_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
-class ChangeEmailCodeScreen extends ConsumerWidget {
-  ChangeEmailCodeScreen({Key? key}) : super(key: key);
+@RoutePage()
+class ChangeEmailCodePage extends ConsumerWidget {
+  ChangeEmailCodePage({Key? key}) : super(key: key);
 
   final TextEditingController controller = TextEditingController();
 
@@ -36,7 +38,7 @@ class ChangeEmailCodeScreen extends ConsumerWidget {
                   alignment: Alignment.centerLeft,
                   child: GestureDetector(
                     onTap: () {
-                      AutoRouter.of(context).pop();
+                      ref.watch(router)!.pop();
                     },
                     child: Container(
                       color: Colors.transparent,
@@ -61,7 +63,7 @@ class ChangeEmailCodeScreen extends ConsumerWidget {
                     onPressed: code.length < 4
                         ? null
                         : () {
-                            AutoRouter.of(context)
+                            ref.watch(router)!
                                 .popUntilRouteWithPath('settings');
                           },
                     child: const Text('Verify'),

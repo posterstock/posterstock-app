@@ -20,7 +20,7 @@ class ChoosePosterTile extends StatelessWidget {
         GestureDetector(
           onTap: () {
             if (post != null && customOnItemTap == null) {
-              AutoRouter.of(context).push(
+              ref.watch(router).push(
                 PosterRoute(
                   post: PostMovieModel(
                     year: post!.year,

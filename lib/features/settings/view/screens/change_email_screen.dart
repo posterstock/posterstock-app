@@ -3,14 +3,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/settings/controllers/change_email_controller.dart';
 import 'package:poster_stock/features/settings/state_holders/change_email_state_holder.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
-class ChangeEmailScreen extends ConsumerWidget {
-  ChangeEmailScreen({Key? key}) : super(key: key);
+@RoutePage()
+class ChangeEmailPage extends ConsumerWidget {
+  ChangeEmailPage({Key? key}) : super(key: key);
 
   final TextEditingController controller = TextEditingController();
 
@@ -40,7 +42,7 @@ class ChangeEmailScreen extends ConsumerWidget {
                   alignment: Alignment.centerLeft,
                   child: GestureDetector(
                     onTap: () {
-                      AutoRouter.of(context).pop();
+                      ref.watch(router)!.pop();
                     },
                     child: Container(
                       color: Colors.transparent,
@@ -65,8 +67,8 @@ class ChangeEmailScreen extends ConsumerWidget {
                           .read(changeEmailControllerProvider)
                           .updateEmail(controller.text);
                       if (checkEmail(controller.text)) {
-                        AutoRouter.of(context).push(
-                          ChangeEmailCodeScreen(),
+                        ref.watch(router)!.push(
+                          ChangeEmailCodeRoute(),
                         );
                       }
                     },

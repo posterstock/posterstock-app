@@ -8,6 +8,8 @@ import 'package:poster_stock/features/navigation_page/state_holder/previous_page
 import 'package:poster_stock/features/navigation_page/view/navigation_page.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 
+import '../../../common/state_holders/router_state_holder.dart';
+
 final menuControllerProvider = Provider<MenuController>(
   (ref) => MenuController(
     menuState: ref.watch(menuStateHolderProvider.notifier),
@@ -40,10 +42,10 @@ class MenuController {
     menuState.updateState(!menuValue);
   }
 
-  void jumpToPage(int page, BuildContext context) {
+  void jumpToPage(int page, BuildContext context, WidgetRef ref) {
     FocusScope.of(context).unfocus();
     if (previousPageState.state.isNotEmpty) {
-      AutoRouter.of(context).popUntilRouteWithPath('navigation');
+      ref.watch(router)!.popUntilRouteWithPath('/');
     }
     if (menuValue == true) {
       menuState.updateState(!menuValue);
@@ -53,9 +55,9 @@ class MenuController {
     pagesState.updatePage(page);
   }
 
-  void backToPage(BuildContext context) {
+  void backToPage(BuildContext context, WidgetRef ref) {
     FocusScope.of(context).unfocus();
-    AutoRouter.of(context).popUntilRouteWithPath('navigation');
+    ref.watch(router)!.popUntilRouteWithPath('/');
     if (menuValue ==true) {
       menuState.updateState(!menuValue);
     }

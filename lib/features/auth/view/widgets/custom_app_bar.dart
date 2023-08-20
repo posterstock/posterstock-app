@@ -1,14 +1,17 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
-class CustomAppBar extends StatelessWidget {
+import '../../../../common/state_holders/router_state_holder.dart';
+
+class CustomAppBar extends ConsumerWidget {
   const CustomAppBar({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
       height: 42,
       child: Row(
@@ -33,7 +36,7 @@ class CustomAppBar extends StatelessWidget {
   }
 }
 
-class CustomBackButton extends StatelessWidget {
+class CustomBackButton extends ConsumerWidget {
   const CustomBackButton({
     this.color,
     this.addOnTap,
@@ -44,7 +47,7 @@ class CustomBackButton extends StatelessWidget {
   final Future<void> Function()? addOnTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return InkWell(
       highlightColor: Colors.transparent,
       onTap: () async {
@@ -52,7 +55,7 @@ class CustomBackButton extends StatelessWidget {
           await addOnTap!();
         }
         if (context.mounted) {
-          AutoRouter.of(context).pop();
+          ref.watch(router)!.pop();
         }
       },
       child: SizedBox(

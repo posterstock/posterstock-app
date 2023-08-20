@@ -21,6 +21,32 @@ class AuthService {
     _dio.interceptors.add(SuperTokensInterceptorWrapper(client: _dio));
   }
 
+  Future<void> registerNotification(String token, String userToken) async {
+    try {
+      final response = await _dio.post(
+        'api/profiles/register/$token/',
+        options: Options(
+          contentType: 'text/plain; charset=utf-8',
+          headers: {
+            'rid': 'thirdpartypasswordless',
+            'Authorization': 'Bearer $userToken',
+          },
+        ),
+      );
+      print(990);
+      print(response.data);
+      print(response.headers);
+      return response.data;
+    } on DioError catch (e) {
+      print(e.type);
+      print(e.response?.statusCode);
+      print(e.response?.statusMessage);
+      print(e.response?.data);
+      print(e.response?.headers);
+      rethrow;
+    }
+  }
+
   Future<void> authApple({
     String? name,
     String? surname,

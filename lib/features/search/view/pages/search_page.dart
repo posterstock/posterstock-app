@@ -1,3 +1,4 @@
+import 'package:auto_route/annotations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,7 @@ import 'package:poster_stock/features/search/state_holders/search_value_state_ho
 import 'package:poster_stock/features/search/view/widgets/search_user_tile.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
+@RoutePage()
 class SearchPage extends ConsumerWidget {
   SearchPage({Key? key}) : super(key: key);
 
@@ -73,7 +75,7 @@ class SearchPage extends ConsumerWidget {
                     onPressed: () {
                       ref.read(searchControllerProvider).updateSearch('');
                       textController.text = '';
-                      ref.read(menuControllerProvider).backToPage(context);
+                      ref.read(menuControllerProvider).backToPage(context,ref);
                     },
                   ),
                 ],

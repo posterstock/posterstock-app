@@ -12,6 +12,10 @@ class AuthRepository {
     return await _service.getRegistered(email);
   }
 
+  Future<void> registerNotification(String token, String userToken) async {
+    return await _service.registerNotification(token, userToken);
+  }
+
   Future<String?> confirmCode({
     required String code,
     required String sessionId,

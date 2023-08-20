@@ -17,6 +17,7 @@ import 'package:poster_stock/features/navigation_page/view/widgets/bottom_nav_ba
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
+@RoutePage()
 class NavigationPage extends ConsumerWidget {
   const NavigationPage({Key? key}) : super(key: key);
 
@@ -35,7 +36,7 @@ class NavigationPage extends ConsumerWidget {
           onWillPop: () async {
             final pages = ref.watch(previousPageStateHolderProvider);
             if (pages.isEmpty) return true;
-            ref.read(menuControllerProvider).backToPage(context);
+            ref.read(menuControllerProvider).backToPage(context, ref);
             return false;
           },
           child: Stack(
