@@ -7,7 +7,7 @@ import 'package:supertokens_flutter/supertokens.dart';
 class UsersListService {
   final Dio _dio = DioKeeper.getDio();
 
-  Future<List<dynamic>> getPosts({
+  Future<List<dynamic>> getFollows({
     required bool followers,
     required int id,
   }) async {

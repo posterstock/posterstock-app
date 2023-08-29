@@ -10,11 +10,11 @@ StateNotifierProvider<EditProfileNameStateHolder, String?>(
 class EditProfileNameStateHolder extends StateNotifier<String?> {
   EditProfileNameStateHolder(super.state);
 
-  void updateError(String value) {
+  void updateValue(String value) {
     state = value;
   }
 
-  void clearError() {
+  void clearValue() {
     state = null;
   }
 }

@@ -130,15 +130,21 @@ class _PosterPageState extends ConsumerState<PosterPage>
     final comments = ref.watch(commentsStateHolderProvider);
     if (post == null) {
       Future(() async {
-        var el = AutoRouter
-            .of(context)
-            .stackData
-            .lastWhere((element) => element.route.path == '/:username/:id');
+        RouteData? el;
+        try {
+          el = AutoRouter
+              .of(context)
+              .stackData
+              .lastWhere((element) => element.route.path == '/:username/:id');
+        } catch (e) {
+          el = null;
+        }
+        if (el == null) return;
         ref
             .read(commentsControllerProvider)
-            .getPost(el.pathParams.getInt('id'));
+            .getPost(el!.pathParams.getInt('id'));
         ref.read(commentsControllerProvider).updateComments(
-            el.pathParams.getInt('id'));
+            el!.pathParams.getInt('id'));
       });
     }
     if (posterController == null) {
@@ -435,8 +441,9 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                                 (context, child, event) {
                                               if (event
                                                   ?.cumulativeBytesLoaded !=
-                                                  event?.expectedTotalBytes)
+                                                  event?.expectedTotalBytes) {
                                                 return shimmer;
+                                              }
                                               return child;
                                             },
                                           ),
@@ -686,7 +693,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
             .top;
     result += 28 + 8 + 44;
     result += TextInfoService
-        .textSize(
+        .textSizeConstWidth(
       post?.name ?? '',
       context.textStyles.title3!,
       MediaQuery
@@ -697,7 +704,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
         .height;
     result += 6;
     result += TextInfoService
-        .textSize(
+        .textSizeConstWidth(
       post?.year.toString() ?? '',
       context.textStyles.subheadline!,
       MediaQuery
@@ -709,7 +716,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
     result += 24;
     if (post != null) {
       result += TextInfoService
-          .textSize(
+          .textSizeConstWidth(
         (post!.description ?? '').length > 280
             ? post!.description!.substring(0, 280)
             : (post!.description ?? ''),
@@ -724,7 +731,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
     result += 24;
     for (var comment in comments ?? <Comment>[]) {
       result += TextInfoService
-          .textSize(
+          .textSizeConstWidth(
         comment.text,
         context.textStyles.subheadline!,
         MediaQuery
@@ -750,9 +757,11 @@ class CommentTextField extends ConsumerStatefulWidget {
   const CommentTextField({
     super.key,
     required this.id,
+    this.isList = false,
   });
 
   final int id;
+  final bool isList;
 
   @override
   ConsumerState<CommentTextField> createState() => _CommentTextFieldState();
@@ -836,12 +845,21 @@ class _CommentTextFieldState extends ConsumerState<CommentTextField> {
                       disabled: controller.text.isEmpty ||
                           controller.text.length > 140,
                       onTap: () {
-                        ref
-                            .read(commentsControllerProvider)
-                            .postComment(widget.id, controller.text);
-                        ref
-                            .read(homePagePostsControllerProvider)
-                            .addComment(widget.id);
+                        if (!widget.isList) {
+                          ref
+                              .read(commentsControllerProvider)
+                              .postComment(widget.id, controller.text);
+                          ref
+                              .read(homePagePostsControllerProvider)
+                              .addComment(widget.id);
+                        } else {
+                          ref
+                              .read(commentsControllerProvider)
+                              .postCommentList(widget.id, controller.text);
+                          ref
+                              .read(homePagePostsControllerProvider)
+                              .addCommentList(widget.id);
+                        }
                         controller.clear();
                         focus.unfocus();
                       },
@@ -1121,11 +1139,7 @@ class PosterInfo extends ConsumerWidget {
               iconPath: 'assets/icons/ic_comment2.svg',
               iconColor: context.colors.iconsDisabled!,
               amount: (comments?.length ?? this.comments),
-              onTap: () {
-                ref
-                    .read(homePagePostsControllerProvider)
-                    .addComment(post!.id);
-              },
+              onTap: () {},
             ),
           ],
         ),

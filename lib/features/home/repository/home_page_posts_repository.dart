@@ -20,6 +20,7 @@ class HomePagePostsRepository implements IHomePagePostsRepository {
         if (element['type'] == 'poster') {
           result.add(PostMovieModel.fromJson(element));
         } else if (element['type'] == 'list') {
+          print(element);
           result.add(MultiplePostModel.fromJson(element));
         } else {}
       }
@@ -34,6 +35,16 @@ class HomePagePostsRepository implements IHomePagePostsRepository {
     if (id == null) return;
     try {
       await api.setLike(id, like);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  Future<void> setLikeList(int? id, bool like) async {
+    if (id == null) return;
+    try {
+      await api.setLikeList(id, like);
     } catch (e) {
       print(e);
     }

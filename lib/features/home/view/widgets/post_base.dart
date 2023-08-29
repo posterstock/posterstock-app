@@ -33,11 +33,13 @@ class PostBase extends ConsumerWidget {
     Key? key,
     this.index,
     this.showSuggestion = true,
+    this.poster,
   }) : super(key: key);
 
   final int? index;
   final PageHolder pageHolder = PageHolder();
   final bool showSuggestion;
+  final PostMovieModel? poster;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -52,6 +54,9 @@ class PostBase extends ConsumerWidget {
         ? (anyPost?[0]) as MultiplePostModel
         : null;
     UserModel? user;
+    if (post == null && poster != null) {
+      post = [poster!];
+    }
     if (post != null) {
       user = post[0].author;
     } else if (multPost != null) {
@@ -109,12 +114,19 @@ class PostBase extends ConsumerWidget {
                         loading: post == null && multPost == null,
                         time: post?[0].time ?? multPost?.time,
                         user: user,
+                        showFollowButton: poster == null,
                       ),
                     )
                   ],
                 ),
               ),
-              if (post == null && multPost == null || post != null)
+              if (poster != null)
+                MovieCard(
+                  key: key,
+                  poster: poster,
+                  pageHolder: pageHolder,
+                ),
+              if (post == null && multPost == null && poster == null || post != null && poster == null)
                 MovieCard(
                   key: key,
                   index: index!,
@@ -122,7 +134,7 @@ class PostBase extends ConsumerWidget {
                 ),
               if (multPost != null)
                 MultipleMovieCard(
-                  post: multPost!,
+                  post: multPost,
                 ),
             ],
           ),
@@ -277,7 +289,7 @@ class UserInfoTile extends ConsumerWidget {
               ),
               if (!(user?.followed ?? true) && (!loading) && showFollowButton)
                 SizedBox(
-                  width: TextInfoService.textSizeNoWidth(
+                  width: TextInfoService.textSize(
                               AppLocalizations.of(context)!.follow,
                               context.textStyles.calloutBold!)
                           .width +

@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +12,7 @@ import 'package:poster_stock/features/home/state_holders/home_page_posts_state_h
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
+import 'package:poster_stock/features/search/state_holders/search_posts_state_holder.dart';
 import 'package:poster_stock/themes/app_colors.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:shimmer/shimmer.dart';
@@ -22,12 +26,14 @@ import 'current_post_shower.dart';
 class MovieCard extends ConsumerStatefulWidget {
   const MovieCard({
     Key? key,
-    required this.index,
+    this.index,
+    this.poster,
     required this.pageHolder,
   }) : super(key: key);
 
   final PageHolder pageHolder;
-  final int index;
+  final int? index;
+  final PostMovieModel? poster;
 
   @override
   ConsumerState<MovieCard> createState() => MovieCardState();
@@ -75,15 +81,26 @@ class MovieCardState extends ConsumerState<MovieCard>
 
   @override
   Widget build(BuildContext context) {
-    movie = ref
-        .watch(homePagePostsStateHolderProvider)?[widget.index]
-        .map((e) => e as PostMovieModel)
-        .toList();
+    if (widget.index == null) {
+      movie = [widget.poster!];
+    } else {
+      movie = ref
+          .watch(homePagePostsStateHolderProvider)?[widget.index!]
+          .map((e) => e as PostMovieModel)
+          .toList();
+    }
 
     getInitData();
     widget.pageHolder.page = (pageController?.page ?? 0).round();
     return Container(
-      height: (textHeight ?? 0) + 58 + 31 + titleHeight!,
+      height: (textHeight ?? 0) +
+          58 +
+          31 +
+          (TextInfoService.textSizeConstWidth(
+            '',
+            context.textStyles.subheadlineBold!,
+            MediaQuery.of(context).size.width - 134,
+          ).height),
       child: AnimatedBuilder(
         animation: controller,
         builder: (context, child) {
@@ -125,7 +142,11 @@ class MovieCardState extends ConsumerState<MovieCard>
                         likeCommentController: likeCommentController,
                         onPosterTap: () {},
                         textHeight: textHeight!,
-                        titleHeight: titleHeight!,
+                        titleHeight: TextInfoService.textSizeConstWidth(
+                          '',
+                          context.textStyles.subheadlineBold!,
+                          MediaQuery.of(context).size.width - 134,
+                        ).height,
                         description:
                             (movie?[index].description ?? '').length > 280
                                 ? (movie?[index].description ?? '')
@@ -207,21 +228,21 @@ class MovieCardState extends ConsumerState<MovieCard>
       var description = (movie?[0].description ?? '').length > 280
           ? (movie?[0].description ?? '').substring(0, 280)
           : (movie?[0].description ?? '');
-      textHeight = TextInfoService.textSize(
+      textHeight = TextInfoService.textSizeConstWidth(
                       description,
                       context.textStyles.subheadline!,
                       MediaQuery.of(context).size.width - 84)
                   .height <
               100
           ? 100
-          : TextInfoService.textSize(
+          : TextInfoService.textSizeConstWidth(
                   description,
                   context.textStyles.subheadline!,
                   MediaQuery.of(context).size.width - 84)
               .height;
       if ((movie?.length ?? 1) > 1) {
         for (PostMovieModel i in movie!) {
-          var size = TextInfoService.textSize(
+          var size = TextInfoService.textSizeConstWidth(
               (i.description ?? '').length > 280
                   ? (i.description?.substring(0, 280) ?? '')
                   : (i.description ?? ''),
@@ -234,7 +255,7 @@ class MovieCardState extends ConsumerState<MovieCard>
         }
       }
     }
-    titleHeight = TextInfoService.textSize(
+    titleHeight = TextInfoService.textSizeConstWidth(
       movie?[0].name ?? '',
       context.textStyles.subheadlineBold!,
       MediaQuery.of(context).size.width - 134,
@@ -298,16 +319,11 @@ class _MovieCardPageViewContent extends ConsumerWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: movie != null
-                  ? MediaQuery.of(context).size.width - 134
-                  : null,
-              child: TextOrContainer(
-                text: movie != null ? movie!.name : null,
-                style: context.textStyles.subheadlineBold!,
-                emptyWidth: 146,
-                emptyHeight: 17,
-              ),
+            TextOrContainer(
+              text: movie != null ? movie!.name : null,
+              style: context.textStyles.subheadlineBold!,
+              emptyWidth: 146,
+              emptyHeight: 17,
             ),
             SizedBox(
               height: movie != null ? 5 : 8,
@@ -325,7 +341,13 @@ class _MovieCardPageViewContent extends ConsumerWidget {
             ),
             if (movie != null)
               SizedBox(
-                height: textHeight,
+                height: textHeight +
+                    titleHeight -
+                    TextInfoService.textSizeConstWidth(
+                      movie?.name ?? '',
+                      context.textStyles.subheadlineBold!,
+                      MediaQuery.of(context).size.width - 134,
+                    ).height,
                 width: MediaQuery.of(context).size.width - 84,
                 child: Text(
                   description,
@@ -369,8 +391,11 @@ class _MovieCardPageViewContent extends ConsumerWidget {
                         onTap: () {
                           if (movie != null) {
                             ref
-                              .read(homePagePostsControllerProvider)
-                              .setLikeId(movie!.id, !movie!.liked);
+                                .read(homePagePostsControllerProvider)
+                                .setLikeId(movie!.id, !movie!.liked);
+                            ref
+                                .read(searchPostsStateHolderProvider.notifier)
+                                .setLikeId(movie!.id, !movie!.liked);
                           }
                         },
                       ),

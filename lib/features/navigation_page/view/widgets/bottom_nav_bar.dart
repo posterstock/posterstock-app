@@ -141,8 +141,6 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                   ),
                   BottomNavBarItem(
                     onTap: () {
-                      ref.read(profileControllerApiProvider).clearUser();
-                      ref.read(profileControllerApiProvider).getUserInfo(null);
                       ref.read(menuControllerProvider).jumpToPage(3, context, ref);
                     },
                     //TODO check if has avatar

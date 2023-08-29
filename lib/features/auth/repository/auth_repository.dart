@@ -16,6 +16,10 @@ class AuthRepository {
     return await _service.registerNotification(token, userToken);
   }
 
+  Future<void> removeFCMToken(String token, String userToken) async {
+    return await _service.removeFCMToken(token, userToken);
+  }
+
   Future<String?> confirmCode({
     required String code,
     required String sessionId,

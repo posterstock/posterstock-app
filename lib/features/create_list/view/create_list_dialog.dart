@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,8 +12,13 @@ import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
 import 'package:poster_stock/features/create_list/state_holders/chosen_cover_state_holder.dart';
+import 'package:poster_stock/features/create_list/state_holders/create_list_chosen_poster_state_holder.dart';
 import 'package:poster_stock/features/create_list/view/pick_cover_dialog.dart';
 import 'package:poster_stock/features/create_list/view/widgets/%D1%81hoose_poster_tile.dart';
+import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
+import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
+import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
+import 'package:poster_stock/features/profile/state_holders/profile_posts_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class CreateListDialog extends ConsumerStatefulWidget {
@@ -25,8 +33,17 @@ class CreateListDialog extends ConsumerStatefulWidget {
 class _CreateListDialogState extends ConsumerState<CreateListDialog> {
   final dragController = DraggableScrollableController();
   final searchController = TextEditingController();
+  final nameController = TextEditingController();
+  final descriptionController = TextEditingController();
   final FocusNode focus = FocusNode();
   bool disposed = false;
+  bool loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+  }
 
   @override
   void dispose() {
@@ -37,9 +54,15 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
   @override
   Widget build(BuildContext context) {
     final image = ref.watch(chosenCoverStateHolderProvider);
+    final posters = ref.watch(profilePostsStateHolderProvider);
+    if (posters == null) {
+      print("REBUILLDDDList");
+      ref.read(profileControllerApiProvider).getUserInfo(null);
+    }
     dragController.addListener(() {
       if (dragController.size < 0.1) {
         if (!disposed) {
+          ref.read(pickCoverControllerProvider).clearAll();
           Navigator.pop(context);
         }
         disposed = true;
@@ -71,6 +94,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
               right: 0,
               child: GestureDetector(
                 onTap: () {
+                  ref.read(pickCoverControllerProvider).clearAll();
                   Navigator.pop(context);
                 },
                 child: Container(
@@ -121,13 +145,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                       style: context.textStyles.bodyBold,
                                     ),
                                     const SizedBox(height: 0.5),
-                                    Text(
-                                      '0 of 30 posters',
-                                      style:
-                                          context.textStyles.footNote!.copyWith(
-                                        color: context.colors.textsSecondary,
-                                      ),
-                                    ),
+                                    SubTextCreateList(),
                                     const SizedBox(height: 16.5),
                                     SizedBox(
                                       height: 36,
@@ -156,13 +174,13 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                               padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                               sliver: SliverGrid(
                                 delegate: SliverChildBuilderDelegate(
-                                  childCount: 15,
+                                  childCount: posters?.length,
                                   (context, index) {
                                     return ChoosePosterTile(
-                                      imagePath:
-                                          'https://i.ebayimg.com/images/g/3JkAAOSwOU9jJjJi/s-l1600.jpg',
-                                      name: 'Star Wars',
-                                      year: '1999',
+                                      imagePath: posters?[index].imagePath,
+                                      name: posters?[index].name,
+                                      year: posters?[index].year,
+                                      id: posters?[index].id,
                                       index: index,
                                     );
                                   },
@@ -211,6 +229,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                         children: [
                           Expanded(
                             child: TextField(
+                              controller: nameController,
                               decoration: InputDecoration(
                                 hintText: 'List name',
                                 hintStyle: context.textStyles.callout!.copyWith(
@@ -227,6 +246,12 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                               style: context.textStyles.callout!.copyWith(
                                 color: context.colors.textsPrimary,
                               ),
+                              onChanged: (value) {
+                                if (nameController.text.length > 70) {
+                                  nameController.text = nameController.text.substring(0,70);
+                                }
+                                setState(() {});
+                              },
                             ),
                           ),
                           GestureDetector(
@@ -245,7 +270,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                       useSafeArea: true,
                                       builder: (context) => PickCoverDialog(
                                         onItemTap: (BuildContext context,
-                                            WidgetRef ref, Uint8List image) {
+                                            WidgetRef ref, String image) {
                                           ref
                                               .read(pickCoverControllerProvider)
                                               .setImage(image);
@@ -284,8 +309,8 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                           child: SizedBox(
                                             width: 36,
                                             height: 24,
-                                            child: Image.memory(
-                                              image,
+                                            child: Image.file(
+                                              File(image),
                                               fit: BoxFit.cover,
                                               cacheWidth: 24,
                                             ),
@@ -315,13 +340,60 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                     ),
                     Container(
                       color: context.colors.backgroundsPrimary,
-                      child: const DescriptionTextField(),
+                      child: DescriptionTextField(
+                        buttonAddCheck: nameController.text.isNotEmpty &&
+                            ref
+                                    .watch(
+                                        createListChosenPosterStateHolderProvider)
+                                    .length >
+                                2 &&
+                            ref
+                                    .watch(
+                                        createListChosenPosterStateHolderProvider)
+                                    .length <
+                                31,
+                        controller: descriptionController,
+                        buttonLoading: loading,
+                        onTap: () async {
+                          loading = true;
+                          setState(() {});
+                          await ref.read(pickCoverControllerProvider).createList(
+                                title: nameController.text,
+                                description: descriptionController.text,
+                                context: context,
+                              );
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                            ref.read(menuControllerProvider).switchMenu();
+                          }
+                          loading = false;
+                          setState(() {});
+                        },
+                      ),
                     ),
                   ],
                 ),
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class SubTextCreateList extends ConsumerWidget {
+  const SubTextCreateList({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final chosenPosters = ref.watch(createListChosenPosterStateHolderProvider);
+    return Text(
+      '${chosenPosters.length} of 30 posters',
+      style:
+          context.textStyles.footNote!.copyWith(
+        color: context.colors.textsSecondary,
       ),
     );
   }
@@ -452,9 +524,13 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
               const SizedBox(width: 12),
               SizedBox(
                 height: 32,
-                width:  TextInfoService.textSizeNoWidth(widget.button ?? "Create list", context.textStyles.calloutBold!.copyWith(
-                  color: context.colors.textsBackground,
-                ),).width + 32,
+                width: TextInfoService.textSize(
+                      widget.button ?? "Create list",
+                      context.textStyles.calloutBold!.copyWith(
+                        color: context.colors.textsBackground,
+                      ),
+                    ).width +
+                    32,
                 child: AppTextButton(
                   disabled: (descriptionController!.text.isEmpty ||
                           descriptionController!.text.length >
@@ -463,20 +539,19 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
                   onTap: widget.onTap,
                   child: widget.buttonLoading
                       ? Center(
-
                           child: defaultTargetPlatform != TargetPlatform.android
                               ? CupertinoActivityIndicator(
-                            radius: 10.0,
-                            color: context.colors.textsBackground!,
-                          )
+                                  radius: 10.0,
+                                  color: context.colors.textsBackground!,
+                                )
                               : SizedBox(
-                            width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
                                     color: context.colors.textsBackground!,
                                     strokeWidth: 2,
                                   ),
-                              ),
+                                ),
                         )
                       : Text(
                           widget.button ?? "Create list",

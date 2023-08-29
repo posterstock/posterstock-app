@@ -4,13 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
+import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
+import 'package:poster_stock/features/home/models/post_movie_model.dart';
+import 'package:poster_stock/features/home/view/widgets/movie_card.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/list/controller/list_controller.dart';
 import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
+import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../../common/services/text_info_service.dart';
@@ -52,6 +56,7 @@ class _ListPageState extends ConsumerState<ListPage>
     );
     animationController.animateTo(250);
     Future(() async {
+      ref.read(listsControllerProvider).clear();
       ref.read(listsControllerProvider).getPost(widget.id);
     });
   }
@@ -100,7 +105,8 @@ class _ListPageState extends ConsumerState<ListPage>
     final posts = ref.watch(listsStateHolderProvider);
     if (posts == null) {
       Future(() async {
-        var el = ref.watch(router)!
+        var el = ref
+            .watch(router)!
             .stackData
             .lastWhere((element) => element.route.path == '/list/:id');
         ref.read(listsControllerProvider).getPost(el.pathParams.getInt('id'));
@@ -308,6 +314,7 @@ class _ListPageState extends ConsumerState<ListPage>
                       child: Container(
                         color: context.colors.backgroundsSecondary,
                         height: 250,
+                        width: double.infinity,
                         child: posts?.image != null
                             ? Image.network(
                                 posts!.image!,
@@ -330,11 +337,14 @@ class _ListPageState extends ConsumerState<ListPage>
                   ),
                 ),
               ),
-              const Positioned(
+              Positioned(
                 bottom: 0,
                 left: 0,
                 right: 0,
-                child: CommentTextField(id: 0),
+                child: CommentTextField(
+                  id: posts?.id ?? -1,
+                  isList: true,
+                ),
               )
             ],
           ),
@@ -347,12 +357,12 @@ class _ListPageState extends ConsumerState<ListPage>
       BuildContext context, MultiplePostModel? posts) {
     final comments = ref.watch(commentsStateHolderProvider);
     double result = (comments?.length ?? 0) * 80 + 200;
-    result += TextInfoService.textSize(
+    result += TextInfoService.textSizeConstWidth(
       posts?.name ?? '',
       context.textStyles.title3!,
       MediaQuery.of(context).size.width - 32,
     ).height;
-    result += TextInfoService.textSize(
+    result += TextInfoService.textSizeConstWidth(
       (posts?.description ?? '').length > 280
           ? posts!.description!.substring(0, 280)
           : (posts?.description ?? ''),
@@ -365,7 +375,7 @@ class _ListPageState extends ConsumerState<ListPage>
         212;
     result += 32;
     for (var comment in comments ?? []) {
-      result += TextInfoService.textSize(
+      result += TextInfoService.textSizeConstWidth(
         comment.text,
         context.textStyles.subheadline!,
         MediaQuery.of(context).size.width - 84,
@@ -377,7 +387,7 @@ class _ListPageState extends ConsumerState<ListPage>
   }
 }
 
-class CollectionInfoWidget extends StatelessWidget {
+class CollectionInfoWidget extends ConsumerWidget {
   const CollectionInfoWidget({
     Key? key,
     this.post,
@@ -388,7 +398,8 @@ class CollectionInfoWidget extends StatelessWidget {
   final Widget shimmer;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final comments = ref.watch(commentsStateHolderProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -417,16 +428,28 @@ class CollectionInfoWidget extends StatelessWidget {
           Row(
             children: [
               Spacer(),
-              ReactionButton(
-                iconPath: 'assets/icons/ic_heart.svg',
-                iconColor: context.colors.iconsDisabled!,
-                amount: post?.likes,
+              LikeButton(
+                amount: post?.likes ?? 0,
+                liked: post?.liked ?? false,
+                onTap: () {
+                  if (post == null) return;
+                  ref
+                      .read(homePagePostsControllerProvider)
+                      .setLikeIdList(post!.id, !(post!.liked));
+                  ref.read(listsStateHolderProvider.notifier).updateState(
+                        post?.copyWith(
+                          liked: !(post!.liked),
+                          likes:
+                              post!.liked ? post!.likes - 1 : post!.likes + 1,
+                        ),
+                      );
+                },
               ),
               SizedBox(width: 12),
               ReactionButton(
                 iconPath: 'assets/icons/ic_comment2.svg',
                 iconColor: context.colors.iconsDisabled!,
-                amount: post?.comments,
+                amount: comments?.length ?? post?.comments,
               ),
             ],
           ),
@@ -457,10 +480,25 @@ class CollectionInfoWidget extends StatelessWidget {
               itemBuilder: (context, index) {
                 return PostsCollectionTile(
                   shimmer: shimmer,
-                  imagePath: post?.posters[index].image ?? '',
-                  name: post?.posters[index].title ?? '',
                   index: index,
-                  year: '1999',
+                  post: PostMovieModel(
+                    year: post!.posters[index].years,
+                    imagePath: post!.posters[index].image,
+                    id: post!.posters[index].id,
+                    name: post!.posters[index].title,
+                    author: post!.author,
+                    time: post!.time,
+                    liked: false,
+                    timeDate: post!.timeDate,
+                  ),
+                  customOnItemTap: (post, index) {
+                    AutoRouter.of(context).push(
+                      PosterRoute(
+                        postId: post.id,
+                        username: post.author.username,
+                      ),
+                    );
+                  },
                 );
               },
             ),

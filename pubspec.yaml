@@ -23,7 +23,7 @@ dependencies:
   package_info_plus: ^4.0.1
   scrollable_positioned_list: ^0.3.8
   sticky_headers: ^0.3.0+2
-  photo_manager: ^2.6.0
+  photo_manager: ^2.7.1
   url_launcher: ^6.1.11
   flutter_screenutil: ^5.8.4
   flutter_bloc: ^8.1.3
@@ -40,6 +40,10 @@ dependencies:
   shared_preferences: ^2.2.0
   firebase_messaging: ^14.6.5
   flutter_local_notifications: ^15.1.0+1
+  davinci: ^2.1.1
+  transparent_image: ^2.0.1
+  async: ^2.11.0
+  image: ^4.0.17
 
 
 dev_dependencies:
@@ -92,26 +96,28 @@ flutter:
         - asset: fonts/Montserrat/Montserrat-Regular.ttf
         - asset: fonts/Montserrat/Montserrat-SemiBold.ttf
         - asset: fonts/Montserrat/Montserrat-Thin.ttf
+    - family: SF-Pro-Text-IOS
+      fonts:
+        - asset: fonts/SFProText/SF-Pro-Text-Medium.otf
     - family: SF-Pro-Text
       fonts:
         - asset: fonts/SFProText/SF-Pro-Text-Black.otf
         - asset: fonts/SFProText/SF-Pro-Text-Bold.otf
         - asset: fonts/SFProText/SF-Pro-Text-Heavy.otf
         - asset: fonts/SFProText/SF-Pro-Text-Light.otf
-        - asset: fonts/SFProText/SF-Pro-Text-Medium.otf
-          weight: 500
         - asset: fonts/SFProText/SF-Pro-Text-Regular.otf
-          weight: 400
         - asset: fonts/SFProText/SF-Pro-Text-SemiBold.otf
         - asset: fonts/SFProText/SF-Pro-Text-Thin.otf
         - asset: fonts/SFProText/SF-Pro-Text-Ultralight.otf
+    - family: SF-Pro-Display-IOS
+      fonts:
+        - asset: fonts/SFProDisplay/SF-Pro-Display-Medium.otf
     - family: SF-Pro-Display
       fonts:
         - asset: fonts/SFProDisplay/SF-Pro-Display-Black.otf
         - asset: fonts/SFProDisplay/SF-Pro-Display-Bold.otf
         - asset: fonts/SFProDisplay/SF-Pro-Display-Heavy.otf
         - asset: fonts/SFProDisplay/SF-Pro-Display-Light.otf
-        - asset: fonts/SFProDisplay/SF-Pro-Display-Medium.otf
         - asset: fonts/SFProDisplay/SF-Pro-Display-Regular.otf
         - asset: fonts/SFProDisplay/SF-Pro-Display-SemiBold.otf
         - asset: fonts/SFProDisplay/SF-Pro-Display-Thin.otf

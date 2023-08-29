@@ -11,6 +11,20 @@ class NotificationsStateHolder extends StateNotifier<List<NotificationModel>?> {
   NotificationsStateHolder(super.state);
 
   void updateState(List<NotificationModel> list) {
-    state = [...(state ?? []), ...list];
+    if (list.isEmpty && state != null) return;
+    state = [...?state, ...list];
+  }
+
+  void updateStateStart(List<NotificationModel> list) {
+    if (list.isEmpty && state != null) return;
+    for (int i = 0; i < (state?.length ?? 0); i++) {
+      for (int j = 0; j < list.length; j++) {
+        if (state![i].id == state![j].id) {
+          state!.removeAt(i);
+          i--;
+        }
+      }
+    }
+    state = [...list, ...?state];
   }
 }

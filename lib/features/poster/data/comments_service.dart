@@ -24,6 +24,25 @@ class PostService {
     }
   }
 
+  Future<Map<String, dynamic>> postCommentList(int id, String text) async {
+    try {
+      final response = await _dio.post('api/lists/$id/comment/',
+          options: Options(
+            contentType: 'application/json',
+            headers: {
+              'accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+          ),
+          data: jsonEncode({'text': text}));
+      print(response.data);
+      return response.data;
+    } on DioError catch (e) {
+      print(e.response?.headers);
+      rethrow;
+    }
+  }
+
   Future<List> getComments(int id) async {
     try {
       final response = await _dio.get(

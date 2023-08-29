@@ -10,7 +10,7 @@ class ProfileRepository implements IProfileRepository {
   final profileService = ProfileService();
 
   @override
-  Future<UserDetailsModel> getProfileInfo(String? id) async {
+  Future<UserDetailsModel> getProfileInfo(dynamic id) async {
     final result = (await profileService.getProfileInfo(id));
     return UserDetailsModel.fromJson(result).copyWith(
       mySelf: id == null,
@@ -26,7 +26,6 @@ class ProfileRepository implements IProfileRepository {
   Future<List<PostMovieModel>> getProfilePosts(int? id) async {
     try {
       final result = (await profileService.getUserPosts(id));
-      print(result);
       return result
           .map(
             (e) => PostMovieModel.fromJson(e),

@@ -17,7 +17,7 @@ import 'package:poster_stock/features/auth/view/pages/sign_up_page.dart'
     as _i16;
 import 'package:poster_stock/features/bookmarks/view/pages/bookmarks_page.dart'
     as _i2;
-import 'package:poster_stock/features/edit_profile/view/view/pages/edit_profile_page.dart'
+import 'package:poster_stock/features/edit_profile/view/pages/edit_profile_page.dart'
     as _i6;
 import 'package:poster_stock/features/home/view/pages/home_page.dart' as _i7;
 import 'package:poster_stock/features/list/view/list_page.dart' as _i8;
@@ -194,13 +194,13 @@ abstract class $AppRouter extends _i18.RootStackRouter {
       );
     },
     UsersListRoute.name: (routeData) {
-      final args = routeData.argsAs<UsersListRouteArgs>(
-          orElse: () => const UsersListRouteArgs());
+      final args = routeData.argsAs<UsersListRouteArgs>();
       return _i18.AutoRoutePage<dynamic>(
         routeData: routeData,
         child: _i17.UsersListPage(
           key: args.key,
           following: args.following,
+          id: args.id,
         ),
       );
     },
@@ -635,12 +635,14 @@ class UsersListRoute extends _i18.PageRouteInfo<UsersListRouteArgs> {
   UsersListRoute({
     _i20.Key? key,
     bool following = false,
+    required int id,
     List<_i18.PageRouteInfo>? children,
   }) : super(
           UsersListRoute.name,
           args: UsersListRouteArgs(
             key: key,
             following: following,
+            id: id,
           ),
           initialChildren: children,
         );
@@ -655,14 +657,17 @@ class UsersListRouteArgs {
   const UsersListRouteArgs({
     this.key,
     this.following = false,
+    required this.id,
   });
 
   final _i20.Key? key;
 
   final bool following;
 
+  final int id;
+
   @override
   String toString() {
-    return 'UsersListRouteArgs{key: $key, following: $following}';
+    return 'UsersListRouteArgs{key: $key, following: $following, id: $id}';
   }
 }

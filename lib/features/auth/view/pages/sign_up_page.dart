@@ -106,7 +106,6 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     final nameErrorState = ref.watch(signUpNameErrorStateHolderProvider);
     final screenHeight = (MediaQuery.of(context).size.height -
         MediaQuery.of(context).viewInsets.bottom);
-    final int fullContent = 500;
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();

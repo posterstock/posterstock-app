@@ -32,6 +32,11 @@ class CommentsController {
     await commentsStateHolder.updateMoreComments([result]);
   }
 
+  Future<void> postCommentList(final int id, final String text) async {
+    final result = await postRepository.postCommentList( id, text);
+    await commentsStateHolder.updateMoreComments([result]);
+  }
+
   Future<void> updateComments(final int id) async {
     print('comm$id');
     if (loadingComments) return;

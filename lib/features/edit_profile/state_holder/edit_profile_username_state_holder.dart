@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final editProfileUsernameStateHolder =
-    StateNotifierProvider<EditProfileUsernameStateHolder, String?>(
-  (ref) => EditProfileUsernameStateHolder(
+StateNotifierProvider<EditProfileUsernameStateHolder, String?>(
+      (ref) => EditProfileUsernameStateHolder(
     null,
   ),
 );
@@ -10,11 +10,11 @@ final editProfileUsernameStateHolder =
 class EditProfileUsernameStateHolder extends StateNotifier<String?> {
   EditProfileUsernameStateHolder(super.state);
 
-  void updateError(String value) {
+  void updateValue(String value) {
     state = value;
   }
 
-  void clearError() {
+  void clearValue() {
     state = null;
   }
 }

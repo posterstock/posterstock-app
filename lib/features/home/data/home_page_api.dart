@@ -98,4 +98,30 @@ class HomePageApi implements IHomePageApi {
       rethrow;
     }
   }
+
+  @override
+  Future<void> setLikeList(int id, bool like) async {
+    try {
+      if (like) {
+        var response = await _dio.post(
+          'api/lists/$id/like/',
+          options: Options(
+            headers: {'Authorization': 'Bearer $token'},
+          ),
+        );
+        print(response);
+      } else {
+        var response = await _dio.post(
+          'api/lists/$id/unlike/',
+          options: Options(
+            headers: {'Authorization': 'Bearer $token'},
+          ),
+        );
+        print(response);
+      }
+    } on DioError catch (e) {
+      print(e.response);
+      rethrow;
+    }
+  }
 }

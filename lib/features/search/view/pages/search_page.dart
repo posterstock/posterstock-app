@@ -14,6 +14,7 @@ import 'package:poster_stock/features/navigation_page/controller/menu_controller
 import 'package:poster_stock/features/navigation_page/state_holder/previous_page_state_holder.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/search/controller/search_controller.dart';
+import 'package:poster_stock/features/search/state_holders/search_posts_state_holder.dart';
 import 'package:poster_stock/features/search/state_holders/search_users_state_holder.dart';
 import 'package:poster_stock/features/search/state_holders/search_value_state_holder.dart';
 import 'package:poster_stock/features/search/view/widgets/search_user_tile.dart';
@@ -54,10 +55,10 @@ class SearchPage extends ConsumerWidget {
                         'assets/icons/search_cross.svg',
                       ),
                       onChanged: (value) {
-                        ref.read(searchControllerProvider).updateSearch(value);
+                        ref.read(searchControllerProvider).startSearchUsers(value);
                       },
                       onRemoved: () {
-                        ref.read(searchControllerProvider).updateSearch('');
+                        ref.read(searchControllerProvider).startSearchUsers('');
                       },
                     ),
                   ),
@@ -73,7 +74,7 @@ class SearchPage extends ConsumerWidget {
                       ),
                     ),
                     onPressed: () {
-                      ref.read(searchControllerProvider).updateSearch('');
+                      ref.read(searchControllerProvider).startSearchUsers('');
                       textController.text = '';
                       ref.read(menuControllerProvider).backToPage(context,ref);
                     },
@@ -122,30 +123,7 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
   @override
   Widget build(BuildContext context) {
     final users = ref.watch(searchUsersStateHolderProvider);
-    final posters = List.generate(
-      0,
-      (index) => PostMovieModel(
-          timeDate: DateTime.now(),
-          liked: false,
-          id: 1,
-          year: '2020',
-          imagePath: index % 2 == 0
-              ? 'https://m.media-amazon.com/images/I/61YwNp4JaPL._AC_UF1000,1000_QL80_.jpg'
-              : 'https://m.media-amazon.com/images/I/51ifcV+yjPL._AC_.jpg',
-          name: index % 2 == 0 ? 'Joker' : 'The Walking Dead',
-          author: UserModel(
-            id: 12,
-            name: 'Name $index',
-            username: 'username$index',
-            followed: index % 2 == 0,
-            imagePath: index % 2 == 0
-                ? 'https://sun9-19.userapi.com/impg/JYz26AJyJy7WGCILcB53cuVK7IgG8kz7mW2h7g/YuMDQr8n2Lc.jpg?size=300x245&quality=96&sign=a881f981e785f06c51dff40d3262565f&type=album'
-                : 'https://sun9-63.userapi.com/impg/eV4ZjNdv2962fzcxP3sivERc4kN64GhCFTRNZw/_5JxseMZ_0g.jpg?size=267x312&quality=95&sign=efb3d7b91e0b102fa9b62d7dc8724050&type=album',
-          ),
-          time: '12:00',
-          description:
-              "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."),
-    );
+    final posters = ref.watch(searchPostsStateHolderProvider);
     final lists = [];
     return Column(
       children: [
@@ -181,8 +159,13 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
           child: TabBarView(
             controller: controller,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
+              NotificationListener<ScrollUpdateNotification>(
+                onNotification: (not) {
+                  if (not.metrics.axisDirection == AxisDirection.down && not.metrics.pixels >= not.metrics.maxScrollExtent - MediaQuery.of(context).size.height) {
+                    ref.read(searchControllerProvider).updateSearchUsers();
+                  }
+                  return true;
+                },
                 child: ListView.separated(
                   physics: const AlwaysScrollableScrollPhysics(
                     parent: BouncingScrollPhysics(),
@@ -203,37 +186,54 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
                   },
                 ),
               ),
-              ListView.separated(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
+              NotificationListener<ScrollUpdateNotification>(
+                onNotification: (not) {
+                  if (not.metrics.axisDirection == AxisDirection.down && not.metrics.pixels >= not.metrics.maxScrollExtent - MediaQuery.of(context).size.height) {
+                    ref.read(searchControllerProvider).updateSearchPosts();
+                  }
+                  return true;
+                },
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  itemCount: posters?.length ?? 0,
+                  itemBuilder: (context, index) {
+                    return PostBase(
+                      key: Key(posters![index].id.toString()),
+                      poster: posters[index],
+                      showSuggestion: false,
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return Divider(
+                      height: 0.5,
+                      thickness: 0.5,
+                      color: context.colors.fieldsDefault,
+                    );
+                  },
                 ),
-                itemCount: posters.length,
-                itemBuilder: (context, index) {
-                  return PostBase(
-                    index: index,
-                    showSuggestion: false,
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return Divider(
-                    height: 0.5,
-                    thickness: 0.5,
-                    color: context.colors.fieldsDefault,
-                  );
-                },
               ),
-              GridView.builder(
-                padding: const EdgeInsets.all(16.0),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 13.0,
-                  mainAxisSpacing: 16.0,
-                  mainAxisExtent: 113,
-                ),
-                itemCount: lists.length,
-                itemBuilder: (context, index) {
-                  return ListGridWidget(post: lists[index]);
+              NotificationListener<ScrollUpdateNotification>(
+                onNotification: (not) {
+                  if (not.metrics.axisDirection == AxisDirection.down && not.metrics.pixels >= not.metrics.maxScrollExtent - MediaQuery.of(context).size.height) {
+                    ref.read(searchControllerProvider).updateSearchLists();
+                  }
+                  return true;
                 },
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(16.0),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 13.0,
+                    mainAxisSpacing: 16.0,
+                    mainAxisExtent: 113,
+                  ),
+                  itemCount: lists.length,
+                  itemBuilder: (context, index) {
+                    return ListGridWidget(post: lists[index]);
+                  },
+                ),
               ),
             ],
           ),

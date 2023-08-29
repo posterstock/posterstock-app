@@ -15,6 +15,10 @@ class PostRepository {
     return Comment.fromJson(await service.postComment(id, text));
   }
 
+  Future<Comment> postCommentList(int id, String text) async {
+    return Comment.fromJson(await service.postCommentList(id, text));
+  }
+
   Future<PostMovieModel> getPost(int id) async {
     return PostMovieModel.fromJson(await service.getPost(id));
   }

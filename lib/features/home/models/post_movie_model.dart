@@ -55,7 +55,7 @@ class PostMovieModel extends PostBaseModel {
               username: json['username'] as String? ?? '',
               imagePath:(json['profile_image'] as String?) == "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp" ? null : json['profile_image'] as String?,
               followed: !(json['is_suggested'] as bool? ?? true),
-              color: avatar[(json['user_id'] as int? ?? 0) % 4],
+              color: avatar[(json['user_id'] as int? ?? 0) % 3],
             )
           : UserModel.fromJson(json['user'] as Map<String, dynamic>),
       timeDate: json['created_at'] == null

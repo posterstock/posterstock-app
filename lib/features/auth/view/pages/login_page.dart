@@ -116,6 +116,7 @@ class LoginPage extends ConsumerWidget {
                       color: context.colors.textsAction!,
                     ),
                     onTap: () async {
+                      print(999000);
                       bool success = await ref
                           .read(signUpControllerProvider)
                           .processSignIn();

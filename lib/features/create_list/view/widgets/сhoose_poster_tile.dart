@@ -1,35 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/features/create_list/state_holders/create_list_chosen_poster_state_holder.dart';
+import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
-class ChoosePosterTile extends StatefulWidget {
-  const ChoosePosterTile(
-      {Key? key,
-      required this.index,
-      required this.imagePath,
-      required this.name,
-      required this.year})
-      : super(key: key);
+class ChoosePosterTile extends ConsumerWidget {
+  const ChoosePosterTile({
+    Key? key,
+    required this.index,
+    required this.imagePath,
+    required this.name,
+    required this.year,
+    required this.id,
+  }) : super(key: key);
   final int index;
-  final String imagePath;
-  final String name;
-  final String year;
+  final String? imagePath;
+  final String? name;
+  final String? year;
+  final int? id;
 
   @override
-  State<ChoosePosterTile> createState() => _ChoosePosterTileState();
-}
-
-class _ChoosePosterTileState extends State<ChoosePosterTile> {
-  bool chosen = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final shimmer = ShimmerLoader(
+      child: Container(
+        color: Colors.white,
+      ),
+    );
+    bool chosen = false;
+    for (var i in ref
+        .watch(createListChosenPosterStateHolderProvider)) {
+      if (i.$1 == id) chosen = true;
+    }
     return Column(
       children: [
         GestureDetector(
           onTap: () {
-            chosen = !chosen;
-            setState(() {});
+            if (id != null && imagePath != null) {
+              ref
+                  .read(createListChosenPosterStateHolderProvider.notifier)
+                  .switchElement((id!, imagePath!));
+            }
           },
           child: Stack(
             children: [
@@ -40,8 +51,19 @@ class _ChoosePosterTileState extends State<ChoosePosterTile> {
                   height: 160,
                   width: double.infinity,
                   child: Image.network(
-                    widget.imagePath,
+                    imagePath ?? '',
                     fit: BoxFit.cover,
+                    errorBuilder: (context, obj, trace) {
+                      return shimmer;
+                    },
+                    loadingBuilder: (context, child, event) {
+                      if (event?.cumulativeBytesLoaded !=
+                          event?.expectedTotalBytes) {
+                        return shimmer;
+                      }
+                      return child;
+                    },
+                    key: Key(imagePath ?? ''),
                   ),
                 ),
               ),
@@ -71,7 +93,7 @@ class _ChoosePosterTileState extends State<ChoosePosterTile> {
         ),
         const SizedBox(height: 8),
         Text(
-          widget.name,
+          name ?? '',
           textAlign: TextAlign.center,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -81,7 +103,7 @@ class _ChoosePosterTileState extends State<ChoosePosterTile> {
         ),
         const SizedBox(height: 4),
         Text(
-          widget.year,
+          year ?? '',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: context.textStyles.caption1!.copyWith(

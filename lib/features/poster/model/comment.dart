@@ -17,7 +17,7 @@ class Comment {
     return Comment(
       id: json['id'],
       text: json['text'],
-      time: _getTimeString(DateTime.fromMillisecondsSinceEpoch(json['timestamp'] * 1000)),
+      time: _getTimeString(DateTime.fromMillisecondsSinceEpoch(json['created_at'] * 1000)),
       model: UserModel.fromJson(json['user']),
     );
   }

@@ -8,7 +8,7 @@ class UsersListRepository {
     required bool followers,
     required int id,
   }) async {
-    return (await _api.getPosts(
+    return (await _api.getFollows(
       followers: followers,
       id: id,
     ))

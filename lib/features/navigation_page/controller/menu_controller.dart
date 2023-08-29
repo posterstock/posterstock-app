@@ -6,6 +6,7 @@ import 'package:poster_stock/features/navigation_page/state_holder/navigation_pa
 import 'package:poster_stock/features/navigation_page/state_holder/navigation_route_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/previous_page_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/view/navigation_page.dart';
+import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 
 import '../../../common/state_holders/router_state_holder.dart';
@@ -53,6 +54,9 @@ class MenuController {
     previousPageState.updatePage(routerValue?.activeIndex ?? 0);
     routerState.updatePage(page);
     pagesState.updatePage(page);
+    if (page == 3) {
+      ref.read(profileControllerApiProvider).clearUser();
+    }
   }
 
   void backToPage(BuildContext context, WidgetRef ref) {

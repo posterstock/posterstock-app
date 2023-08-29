@@ -9,7 +9,10 @@ import 'package:poster_stock/features/auth/state_holders/device_id_state_holder.
 import 'package:poster_stock/features/auth/state_holders/email_state_holder.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poster_stock/features/auth/state_holders/session_id_state_holder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supertokens_flutter/supertokens.dart';
+
+import 'package:poster_stock/main.dart' as main;
 
 final authControllerProvider = Provider(
   (ref) => AuthController(
@@ -109,6 +112,9 @@ class AuthController {
     );
     final token = await FirebaseMessaging.instance.getToken();
     await registerNotification(token!);
+    var instance = await SharedPreferences.getInstance();
+    instance.setBool('apple', true);
+    main.apple = true;
     return true;
   }
 
@@ -124,6 +130,9 @@ class AuthController {
     );
     final token = await FirebaseMessaging.instance.getToken();
     await registerNotification(token!);
+    var instance = await SharedPreferences.getInstance();
+    instance.setBool('google', true);
+    main.google = true;
     return true;
   }
 }

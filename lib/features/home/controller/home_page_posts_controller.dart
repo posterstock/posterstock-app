@@ -39,15 +39,14 @@ class HomePagePostsController {
     gettingPosts = false;
   }
 
-  Future<void> setLike(int index, int index2) async {
-    homePagePostsState.setLike(index, index2);
-    repository.setLike(homePagePostsState.state?[index][index2].id,
-        (homePagePostsState.state?[index][index2].liked ?? false));
-  }
-
   Future<void> setLikeId(int id, bool value) async {
     homePagePostsState.setLikeId(id, value);
     repository.setLike(id, value);
+  }
+
+  Future<void> setLikeIdList(int id, bool value) async {
+    homePagePostsState.setLikeIdList(id, value);
+    repository.setLikeList(id, value);
   }
 
   Future<void> setFollowId(int id, bool value) async {
@@ -56,5 +55,9 @@ class HomePagePostsController {
 
   Future<void> addComment(int id) async {
     homePagePostsState.addComment(id);
+  }
+
+  Future<void> addCommentList(int id) async {
+    homePagePostsState.addCommentList(id);
   }
 }

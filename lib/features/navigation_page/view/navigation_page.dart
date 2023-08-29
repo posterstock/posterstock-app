@@ -5,7 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/state_holders/auth_id_state_holder.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/create_list/view/create_list_dialog.dart';
 import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
@@ -23,13 +25,23 @@ class NavigationPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var rtr = ref.watch(router);
+    rtr?.addListener(() {
+      if (TokenKeeper.token == null) {
+        if (rtr.topRoute.path == '/') {
+          rtr.replaceNamed(
+            '/auth',
+          );
+        }
+      }
+    });
     return AutoTabsRouter.pageView(
       physics: const NeverScrollableScrollPhysics(),
       routes: [
-        const HomeRoute(),
-        SearchRoute(),
+        const PageRouteInfo(HomeRoute.name),
+        const PageRouteInfo(SearchRoute.name),
         const NotificationsRoute(),
-        ProfileRoute(),
+        ProfileRoute()
       ],
       builder: (context, child, _) {
         return WillPopScope(

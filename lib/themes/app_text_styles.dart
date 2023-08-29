@@ -76,12 +76,13 @@ class AppAllTextStyles extends AppTextStyles {
             color: colors.textsPrimary,
           ),
           subheadlineBold: TextStyle(
-            fontFamily: 'SF-Pro-Text',
+            fontFamily: 'SF-Pro-Text-IOS',
             fontWeight: FontWeight.w500,
             fontSize: 15,
             height: 20 / 15,
             letterSpacing: -0.5,
             color: colors.textsPrimary,
+              fontFamilyFallback: ['SF-Pro-Display'],
           ),
           subheadline: TextStyle(
             fontFamily: 'SF-Pro-Text',

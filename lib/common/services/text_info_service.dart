@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TextInfoService {
-  static Size textSize(String text, TextStyle style, double width) {
+  static Size textSizeConstWidth(String text, TextStyle style, double width) {
     final TextPainter textPainter = TextPainter(
       text: TextSpan(text: text, style: style),
       textDirection: TextDirection.ltr,
@@ -11,7 +11,8 @@ class TextInfoService {
       );
     return textPainter.size;
   }
-  static Size textSizeNoWidth(String text, TextStyle style) {
+
+  static Size textSize(String text, TextStyle style) {
     final TextPainter textPainter = TextPainter(
       text: TextSpan(text: text, style: style),
       textDirection: TextDirection.ltr,

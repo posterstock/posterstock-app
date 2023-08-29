@@ -386,7 +386,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                           children: [
                                             SizedBox(
                                               width: TextInfoService
-                                                          .textSizeNoWidth(
+                                                          .textSize(
                                                         results[index].title,
                                                         context.textStyles
                                                             .bodyRegular!,
@@ -395,7 +395,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                               .size
                                                               .width -
                                                           54 -
-                                                          TextInfoService.textSizeNoWidth(
+                                                          TextInfoService.textSize(
                                                                   results[index].endYear ==
                                                                           null
                                                                       ? results[index]
@@ -410,7 +410,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                           .size
                                                           .width -
                                                       54 -
-                                                      TextInfoService.textSizeNoWidth(
+                                                      TextInfoService.textSize(
                                                               results[index].endYear ==
                                                                       null
                                                                   ? results[index]
@@ -420,7 +420,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                               context.textStyles
                                                                   .caption1!)
                                                           .width)
-                                                  : TextInfoService.textSizeNoWidth(
+                                                  : TextInfoService.textSize(
                                                       results[index].title,
                                                       context.textStyles
                                                           .bodyRegular!,

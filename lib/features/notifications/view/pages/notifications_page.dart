@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,6 +29,9 @@ class NotificationsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifications = ref.watch(notificationsStateHolderProvider);
+    if (notifications == null) {
+      ref.read(notificationsControllerProvider).getNotificationsData();
+    }
     final controller = ScrollController();
     bool keepOffset = false;
     return NotificationListener<ScrollUpdateNotification>(
@@ -42,15 +47,24 @@ class NotificationsPage extends ConsumerWidget {
           });
           ref
               .read(notificationsControllerProvider)
-              .getNotificationsData()
+              .getNotificationsData(
+                getNewPosts: true,
+              )
               .then((value) {
             keepOffset = false;
+            Future.delayed(const Duration(seconds: 3), () {
+              keepOffset = false;
+            });
           });
         }
         if (keepOffset) {
           controller.jumpTo(
             -50,
           );
+        }
+        if (n.metrics.pixels >=
+            n.metrics.maxScrollExtent - MediaQuery.of(context).size.height) {
+          ref.read(notificationsControllerProvider).getNotificationsData();
         }
         return false;
       },
@@ -97,7 +111,7 @@ class NotificationsPage extends ConsumerWidget {
                   toolbarHeight: 42,
                   expandedHeight: 42,
                 ),
-                if (notifications == null)
+                if (notifications?.isEmpty == true)
                   SliverToBoxAdapter(
                     child: Container(
                       color: context.colors.backgroundsPrimary,
@@ -107,26 +121,44 @@ class NotificationsPage extends ConsumerWidget {
                       ),
                     ),
                   ),
+                if (notifications == null)
+                  SliverToBoxAdapter(
+                    child: Container(
+                      color: context.colors.backgroundsPrimary,
+                      height: MediaQuery.of(context).size.height - 200,
+                      child: Center(
+                        child: defaultTargetPlatform != TargetPlatform.android
+                            ? const CupertinoActivityIndicator(
+                                radius: 10,
+                              )
+                            : SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: context.colors.iconsDisabled!,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
                 if (notifications != null)
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
+                      childCount:
+                          notifications.isEmpty ? 1 : notifications.length,
                       (context, index) {
-                        if (notifications!.isEmpty) {
+                        if (notifications.isEmpty) {
                           return Container(
                             height: 78,
                             color: context.colors.backgroundsPrimary,
                           );
                         }
+                        if (notifications.length <= index) return SizedBox();
                         return NotificationTile(
                           notification: notifications[index],
-                          onTap: () {
-                            print(1);
-                          },
                         );
                       },
-                      childCount: notifications == null
-                          ? 0
-                          : (notifications.isEmpty ? 1 : notifications.length),
                     ),
                   )
               ],
@@ -142,12 +174,9 @@ class NotificationTile extends ConsumerWidget {
   const NotificationTile({
     Key? key,
     required this.notification,
-    required this.onTap,
   }) : super(key: key);
 
   final NotificationModel notification;
-  final void Function() onTap;
-
   static const List<Color> avatar = [
     Color(0xfff09a90),
     Color(0xfff3d376),
@@ -159,34 +188,43 @@ class NotificationTile extends ConsumerWidget {
     return Material(
       color: context.colors.backgroundsPrimary,
       child: CustomInkWell(
-        onTap: onTap,
+        onTap: () {
+          print(notification.deepLink);
+          ref.watch(router)!.pushNamed(
+                notification.deepLink,
+              );
+        },
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              GestureDetector(
-                onTap: () {
-                  /*ref.watch(router)!.push(
-                    ProfileRoute(),
-                  );*/
-                },
-                child: CircleAvatar(
-                  radius: 20,
-                  backgroundImage: notification.user.imagePath != null
-                      ? NetworkImage(notification.user.imagePath!)
-                      : null,
-                  backgroundColor: avatar[Random().nextInt(3)],
-                  child: notification.user.imagePath == null
-                      ? Text(
-                          getAvatarName(notification.user.name).toUpperCase(),
-                          style: context.textStyles.calloutBold!.copyWith(
-                            color: context.colors.textsBackground,
-                          ),
-                        )
-                      : const SizedBox(),
-                ),
-              ),
+              notification.image.isEmpty
+                  ? CircleAvatar(
+                      radius: 20,
+                      backgroundImage: NetworkImage(notification.profileImage),
+                      backgroundColor: avatar[Random().nextInt(3)],
+                    )
+                  : SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: Image.network(
+                        notification.image,
+                        fit: BoxFit.fitWidth,
+                        loadingBuilder: (context, child, event) {
+                          if (event?.expectedTotalBytes ==
+                              event?.cumulativeBytesLoaded) return child;
+                          return Container(
+                            color: context.colors.backgroundsSecondary,
+                          );
+                        },
+                        errorBuilder: (context, obj, err) {
+                          return Container(
+                            color: context.colors.backgroundsSecondary,
+                          );
+                        },
+                      ),
+                    ),
               const SizedBox(
                 width: 16,
               ),
@@ -196,25 +234,30 @@ class NotificationTile extends ConsumerWidget {
                   children: [
                     RichText(
                       text: TextSpan(
-                        text: '${notification.user.name} ',
-                        style: context.textStyles.subheadlineBold,
-                        children: <TextSpan>[
+                        text: '${notification.info.split(' ')[0]} ',
+                        style: context.textStyles.subheadlineBold!.copyWith(
+                          fontWeight: Platform.isIOS ? FontWeight.w600 : null,
+                        ),
+                        children: [
                           TextSpan(
-                            text: notification.info,
+                            text: (notification.info.split(' ')..removeAt(0))
+                                .join(' '),
                             style: context.textStyles.subheadline,
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    Text(
-                      notification.time,
-                      style: context.textStyles.caption1!.copyWith(
-                        color: context.colors.textsSecondary,
+                    if (notification.time.isNotEmpty)
+                      const SizedBox(
+                        height: 8,
                       ),
-                    )
+                    if (notification.time.isNotEmpty)
+                      Text(
+                        notification.time,
+                        style: context.textStyles.caption1!.copyWith(
+                          color: context.colors.textsSecondary,
+                        ),
+                      )
                   ],
                 ),
               )

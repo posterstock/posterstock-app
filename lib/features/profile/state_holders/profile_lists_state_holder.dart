@@ -18,7 +18,7 @@ class ProfileListsStateHolder extends StateNotifier<List<ListBaseModel>?> {
     state = [...?list];
   }
 
-  void clearState() {
+  Future<void> clearState() async {
     state = null;
   }
 }

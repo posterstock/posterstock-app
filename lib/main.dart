@@ -18,7 +18,10 @@ import 'package:poster_stock/common/helpers/custom_scroll_behavior.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/features/settings/controllers/app_language_controller.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
+import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
+import 'package:poster_stock/features/theme_switcher/state_holder/theme_value_state_holder.dart';
+import 'package:poster_stock/themes/app_themes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supertokens_flutter/supertokens.dart';
 
@@ -38,6 +41,11 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   showPush(message);
 }
 
+String? initTheme;
+bool google = false;
+bool apple = false;
+String? email;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SuperTokens.init(
@@ -45,8 +53,10 @@ void main() async {
   );
 
   PhotoManager.clearFileCache();
-  await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-      AndroidFlutterLocalNotificationsPlugin>()?.requestPermission();
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.requestPermission();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -56,14 +66,11 @@ void main() async {
   debugPrint("FCM TOKEN $fcmToken");
   TokenKeeper.token =
       prefs.getString('token') == '' ? null : prefs.getString('token');
-  //TODO
-  PackageInfo.setMockInitialValues(
-    appName: 'Posterstock',
-    packageName: 'com.thedirection.posterstock',
-    version: '0.0.t',
-    buildNumber: '1',
-    buildSignature: 'Posterstock',
-  );
+  var instance = await SharedPreferences.getInstance();
+  initTheme = instance.getString('theme');
+  google = instance.getBool('google') ?? false;
+  apple = instance.getBool('apple') ?? false;
+  email = instance.getString('email');
 
   runApp(ProviderScope(child: App()));
 }
@@ -78,6 +85,29 @@ class App extends ConsumerWidget {
     if (_appRouter == null) {
       _appRouter = AppRouter();
       initPushes(_appRouter!);
+    }
+    if (initTheme != null) {
+      print(initTheme);
+      if (initTheme == 'Themes.dark') {
+        Future(() {
+          ref
+              .read(themeStateHolderProvider.notifier)
+              .updateState(AppThemes.darkThemeData);
+          ref
+              .read(themeValueStateHolderProvider.notifier)
+              .updateState(Themes.dark);
+        });
+      } else if (initTheme == 'Themes.light') {
+        Future(() {
+          ref
+              .read(themeStateHolderProvider.notifier)
+              .updateState(AppThemes.lightThemeData);
+          ref
+              .read(themeValueStateHolderProvider.notifier)
+              .updateState(Themes.light);
+        });
+      }
+      initTheme = null;
     }
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -94,13 +124,8 @@ class App extends ConsumerWidget {
     List<Locale> locales = langs.map((e) => e.locale).toList();
     if (rtr == null) {
       Future(() {
+        print("HEELL NOOO");
         ref.read(router.notifier).setRouter(_appRouter);
-        if (initLink != null) {
-          print('i did');
-          _appRouter!.pushNamed(initLink!);
-          print(initLink);
-          initLink = null;
-        }
       });
     }
     if (appLocale == null) {
@@ -118,7 +143,18 @@ class App extends ConsumerWidget {
     }
     return MaterialApp.router(
       routerConfig: _appRouter!.config(deepLinkBuilder: (deepLink) {
-        if(deepLink.path == '/') return DeepLink([AuthRoute()]);
+        if (initLink != null) {
+          var route =
+              _appRouter!.matcher.match(initLink!)?[0].toPageRouteInfo();
+          if (route != null) {
+            if (route is NavigationRoute) return DeepLink([route]);
+            return DeepLink([AuthRoute(), route, ...?route.initialChildren]);
+          }
+          return DeepLink([AuthRoute()]);
+        }
+        if (deepLink.path == '/' || deepLink.path == '') {
+          return DeepLink([AuthRoute()]);
+        }
         return deepLink;
       }),
       scaffoldMessengerKey: scaffoldMessengerKey,

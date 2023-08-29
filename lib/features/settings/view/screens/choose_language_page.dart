@@ -70,11 +70,6 @@ class ChooseLanguagePage extends ConsumerWidget {
                                 Languages.english(),
                               );
                         },
-                        () {
-                          ref.read(appLanguageControllerProvider).updateLanguage(
-                                Languages.russian(),
-                              );
-                        },
                       ],
                       children: [
                         Row(
@@ -89,26 +84,6 @@ class ChooseLanguagePage extends ConsumerWidget {
                                     ?.locale
                                     .languageCode ==
                                 'en')
-                              Text(
-                                '􀆅',
-                                style: context.textStyles.headline!.copyWith(
-                                  color: context.colors.iconsActive,
-                                ),
-                              ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              'Русский',
-                              style: context.textStyles.bodyRegular,
-                            ),
-                            const Spacer(),
-                            if (ref
-                                    .watch(chosenLanguageStateHolder)
-                                    ?.locale
-                                    .languageCode ==
-                                'ru')
                               Text(
                                 '􀆅',
                                 style: context.textStyles.headline!.copyWith(

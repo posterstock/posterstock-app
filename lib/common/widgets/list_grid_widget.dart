@@ -36,6 +36,7 @@ class ListGridWidget extends ConsumerWidget {
             borderRadius: BorderRadius.circular(8.0),
             child: Container(
               height: 92,
+              width: double.infinity,
               color: context.colors.backgroundsSecondary,
               child: Image.network(
                 post?.image ?? '',

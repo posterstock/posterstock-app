@@ -11,11 +11,13 @@ import 'package:poster_stock/features/auth/state_holders/session_id_state_holder
 import 'package:poster_stock/features/auth/state_holders/sign_up_loading_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/sign_up_name_error_state_holdeer.dart';
 import 'package:poster_stock/features/auth/state_holders/sign_up_username_error_state_holder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supertokens_flutter/supertokens.dart';
 
 import '../../../common/state_holders/intl_state_holder.dart';
 import '../state_holders/name_state_holder.dart';
 import '../state_holders/username_state_holder.dart';
+import 'package:poster_stock/main.dart' as main;
 
 final signUpControllerProvider = Provider<SignUpController>(
   (ref) => SignUpController(
@@ -117,6 +119,7 @@ class SignUpController {
   Future<bool> processSignIn() async {
     codeErrorStateHolder.setValue(null);
     signUpLoadingStateHolder.setValue(true);
+    String? token;
     try {
       await repository.confirmCode(
         code: code,
@@ -124,19 +127,27 @@ class SignUpController {
         deviceId: deviceId,
         email: email
       );
-      //final token = await FirebaseMessaging.instance.getToken();
-      //await registerNotification(token!);
-      signUpLoadingStateHolder.setValue(false);
-      return true;
+      token = await FirebaseMessaging.instance.getToken();
     } catch (e) {
       codeErrorStateHolder.setValue("Wrong code");
-      signUpLoadingStateHolder.setValue(false);
-      return false;
     }
+    if (token != null) {
+      try {
+        await registerNotification(token);
+      } catch (e) {
+        print(e);
+      }
+    }
+    signUpLoadingStateHolder.setValue(false);
+    var instance = await SharedPreferences.getInstance();
+    instance.setString('email', email);
+    main.email = email;
+    return token != null;
   }
 
   Future<bool> processAuth() async {
     signUpLoadingStateHolder.setValue(true);
+    String? token;
     try {
      await repository.confirmCode(
         code: code,
@@ -146,14 +157,30 @@ class SignUpController {
         login: username,
         email: email,
       );
-     final token = await FirebaseMessaging.instance.getToken();
-     await registerNotification(token!);
-     signUpLoadingStateHolder.setValue(false);
-      return true;
+     token = await FirebaseMessaging.instance.getToken();
     } catch (e) {
-      signUpLoadingStateHolder.setValue(false);
-      return false;
+      codeErrorStateHolder.setValue("Wrong code");
     }
+    if (token != null) {
+      try {
+        await registerNotification(token);
+      } catch (e) {
+        print(e);
+      }
+    }
+    signUpLoadingStateHolder.setValue(false);
+    var instance = await SharedPreferences.getInstance();
+    instance.setString('email', email);
+    main.email = email;
+    return token != null;
+  }
+
+  Future<void> removeFCMToken() async {
+    var fcmToken = await FirebaseMessaging.instance.getToken();
+    final userToken = await SuperTokens.getAccessToken();
+    if (userToken == null) return;
+    if (fcmToken == null) return;
+    await repository.removeFCMToken(fcmToken, userToken);
   }
 
   Future<void> registerNotification(String token) async {

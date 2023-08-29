@@ -90,6 +90,7 @@ class CreatePosterController {
         description,
       );
       if (profileInfoStateHolder != null) {
+        print("REBUILLDDDPoster");
         profileControllerApi.getUserInfo(profileInfoStateHolder!.username);
       }
     } catch (e) {

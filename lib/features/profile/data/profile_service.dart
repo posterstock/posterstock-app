@@ -31,7 +31,7 @@ class ProfileService {
   }
 
   @override
-  Future<Map<String, dynamic>> getProfileInfo(String? id) async {
+  Future<Map<String, dynamic>> getProfileInfo(dynamic id) async {
     try {
       print('AA$id');
       if (id == null) {
@@ -51,10 +51,18 @@ class ProfileService {
           rethrow;
         }
       }
-      final response = await _dio.get(
-        'api/users/u/$id',
-        options: Options(headers: {}),
-      );
+      Response response;
+      if (id is String) {
+        response = await _dio.get(
+          'api/users/u/$id',
+          options: Options(headers: {}),
+        );
+      } else {
+        response = await _dio.get(
+          'api/users/$id',
+          options: Options(headers: {}),
+        );
+      }
       print(response);
       return response.data;
     } on DioError catch (e) {

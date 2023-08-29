@@ -17,7 +17,7 @@ class ProfilePostsStateHolder extends StateNotifier<List<PostMovieModel>?> {
     state = [...?list];
   }
 
-  void clearState() {
+  Future<void> clearState() async {
     state = null;
   }
 }

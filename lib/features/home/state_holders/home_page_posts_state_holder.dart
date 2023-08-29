@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_base_model.dart';
+import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_likes_state_holder.dart';
 
 final homePagePostsStateHolderProvider =
@@ -22,16 +24,19 @@ class HomePagePostsStateHolder
     List<List<PostBaseModel>>? newState = [];
     for (int i = 0; i < posts.length; i++) {
       newState.add([posts[i]]);
+      if (posts[i] is MultiplePostModel) continue;
       for (int j = i + 1; j < posts.length; j++) {
+        if (posts[j] is MultiplePostModel) continue;
         if (posts[i].author.username == posts[j].author.username) {
-          for (var post in newState[i]) {
-            if (post.timeDate.difference(posts[j].timeDate).inHours.abs() <
-                25) {
-              newState[i].add(posts[j]);
-              posts.removeAt(j);
-              j--;
-              break;
-            }
+          if (newState[i][0]
+                  .timeDate
+                  .difference(posts[j].timeDate)
+                  .inHours
+                  .abs() <
+              25) {
+            newState[i].add(posts[j]);
+            posts.removeAt(j);
+            j--;
           }
         }
       }
@@ -66,19 +71,26 @@ class HomePagePostsStateHolder
     }
   }
 
-  Future<void> setLike(int index, int index2) async {
-    state?[index][index2] = (state?[index][index2].copyWith(
-        liked: state?[index][index2].liked == false ? true : false,
-        likes: state?[index][index2].liked == false
-            ? (state?[index][index2].likes ?? 0) + 1
-            : (state?[index][index2].likes ?? 0) - 1))!;
-    state = [...?state];
-  }
-
   Future<void> setLikeId(int id, bool value) async {
     for (int i = 0; i < (state?.length ?? 0); i++) {
       for (int j = 0; j < (state?[i].length ?? 0); j++) {
-        if (state![i][j].id == id) {
+        if (state![i][j].id == id && state![i][j] is PostMovieModel) {
+          print("ABOBA");
+          print(value);
+          var likes = state![i][j].likes;
+          state![i][j] = state![i][j]
+              .copyWith(liked: value, likes: value ? likes + 1 : likes - 1);
+          state = [...?state];
+          return;
+        }
+      }
+    }
+  }
+
+  Future<void> setLikeIdList(int id, bool value) async {
+    for (int i = 0; i < (state?.length ?? 0); i++) {
+      for (int j = 0; j < (state?[i].length ?? 0); j++) {
+        if (state![i][j].id == id && state![i][j] is MultiplePostModel) {
           print("ABOBA");
           print(value);
           var likes = state![i][j].likes;
@@ -115,7 +127,20 @@ class HomePagePostsStateHolder
     if (state == null) return;
     for (int i = 0; i < state!.length; i++) {
       for (int j = 0; j < state![i].length; j++) {
-        if (state![i][j].id == id) {
+        if (state![i][j].id == id && state![i][j] is PostMovieModel) {
+          state![i][j] =
+              state![i][j].copyWith(comments: state![i][j].comments + 1);
+        }
+      }
+    }
+    state = [...?state];
+  }
+
+  Future<void> addCommentList(int id) async {
+    if (state == null) return;
+    for (int i = 0; i < state!.length; i++) {
+      for (int j = 0; j < state![i].length; j++) {
+        if (state![i][j].id == id && state![i][j] is MultiplePostModel) {
           state![i][j] =
               state![i][j].copyWith(comments: state![i][j].comments + 1);
         }
@@ -131,21 +156,19 @@ class HomePagePostsStateHolder
     List<List<PostBaseModel>>? newState = [];
     for (int i = 0; i < posts.length; i++) {
       newState.add([posts[i]]);
+      if (posts[i] is MultiplePostModel) continue;
       for (int j = i + 1; j < posts.length; j++) {
+        if (posts[j] is MultiplePostModel) continue;
         if (posts[i].author.username == posts[j].author.username) {
-          for (var post in newState[i]) {
-            if (post.timeDate.difference(posts[j].timeDate).inHours.abs() <
-                25) {
-              print(
-                  'suc${post.name} ${posts[j].name} ${post.timeDate} ${posts[j].timeDate} ${post.time} ${posts[j].time} ${post.timeDate.difference(posts[j].timeDate).inHours.abs()}');
-              newState[i].add(posts[j]);
-              posts.removeAt(j);
-              j--;
-              break;
-            } else {
-              print(
-                  '${post.name} ${posts[j].name} ${post.timeDate} ${posts[j].timeDate} ${post.time} ${posts[j].time} ${post.timeDate.difference(posts[j].timeDate).inHours.abs()}');
-            }
+          if (newState[i][0]
+              .timeDate
+              .difference(posts[j].timeDate)
+              .inHours
+              .abs() <
+              25) {
+            newState[i].add(posts[j]);
+            posts.removeAt(j);
+            j--;
           }
         }
       }

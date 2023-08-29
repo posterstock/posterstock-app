@@ -19,6 +19,9 @@ import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
+import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
+import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
+import 'package:poster_stock/features/navigation_page/state_holder/navigation_route_state_holder.dart';
 import 'package:poster_stock/features/peek_pop/peek_and_pop_dialog.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
@@ -51,6 +54,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   final scrollController = ScrollController();
   final searchController = TextEditingController();
   final focusNode = FocusNode();
+  bool loading = false;
+  bool myself = false;
   final shimmer = ShimmerLoader(
     loaded: false,
     child: Container(
@@ -61,51 +66,61 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   @override
   void initState() {
     super.initState();
-    print('DD${widget.username}');
+    ref.read(profileControllerApiProvider).clearUser();
     animationController = AnimationController(
       vsync: this,
       lowerBound: 0,
       upperBound: 1,
       duration: const Duration(milliseconds: 300),
     );
-    if (widget.username != 'profile') {
-      Future(() async {
-        await ref.read(profileControllerApiProvider).clearUser();
+    Future(() {
+      var profile = ref.watch(profileInfoStateHolderProvider);
+      var rtr = ref.watch(router);
+      rtr!.addListener(() {
+        if (profile == null) {
+          getProfile(profile);
+        }
       });
-    }
+    });
   }
 
-  static const List<Color> avatar = [
-    Color(0xfff09a90),
-    Color(0xfff3d376),
-    Color(0xff92bdf4),
-  ];
+  Future<void> getProfile(UserDetailsModel? profile) async {
+    if (loading) return;
+    loading = true;
+    if (profile == null) {
+      Future(() {
+        RouteData? el;
+        try {
+          if (ref.watch(router)!.topRoute.path == '/:username') {
+            el = ref.watch(router)!.topRoute;
+            print(el.pathParams.getString('username'));
+            print('HEIL');
+            ref
+                .read(profileControllerApiProvider)
+                .getUserInfo(el.pathParams.getString('username'));
+          } else if (ref.watch(router)!.topRoute.path == '/user/:id') {
+            el = ref.watch(router)!.topRoute;
+            ref.read(profileControllerApiProvider).getUserInfo(el.pathParams.getInt('id'));
+          } else if (ref.watch(router)!.topRoute.path == 'profile') {
+            ref.read(profileControllerApiProvider).getUserInfo(null);
+          } else if (ref.watch(router)!.topRoute.path != '/edit_profile'){
+            ref.read(profileControllerApiProvider).clearUser();
+          }
+        } catch (e) {
+          el = null;
+        }
+      });
+    }
+    loading = false;
+  }
 
   @override
   Widget build(BuildContext context) {
     var profile = ref.watch(profileInfoStateHolderProvider);
-    final photo = ref.watch(avatarStateHolderProvider);
-    bool myself = profile?.mySelf ?? false;
     if (profile == null) {
-      Future(() async {
-        for (var a in ref.watch(router)!.stackData) {
-          print(a.path);
-        }
-        RouteData? el;
-        try {
-          el = ref.watch(router)!
-              .stackData
-              .lastWhere((element) => element.route.path == '/:username');
-        } catch (e) {
-          el = null;
-        }
-        ref.read(profileControllerApiProvider).getUserInfo(
-              el?.pathParams.getString('username') == 'profile'
-                  ? null
-                  : el?.pathParams.getString('username'),
-            );
-      });
+      getProfile(profile);
     }
+    myself = widget.username == 'profile';
     if (myself == true && tabController?.length != 3) {
       tabController = TabController(
         length: 3,
@@ -119,7 +134,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     }
     return WillPopScope(
       onWillPop: () async {
-        await ref.read(profileControllerApiProvider).clearUser();
+        ref.read(profileControllerApiProvider).clearUser();
         return true;
       },
       child: CustomScaffold(
@@ -151,7 +166,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                       ? 50
                       : 225 +
                           ((profile.description != null)
-                              ? TextInfoService.textSize(
+                              ? TextInfoService.textSizeConstWidth(
                                       profile.description ?? '',
                                       context.textStyles.footNote!,
                                       MediaQuery.of(context).size.width - 32)
@@ -161,7 +176,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                       ? 50
                       : 225 +
                           ((profile.description != null)
-                              ? TextInfoService.textSize(
+                              ? TextInfoService.textSizeConstWidth(
                                       profile.description ?? '',
                                       context.textStyles.footNote!,
                                       MediaQuery.of(context).size.width - 32)
@@ -171,7 +186,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                       ? 50
                       : 225 +
                           ((profile.description != null)
-                              ? TextInfoService.textSize(
+                              ? TextInfoService.textSizeConstWidth(
                                       profile.description ?? '',
                                       context.textStyles.footNote!,
                                       MediaQuery.of(context).size.width - 32)
@@ -195,7 +210,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                     alignment: Alignment.centerLeft,
                                     child: GestureDetector(
                                       onTap: () async {
-                                        await ref
+                                        ref
                                             .read(profileControllerApiProvider)
                                             .clearUser();
                                         ref.watch(router)!.pop();
@@ -323,8 +338,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                   GestureDetector(
                                     onTap: () {
                                       ref.watch(router)!.push(
-                                        UsersListRoute(),
-                                      );
+                                            UsersListRoute(id: profile.id),
+                                          );
                                     },
                                     child: Container(
                                       color: Colors.transparent,
@@ -367,10 +382,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                   GestureDetector(
                                     onTap: () {
                                       ref.watch(router)!.push(
-                                        UsersListRoute(
-                                          following: true,
-                                        ),
-                                      );
+                                            UsersListRoute(
+                                              following: true,
+                                              id: profile.id,
+                                            ),
+                                          );
                                     },
                                     child: Container(
                                       color: Colors.transparent,
@@ -483,8 +499,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                     onTap: () {
                                       if (myself) {
                                         ref.watch(router)!.push(
-                                          EditProfileRoute(),
-                                        );
+                                              EditProfileRoute(),
+                                            );
                                       } else {
                                         ref
                                             .read(profileControllerApiProvider)
@@ -713,8 +729,8 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
             bookmark: true,
             customOnItemTap: (post, index) {
               ref.watch(router)!.push(
-                BookmarksRoute(startIndex: index),
-              );
+                    BookmarksRoute(startIndex: index),
+                  );
             },
             customOnLongTap: () {},
           ),
@@ -819,18 +835,16 @@ class PostsCollectionTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print(post?.name);
-    print(post?.description);
     return PeekAndPopDialog(
       customOnLongTap: customOnLongTap,
       onTap: () {
         if (post != null) {
           if (customOnItemTap == null) {
             ref.watch(router)!.push(
-              PosterRoute(
-                postId: post!.id,
-              ),
-            );
+                  PosterRoute(
+                    postId: post!.id,
+                  ),
+                );
           } else {
             customOnItemTap!(post!, index);
           }
@@ -851,6 +865,7 @@ class PostsCollectionTile extends ConsumerWidget {
             borderRadius: BorderRadius.circular(8.0),
             child: Container(
               color: context.colors.backgroundsSecondary,
+              width: double.infinity,
               height: 160,
               child: Image.network(
                 (post == null ? imagePath : post?.imagePath) ?? '',
@@ -1194,8 +1209,8 @@ class MyProfileDialog extends ConsumerWidget {
                                 onTap: () {
                                   Navigator.pop(context);
                                   ref.watch(router)!.push(
-                                    const SettingsRoute(),
-                                  );
+                                        const SettingsRoute(),
+                                      );
                                 },
                                 child: Center(
                                   child: Text(

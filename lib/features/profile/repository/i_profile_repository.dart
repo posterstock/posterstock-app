@@ -5,7 +5,7 @@ import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 
 abstract class IProfileRepository {
-  Future<UserDetailsModel> getProfileInfo(String? id);
+  Future<UserDetailsModel> getProfileInfo(dynamic id);
 
   Future<List<PostMovieModel>?> getProfilePosts(int? id);
 

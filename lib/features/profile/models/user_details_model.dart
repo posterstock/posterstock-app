@@ -49,7 +49,7 @@ class UserDetailsModel {
       mySelf: json['myself'] as bool? ?? false,
       posters: json['posters'] as int? ?? 0,
       lists: json['lists'] as int? ?? 0,
-      color: avatar[Random().nextInt(3)],
+      color: avatar[(json['id'] as int) % 3],
     );
   }
 

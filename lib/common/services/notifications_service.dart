@@ -13,10 +13,22 @@ const String darwinNotificationCategoryPlain = 'plainCategory';
 
 String? initLink;
 
-@pragma('vm:entry-point')
-void _bgHandler (NotificationResponse response) {
-  print(13);
-  initLink = response.payload;
+void bgHandler (NotificationResponse response, StackRouter? router) {
+  print("HOLY CRAP");
+  var splittedUrl = response.payload?.split('/') ?? [];
+  bool hasHttp = splittedUrl[0].startsWith('http');
+  splittedUrl.removeAt(0);
+  if (hasHttp) {
+    splittedUrl.removeAt(0);
+    splittedUrl.removeAt(0);
+  }
+  initLink = '/';
+  for (var i = 0; i < splittedUrl.length; i++) {
+    initLink = '${initLink!}${splittedUrl[i]}/';
+  }
+  if (initLink != null && router != null) {
+    router.pushNamed(initLink!);
+  }
 }
 
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
@@ -44,7 +56,7 @@ void onDidReceiveLocalNotification(
   initLink = payload;
 }
 
-void initPushes(StackRouter router) async {
+Future<void> initPushes(StackRouter? router) async {
   print('ABOBA');
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
     alert: true,
@@ -75,53 +87,65 @@ void initPushes(StackRouter router) async {
     showPush(message);
   });
 
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    print(34);
+  FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
     debugPrint('Got a message whilst in the foreground!');
     debugPrint('Message data: ${message.data}');
     debugPrint('Message n: ${message.notification}');
+
+    showPush(message);
+  });
+
+  FirebaseMessaging.instance.getInitialMessage().then((value) {
+    flutterLocalNotificationsPlugin
+        .getNotificationAppLaunchDetails()
+        .then((value) async {
+      print("HIVAVA");
+      print(value);
+      if (value?.didNotificationLaunchApp != true) return;
+      bgHandler(value!.notificationResponse!, router);
+    });
   });
 
   var initializationSettings = InitializationSettings(
       android: initialzationSettingsAndroid, iOS: initializationSettingsDarwin);
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
-    onDidReceiveBackgroundNotificationResponse: _bgHandler,
+    //onDidReceiveBackgroundNotificationResponse: bgHandler,
     onDidReceiveNotificationResponse: (response) {
       print('RECIEVED');
-     for (var a in router.stack) {
-       print(a.routeData.path);
-     }
-      router.pushNamed(response.payload!);
-    },
+      if (router != null) {
+        for (var a in router.stack) {
+          print(a.routeData.path);
+        }
+        router.pushNamed(response.payload!);
+      }
+    }
   );
 }
 
 /// Метод который показывает сам пуш. По дефолту сделано, чтобы показывало все с
 /// поля notification, но можно всё поменять на data
-void showPush(RemoteMessage message) {
+void showPush(RemoteMessage message) async {
   print(message.notification);
-  if (message.notification != null) {
-    print(message.data);
-    flutterLocalNotificationsPlugin.show(
-      message.hashCode,
-      message.notification!.title,
-      message.notification!.body,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          channel.id,
-          channel.name,
-          //channel.description,
-          color: Colors.transparent,
-          icon: "@mipmap/ic_notification",
-          importance: Importance.max,
-          priority: Priority.high,
-        ),
-        iOS: iosNotificationDetails,
+  print(message.data);
+  flutterLocalNotificationsPlugin.show(
+    message.hashCode,
+    message.data['text'].split(' ')[0],
+    message.data['text'],
+    NotificationDetails(
+      android: AndroidNotificationDetails(
+        channel.id,
+        channel.name,
+        //channel.description,
+        color: Colors.transparent,
+        icon: "@mipmap/ic_notification",
+        importance: Importance.max,
+        priority: Priority.high,
       ),
-      payload: message.data['deep_link'],
-    );
-  }
+      iOS: iosNotificationDetails,
+    ),
+    payload: message.data['deep_link'],
+  );
 }
 
 const DarwinNotificationDetails iosNotificationDetails =

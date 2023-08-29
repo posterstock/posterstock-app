@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
+import 'package:poster_stock/features/home/view/widgets/movie_card.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
+import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
-class MultipleMovieCard extends StatelessWidget {
+class MultipleMovieCard extends ConsumerWidget {
   const MultipleMovieCard({
     Key? key,
     required this.post,
@@ -12,29 +16,35 @@ class MultipleMovieCard extends StatelessWidget {
   final MultiplePostModel post;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final shimmer = ShimmerLoader(
+      child: Container(
+        color: context.colors.backgroundsSecondary,
+      ),
+    );
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.only(right: 16.0, left: 68.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
-            child: Row(
-              children: List.generate(
-                post.posters.length,
-                (index) => Expanded(
-                  child: Container(
-                    height: 163,
-                    color: context.colors.backgroundsSecondary,
-                    child: Image.network(
-                      post.posters[index].image,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const SizedBox(),
-                    ),
-                  ),
-                ),
+            child: SizedBox(
+              height: 163,
+              width: double.infinity,
+              child: Image.network(
+                post.image ?? '',
+                fit: BoxFit.cover,
+                errorBuilder: (context, obj, trace) {
+                  return shimmer;
+                },
+                loadingBuilder: (context, child, event) {
+                  if (event?.cumulativeBytesLoaded !=
+                      event?.expectedTotalBytes) {
+                    return shimmer;
+                  }
+                  return child;
+                },
               ),
             ),
           ),
@@ -65,10 +75,14 @@ class MultipleMovieCard extends StatelessWidget {
           Row(
             children: [
               const Spacer(),
-              ReactionButton(
-                iconPath: 'assets/icons/ic_heart.svg',
-                iconColor: context.colors.iconsDisabled!,
+              LikeButton(
+                liked: post.liked,
                 amount: post.likes,
+                onTap: () {
+                  ref
+                      .read(homePagePostsControllerProvider)
+                      .setLikeIdList(post.id, !(post.liked));
+                },
               ),
               const SizedBox(
                 width: 12,

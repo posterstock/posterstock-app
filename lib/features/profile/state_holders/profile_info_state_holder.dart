@@ -18,7 +18,7 @@ class ProfileInfoStateHolder extends StateNotifier<UserDetailsModel?> {
     state = state?.copyWith(followed: value);
   }
 
-  void clearState() {
+  Future<void> clearState() async {
     state = null;
   }
 }

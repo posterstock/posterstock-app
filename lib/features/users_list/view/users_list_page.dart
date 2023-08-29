@@ -19,9 +19,11 @@ class UsersListPage extends ConsumerStatefulWidget {
   const UsersListPage({
     super.key,
     this.following = false,
+    required this.id,
   });
 
   final bool following;
+  final int id;
 
   @override
   ConsumerState<UsersListPage> createState() => _UsersListPageState();
@@ -34,9 +36,8 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
     super.initState();
     Future(() {
       ref.read(usersListControllerProvider).clearUsers();
-      final id = ref.watch(profileInfoStateHolderProvider)?.id;
       ref.read(usersListControllerProvider).getUsers(
-        id: id!,
+        id: widget.id,
         followers: !widget.following,
       );
     });

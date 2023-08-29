@@ -4,5 +4,7 @@ abstract class IHomePagePostsRepository {
   Future<(List<PostBaseModel>?, bool)?> getPosts(
       {bool getNesPosts = false});
 
-  Future<void> setLike(int? index, bool like);
+  Future<void> setLike(int? id, bool like);
+
+  Future<void> setLikeList(int? id, bool like);
 }

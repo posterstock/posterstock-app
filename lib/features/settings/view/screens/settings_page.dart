@@ -7,9 +7,11 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
+import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_value_state_holder.dart';
+import 'package:poster_stock/main.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/app_themes.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -111,14 +113,16 @@ class SettingsPage extends ConsumerWidget {
                       ],
                     ),
                   ),
+                  if (email != null)
                   const SizedBox(
                     height: 24,
                   ),
+                  if (email != null)
                   SettingsButton(
                     onTap: () {
-                      ref.watch(router)!.push(
+                      /*ref.watch(router)!.push(
                         ChangeEmailRoute(),
-                      );
+                      );*/
                     },
                     child: Row(
                       children: [
@@ -131,7 +135,7 @@ class SettingsPage extends ConsumerWidget {
                         ),
                         Expanded(
                           child: Text(
-                            'itsmishakiva@outlook.com',
+                            email!,
                             maxLines: 1,
                             textAlign: TextAlign.right,
                             overflow: TextOverflow.ellipsis,
@@ -151,12 +155,14 @@ class SettingsPage extends ConsumerWidget {
                       ],
                     ),
                   ),
+                  if (email == null)
                   const SizedBox(
                     height: 24,
                   ),
+                  if (email == null)
                   DoubleButton(
                     onTap1: () {
-                      showModalBottomSheet(
+                      /*showModalBottomSheet(
                         context: context,
                         builder: (context) => GestureDetector(
                           onTap: () {
@@ -172,7 +178,7 @@ class SettingsPage extends ConsumerWidget {
                         ),
                         backgroundColor: Colors.transparent,
                         isScrollControlled: true,
-                      );
+                      );*/
                     },
                     onTap2: () {},
                     child1: Row(
@@ -182,6 +188,7 @@ class SettingsPage extends ConsumerWidget {
                           style: context.textStyles.bodyRegular,
                         ),
                         const Spacer(),
+                        if (google)
                         Text(
                           '􀆅',
                           style: context.textStyles.headline!.copyWith(
@@ -197,12 +204,21 @@ class SettingsPage extends ConsumerWidget {
                           style: context.textStyles.bodyRegular,
                         ),
                         const Spacer(),
+                        if (apple)
+                          Text(
+                            '􀆅',
+                            style: context.textStyles.headline!.copyWith(
+                              color: context.colors.iconsActive,
+                            ),
+                          ),
                       ],
                     ),
                   ),
+                  if (email == null)
                   const SizedBox(
                     height: 8,
                   ),
+                  if (email == null)
                   Padding(
                     padding: const EdgeInsets.only(left: 16.0),
                     child: Text(
@@ -347,7 +363,14 @@ class SettingsPage extends ConsumerWidget {
                               print(90);
                               print(await SuperTokens.getAccessToken());
                               TokenKeeper.token = null;
+                              await ref.read(signUpControllerProvider).removeFCMToken();
                               prefs.remove('token');
+                              prefs.remove('google');
+                              prefs.remove('apple');
+                              prefs.remove('email');
+                              apple = false;
+                              google = false;
+                              email = null;
                               if (context.mounted) {
                                 ref.watch(router)!
                                     .pushAndPopUntil(
@@ -421,7 +444,13 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
+  Future<void> saveTheme(Themes theme) async {
+    final instance = await SharedPreferences.getInstance();
+    instance.setString('theme', theme.toString());
+  }
+
   void changeTheme(WidgetRef ref, Themes theme) {
+    saveTheme(theme);
     if (theme == Themes.dark) {
       ref
           .read(themeControllerProvider)

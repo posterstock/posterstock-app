@@ -1,18 +1,22 @@
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
+import 'package:poster_stock/features/create_list/state_holders/gallery_index_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 import '../state_holders/pick_cover_gallery_state_holder.dart';
 import 'create_list_dialog.dart';
 
 class PickCoverDialog extends ConsumerStatefulWidget {
   const PickCoverDialog({super.key, required this.onItemTap});
-  final void Function(BuildContext, WidgetRef, Uint8List) onItemTap;
+
+  final void Function(BuildContext, WidgetRef, String) onItemTap;
 
   @override
   ConsumerState<PickCoverDialog> createState() => _PickCoverDialogState();
@@ -35,6 +39,8 @@ class _PickCoverDialogState extends ConsumerState<PickCoverDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final page = ref.watch(galleryIndexStateHolderProvider);
+    final images = ref.watch(pickCoverGalleryStateHolderProvider);
     dragController.addListener(() {
       if (dragController.size < 0.1) {
         if (!disposed) {
@@ -95,13 +101,28 @@ class _PickCoverDialogState extends ConsumerState<PickCoverDialog> {
               ),
               SliverGrid(
                 delegate: SliverChildBuilderDelegate(
+                  addAutomaticKeepAlives: false,
                   (context, index) {
+                    if (images.length <= page &&
+                        index % 30 == 0 &&
+                        !ref
+                            .watch(pickCoverControllerProvider)
+                            .loadingPages
+                            .contains(index)) {
+                      Future(() {
+                        ref.read(pickCoverControllerProvider).loadPage(page);
+                      });
+                    }
                     return Container(
+                      key: Key(index.toString()),
                       color: context.colors.backgroundsSecondary,
-                      child: GalleryCover(
-                        index: index,
-                        onTap: widget.onItemTap,
-                      ),
+                      child: images.length > index && images[index] != null
+                          ? GalleryCover(
+                              key: Key(images[index]!),
+                              image: images[index]!,
+                              onTap: widget.onItemTap,
+                            )
+                          : const SizedBox(),
                     );
                   },
                 ),
@@ -120,72 +141,54 @@ class _PickCoverDialogState extends ConsumerState<PickCoverDialog> {
   }
 }
 
-class GalleryCover extends ConsumerWidget {
-  const GalleryCover({
+class GalleryCover extends ConsumerStatefulWidget {
+  GalleryCover({
     Key? key,
-    required this.index,
+    required this.image,
     required this.onTap,
-  }) : super(key: key);
-  final int index;
-  final void Function(BuildContext, WidgetRef, Uint8List) onTap;
+  })  : fileImage = Image.file(
+          key: Key(image),
+          File(image),
+          cacheWidth: 200,
+        ),
+        super(key: key);
+  final String image;
+  final void Function(BuildContext, WidgetRef, String) onTap;
+  final Image fileImage;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    var images = ref.read(pickCoverGalleryStateHolderProvider);
-    if (images.length > index) {
-      var image = Image.memory(
-        images[index],
-        cacheWidth: 212,
-        fit: BoxFit.cover,
-      );
-      return GestureDetector(
-        onTap: () {
-          onTap(context, ref, images[index]);
-        },
-        child: image,
-      );
-    }
-    return FutureBuilder(
-      future: getData(context, ref),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return const SizedBox();
-        return GestureDetector(
-          child: snapshot.data!.$1,
-          onTap: () {
-            if (snapshot.data!.$2 == null) return;
-            onTap(context, ref, snapshot.data!.$2!);
-          },
-        );
-      },
-    );
+  ConsumerState<GalleryCover> createState() => _GalleryCoverState();
+}
+
+class _GalleryCoverState extends ConsumerState<GalleryCover> {
+
+  @override
+  void initState() {
+    super.initState();
+    Future(() {
+      precacheImage(widget.fileImage.image, context);
+    });
   }
 
-  Future<(Image?, Uint8List?)?> getData(
-      BuildContext context, WidgetRef ref) async {
-    var res = await PhotoManager.requestPermissionExtend();
-    if (!res.isAuth) {
-      return null;
-    }
-    var path = (await PhotoManager.getAssetPathList(
-      hasAll: true,
-      onlyAll: true,
-      type: RequestType.image,
-    ))[0];
-    var assets = await path.getAssetListRange(
-      start: index,
-      end: index + 1,
+  @override
+  void dispose() {
+    widget.fileImage.image.evict();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        widget.onTap(context, ref, widget.image);
+      },
+      child: FadeInImage(
+        key: Key(widget.image),
+        fadeInDuration: const Duration(milliseconds: 300),
+        placeholder: MemoryImage(kTransparentImage),
+        placeholderFit: BoxFit.cover,
+        image: widget.fileImage.image,
+      ),
     );
-    File? file = await assets[0].file;
-    if (file == null) return null;
-    var bytes = file.readAsBytesSync();
-    ref.read(pickCoverGalleryStateHolderProvider.notifier).addElement(bytes);
-    Image image = Image.memory(
-      bytes,
-      cacheWidth: 212,
-      fit: BoxFit.cover,
-    );
-    if (!context.mounted) return (image, bytes);
-    await precacheImage(image.image, context);
-    return (image, bytes);
   }
 }

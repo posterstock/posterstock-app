@@ -16,7 +16,28 @@ class NotificationsController {
 
   NotificationsController({required this.notificationsState});
 
-  Future<void> getNotificationsData() async {
-    notificationsState.updateState(await repo.getNotifications());
+  bool loadedAll = false;
+  bool loading = false;
+
+  Future<void> getNotificationsData({
+    bool getNewPosts = false,
+  }) async {
+    if (loading) return;
+    loading = true;
+    try {
+      if (getNewPosts) {
+        notificationsState
+            .updateStateStart(await repo.getNotifications(getNewPosts: true));
+      } else if (!loadedAll) {
+        var nots = await repo.getNotifications();
+        if (nots.isEmpty) {
+          loadedAll = true;
+        }
+        notificationsState.updateState(nots);
+      }
+    } catch (e) {
+      print(e);
+    }
+    loading = false;
   }
 }

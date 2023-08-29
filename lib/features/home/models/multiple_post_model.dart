@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:poster_stock/features/home/models/comment_model.dart';
 import 'package:poster_stock/features/home/models/post_base_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
@@ -56,11 +57,27 @@ class MultiplePostModel extends PostBaseModel {
         );
 
   factory MultiplePostModel.fromJson(Map<String, Object?> json) {
+    print("ZHOPA");
+    print(json);
+    const List<Color> avatar = [
+      Color(0xfff09a90),
+      Color(0xfff3d376),
+      Color(0xff92bdf4),
+    ];
     return MultiplePostModel(
       id: json['id'] as int,
       name: json['title'] as String,
       liked: json['has_liked'] as bool,
-      author: UserModel.fromJson(json['user'] as Map<String, Object?>),
+      author: json['user'] == null
+          ? UserModel(
+        id: json['user_id'] as int? ?? 0,
+        name: json['name'] as String? ?? '',
+        username: json['username'] as String? ?? '',
+        imagePath:(json['profile_image'] as String?) == "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp" ? null : json['profile_image'] as String?,
+        followed: !(json['is_suggested'] as bool? ?? true),
+        color: avatar[(json['user_id'] as int? ?? 0) % 3],
+      )
+          : UserModel.fromJson(json['user'] as Map<String, dynamic>),
       time: _getTimeString(DateTime.fromMillisecondsSinceEpoch(
           (json['created_at'] as int? ?? DateTime.now().millisecondsSinceEpoch) * 1000)),
       timeDate: DateTime.fromMillisecondsSinceEpoch(
@@ -68,11 +85,10 @@ class MultiplePostModel extends PostBaseModel {
       likes: json['likes_count'] as int,
       comments: json['comments_count'] as int,
       description: json['description'] as String?,
-      posters: (json['posters'] as List<dynamic>)
-          .map(
+      posters: (json['posters'] as List<dynamic>?)?.map(
             (e) => MultiplePostSingleModel.fromJson(e),
           )
-          .toList(),
+          .toList() ?? [],
       image: json['image'] as String?,
     );
   }

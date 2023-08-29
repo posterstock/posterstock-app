@@ -24,7 +24,7 @@ class AuthService {
   Future<void> registerNotification(String token, String userToken) async {
     try {
       final response = await _dio.post(
-        'api/profiles/register/$token/',
+        'api/notifications/register/$token/',
         options: Options(
           contentType: 'text/plain; charset=utf-8',
           headers: {
@@ -33,11 +33,39 @@ class AuthService {
           },
         ),
       );
-      print(990);
+      print("THIS IS TOKEN SEND TO BACKEND");
       print(response.data);
       print(response.headers);
       return response.data;
     } on DioError catch (e) {
+      print("THIS IS TOKEN SEND TO BACKEND ERROR");
+      print(e.type);
+      print(e.response?.statusCode);
+      print(e.response?.statusMessage);
+      print(e.response?.data);
+      print(e.response?.headers);
+      rethrow;
+    }
+  }
+
+  Future<void> removeFCMToken(String token, String userToken) async {
+    try {
+      final response = await _dio.delete(
+        'api/notifications/drop/$token/',
+        options: Options(
+          contentType: 'text/plain; charset=utf-8',
+          headers: {
+            'rid': 'thirdpartypasswordless',
+            'Authorization': 'Bearer $userToken',
+          },
+        ),
+      );
+      print("THIS IS TOKEN REMOVE FROM BACKEND");
+      print(response.data);
+      print(response.headers);
+      return response.data;
+    } on DioError catch (e) {
+      print("THIS IS TOKEN REMOVE FROM BACKEND ERROR");
       print(e.type);
       print(e.response?.statusCode);
       print(e.response?.statusMessage);

@@ -47,11 +47,22 @@ class AuthPage extends ConsumerWidget {
     final loadingState = ref.watch(authLoadingStateHolderProvider);
     final errorState = ref.watch(authErrorStateHolderProvider);
     final theme = ref.watch(themeStateHolderProvider);
+    var rtr = ref.watch(router);
+    rtr?.addListener(() {
+      if (TokenKeeper.token != null) {
+          if (rtr.topRoute.path == '/auth') {
+            rtr.replaceNamed(
+              '/',
+            );
+          }
+      }
+    });
     if (TokenKeeper.token != null) {
       Future(() {
-        ref.watch(router)!.replaceNamed(
-          '/',
-        );
+        if (rtr?.topRoute.path == '/auth')
+          rtr!.replaceNamed(
+            '/',
+          );
       });
     }
     return AutoRouter(
