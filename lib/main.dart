@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -64,6 +66,12 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   final prefs = await SharedPreferences.getInstance();
   debugPrint("FCM TOKEN $fcmToken");
+  // Тут отлавливаем Fatal errors
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
   TokenKeeper.token =
       prefs.getString('token') == '' ? null : prefs.getString('token');
   var instance = await SharedPreferences.getInstance();

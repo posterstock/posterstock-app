@@ -60,6 +60,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '405674784124',
     projectId: 'posterstock-td',
     storageBucket: 'posterstock-td.appspot.com',
+    androidClientId: '405674784124-buqlusrif3nur8sqk7li6u1ruq6votji.apps.googleusercontent.com',
     iosClientId: '405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com',
     iosBundleId: 'com.thedirection.posterstock',
   );
@@ -70,6 +71,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '405674784124',
     projectId: 'posterstock-td',
     storageBucket: 'posterstock-td.appspot.com',
+    androidClientId: '405674784124-buqlusrif3nur8sqk7li6u1ruq6votji.apps.googleusercontent.com',
     iosClientId: '405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com',
     iosBundleId: 'com.thedirection.posterstock',
   );
