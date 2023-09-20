@@ -17,6 +17,15 @@ class CommentsStateHolder extends StateNotifier<List<Comment>?> {
     state = [...?comments];
   }
 
+  Future<void> deleteComment(int id) async {
+    for (int i = 0; i < (state?.length ?? 0); i++) {
+      if (state![i].id == id) {
+        state!.removeAt(i);
+      }
+    }
+    state = [...?state];
+  }
+
   Future<void> clearComments() async {
     state = null;
   }

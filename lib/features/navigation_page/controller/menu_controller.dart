@@ -54,9 +54,6 @@ class MenuController {
     previousPageState.updatePage(routerValue?.activeIndex ?? 0);
     routerState.updatePage(page);
     pagesState.updatePage(page);
-    if (page == 3) {
-      ref.read(profileControllerApiProvider).clearUser();
-    }
   }
 
   void backToPage(BuildContext context, WidgetRef ref) {

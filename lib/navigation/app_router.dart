@@ -1,4 +1,8 @@
+import 'dart:math';
+
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
+import 'package:poster_stock/features/poster/view/pages/poster_page/poster_page.dart';
 import 'app_router.gr.dart';
 
 @AutoRouterConfig(replaceInRouteName: 'Page,Route')
@@ -24,18 +28,44 @@ class AppRouter extends $AppRouter {
             AutoRoute(page: ProfileRoute.page, path: 'profile'),
           ],
         ),
-    AutoRoute(page: ListRoute.page, path: '/lists/:id'),
-    RedirectRoute(path: '/list/:id', redirectTo: '/lists/:id'),
-    AutoRoute(page: ProfileRoute.page, path: '/:username'),
-    AutoRoute(page: PosterRoute.page, path: '/:username/:id'),
-    AutoRoute(page: SettingsRoute.page, path: '/settings'),
-    AutoRoute(page: ChooseLanguageRoute.page, path: '/language'),
-    AutoRoute(page: ChangeEmailRoute.page, path: '/change_email'),
-    AutoRoute(
-        page: ChangeEmailCodeRoute.page, path: '/change_email_code'),
-    AutoRoute(page: EditProfileRoute.page, path: '/edit_profile'),
-    AutoRoute(page: BookmarksRoute.page, path: '/bookmarks'),
-    AutoRoute(page: UsersListRoute.page, path: '/users_list'),
+        AutoRoute(page: SettingsRoute.page, path: '/settings'),
+        AutoRoute(page: ChooseLanguageRoute.page, path: '/language'),
+        AutoRoute(page: ChangeEmailRoute.page, path: '/change_email'),
+        AutoRoute(page: ChangeEmailCodeRoute.page, path: '/change_email_code'),
+        AutoRoute(page: EditProfileRoute.page, path: '/edit_profile'),
+        AutoRoute(page: BookmarksRoute.page, path: '/bookmarks'),
+        AutoRoute(page: UsersListRoute.page, path: '/users_list'),
+        AutoRoute(page: ProfileRoute.page, path: '/:username'),
+        AutoRoute(page: ListRoute.page, path: '/lists/:id'),
+        RedirectRoute(path: '/list/:id', redirectTo: '/lists/:id'),
+        AutoRoute(page: ProfileRouteId.page, path: '/users/:id'),
+        CustomRoute(
+          page: PosterRoute.page,
+          path: '/:username/:id',
+          opaque: false,
+          customRouteBuilder: <PageRoute>(BuildContext context, Widget child,
+              AutoRoutePage<PageRoute> page) {
+            return PageRouteBuilder(
+              opaque: false,
+              fullscreenDialog: page.fullscreenDialog,
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return Stack(
+                  children: <Widget>[
+                    SlideTransition(
+                      position: Tween<Offset>(
+                        begin: Offset(1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    )
+                  ],
+                );
+              },
+              settings: page,
+              pageBuilder: (_, __, ___) => child,
+            );
+          },
+        ),
       ];
 }
 /*

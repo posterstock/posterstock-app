@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
@@ -13,11 +11,13 @@ import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
 import 'package:poster_stock/features/create_list/state_holders/chosen_cover_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/create_list_chosen_poster_state_holder.dart';
+import 'package:poster_stock/features/create_list/state_holders/list_search_posters_state_holder.dart';
+import 'package:poster_stock/features/create_list/state_holders/lists_search_value_state_holder.dart';
 import 'package:poster_stock/features/create_list/view/pick_cover_dialog.dart';
 import 'package:poster_stock/features/create_list/view/widgets/%D1%81hoose_poster_tile.dart';
+import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
-import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_posts_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -42,7 +42,10 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
   @override
   void initState() {
     super.initState();
-
+    Future(() {
+      ref.read(pickCoverControllerProvider).clearAll();
+      ref.read(listSearchValueStateHolderProvider.notifier).clearState();
+    });
   }
 
   @override
@@ -54,15 +57,23 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
   @override
   Widget build(BuildContext context) {
     final image = ref.watch(chosenCoverStateHolderProvider);
-    final posters = ref.watch(profilePostsStateHolderProvider);
-    if (posters == null) {
-      print("REBUILLDDDList");
+    final searchValue = ref.watch(listSearchValueStateHolderProvider);
+    final posts = ref.watch(profilePostsStateHolderProvider);
+    final postersSearch = ref.watch(listSearchPostsStateHolderProvider);
+    if (posts == null) {
       ref.read(profileControllerApiProvider).getUserInfo(null);
+    }
+    List<PostMovieModel>? posters;
+    if (searchValue.isEmpty) {
+      posters = posts;
+    } else {
+      posters = postersSearch;
     }
     dragController.addListener(() {
       if (dragController.size < 0.1) {
         if (!disposed) {
           ref.read(pickCoverControllerProvider).clearAll();
+          ref.read(listSearchValueStateHolderProvider.notifier).clearState();
           Navigator.pop(context);
         }
         disposed = true;
@@ -94,6 +105,8 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
               right: 0,
               child: GestureDetector(
                 onTap: () {
+                  ref.read(listSearchValueStateHolderProvider.notifier)
+                      .clearState();
                   ref.read(pickCoverControllerProvider).clearAll();
                   Navigator.pop(context);
                 },
@@ -121,80 +134,147 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                   child: Column(
                     children: [
                       Expanded(
-                        child: CustomScrollView(
-                          controller: controller,
-                          slivers: [
-                            SliverPersistentHeader(
-                              delegate: AppDialogHeaderDelegate(
-                                extent: 150,
-                                content: Column(
-                                  children: [
-                                    const SizedBox(height: 14),
-                                    Container(
-                                      height: 4,
-                                      width: 36,
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(2.0),
-                                        color: context.colors.fieldsDefault,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 22),
-                                    Text(
-                                      'Create list',
-                                      style: context.textStyles.bodyBold,
-                                    ),
-                                    const SizedBox(height: 0.5),
-                                    SubTextCreateList(),
-                                    const SizedBox(height: 16.5),
-                                    SizedBox(
-                                      height: 36,
-                                      child: AppTextField(
-                                        searchField: true,
-                                        focus: focus,
-                                        hint: 'Search',
-                                        removableWhenNotEmpty: true,
-                                        crossPadding: const EdgeInsets.all(8.0),
-                                        crossButton: SvgPicture.asset(
-                                          'assets/icons/search_cross.svg',
+                        child: NotificationListener<ScrollUpdateNotification>(
+                          onNotification: (info) {
+                            if (info.metrics.pixels >=
+                                info.metrics.maxScrollExtent - MediaQuery
+                                    .of(context)
+                                    .size
+                                    .height) {
+                              ref.read(pickCoverControllerProvider)
+                                  .updateSearch(searchValue);
+                            }
+                            return true;
+                          },
+                          child: CustomScrollView(
+                            controller: controller,
+                            slivers: [
+                              SliverPersistentHeader(
+                                delegate: AppDialogHeaderDelegate(
+                                  extent: 150,
+                                  content: Column(
+                                    children: [
+                                      const SizedBox(height: 14),
+                                      Container(
+                                        height: 4,
+                                        width: 36,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                          BorderRadius.circular(2.0),
+                                          color: context.colors.fieldsDefault,
                                         ),
-                                        onRemoved: () {
-                                          searchController.clear();
-                                        },
-                                        controller: searchController,
                                       ),
+                                      const SizedBox(height: 22),
+                                      Text(
+                                        'Create list',
+                                        style: context.textStyles.bodyBold,
+                                      ),
+                                      const SizedBox(height: 0.5),
+                                      SubTextCreateList(),
+                                      const SizedBox(height: 16.5),
+                                      SizedBox(
+                                        height: 36,
+                                        child: posters?.isEmpty == true
+                                            ? null
+                                            : AppTextField(
+                                          searchField: true,
+                                          focus: focus,
+                                          hint: 'Search',
+                                          removableWhenNotEmpty: true,
+                                          crossPadding:
+                                          const EdgeInsets.all(8.0),
+                                          crossButton: SvgPicture.asset(
+                                            'assets/icons/search_cross.svg',
+                                          ),
+                                          onRemoved: () {
+                                            searchController.clear();
+                                            ref
+                                                .read(
+                                                pickCoverControllerProvider)
+                                                .updateSearch('');
+                                            ref.read(
+                                                listSearchValueStateHolderProvider
+                                                    .notifier).clearState();
+                                          },
+                                          onChanged: (value) {
+                                            ref
+                                                .read(
+                                                pickCoverControllerProvider)
+                                                .updateSearch(value);
+                                            ref.read(
+                                                listSearchValueStateHolderProvider
+                                                    .notifier).updateState(
+                                                value);
+                                          },
+                                          controller: searchController,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                    ],
+                                  ),
+                                ),
+                                pinned: true,
+                              ),
+                              if (posters?.isEmpty == true)
+                                SliverFillRemaining(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 32.0,
+                                      vertical: 16.0,
                                     ),
-                                    const SizedBox(height: 16),
-                                  ],
+                                    child: Column(
+                                      children: [
+                                        SvgPicture.asset(
+                                          'assets/icons/empty_collection.svg',
+                                          colorFilter: ColorFilter.mode(
+                                            context.colors.iconsDisabled!,
+                                            BlendMode.srcIn,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          searchValue.isEmpty
+                                              ? 'To create a list, first add posters to your collection.'
+                                              : 'No posters found',
+                                          style: context
+                                              .textStyles.subheadlineBold!
+                                              .copyWith(
+                                            color: context.colors.textsDisabled,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              pinned: true,
-                            ),
-                            SliverPadding(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                              sliver: SliverGrid(
-                                delegate: SliverChildBuilderDelegate(
-                                  childCount: posters?.length,
-                                  (context, index) {
-                                    return ChoosePosterTile(
-                                      imagePath: posters?[index].imagePath,
-                                      name: posters?[index].name,
-                                      year: posters?[index].year,
-                                      id: posters?[index].id,
-                                      index: index,
-                                    );
-                                  },
-                                ),
-                                gridDelegate:
+                              if (posters?.isEmpty != true)
+                                SliverPadding(
+                                  padding:
+                                  const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                                  sliver: SliverGrid(
+                                    delegate: SliverChildBuilderDelegate(
+                                      childCount: posters?.length,
+                                          (context, index) {
+                                        return ChoosePosterTile(
+                                          imagePath: posters?[index].imagePath,
+                                          name: posters?[index].name,
+                                          year: posters?[index].year,
+                                          id: posters?[index].id,
+                                          index: index,
+                                        );
+                                      },
+                                    ),
+                                    gridDelegate:
                                     const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
-                                  crossAxisSpacing: 12.5,
-                                  mainAxisSpacing: 15,
-                                  mainAxisExtent: 201,
+                                      crossAxisCount: 3,
+                                      crossAxisSpacing: 12.5,
+                                      mainAxisSpacing: 15,
+                                      mainAxisExtent: 201,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                       if (!focus.hasFocus)
@@ -203,7 +283,10 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                         ),
                       Container(
                         color: context.colors.backgroundsPrimary,
-                        height: MediaQuery.of(context).padding.bottom,
+                        height: MediaQuery
+                            .of(context)
+                            .padding
+                            .bottom,
                       ),
                     ],
                   ),
@@ -248,7 +331,8 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                               ),
                               onChanged: (value) {
                                 if (nameController.text.length > 70) {
-                                  nameController.text = nameController.text.substring(0,70);
+                                  nameController.text =
+                                      nameController.text.substring(0, 70);
                                 }
                                 setState(() {});
                               },
@@ -258,81 +342,84 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                             onTap: () {
                               dragController
                                   .animateTo(
-                                    0.7,
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.linear,
-                                  )
+                                0.7,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.linear,
+                              )
                                   .then(
-                                    (value) => showModalBottomSheet(
+                                    (value) =>
+                                    showModalBottomSheet(
                                       context: context,
                                       backgroundColor: Colors.transparent,
                                       isScrollControlled: true,
                                       useSafeArea: true,
-                                      builder: (context) => PickCoverDialog(
-                                        onItemTap: (BuildContext context,
-                                            WidgetRef ref, String image) {
-                                          ref
-                                              .read(pickCoverControllerProvider)
-                                              .setImage(image);
-                                          Navigator.pop(context);
-                                        },
-                                      ),
+                                      builder: (context) =>
+                                          PickCoverDialog(
+                                            onItemTap: (BuildContext context,
+                                                WidgetRef ref, String image) {
+                                              ref
+                                                  .read(
+                                                  pickCoverControllerProvider)
+                                                  .setImage(image);
+                                              Navigator.pop(context);
+                                            },
+                                          ),
                                     ),
-                                  );
+                              );
                             },
                             child: Container(
                               color: context.colors.backgroundsPrimary,
                               child: image == null
                                   ? Row(
-                                      children: [
-                                        Text(
-                                          'Upload cover',
-                                          style: context.textStyles.caption2!
-                                              .copyWith(
-                                            color: context.colors.textsDisabled,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        SvgPicture.asset(
-                                          'assets/icons/ic_pick_photo.svg',
-                                          width: 24,
-                                        ),
-                                        //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
-                                        const SizedBox(width: 16),
-                                      ],
-                                    )
-                                  : Row(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(2.0),
-                                          child: SizedBox(
-                                            width: 36,
-                                            height: 24,
-                                            child: Image.file(
-                                              File(image),
-                                              fit: BoxFit.cover,
-                                              cacheWidth: 24,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        GestureDetector(
-                                          onTap: () {
-                                            ref
-                                                .read(
-                                                    pickCoverControllerProvider)
-                                                .removeImage();
-                                          },
-                                          child: SvgPicture.asset(
-                                            'assets/icons/ic_trash.svg',
-                                            width: 24,
-                                          ),
-                                        ),
-                                        //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
-                                        const SizedBox(width: 16),
-                                      ],
+                                children: [
+                                  Text(
+                                    'Upload cover',
+                                    style: context.textStyles.caption2!
+                                        .copyWith(
+                                      color: context.colors.textsDisabled,
                                     ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  SvgPicture.asset(
+                                    'assets/icons/ic_pick_photo.svg',
+                                    width: 24,
+                                  ),
+                                  //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
+                                  const SizedBox(width: 16),
+                                ],
+                              )
+                                  : Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius:
+                                    BorderRadius.circular(2.0),
+                                    child: SizedBox(
+                                      width: 36,
+                                      height: 24,
+                                      child: Image.file(
+                                        File(image),
+                                        fit: BoxFit.cover,
+                                        cacheWidth: 24,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  GestureDetector(
+                                    onTap: () {
+                                      ref
+                                          .read(
+                                          pickCoverControllerProvider)
+                                          .removeImage();
+                                    },
+                                    child: SvgPicture.asset(
+                                      'assets/icons/ic_trash.svg',
+                                      width: 24,
+                                    ),
+                                  ),
+                                  //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
+                                  const SizedBox(width: 16),
+                                ],
+                              ),
                             ),
                           )
                         ],
@@ -343,25 +430,27 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                       child: DescriptionTextField(
                         buttonAddCheck: nameController.text.isNotEmpty &&
                             ref
-                                    .watch(
-                                        createListChosenPosterStateHolderProvider)
-                                    .length >
+                                .watch(
+                                createListChosenPosterStateHolderProvider)
+                                .length >
                                 2 &&
                             ref
-                                    .watch(
-                                        createListChosenPosterStateHolderProvider)
-                                    .length <
+                                .watch(
+                                createListChosenPosterStateHolderProvider)
+                                .length <
                                 31,
                         controller: descriptionController,
                         buttonLoading: loading,
                         onTap: () async {
                           loading = true;
                           setState(() {});
-                          await ref.read(pickCoverControllerProvider).createList(
-                                title: nameController.text,
-                                description: descriptionController.text,
-                                context: context,
-                              );
+                          await ref
+                              .read(pickCoverControllerProvider)
+                              .createList(
+                            title: nameController.text,
+                            description: descriptionController.text,
+                            context: context,
+                          );
                           if (context.mounted) {
                             Navigator.pop(context);
                             ref.read(menuControllerProvider).switchMenu();
@@ -391,8 +480,7 @@ class SubTextCreateList extends ConsumerWidget {
     final chosenPosters = ref.watch(createListChosenPosterStateHolderProvider);
     return Text(
       '${chosenPosters.length} of 30 posters',
-      style:
-          context.textStyles.footNote!.copyWith(
+      style: context.textStyles.footNote!.copyWith(
         color: context.colors.textsSecondary,
       ),
     );
@@ -409,8 +497,8 @@ class AppDialogHeaderDelegate extends SliverPersistentHeaderDelegate {
   final double extent;
 
   @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(BuildContext context, double shrinkOffset,
+      bool overlapsContent) {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         topRight: Radius.circular(16.0),
@@ -506,7 +594,10 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
           ),
         ),
         Container(
-          height: 56 + MediaQuery.of(context).padding.bottom,
+          height: 56 + MediaQuery
+              .of(context)
+              .padding
+              .bottom,
           color: context.colors.backgroundsPrimary,
           child: Row(
             children: [
@@ -516,50 +607,52 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
                   '${descriptionController!.text.length}/${widget.maxSymbols}',
                   style: context.textStyles.footNote!.copyWith(
                     color:
-                        descriptionController!.text.length > widget.maxSymbols
-                            ? context.colors.textsError
-                            : context.colors.textsDisabled,
+                    descriptionController!.text.length > widget.maxSymbols
+                        ? context.colors.textsError
+                        : context.colors.textsDisabled,
                   ),
                 ),
               const SizedBox(width: 12),
               SizedBox(
                 height: 32,
-                width: TextInfoService.textSize(
-                      widget.button ?? "Create list",
-                      context.textStyles.calloutBold!.copyWith(
-                        color: context.colors.textsBackground,
-                      ),
-                    ).width +
+                width: TextInfoService
+                    .textSize(
+                  widget.button ?? "Create list",
+                  context.textStyles.calloutBold!.copyWith(
+                    color: context.colors.textsBackground,
+                  ),
+                )
+                    .width +
                     32,
                 child: AppTextButton(
                   disabled: (descriptionController!.text.isEmpty ||
-                          descriptionController!.text.length >
-                              widget.maxSymbols) ||
+                      descriptionController!.text.length >
+                          widget.maxSymbols) ||
                       !widget.buttonAddCheck,
                   onTap: widget.onTap,
                   child: widget.buttonLoading
                       ? Center(
-                          child: defaultTargetPlatform != TargetPlatform.android
-                              ? CupertinoActivityIndicator(
-                                  radius: 10.0,
-                                  color: context.colors.textsBackground!,
-                                )
-                              : SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    color: context.colors.textsBackground!,
-                                    strokeWidth: 2,
-                                  ),
-                                ),
-                        )
+                    child: defaultTargetPlatform != TargetPlatform.android
+                        ? CupertinoActivityIndicator(
+                      radius: 10.0,
+                      color: context.colors.textsBackground!,
+                    )
+                        : SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        color: context.colors.textsBackground!,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  )
                       : Text(
-                          widget.button ?? "Create list",
-                          style: context.textStyles.calloutBold!.copyWith(
-                            color: context.colors.textsBackground,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                    widget.button ?? "Create list",
+                    style: context.textStyles.calloutBold!.copyWith(
+                      color: context.colors.textsBackground,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
               const SizedBox(width: 16),

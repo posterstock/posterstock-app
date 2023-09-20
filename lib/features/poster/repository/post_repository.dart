@@ -15,11 +15,24 @@ class PostRepository {
     return Comment.fromJson(await service.postComment(id, text));
   }
 
+  Future<void> deleteComment(int postId, int id) async {
+    return await service.deleteComment(postId, id);
+  }
+
   Future<Comment> postCommentList(int id, String text) async {
     return Comment.fromJson(await service.postCommentList(id, text));
   }
 
   Future<PostMovieModel> getPost(int id) async {
     return PostMovieModel.fromJson(await service.getPost(id));
+  }
+
+  Future<void> deletePost(int id) async {
+    await service.deletePost(id);
+  }
+
+
+  Future<void> setBookmarked(int id, bool bookmarked) async {
+    await service.setBookmarked(id, bookmarked);
   }
 }

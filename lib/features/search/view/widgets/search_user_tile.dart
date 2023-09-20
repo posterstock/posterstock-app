@@ -44,7 +44,7 @@ class SearchUserTile extends ConsumerWidget {
                 backgroundImage: user.imagePath != null
                     ? NetworkImage(user.imagePath!)
                     : null,
-                backgroundColor: avatar[Random().nextInt(3)],
+                backgroundColor: user.color,
                 child: user.imagePath == null
                     ? Text(
                         getAvatarName(user.name, user.username).toUpperCase(),

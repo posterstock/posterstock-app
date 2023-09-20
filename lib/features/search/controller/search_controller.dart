@@ -122,6 +122,7 @@ class SearchController {
         lists.$1,
       );
     } catch (e) {
+      print(18);
       print(e);
     }
     loadingUpdateLists = false;

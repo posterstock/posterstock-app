@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,26 +10,41 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_native_splash/cli_commands.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
+import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/common/widgets/list_grid_widget.dart';
+import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
+import 'package:poster_stock/features/create_list/state_holders/list_search_posters_state_holder.dart';
+import 'package:poster_stock/features/create_list/state_holders/lists_search_value_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/avatar_state_holder.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
+import 'package:poster_stock/features/list/controller/list_controller.dart';
+import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/navigation_route_state_holder.dart';
 import 'package:poster_stock/features/peek_pop/peek_and_pop_dialog.dart';
+import 'package:poster_stock/features/poster/controller/comments_controller.dart';
+import 'package:poster_stock/features/poster/state_holder/page_transition_controller_state_holder.dart';
+import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
+import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
+import 'package:poster_stock/features/profile/state_holders/profile_bookmarks_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_lists_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_posts_state_holder.dart';
 import 'package:poster_stock/features/profile/view/empty_collection_widget.dart';
+import 'package:poster_stock/features/search/state_holders/search_posts_state_holder.dart';
+import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 
@@ -66,7 +82,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   @override
   void initState() {
     super.initState();
-    ref.read(profileControllerApiProvider).clearUser();
+    Future(() {
+      ref.read(profileControllerApiProvider).clearUser();
+    });
     animationController = AnimationController(
       vsync: this,
       lowerBound: 0,
@@ -78,49 +96,69 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
       var rtr = ref.watch(router);
       rtr!.addListener(() {
         if (profile == null) {
-          getProfile(profile);
+          getProfile();
         }
       });
     });
   }
 
-  Future<void> getProfile(UserDetailsModel? profile) async {
+  Future<void> getProfile() async {
     if (loading) return;
     loading = true;
-    if (profile == null) {
-      Future(() {
-        RouteData? el;
-        try {
-          if (ref.watch(router)!.topRoute.path == '/:username') {
-            el = ref.watch(router)!.topRoute;
-            print(el.pathParams.getString('username'));
-            print('HEIL');
-            ref
-                .read(profileControllerApiProvider)
-                .getUserInfo(el.pathParams.getString('username'));
-          } else if (ref.watch(router)!.topRoute.path == '/user/:id') {
-            el = ref.watch(router)!.topRoute;
-            ref.read(profileControllerApiProvider).getUserInfo(el.pathParams.getInt('id'));
-          } else if (ref.watch(router)!.topRoute.path == 'profile') {
-            ref.read(profileControllerApiProvider).getUserInfo(null);
-          } else if (ref.watch(router)!.topRoute.path != '/edit_profile'){
-            ref.read(profileControllerApiProvider).clearUser();
-          }
-        } catch (e) {
-          el = null;
+    final rtr = ref.watch(router);
+    var anyProfile = ref.watch(profileInfoStateHolderProvider);
+    var myProfile = ref.watch(myProfileInfoStateHolderProvider);
+    Future(() {
+      if (rtr!.topRoute.path == 'profile' && anyProfile?.id != myProfile?.id) {
+        Future(() {
+          ref.read(profileControllerApiProvider).clearUser();
+        });
+      }
+      RouteData? el;
+      try {
+        if (ref.watch(router)!.topRoute.path == '/:username') {
+          el = ref.watch(router)!.topRoute;
+          ref
+              .read(profileControllerApiProvider)
+              .getUserInfo(el.pathParams.getString('username'));
+        } else if (ref.watch(router)!.topRoute.path == '/users/:id') {
+          el = ref.watch(router)!.topRoute;
+          ref
+              .read(profileControllerApiProvider)
+              .getUserInfo(el.pathParams.getInt('id'));
+        } else if (ref.watch(router)!.topRoute.path == 'profile') {
+          print("GG${ref.watch(router)!.topRoute.path}");
+          ref.read(profileControllerApiProvider).getUserInfo(null);
         }
-      });
-    }
+      } catch (e) {
+        el = null;
+      }
+    });
     loading = false;
   }
 
+  bool? homeProfileRoute;
+
   @override
   Widget build(BuildContext context) {
-    var profile = ref.watch(profileInfoStateHolderProvider);
-    if (profile == null) {
-      getProfile(profile);
+    final rtr = ref.watch(router);
+    homeProfileRoute ??= rtr?.topRoute.path == 'profile';
+    var anyProfile = ref.watch(profileInfoStateHolderProvider);
+    var myProfile = ref.watch(myProfileInfoStateHolderProvider);
+    UserDetailsModel? profile;
+    if (anyProfile != null) {
+      profile = anyProfile;
+    } else if (rtr!.topRoute.path == 'profile' &&
+        anyProfile?.id != myProfile?.id) {
+      Future(() {
+        ref.read(profileControllerApiProvider).clearUser();
+      });
+      profile = myProfile;
     }
-    myself = widget.username == 'profile';
+    if (anyProfile == null) {
+      getProfile();
+    }
+    myself = (profile?.id == myProfile?.id);
     if (myself == true && tabController?.length != 3) {
       tabController = TabController(
         length: 3,
@@ -132,22 +170,27 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
         vsync: this,
       );
     }
-    return WillPopScope(
-      onWillPop: () async {
-        ref.read(profileControllerApiProvider).clearUser();
-        return true;
-      },
-      child: CustomScaffold(
+    return CustomScaffold(
+      child: NotificationListener<ScrollUpdateNotification>(
+        onNotification: (details) {
+          if (((details.scrollDelta ?? 1) < 0 ||
+                  animationController.value > 0) &&
+              animationController.value > 0 &&
+              details.metrics.pixels <= 245) {
+            animationController.animateTo(
+              (details.metrics.pixels < 0 ? 0 : details.metrics.pixels) / 245,
+              duration: Duration.zero,
+            );
+          }
+          return true;
+        },
         child: NotificationListener<ScrollUpdateNotification>(
-          onNotification: (details) {
-            if (((details.scrollDelta ?? 1) < 0 ||
-                    animationController.value > 0) &&
-                animationController.value > 0 &&
-                details.metrics.pixels <= 245) {
-              animationController.animateTo(
-                (details.metrics.pixels < 0 ? 0 : details.metrics.pixels) / 245,
-                duration: Duration.zero,
-              );
+          onNotification: (info) {
+            if (profile == null || tabController?.length != 3 || tabController?.index != 1) {
+              return true;
+            }
+            if (info.metrics.pixels > info.metrics.maxScrollExtent - MediaQuery.of(context).size.height) {
+              ref.read(profileControllerApiProvider).updateBookmarks();
             }
             return true;
           },
@@ -204,7 +247,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                         children: [
                           SizedBox(
                             width: 65,
-                            child: (myself)
+                            child: (rtr?.topRoute.path == 'profile')
                                 ? const SizedBox()
                                 : Align(
                                     alignment: Alignment.centerLeft,
@@ -298,14 +341,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                         ? Image.network(
                                             profile.imagePath!,
                                             fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, obj, trace) {
+                                            errorBuilder: (context, obj, trace) {
                                               return shimmer;
                                             },
                                             loadingBuilder:
                                                 (context, child, event) {
-                                              if (event
-                                                      ?.cumulativeBytesLoaded !=
+                                              if (event?.cumulativeBytesLoaded !=
                                                   event?.expectedTotalBytes) {
                                                 return shimmer;
                                               }
@@ -319,15 +360,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                             getAvatarName(profile.name)
                                                     .toUpperCase()
                                                     .isEmpty
-                                                ? getAvatarName(
-                                                        profile.username)
+                                                ? getAvatarName(profile.username)
                                                     .toUpperCase()
                                                 : getAvatarName(profile.name)
                                                     .toUpperCase(),
                                             style: context.textStyles.title3!
                                                 .copyWith(
-                                              color: context
-                                                  .colors.textsBackground,
+                                              color:
+                                                  context.colors.textsBackground,
                                             ),
                                           )
                                         : const SizedBox(),
@@ -337,9 +377,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      ref.watch(router)!.push(
-                                            UsersListRoute(id: profile.id),
-                                          );
+                                      if (profile != null) {
+                                        ref.watch(router)!.push(
+                                              UsersListRoute(id: profile.id),
+                                            );
+                                      }
                                     },
                                     child: Container(
                                       color: Colors.transparent,
@@ -347,18 +389,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          ShimmerLoader(
-                                            loaded: profile != null,
-                                            child: TextOrContainer(
-                                              text: profile.followers == null
-                                                  ? null
-                                                  : profile!.followers
-                                                      .toString(),
-                                              style:
-                                                  context.textStyles.headline,
-                                              emptyWidth: 35,
-                                              emptyHeight: 20,
-                                            ),
+                                          TextOrContainer(
+                                            text: profile.followers.toString(),
+                                            style: context.textStyles.headline,
+                                            emptyWidth: 35,
+                                            emptyHeight: 20,
                                           ),
                                           const SizedBox(
                                             height: 3,
@@ -381,12 +416,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      ref.watch(router)!.push(
-                                            UsersListRoute(
-                                              following: true,
-                                              id: profile.id,
-                                            ),
-                                          );
+                                      if (profile != null) {
+                                        ref.watch(router)!.push(
+                                              UsersListRoute(
+                                                following: true,
+                                                id: profile.id,
+                                              ),
+                                            );
+                                      }
                                     },
                                     child: Container(
                                       color: Colors.transparent,
@@ -399,10 +436,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                             child: TextOrContainer(
                                               text: profile.following == null
                                                   ? null
-                                                  : profile!.following
-                                                      .toString(),
-                                              style:
-                                                  context.textStyles.headline,
+                                                  : profile.following.toString(),
+                                              style: context.textStyles.headline,
                                               emptyWidth: 35,
                                               emptyHeight: 20,
                                             ),
@@ -432,8 +467,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                               Row(
                                 children: [
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       ShimmerLoader(
                                         loaded: profile != null,
@@ -466,8 +500,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                             const SizedBox(width: 4),
                                             Text(
                                               profile.posters.toString(),
-                                              style: context
-                                                  .textStyles.caption1!
+                                              style: context.textStyles.caption1!
                                                   .copyWith(
                                                       color: context
                                                           .colors.textsPrimary),
@@ -484,8 +517,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                             const SizedBox(width: 4),
                                             Text(
                                               profile.lists.toString() ?? '0',
-                                              style: context
-                                                  .textStyles.caption1!
+                                              style: context.textStyles.caption1!
                                                   .copyWith(
                                                       color: context
                                                           .colors.textsPrimary),
@@ -505,8 +537,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                         ref
                                             .read(profileControllerApiProvider)
                                             .follow(
-                                              profile!.id!,
-                                              profile!.followed,
+                                              profile!.id,
+                                              profile.followed,
                                             );
                                       }
                                     },
@@ -535,7 +567,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                 ),
                               if (profile.description != null)
                                 Text(
-                                  profile!.description!,
+                                  profile.description!,
                                   style: context.textStyles.footNote,
                                 ),
                               if (profile.description != null)
@@ -574,15 +606,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                     toolbarHeight: 48,
                     pinned: true,
                     leading: const SizedBox(),
-                    flexibleSpace: tabController == null ||
-                            tabController?.animation == null
-                        ? const SizedBox()
-                        : ProfileTabBar(
-                            animation: tabController!.animation!,
-                            tabController: tabController,
-                            profile: profile,
-                            myself: myself,
-                          ),
+                    flexibleSpace:
+                        tabController == null || tabController?.animation == null
+                            ? const SizedBox()
+                            : ProfileTabBar(
+                                animation: tabController!.animation!,
+                                tabController: tabController,
+                                profile: profile,
+                                myself: myself,
+                              ),
                   ),
                 if (profile != null)
                   SliverToBoxAdapter(
@@ -612,12 +644,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                         crossButton: SvgPicture.asset(
                                           'assets/icons/search_cross.svg',
                                         ),
-                                        style: context.textStyles.callout!
-                                            .copyWith(
+                                        style:
+                                            context.textStyles.callout!.copyWith(
                                           fontSize: context.textStyles.callout!
                                                           .fontSize! *
-                                                      animationController
-                                                          .value <
+                                                      animationController.value <
                                                   1
                                               ? 1
                                               : context.textStyles.callout!
@@ -626,7 +657,26 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                         ),
                                         focus: focusNode,
                                         onRemoved: () {
+                                          ref
+                                              .read(pickCoverControllerProvider)
+                                              .updateSearch('');
+                                          ref
+                                              .watch(
+                                                  listSearchValueStateHolderProvider
+                                                      .notifier)
+                                              .updateState('');
                                           searchController.clear();
+                                        },
+                                        onChanged: (value) {
+                                          print(value);
+                                          ref
+                                              .read(pickCoverControllerProvider)
+                                              .updateSearch(value);
+                                          ref
+                                              .watch(
+                                                  listSearchValueStateHolderProvider
+                                                      .notifier)
+                                              .updateState(value);
                                         },
                                       ),
                                     ),
@@ -644,8 +694,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                                           .textStyles
                                                           .bodyRegular!
                                                           .fontSize! *
-                                                      animationController
-                                                          .value <
+                                                      animationController.value <
                                                   1
                                               ? 1
                                               : context.textStyles.bodyRegular!
@@ -670,6 +719,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
             body: tabController == null
                 ? const SizedBox()
                 : ProfileTabs(
+                    animationController: animationController,
+                    searchTextController: searchController,
                     shimmer: shimmer,
                     controller: tabController!,
                     name: profile?.mySelf == true ? null : profile?.name,
@@ -699,10 +750,14 @@ class ProfileTabs extends ConsumerStatefulWidget {
     required this.controller,
     this.name,
     required this.shimmer,
+    required this.animationController,
+    required this.searchTextController,
   }) : super(key: key);
   final TabController controller;
   final String? name;
   final Widget shimmer;
+  final AnimationController animationController;
+  final TextEditingController searchTextController;
 
   @override
   ConsumerState<ProfileTabs> createState() => _ProfileTabsState();
@@ -712,42 +767,85 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
     with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    final posters = ref.watch(profilePostsStateHolderProvider);
     final lists = ref.watch(profileListsStateHolderProvider);
-    return TabBarView(
-      controller: widget.controller,
-      children: [
-        PostsCollectionView(
-          movies: posters,
-          shimmer: widget.shimmer,
-          name: widget.name,
-        ),
-        if (widget.controller.length == 3)
-          PostsCollectionView(
-            movies: [],
-            shimmer: widget.shimmer,
-            bookmark: true,
-            customOnItemTap: (post, index) {
-              ref.watch(router)!.push(
-                    BookmarksRoute(startIndex: index),
-                  );
+    final searchValue = ref.watch(listSearchValueStateHolderProvider);
+    final posts = ref.watch(profilePostsStateHolderProvider);
+    final postersSearch = ref.watch(listSearchPostsStateHolderProvider);
+    final bookmarks = ref.watch(profileBookmarksStateHolderProvider);
+    List<PostMovieModel>? posters;
+    if (searchValue.isEmpty) {
+      posters = posts;
+    } else {
+      posters = postersSearch;
+    }
+    return AnimatedBuilder(
+      animation: widget.animationController,
+      builder: (context, child) {
+        if (widget.animationController.value <= 0.5 &&
+            widget.searchTextController.text.isNotEmpty) {
+          posters = posts;
+          Future(() {
+            ref.read(listSearchValueStateHolderProvider.notifier).clearState();
+            ref.read(listSearchPostsStateHolderProvider.notifier).clearState();
+            widget.searchTextController.clear();
+          });
+        }
+        return child!;
+      },
+      child: TabBarView(
+        controller: widget.controller,
+        children: [
+          NotificationListener<ScrollUpdateNotification>(
+            onNotification: (info) {
+              if (info.metrics.pixels >=
+                  info.metrics.maxScrollExtent -
+                      MediaQuery.of(context).size.height) {
+                ref.read(pickCoverControllerProvider).updateSearch(searchValue);
+              }
+              return true;
             },
-            customOnLongTap: () {},
+            child: PostsCollectionView(
+              movies: posters,
+              shimmer: widget.shimmer,
+              name: widget.name,
+            ),
           ),
-        GridView.builder(
-          padding: const EdgeInsets.all(16.0),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 13.0,
-            mainAxisSpacing: 16.0,
-            mainAxisExtent: 113,
+          if (widget.controller.length == 3)
+            PostsCollectionView(
+              movies: bookmarks,
+              shimmer: widget.shimmer,
+              bookmark: true,
+              customOnItemTap: (post, index) {
+                int id;
+                var list = bookmarks![index].tmdbLink!.split('/');
+                list.removeLast();
+                print(list);
+                id = int.parse(list.last);
+                ref.watch(router)!.push(
+                      BookmarksRoute(id: id),
+                    );
+              },
+              customOnLongTap: () {},
+            ),
+          GridView.builder(
+            padding: const EdgeInsets.all(16.0),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 13.0,
+              mainAxisSpacing: 16.0,
+              mainAxisExtent:
+                  ((MediaQuery.of(context).size.width - 16.0 * 3) / 2) /
+                          540 *
+                          300 +
+                      23,
+            ),
+            itemCount: lists?.length ?? 30,
+            itemBuilder: (context, index) {
+              return ListGridWidget(post: lists?[index]);
+            },
           ),
-          itemCount: lists?.length ?? 30,
-          itemBuilder: (context, index) {
-            return ListGridWidget(post: lists?[index]);
-          },
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -791,11 +889,15 @@ class PostsCollectionView extends ConsumerWidget {
       physics: const NeverScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
       ),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         crossAxisSpacing: 12.5,
         mainAxisSpacing: 15,
-        mainAxisExtent: 201,
+        mainAxisExtent:
+            ((MediaQuery.of(context).size.width - 15 * 2 - 16 * 2) / 3) /
+                    2 *
+                    3 +
+                41,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       itemCount: movies == null ? 30 : movies!.length,
@@ -866,17 +968,21 @@ class PostsCollectionTile extends ConsumerWidget {
             child: Container(
               color: context.colors.backgroundsSecondary,
               width: double.infinity,
-              height: 160,
-              child: Image.network(
-                (post == null ? imagePath : post?.imagePath) ?? '',
+              height:
+                  ((MediaQuery.of(context).size.width - 15 * 2 - 16 * 2) / 3) /
+                      2 *
+                      3,
+              child: CachedNetworkImage(
+                imageUrl: (post == null ? imagePath : post?.imagePath) ?? '',
                 fit: BoxFit.cover,
-                errorBuilder: (context, obj, trace) {
+                placeholderFadeInDuration: Durations.cachedDuration,
+                fadeInDuration: Durations.cachedDuration,
+                fadeOutDuration: Durations.cachedDuration,
+                placeholder: (context, child) {
                   return shimmer;
                 },
-                loadingBuilder: (context, child, event) {
-                  if (event?.cumulativeBytesLoaded != event?.expectedTotalBytes)
-                    return shimmer;
-                  return child;
+                errorWidget: (context, obj, trace) {
+                  return shimmer;
                 },
               ),
             ),
@@ -949,7 +1055,6 @@ class _PosterImageDialogState extends State<PosterImageDialog>
     controller.forward();
     return Listener(
       onPointerUp: (intent) {
-        print(1);
         Navigator.pop(context);
       },
       child: BackdropFilter(
@@ -971,19 +1076,20 @@ class _PosterImageDialogState extends State<PosterImageDialog>
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8.0),
                   child: Container(
-                    color: context.colors.buttonsPrimary,
+                    color: context.colors.backgroundsSecondary,
                     height: 300,
                     width: 200,
-                    child: Image.network(
-                      widget.imagePath,
+                    child: CachedNetworkImage(
+                      imageUrl: widget.imagePath,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, obj, trace) {
+                      placeholderFadeInDuration: Durations.cachedDuration,
+                      fadeInDuration: Durations.cachedDuration,
+                      fadeOutDuration: Durations.cachedDuration,
+                      placeholder: (context, child) {
                         return shimmer;
                       },
-                      loadingBuilder: (context, child, event) {
-                        if (event?.cumulativeBytesLoaded !=
-                            event?.expectedTotalBytes) return shimmer;
-                        return child;
+                      errorWidget: (context, obj, trace) {
+                        return shimmer;
                       },
                     ),
                   ),
@@ -993,6 +1099,7 @@ class _PosterImageDialogState extends State<PosterImageDialog>
                 ),
                 if (widget.name != null)
                   Container(
+                    width: double.infinity,
                     padding: const EdgeInsets.all(18.0),
                     margin: const EdgeInsets.symmetric(horizontal: 16.0),
                     decoration: BoxDecoration(
@@ -1034,19 +1141,36 @@ class _PosterImageDialogState extends State<PosterImageDialog>
   }
 }
 
+enum InfoDialogType { post, list, postComment, listComment }
+
 class OtherProfileDialog extends ConsumerWidget {
   const OtherProfileDialog({
     Key? key,
     this.user,
     this.user1,
+    this.type,
+    this.entityId,
+    this.myEntity,
   })  : assert(user == null || user1 == null),
         super(key: key);
 
   final UserDetailsModel? user;
   final UserModel? user1;
+  final InfoDialogType? type;
+  final int? entityId;
+  final bool? myEntity;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final myself = ref.watch(myProfileInfoStateHolderProvider);
+    final postId = ref.watch(posterStateHolderProvider);
+    final listId = ref.watch(listsStateHolderProvider);
+    int itemsCount = 0;
+    if (user?.id != myself?.id && user1?.id != myself?.id) itemsCount += 2;
+    if (user?.id == myself?.id ||
+        user1?.id == myself?.id ||
+        myEntity == true && type == InfoDialogType.postComment ||
+        myEntity == true && type == InfoDialogType.listComment) itemsCount++;
     return GestureDetector(
       onTap: () {
         Navigator.pop(context);
@@ -1057,106 +1181,282 @@ class OtherProfileDialog extends ConsumerWidget {
         child: Align(
           alignment: Alignment.bottomCenter,
           child: SizedBox(
-            height: 214 + MediaQuery.of(context).padding.bottom,
+            height:
+                (itemsCount * 60) + MediaQuery.of(context).padding.bottom + 80,
             child: ClipRRect(
               borderRadius: const BorderRadius.only(
                 topRight: Radius.circular(16.0),
                 topLeft: Radius.circular(16.0),
               ),
               child: SizedBox(
-                height: 214,
+                height: itemsCount * 60 + 80,
                 child: Material(
                   color: context.colors.backgroundsPrimary,
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 14),
-                      Container(
-                        height: 4,
-                        width: 36,
-                        color: context.colors.fieldsDefault,
-                      ),
-                      const SizedBox(height: 22),
-                      Text(
-                        (user?.name ?? user1?.name) ?? '',
-                        style: context.textStyles.bodyBold,
-                      ),
-                      const SizedBox(height: 10.5),
-                      Divider(
-                        height: 0.5,
-                        thickness: 0.5,
-                        color: context.colors.fieldsDefault,
-                      ),
-                      InkWell(
-                        onTap: () async {
-                          if (user != null) {
-                            await ref.read(profileControllerApiProvider).follow(
-                                  user!.id,
-                                  user!.followed,
-                                );
-                          } else {
-                            await ref.read(profileControllerApiProvider).follow(
-                                  user1!.id,
-                                  user1!.followed,
-                                );
-                          }
-                          if (context.mounted) {
-                            Navigator.pop(context);
-                          }
-                        },
-                        child: SizedBox(
-                          height: 52,
-                          width: double.infinity,
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 16),
-                              Text(
-                                (user?.followed ?? user1!.followed)
-                                    ? 'Unfollow'
-                                    : 'Follow',
-                                style: context.textStyles.bodyRegular,
-                              ),
-                              const Spacer(),
-                              Text(
-                                '􀜗',
-                                style: context.textStyles.bodyRegular,
-                              ),
-                              const SizedBox(width: 16),
-                            ],
-                          ),
+                  child: Scaffold(
+                    backgroundColor: Colors.transparent,
+                    body: Column(
+                      children: [
+                        const SizedBox(height: 14),
+                        Container(
+                          height: 4,
+                          width: 36,
+                          color: context.colors.fieldsDefault,
                         ),
-                      ),
-                      Divider(
-                        height: 0.5,
-                        thickness: 0.5,
-                        color: context.colors.fieldsDefault,
-                      ),
-                      InkWell(
-                        onTap: () {},
-                        child: SizedBox(
-                          height: 52,
-                          width: double.infinity,
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 16),
-                              Text(
-                                'Report',
-                                style: context.textStyles.bodyRegular!.copyWith(
-                                  color: context.colors.textsError,
-                                ),
-                              ),
-                              const Spacer(),
-                              Text(
-                                '􀉻',
-                                style: context.textStyles.bodyRegular!.copyWith(
-                                  color: context.colors.textsError,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                            ],
-                          ),
+                        const SizedBox(height: 22),
+                        Text(
+                          (user?.name ?? user1?.name) ?? '',
+                          style: context.textStyles.bodyBold,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 10.5),
+                        if (user?.id != myself?.id && user1?.id != myself?.id)
+                          Divider(
+                            height: 0.5,
+                            thickness: 0.5,
+                            color: context.colors.fieldsDefault,
+                          ),
+                        if (user?.id != myself?.id && user1?.id != myself?.id)
+                          InkWell(
+                            onTap: () async {
+                              Navigator.pop(context);
+                              if (user != null) {
+                                await ref
+                                    .read(profileControllerApiProvider)
+                                    .follow(
+                                      user!.id,
+                                      user!.followed,
+                                    );
+                              } else {
+                                await ref
+                                    .read(profileControllerApiProvider)
+                                    .follow(
+                                      user1!.id,
+                                      user1!.followed,
+                                    );
+                              }
+                            },
+                            child: SizedBox(
+                              height: 52,
+                              width: double.infinity,
+                              child: Row(
+                                children: [
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    (user?.followed ?? user1!.followed)
+                                        ? 'Unfollow ${user?.name ?? user1!.name}'
+                                        : 'Follow ${user?.name ?? user1!.name}',
+                                    style: context.textStyles.bodyRegular,
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    (user?.followed ?? user1!.followed)
+                                        ? '􀜗'
+                                        : '􀜕',
+                                    style: context.textStyles.bodyRegular,
+                                  ),
+                                  const SizedBox(width: 16),
+                                ],
+                              ),
+                            ),
+                          ),
+                        if (user?.id != myself?.id && user1?.id != myself?.id)
+                          Divider(
+                            height: 0.5,
+                            thickness: 0.5,
+                            color: context.colors.fieldsDefault,
+                          ),
+                        if (user?.id != myself?.id && user1?.id != myself?.id)
+                          InkWell(
+                            onTap: () {
+                              scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBars.build(
+                                  context,
+                                  null,
+                                  'Not available yet',
+                                ),
+                              );
+                            },
+                            child: SizedBox(
+                              height: 52,
+                              width: double.infinity,
+                              child: Row(
+                                children: [
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    'Report',
+                                    style: context.textStyles.bodyRegular!
+                                        .copyWith(
+                                      color: context.colors.textsError,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    '􀉻',
+                                    style: context.textStyles.bodyRegular!
+                                        .copyWith(
+                                      color: context.colors.textsError,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                ],
+                              ),
+                            ),
+                          ),
+                        if (user?.id == myself?.id ||
+                            user1?.id == myself?.id ||
+                            myEntity == true &&
+                                type == InfoDialogType.postComment ||
+                            myEntity == true &&
+                                type == InfoDialogType.listComment)
+                          Divider(
+                            height: 0.5,
+                            thickness: 0.5,
+                            color: context.colors.fieldsDefault,
+                          ),
+                        if (user?.id == myself?.id ||
+                            user1?.id == myself?.id ||
+                            myEntity == true &&
+                                type == InfoDialogType.postComment ||
+                            myEntity == true &&
+                                type == InfoDialogType.listComment)
+                          InkWell(
+                            onTap: () {
+                              if (type != null) {
+                                switch (type!) {
+                                  case InfoDialogType.post:
+                                    {
+                                      try {
+                                        ref
+                                            .read(commentsControllerProvider)
+                                            .deletePost(entityId!);
+                                        ref
+                                            .read(searchPostsStateHolderProvider
+                                                .notifier)
+                                            .deleteId(entityId!);
+                                        scaffoldMessengerKey.currentState
+                                            ?.showSnackBar(
+                                          SnackBars.build(
+                                            context,
+                                            null,
+                                            'Deleted successfully',
+                                          ),
+                                        );
+                                        ref
+                                            .read(profileControllerApiProvider)
+                                            .getUserInfo(null);
+                                        Navigator.pop(context);
+                                      } catch (_) {
+                                        scaffoldMessengerKey.currentState
+                                            ?.showSnackBar(
+                                          SnackBars.build(
+                                            context,
+                                            null,
+                                            'Could not delete poster',
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  case InfoDialogType.list:
+                                    {
+                                      try {
+                                        //Seems like this is not needed yet
+                                      } catch (_) {
+                                        scaffoldMessengerKey.currentState
+                                            ?.showSnackBar(
+                                          SnackBars.build(
+                                            context,
+                                            null,
+                                            'Could not delete list',
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  case InfoDialogType.postComment:
+                                    {
+                                      try {
+                                        ref
+                                            .read(commentsControllerProvider)
+                                            .deleteComment(
+                                                postId!.id, entityId!);
+                                        scaffoldMessengerKey.currentState
+                                            ?.showSnackBar(
+                                          SnackBars.build(
+                                            context,
+                                            null,
+                                            'Deleted successfully',
+                                          ),
+                                        );
+                                        Navigator.pop(context);
+                                      } catch (_) {
+                                        scaffoldMessengerKey.currentState
+                                            ?.showSnackBar(
+                                          SnackBars.build(
+                                            context,
+                                            null,
+                                            'Could not delete comment',
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  case InfoDialogType.listComment:
+                                    {
+                                      try {
+                                        ref
+                                            .read(listsControllerProvider)
+                                            .deleteComment(
+                                                listId!.id, entityId!);
+                                        scaffoldMessengerKey.currentState
+                                            ?.showSnackBar(
+                                          SnackBars.build(
+                                            context,
+                                            null,
+                                            'Deleted successfully',
+                                          ),
+                                        );
+                                        Navigator.pop(context);
+                                      } catch (_) {
+                                        scaffoldMessengerKey.currentState
+                                            ?.showSnackBar(
+                                          SnackBars.build(
+                                            context,
+                                            null,
+                                            'Could not delete comment',
+                                          ),
+                                        );
+                                      }
+                                    }
+                                }
+                              }
+                            },
+                            child: SizedBox(
+                              height: 52,
+                              width: double.infinity,
+                              child: Row(
+                                children: [
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    'Delete',
+                                    style: context.textStyles.bodyRegular!
+                                        .copyWith(
+                                      color: context.colors.textsError,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  if (user?.id == myself?.id ||
+                                      user1?.id == myself?.id)
+                                    SvgPicture.asset(
+                                      'assets/icons/ic_trash.svg',
+                                      colorFilter: ColorFilter.mode(
+                                        context.colors.textsError!,
+                                        BlendMode.srcIn,
+                                      ),
+                                    ),
+                                  const SizedBox(width: 16),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),

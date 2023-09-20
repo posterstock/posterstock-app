@@ -34,6 +34,11 @@ class ListsController {
     await commentsStateHolder.updateComments([result]);
   }
 
+  Future<void> deleteComment(final int postId, final int id) async {
+    await postRepository.deleteComment(postId, id);
+    commentsStateHolder.deleteComment(id);
+  }
+
   Future<void> updateComments(final int id) async {
     if (loadingComments) return;
     loadingComments = true;
@@ -43,18 +48,19 @@ class ListsController {
   }
 
   Future<void> getPost(final int id) async {
-    print('aab $id');
     if (loadingPost) return;
     loadingPost = true;
-    print(11);
     try {
       final result = await postRepository.getPost(id);
-      print(result);
       await posterStateHolder.updateState(result);
     } catch (e) {
       print(e);
       loadingPost = false;
     }
     loadingPost = false;
+  }
+
+  Future<void> deleteList(int id) async {
+    await postRepository.deleteList(id);
   }
 }

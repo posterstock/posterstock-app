@@ -12,19 +12,23 @@ class NotificationsStateHolder extends StateNotifier<List<NotificationModel>?> {
 
   void updateState(List<NotificationModel> list) {
     if (list.isEmpty && state != null) return;
+    state?.sort((a, b) => a.time.isAfter(b.time) ? 0 : 1);
+    list?.sort((a, b) => a.time.isAfter(b.time) ? 0 : 1);
     state = [...?state, ...list];
   }
 
   void updateStateStart(List<NotificationModel> list) {
     if (list.isEmpty && state != null) return;
-    for (int i = 0; i < (state?.length ?? 0); i++) {
-      for (int j = 0; j < list.length; j++) {
-        if (state![i].id == state![j].id) {
-          state!.removeAt(i);
-          i--;
+    for (int i = 0; i < list.length; i++) {
+      for (int j = 0; j < (state?.length ?? 0); j++) {
+        if (state![j].id == list![i].id) {
+          state!.removeAt(j);
+          j--;
         }
       }
     }
+    state?.sort((a, b) => a.time.isAfter(b.time) ? 0 : 1);
+    list?.sort((a, b) => a.time.isAfter(b.time) ? 0 : 1);
     state = [...list, ...?state];
   }
 }

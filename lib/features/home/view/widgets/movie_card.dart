@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/features/bookmarks/view/pages/bookmarks_page.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
@@ -60,12 +62,6 @@ class MovieCardState extends ConsumerState<MovieCard>
   }
 
   @override
-  void didUpdateWidget(covariant MovieCard oldWidget) {
-    print(oldWidget.index == widget.index);
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
   void initState() {
     super.initState();
     physics = const HorizontalBlockedScrollPhysics();
@@ -99,7 +95,7 @@ class MovieCardState extends ConsumerState<MovieCard>
           (TextInfoService.textSizeConstWidth(
             '',
             context.textStyles.subheadlineBold!,
-            MediaQuery.of(context).size.width - 134,
+            MediaQuery.of(context).size.width - 140,
           ).height),
       child: AnimatedBuilder(
         animation: controller,
@@ -116,10 +112,14 @@ class MovieCardState extends ConsumerState<MovieCard>
                 return;
               }
               Future(() {
-                likeCommentController.animateTo(
-                    (pageController?.page?.toInt() ?? 0) +
-                        (((pageController!.page ?? 0) * 100).toInt() % 100) /
-                            100);
+                try {
+                  likeCommentController.animateTo(
+                      (pageController?.page?.toInt() ?? 0) +
+                          (((pageController!.page ?? 0) * 100).toInt() % 100) /
+                              100);
+                } catch (e) {
+                  return;
+                }
               });
             });
 
@@ -142,10 +142,9 @@ class MovieCardState extends ConsumerState<MovieCard>
                         likeCommentController: likeCommentController,
                         onPosterTap: () {},
                         textHeight: textHeight!,
-                        titleHeight: TextInfoService.textSizeConstWidth(
+                        titleHeight: TextInfoService.textSize(
                           '',
                           context.textStyles.subheadlineBold!,
-                          MediaQuery.of(context).size.width - 134,
                         ).height,
                         description:
                             (movie?[index].description ?? '').length > 280
@@ -255,10 +254,9 @@ class MovieCardState extends ConsumerState<MovieCard>
         }
       }
     }
-    titleHeight = TextInfoService.textSizeConstWidth(
+    titleHeight = TextInfoService.textSize(
       movie?[0].name ?? '',
       context.textStyles.subheadlineBold!,
-      MediaQuery.of(context).size.width - 134,
     ).height;
   }
 }
@@ -298,16 +296,17 @@ class _MovieCardPageViewContent extends ConsumerWidget {
             width: 128,
             height: 193,
             child: movie?.imagePath != null
-                ? Image.network(
-                    movie!.imagePath,
+                ? CachedNetworkImage(
+                    imageUrl: movie!.imagePath,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, obj, trace) {
+                    placeholderFadeInDuration: Durations.cachedDuration,
+                    fadeInDuration: Durations.cachedDuration,
+                    fadeOutDuration: Durations.cachedDuration,
+                    placeholder: (context, child) {
                       return shimmer;
                     },
-                    loadingBuilder: (context, child, event) {
-                      if (event?.cumulativeBytesLoaded !=
-                          event?.expectedTotalBytes) return shimmer;
-                      return child;
+                    errorWidget: (context, obj, trace) {
+                      return shimmer;
                     },
                   )
                 : shimmer,
@@ -321,9 +320,11 @@ class _MovieCardPageViewContent extends ConsumerWidget {
           children: [
             TextOrContainer(
               text: movie != null ? movie!.name : null,
+              overflow: TextOverflow.ellipsis,
               style: context.textStyles.subheadlineBold!,
               emptyWidth: 146,
               emptyHeight: 17,
+              width: MediaQuery.of(context).size.width - 140,
             ),
             SizedBox(
               height: movie != null ? 5 : 8,
@@ -343,10 +344,9 @@ class _MovieCardPageViewContent extends ConsumerWidget {
               SizedBox(
                 height: textHeight +
                     titleHeight -
-                    TextInfoService.textSizeConstWidth(
+                    TextInfoService.textSize(
                       movie?.name ?? '',
                       context.textStyles.subheadlineBold!,
-                      MediaQuery.of(context).size.width - 134,
                     ).height,
                 width: MediaQuery.of(context).size.width - 84,
                 child: Text(

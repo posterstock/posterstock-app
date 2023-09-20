@@ -11,8 +11,8 @@ class NotificationsRepository implements INotificationsRepository {
   Future<List<NotificationModel>> getNotifications({
     bool getNewPosts = false,
   }) async {
-    List<dynamic>? unParsedData =
-        (await service.getNotifications(getNewPosts: getNewPosts))['notifications'];
+    List<dynamic>? unParsedData = (await service.getNotifications(
+        getNewPosts: getNewPosts))['notifications'];
     return unParsedData?.map((e) => NotificationModel.fromJson(e)).toList() ??
         [];
   }

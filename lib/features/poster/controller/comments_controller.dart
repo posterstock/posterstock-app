@@ -4,10 +4,11 @@ import 'package:poster_stock/features/poster/state_holder/comments_state_holder.
 import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
 
 final commentsControllerProvider = Provider<CommentsController>(
-  (ref) => CommentsController(
-    commentsStateHolder: ref.watch(commentsStateHolderProvider.notifier),
-    posterStateHolder: ref.watch(posterStateHolderProvider.notifier),
-  ),
+      (ref) =>
+      CommentsController(
+        commentsStateHolder: ref.watch(commentsStateHolderProvider.notifier),
+        posterStateHolder: ref.watch(posterStateHolderProvider.notifier),
+      ),
 );
 
 class CommentsController {
@@ -27,13 +28,19 @@ class CommentsController {
     posterStateHolder.clear();
   }
 
+
   Future<void> postComment(final int id, final String text) async {
-    final result = await postRepository.postComment( id, text);
+    final result = await postRepository.postComment(id, text);
     await commentsStateHolder.updateMoreComments([result]);
   }
 
+  Future<void> deleteComment(final int postId, final int id) async {
+    await postRepository.deleteComment(postId, id);
+    commentsStateHolder.deleteComment(id);
+  }
+
   Future<void> postCommentList(final int id, final String text) async {
-    final result = await postRepository.postCommentList( id, text);
+    final result = await postRepository.postCommentList(id, text);
     await commentsStateHolder.updateMoreComments([result]);
   }
 
@@ -42,7 +49,8 @@ class CommentsController {
     if (loadingComments) return;
     loadingComments = true;
     final result =
-        await postRepository.getComments( id);
+    await postRepository.getComments(id);
+    print(result);
     await commentsStateHolder.updateComments(result);
     loadingComments = false;
   }
@@ -53,9 +61,18 @@ class CommentsController {
     if (loadingPost) return;
     await Future.delayed(Duration(milliseconds: 500));
     loadingPost = true;
-    final result = await postRepository.getPost( id);
+    final result = await postRepository.getPost(id);
     print(result);
     await posterStateHolder.updateState(result);
     loadingPost = false;
+  }
+
+  Future<void> deletePost(final int id) async {
+    await postRepository.deletePost(id);
+  }
+
+  Future<void> setBookmarked(int id, bool bookmarked) async {
+    await posterStateHolder.updateBookmarked(bookmarked);
+    postRepository.setBookmarked(id, bookmarked);
   }
 }

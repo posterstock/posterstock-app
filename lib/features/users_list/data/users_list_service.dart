@@ -7,25 +7,39 @@ import 'package:supertokens_flutter/supertokens.dart';
 class UsersListService {
   final Dio _dio = DioKeeper.getDio();
 
-  Future<List<dynamic>> getFollows({
+  String? cursor;
+  int? lastId;
+  bool? followers;
+
+  Future<(List<dynamic>, bool)> getFollows({
     required bool followers,
     required int id,
   }) async {
+    if (followers != this.followers || lastId != id) {
+      cursor = null;
+    }
+    print(cursor);
+    this.followers = followers;
+    lastId = id;
     try {
       final response = await _dio.get(
         'api/users/$id/follow${followers ? 'ers' : 'ings'}',
         options: Options(
           contentType: 'text/plain; charset=utf-8',
-          headers: {
-            'rid': 'thirdpartypasswordless'
-          },
+          headers: {'rid': 'thirdpartypasswordless'},
         ),
+        queryParameters: {
+          'cursor': cursor,
+        },
       );
-      print('SS${response.data}');
-      return response.data;
+      print(response.data);
+      cursor = response.data['next_cursor'];
+      print(cursor);
+      return (
+        response.data['users_short'] as List<dynamic>? ?? [],
+        !response.data['has_more']
+      );
     } on DioError catch (e) {
-      print(e.response?.data);
-      print(e.response?.headers);
       rethrow;
     }
   }

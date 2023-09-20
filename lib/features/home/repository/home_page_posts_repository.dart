@@ -18,10 +18,9 @@ class HomePagePostsRepository implements IHomePagePostsRepository {
       final list = apiResult.$1?['entries'];
       for (var element in list) {
         if (element['type'] == 'poster') {
-          result.add(PostMovieModel.fromJson(element));
+          result.add(PostMovieModel.fromJson(element, previewPrimary: true));
         } else if (element['type'] == 'list') {
-          print(element);
-          result.add(MultiplePostModel.fromJson(element));
+          result.add(MultiplePostModel.fromJson(element, previewPrimary: true));
         } else {}
       }
       return (result, apiResult.$2);

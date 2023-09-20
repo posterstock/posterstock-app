@@ -17,10 +17,25 @@ class ListService {
             },
           ),
           data: jsonEncode({'text': text}));
-      print('SS${response.data}');
       return response.data;
     } on DioError catch (e) {
-      print('DSAD${e.response}');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteComment(int postId, int id) async {
+    try {
+      await _dio.delete(
+        'api/lists/$postId/comments/$id',
+        options: Options(
+          contentType: 'application/json',
+          headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+        ),
+      );
+    } on DioError catch (e) {
       print(e.response?.headers);
       rethrow;
     }
@@ -47,7 +62,6 @@ class ListService {
   }
 
   Future<Map<String, dynamic>> getPost(int id) async {
-    print(13);
     try {
       final response = await _dio.get(
         'api/lists/$id/',
@@ -66,8 +80,26 @@ class ListService {
       );
       return response.data;
     } on DioError catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteList(int id) async {
+    try {
+      final response = await _dio.delete(
+        'api/lists/$id/',
+        options: Options(
+          contentType: 'application/json',
+          headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+        ),
+      );
+      print('$id ${response.data}');
+      return response.data;
+    } on DioError catch (e) {
       print(18);
-      print('SS${e.response?.data}');
       print(e.response);
       rethrow;
     }

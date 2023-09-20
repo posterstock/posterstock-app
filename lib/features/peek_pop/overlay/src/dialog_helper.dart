@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -10,8 +9,8 @@ import 'animation/appear_widget.dart';
 ///Helper class to handle dialog appearance
 ///Keeps the latest dialog and closes the previous dialog automatically
 class DialogHelper {
-  static const Color BACKGROUND_COLOR = Color(0x61000000);
-  static const Duration DEFAULT_DURATION = Duration(milliseconds: 150);
+  static const Color backgroundColor = Color(0x61000000);
+  static const Duration defaultDuration = Duration(milliseconds: 150);
 
   static final DialogHelper _instance = DialogHelper._();
 
@@ -21,12 +20,12 @@ class DialogHelper {
 
   DialogHelper._();
 
-  List<IndexedData<OverlayEntry>> _currentOverlay = [];
-  List<IndexedData<Future<bool> Function()>> _currentCallback = [];
-  List<IndexedData<StreamController<double>>> _currentController = [];
+  final List<IndexedData<OverlayEntry>> _currentOverlay = [];
+  final List<IndexedData<Future<bool> Function()>> _currentCallback = [];
+  final List<IndexedData<StreamController<double>>> _currentController = [];
 
   Future<bool> onWillPop() {
-    return _currentCallback.length == 0 ? Future.value(true) : _currentCallback.last.data.call();
+    return _currentCallback.isEmpty ? Future.value(true) : _currentCallback.last.data.call();
   }
 
   // Shows the dialog
@@ -51,7 +50,7 @@ class DialogHelper {
       _currentCallback.add(
         IndexedData<Future<bool> Function()>(
           id: id,
-          data: () => Future.value(true)
+          data: () => Future.value(true),
         )
       );
     }
@@ -64,20 +63,20 @@ class DialogHelper {
 
     final OverlayEntry overlayEntry = OverlayEntry(
       builder: (_) => AppearWidget(
+        progress: controller.stream,
+        duration: defaultDuration,
+        style: AppearStyle.opacity,
         child: Stack(
           children: <Widget>[
             GestureDetector(
               onTap: () => dialog.closable ? hide(context) : (){},
               child: Container(
-                color: BACKGROUND_COLOR,
+                color: backgroundColor,
               ),
             ),
             dialog
           ],
         ),
-        progress: controller.stream,
-        duration: DEFAULT_DURATION,
-        style: AppearStyle.opacity,
       ),
     );
 
@@ -110,7 +109,7 @@ class DialogHelper {
       .forEach((controller) => controller.data.add(0.0));
 
     Future
-      .delayed(DEFAULT_DURATION)
+      .delayed(defaultDuration)
       .then((_) => _hide(id))
       .catchError((error){});
   }
@@ -130,7 +129,9 @@ class DialogHelper {
       if (overlay.id == id || id == null) {
         try {
           overlay.data.remove();
-        } catch(error) {}
+        } catch(_) {
+          debugPrint(_.toString());
+        }
 
         return true;
       }
@@ -142,8 +143,9 @@ class DialogHelper {
       if (controller.id == id || id == null) {
         try {
           controller.data.close();
-        } catch(error) {}
-
+        } catch(_) {
+          debugPrint(_.toString());
+        }
         return true;
       }
 

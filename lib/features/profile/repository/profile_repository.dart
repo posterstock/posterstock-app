@@ -18,6 +18,17 @@ class ProfileRepository implements IProfileRepository {
   }
 
   @override
+  Future<(List<PostMovieModel>?, bool)> getMyBookmarks({bool restart = false}) async {
+    try {
+      final result = (await profileService.getMyBookmarks(restart: restart));
+      return (result.$1?.map((e) => PostMovieModel.fromJson(e)).toList(), result.$2);
+    } catch (e) {
+      print(e);
+    }
+    return (<PostMovieModel>[], true);
+  }
+
+  @override
   Future<void> follow(int? id, bool follow) async {
     await profileService.follow(id, follow);
   }
@@ -28,7 +39,7 @@ class ProfileRepository implements IProfileRepository {
       final result = (await profileService.getUserPosts(id));
       return result
           .map(
-            (e) => PostMovieModel.fromJson(e),
+            (e) => PostMovieModel.fromJson(e, previewPrimary: true),
           )
           .toList();
     } catch (e) {
@@ -43,7 +54,7 @@ class ProfileRepository implements IProfileRepository {
       final result = (await profileService.getUserLists(id));
       return result
           .map(
-            (e) => ListBaseModel.fromJson(e),
+            (e) => ListBaseModel.fromJson(e, previewPrimary: true),
           )
           .toList();
     } catch (e) {

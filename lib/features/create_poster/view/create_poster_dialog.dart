@@ -6,7 +6,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
-import 'package:poster_stock/features/create_list/state_holders/chosen_cover_state_holder.dart';
 import 'package:poster_stock/features/create_list/view/create_list_dialog.dart';
 import 'package:poster_stock/features/create_poster/controller/create_poster_controller.dart';
 import 'package:poster_stock/features/create_poster/model/media_model.dart';
@@ -18,10 +17,6 @@ import 'package:poster_stock/features/create_poster/state_holder/create_poster_s
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_search_state_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
-import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
-import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
-import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
-import 'package:poster_stock/features/profile/state_holders/profile_posts_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class CreatePosterDialog extends ConsumerStatefulWidget {
@@ -107,6 +102,10 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
     if (widget.bookmark) constValue = 480;
     return WillPopScope(
       onWillPop: () async {
+        await showDialog(
+          context: context,
+          builder: (context) => const SizedBox(),
+        );
         ref.read(createPosterControllerProvider).choosePoster(null);
         ref.read(createPosterControllerProvider).chooseMovie(null);
         ref.read(createPosterControllerProvider).updateSearch('');
@@ -187,7 +186,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                             decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(2.0),
-                                              color: context.colors.fieldsDefault,
+                                              color:
+                                                  context.colors.fieldsDefault,
                                             ),
                                           ),
                                           const SizedBox(height: 22),
@@ -233,7 +233,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                         .updateSearch(value);
                                                   },
                                                 ),
-                                                if (chosenMovie?.startYear != null)
+                                                if (chosenMovie?.startYear !=
+                                                    null)
                                                   Positioned(
                                                     left: 50,
                                                     top: 0,
@@ -241,12 +242,13 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                     child: IgnorePointer(
                                                       ignoring: true,
                                                       child: Align(
-                                                        alignment:
-                                                            Alignment.centerLeft,
+                                                        alignment: Alignment
+                                                            .centerLeft,
                                                         child: Row(
                                                           children: [
                                                             Text(
-                                                              chosenMovie!.title,
+                                                              chosenMovie!
+                                                                  .title,
                                                               style: context
                                                                   .textStyles
                                                                   .bodyRegular!
@@ -256,7 +258,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                               ),
                                                             ),
                                                             Text(
-                                                              chosenMovie.startYear
+                                                              chosenMovie
+                                                                  .startYear
                                                                   .toString(),
                                                               style: context
                                                                   .textStyles
@@ -286,14 +289,16 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                       Positioned(
                                         right: 0,
                                         top: 70,
-                                        bottom: searchController.text.isEmpty ? 30: 0,
+                                        bottom: searchController.text.isEmpty
+                                            ? 30
+                                            : 0,
                                         child: GestureDetector(
                                           behavior: HitTestBehavior.opaque,
                                           onTap: () {
                                             searchController.clear();
                                             ref
                                                 .read(
-                                                createPosterControllerProvider)
+                                                    createPosterControllerProvider)
                                                 .updateSearch('');
                                           },
                                           child: Container(
@@ -385,8 +390,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                         child: Row(
                                           children: [
                                             SizedBox(
-                                              width: TextInfoService
-                                                          .textSize(
+                                              width: TextInfoService.textSize(
                                                         results[index].title,
                                                         context.textStyles
                                                             .bodyRegular!,
@@ -396,7 +400,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                               .width -
                                                           54 -
                                                           TextInfoService.textSize(
-                                                                  results[index].endYear ==
+                                                                  results[index]
+                                                                              .endYear ==
                                                                           null
                                                                       ? results[index]
                                                                           .startYear
@@ -411,7 +416,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                           .width -
                                                       54 -
                                                       TextInfoService.textSize(
-                                                              results[index].endYear ==
+                                                              results[index]
+                                                                          .endYear ==
                                                                       null
                                                                   ? results[index]
                                                                       .startYear
@@ -497,21 +503,26 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                           showDivider: false,
                           button: 'Add poster',
                           buttonAddCheck: chosenCover != null,
-                          buttonLoading: ref.watch(createPosterLoadingStateHolderProvider),
+                          buttonLoading:
+                              ref.watch(createPosterLoadingStateHolderProvider),
                           maxSymbols: 280,
                           controller: descController,
                           onTap: () async {
                             try {
-                              ref.read(createPosterLoadingStateHolderProvider
-                                  .notifier).updateValue(true);
+                              ref
+                                  .read(createPosterLoadingStateHolderProvider
+                                      .notifier)
+                                  .updateValue(true);
                               await ref
                                   .read(createPosterControllerProvider)
                                   .createPoster(descController.text);
-                            } catch (e) {
-                              print(e);
+                            } catch (_) {
+                              print(_);
                             }
-                            ref.read(createPosterLoadingStateHolderProvider
-                                .notifier).updateValue(false);
+                            ref
+                                .read(createPosterLoadingStateHolderProvider
+                                    .notifier)
+                                .updateValue(false);
                             if (context.mounted) {
                               Navigator.pop(context);
                               ref.read(menuControllerProvider).switchMenu();
@@ -521,25 +532,28 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                       ),
                     if (widget.bookmark)
                       Container(
-                          color: context.colors.backgroundsPrimary,
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                                bottom: MediaQuery.of(context).padding.bottom),
-                            child: Container(
-                              height: 36,
-                              color: context.colors.backgroundsPrimary,
-                              child: Row(
-                                children: [
-                                  const Spacer(),
-                                  AppTextButton(
-                                    text: "Add bookmark",
-                                    disabled: chosenMovie == null,
-                                  ),
-                                  const SizedBox(width: 16),
-                                ],
-                              ),
+                        color: context.colors.backgroundsPrimary,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).padding.bottom,
+                          ),
+                          child: Container(
+                            height: 36,
+                            color: context.colors.backgroundsPrimary,
+                            child: Row(
+                              children: [
+                                const Spacer(),
+                                AppTextButton(
+                                  text: "Add bookmark",
+                                  disabled: chosenMovie == null,
+                                  onTap: () {},
+                                ),
+                                const SizedBox(width: 16),
+                              ],
                             ),
-                          )),
+                          ),
+                        ),
+                      ),
                     Container(
                       height: MediaQuery.of(context).padding.bottom,
                       color: context.colors.backgroundsPrimary,
@@ -625,7 +639,7 @@ class ChoosePosterRadio extends ConsumerWidget {
             child: AnimatedContainer(
                 width: 22,
                 height: 22,
-                duration: Duration(milliseconds: 150),
+                duration: const Duration(milliseconds: 150),
                 decoration: BoxDecoration(
                   color: context.colors.backgroundsPrimary!
                       .withOpacity(chosenPoster?.$1 == index ? 1 : 0.4),
@@ -634,7 +648,7 @@ class ChoosePosterRadio extends ConsumerWidget {
                 child: chosenPoster?.$1 == index
                     ? Center(
                         child: AnimatedContainer(
-                          duration: Duration(milliseconds: 150),
+                          duration: const Duration(milliseconds: 150),
                           width: 4,
                           height: 4,
                           decoration: BoxDecoration(

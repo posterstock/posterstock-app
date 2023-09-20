@@ -127,7 +127,11 @@ class SignUpController {
         deviceId: deviceId,
         email: email
       );
-      token = await FirebaseMessaging.instance.getToken();
+      try {
+        token = await FirebaseMessaging.instance.getToken();
+      } catch (e) {
+        print(e);
+      }
     } catch (e) {
       codeErrorStateHolder.setValue("Wrong code");
     }
@@ -157,7 +161,11 @@ class SignUpController {
         login: username,
         email: email,
       );
-     token = await FirebaseMessaging.instance.getToken();
+     try {
+       token = await FirebaseMessaging.instance.getToken();
+     } catch (e) {
+       print(e);
+     }
     } catch (e) {
       codeErrorStateHolder.setValue("Wrong code");
     }
@@ -184,11 +192,8 @@ class SignUpController {
   }
 
   Future<void> registerNotification(String token) async {
-    print(330);
     final userToken = await SuperTokens.getAccessToken();
-    print(560);
     if (userToken == null) throw Exception();
-    print(34);
     await repository.registerNotification(token, userToken);
   }
 }

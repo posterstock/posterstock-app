@@ -50,19 +50,41 @@ class EditProfileApi {
           headers: {'Authorization': 'Bearer $token'},
         ),
         data: jsonEncode({
-          if (description != null)
-          "description": description,
+          if (description != null) "description": description,
           "name": name,
-          "username": username,
         }),
       );
+      try {
+        var r1 = await _dio.post(
+          'api/profiles/username/',
+          options: Options(
+            headers: {'Authorization': 'Bearer $token'},
+          ),
+          data: jsonEncode({
+            "username": username,
+          }),
+        );
+        print(r1.data);
+      } catch (e) {
+        print(e);
+      }
       if (avatar == null) return;
       Image? img = decodeImage(avatar);
+      Image? im = copyCrop(
+        img!,
+        x: 0,
+        y: ((img.height - img.width) ~/ 2 < 0
+            ? 0
+            : (img.height - img.width) ~/ 2),
+        width: img.width,
+        height: img.width,
+      );
+      im = copyResize(im, width: 300);
+      print(im.width);
 
-      var pnImage = encodePng(img!);
+      var pnImage = encodePng(im);
       FormData formData = FormData.fromMap({
-        "image":
-        MultipartFile.fromBytes(pnImage),
+        "image": MultipartFile.fromBytes(pnImage),
       });
       var responseImage = await _dio.post(
         'api/profiles/image/',

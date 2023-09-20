@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
+import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
@@ -120,6 +121,13 @@ class SettingsPage extends ConsumerWidget {
                   if (email != null)
                   SettingsButton(
                     onTap: () {
+                      scaffoldMessengerKey.currentState?.showSnackBar(
+                        SnackBars.build(
+                          context,
+                          null,
+                          'Сhanging the email is currently not possible. Please contact support.',
+                        ),
+                      );
                       /*ref.watch(router)!.push(
                         ChangeEmailRoute(),
                       );*/
@@ -359,11 +367,9 @@ class SettingsPage extends ConsumerWidget {
                             onTap: () async {
                               final prefs =
                                   await SharedPreferences.getInstance();
-                              await SuperTokens.signOut();
-                              print(90);
-                              print(await SuperTokens.getAccessToken());
-                              TokenKeeper.token = null;
                               await ref.read(signUpControllerProvider).removeFCMToken();
+                              await SuperTokens.signOut();
+                              TokenKeeper.token = null;
                               prefs.remove('token');
                               prefs.remove('google');
                               prefs.remove('apple');
@@ -423,7 +429,6 @@ class SettingsPage extends ConsumerWidget {
                       FutureBuilder(
                         future: PackageInfo.fromPlatform(),
                         builder: (context, snapshot) {
-                          print(snapshot.error);
                           return Text(
                             'Posterstock ${snapshot.data?.version ?? ''}',
                             textAlign: TextAlign.center,

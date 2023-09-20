@@ -3,33 +3,37 @@ import 'package:poster_stock/features/home/models/user_model.dart';
 class NotificationModel {
   final String id;
   final String image;
-  final String profileImage;
+  final String name;
+  final String? profileImage;
   final String deepLink;
   final String info;
-  final String time;
+  final DateTime time;
+  final String profileDeepLink;
 
   NotificationModel({
     required this.id,
     required this.image,
+    required this.name,
     required this.profileImage,
     required this.info,
     required this.time,
     required this.deepLink,
+    required this.profileDeepLink,
   });
 
   factory NotificationModel.fromJson(Map<String, Object?> json) {
+    print(json);
+    print('${json['text']} ${json['sent_at']} ${DateTime.fromMillisecondsSinceEpoch((json['sent_at'] as int) * 1000)} ${DateTime.now().toLocal()}');
     return NotificationModel(
       id: json.toString(),
-      info: json['text'] as String,
+      info: (json['text'] as String).replaceFirst(json['profile_name'] as String? ?? 'OLD NOTIFICATION', ''),
+      name: json['profile_name'] as String? ?? 'OLD NOTIFICATION ',
       image: json['entity_image'] as String,
-      profileImage: json['profile_image'] as String,
+      profileImage: (json['profile_image'] as String?) == "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp" ? null : json['profile_image'] as String?,
       deepLink: convertDeepLink(json['deep_link'] as String),
-      time: json['created_at'] == null
-          ? ''
-          : _getTimeString(
-        DateTime.fromMillisecondsSinceEpoch(
-            (json['sent_at'] as int) * 1000),
-      ),
+      time:
+          DateTime.fromMillisecondsSinceEpoch((json['sent_at'] as int) * 1000, isUtc: false),
+      profileDeepLink: json['user_deep_link'] as String,
     );
   }
 
@@ -49,8 +53,10 @@ class NotificationModel {
     return initLink;
   }
 
-  static String _getTimeString(DateTime date) {
+  static String getTimeString(DateTime date) {
     DateTime now = DateTime.now();
+    now = now.add(now.timeZoneOffset);
+    now = now.subtract(Duration(hours: 2));
     Duration diff = now.difference(date);
     if (diff.inDays > 30) {
       return "${diff.inDays ~/ 30} month${diff.inDays ~/ 30 > 1 ? "s" : ''} ago";
@@ -63,4 +69,5 @@ class NotificationModel {
     }
     return "Less than a minute ago";
   }
+
 }

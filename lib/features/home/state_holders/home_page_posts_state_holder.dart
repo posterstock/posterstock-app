@@ -42,8 +42,9 @@ class HomePagePostsStateHolder
       }
     }
     for (int i = 0; i < newState.length; i++) {
-      newState[i].sort((first, second) {
-        return first.timeDate.isAfter(second.timeDate) ? -1 : 1;
+      newState[i].sort((first,
+          second) {
+        return first.timeDate.isAfter(second.timeDate) ? 0 : 1;
       });
     }
     if (state == null) {
@@ -75,8 +76,6 @@ class HomePagePostsStateHolder
     for (int i = 0; i < (state?.length ?? 0); i++) {
       for (int j = 0; j < (state?[i].length ?? 0); j++) {
         if (state![i][j].id == id && state![i][j] is PostMovieModel) {
-          print("ABOBA");
-          print(value);
           var likes = state![i][j].likes;
           state![i][j] = state![i][j]
               .copyWith(liked: value, likes: value ? likes + 1 : likes - 1);
@@ -91,8 +90,6 @@ class HomePagePostsStateHolder
     for (int i = 0; i < (state?.length ?? 0); i++) {
       for (int j = 0; j < (state?[i].length ?? 0); j++) {
         if (state![i][j].id == id && state![i][j] is MultiplePostModel) {
-          print("ABOBA");
-          print(value);
           var likes = state![i][j].likes;
           state![i][j] = state![i][j]
               .copyWith(liked: value, likes: value ? likes + 1 : likes - 1);
@@ -175,7 +172,7 @@ class HomePagePostsStateHolder
     }
     for (int i = 0; i < newState.length; i++) {
       newState[i].sort((first, second) {
-        return first.timeDate.isAfter(second.timeDate) ? -1 : 1;
+        return first.timeDate.isAfter(second.timeDate) ? 0 : 1;
       });
     }
     if (state == null) {

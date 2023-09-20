@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/view/widgets/movie_card.dart';
@@ -30,20 +32,21 @@ class MultipleMovieCard extends ConsumerWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
             child: SizedBox(
-              height: 163,
+              height: (MediaQuery.of(context).size.width - 16.0 - 68.0) /
+    540 *
+    300,
               width: double.infinity,
-              child: Image.network(
-                post.image ?? '',
+              child: CachedNetworkImage(
+                imageUrl: post.image ?? '',
                 fit: BoxFit.cover,
-                errorBuilder: (context, obj, trace) {
+                placeholderFadeInDuration: Durations.cachedDuration,
+                fadeInDuration: Durations.cachedDuration,
+                fadeOutDuration: Durations.cachedDuration,
+                placeholder: (context, child) {
                   return shimmer;
                 },
-                loadingBuilder: (context, child, event) {
-                  if (event?.cumulativeBytesLoaded !=
-                      event?.expectedTotalBytes) {
-                    return shimmer;
-                  }
-                  return child;
+                errorWidget: (context, obj, trace) {
+                  return shimmer;
                 },
               ),
             ),

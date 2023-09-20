@@ -10,7 +10,7 @@ class UserListStateHolder extends StateNotifier<List<UserDetailsModel>?> {
   UserListStateHolder(super.state);
 
   Future<void> setState(List<UserDetailsModel>? users) async {
-    state = users;
+    state = [...?state, ...?users];
   }
 
   Future<void> clearState() async {

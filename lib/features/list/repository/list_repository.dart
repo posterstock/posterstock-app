@@ -17,8 +17,16 @@ class ListRepository {
     return Comment.fromJson(await service.postComment(id, text));
   }
 
+  Future<void> deleteComment(int postId, int id) async {
+    await service.deleteComment(postId, id);
+  }
+
   Future<MultiplePostModel> getPost(int id) async {
     print(18);
     return MultiplePostModel.fromJson(await service.getPost(id));
+  }
+
+  Future<void> deleteList(int id) async {
+    await service.deleteList(id);
   }
 }

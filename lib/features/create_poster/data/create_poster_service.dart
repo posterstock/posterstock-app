@@ -32,7 +32,7 @@ class CreatePosterService {
             "description": description,
             "media_id": mediaId,
             "media_type": mediaType,
-            "poster_image": image,
+            "poster_image": '/${image.split('/').last}',
           },
         ),
       );

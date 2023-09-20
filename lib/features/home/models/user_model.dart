@@ -32,7 +32,7 @@ class UserModel {
       name: json['name'] as String,
       username: json['username'] as String,
       imagePath: (json['image'] as String?) == "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp" ? null : json['image'] as String?,
-      followed: (json['followed'] as bool?) ?? false,
+      followed: (json['followed'] as bool?) ?? (json['is_following'] as bool?) ?? false,
       description: json['description'] as String?,
       color: avatar[(json['id'] as int) % 3],
     );

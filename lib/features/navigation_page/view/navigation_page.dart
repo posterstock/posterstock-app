@@ -16,15 +16,29 @@ import 'package:poster_stock/features/navigation_page/controller/menu_controller
 import 'package:poster_stock/features/navigation_page/state_holder/menu_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/previous_page_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/view/widgets/bottom_nav_bar.dart';
+import 'package:poster_stock/features/notifications/state_holders/notifications_count_state_holder.dart';
+import 'package:poster_stock/features/poster/state_holder/page_transition_controller_state_holder.dart';
+import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+final GlobalKey navigationKey = GlobalKey();
 
 @RoutePage()
 class NavigationPage extends ConsumerWidget {
-  const NavigationPage({Key? key}) : super(key: key);
+  NavigationPage({Key? key}) : super(key: navigationKey);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    Future(() async {
+      ref.read(profileControllerApiProvider).getUserInfo(null);
+      final prefs = await SharedPreferences.getInstance();
+      int count = prefs.getInt('notification_count') ?? 0;
+      ref
+          .read(notificationsCountStateHolderProvider.notifier)
+          .updateState(count);
+    });
     var rtr = ref.watch(router);
     rtr?.addListener(() {
       if (TokenKeeper.token == null) {
@@ -35,58 +49,72 @@ class NavigationPage extends ConsumerWidget {
         }
       }
     });
-    return AutoTabsRouter.pageView(
-      physics: const NeverScrollableScrollPhysics(),
-      routes: [
-        const PageRouteInfo(HomeRoute.name),
-        const PageRouteInfo(SearchRoute.name),
-        const NotificationsRoute(),
-        ProfileRoute()
-      ],
-      builder: (context, child, _) {
-        return WillPopScope(
-          onWillPop: () async {
-            final pages = ref.watch(previousPageStateHolderProvider);
-            if (pages.isEmpty) return true;
-            ref.read(menuControllerProvider).backToPage(context, ref);
-            return false;
-          },
-          child: Stack(
-            children: [
-              CustomScaffold(
-                bottomNavBar: const SafeArea(child: AppNavigationBar()),
-                child: AnnotatedRegion<SystemUiOverlayStyle>(
-                  value: SystemUiOverlayStyle(
-                    statusBarColor: Colors.transparent,
-                    statusBarIconBrightness:
-                        Theme.of(context).brightness == Brightness.light
-                            ? Brightness.dark
-                            : Brightness.light,
-                    statusBarBrightness: Theme.of(context).brightness,
-                  ),
-                  child: SafeArea(
-                    child: child,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    bottom: 57 + MediaQuery.of(context).padding.bottom,
-                  ),
-                  child: const Material(
-                    color: Colors.transparent,
-                    child: MenuWidget(),
-                  ),
-                ),
-              )
-            ],
+    final pageTransitionController =
+        ref.watch(pageTransitionControllerStateHolder)!;
+    return AnimatedBuilder(
+      animation: pageTransitionController,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(
+            -MediaQuery.of(context).size.width * 0.3 + pageTransitionController.value * MediaQuery.of(context).size.width * 0.3,
+            0,
           ),
+          child: child,
         );
       },
+      child: AutoTabsRouter.pageView(
+        physics: const NeverScrollableScrollPhysics(),
+        routes: [
+          const PageRouteInfo(HomeRoute.name),
+          const PageRouteInfo(SearchRoute.name),
+          const NotificationsRoute(),
+          ProfileRoute()
+        ],
+        builder: (context, child, _) {
+          return WillPopScope(
+            onWillPop: () async {
+              final pages = ref.watch(previousPageStateHolderProvider);
+              if (pages.isEmpty) return true;
+              ref.read(menuControllerProvider).backToPage(context, ref);
+              return false;
+            },
+            child: Stack(
+              children: [
+                CustomScaffold(
+                  bottomNavBar: const SafeArea(child: AppNavigationBar()),
+                  child: AnnotatedRegion<SystemUiOverlayStyle>(
+                    value: SystemUiOverlayStyle(
+                      statusBarColor: Colors.transparent,
+                      statusBarIconBrightness:
+                          Theme.of(context).brightness == Brightness.light
+                              ? Brightness.dark
+                              : Brightness.light,
+                      statusBarBrightness: Theme.of(context).brightness,
+                    ),
+                    child: SafeArea(
+                      child: child,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      bottom: 57 + MediaQuery.of(context).padding.bottom,
+                    ),
+                    child: const Material(
+                      color: Colors.transparent,
+                      child: MenuWidget(),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

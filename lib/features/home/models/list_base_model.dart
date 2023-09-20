@@ -13,11 +13,13 @@ class ListBaseModel {
     this.user,
   });
 
-  factory ListBaseModel.fromJson(Map<String, dynamic> json) {
+  factory ListBaseModel.fromJson(Map<String, dynamic> json, {bool previewPrimary = false}) {
+    final image = (previewPrimary ?
+    (json['preview_image'] as String? ?? json['image'] as String?) : (json['image'] as String? ?? json['preview_image'] as String?)) ?? '';
     return ListBaseModel(
       id: json['id'],
       title: json['title'],
-      image: json['image'],
+      image: image == 'https://api.posterstock.co/images/' ? 'https://api.posterstock.co/images/default_list_cover.png' : image,
     );
   }
 

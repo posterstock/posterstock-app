@@ -110,8 +110,12 @@ class AuthController {
       clientId: clientId,
       state: state,
     );
-    final token = await FirebaseMessaging.instance.getToken();
-    await registerNotification(token!);
+    try {
+      var token = await FirebaseMessaging.instance.getToken();
+      await registerNotification(token!);
+    } catch (e) {
+      print(e);
+    }
     var instance = await SharedPreferences.getInstance();
     instance.setBool('apple', true);
     main.apple = true;
@@ -128,8 +132,12 @@ class AuthController {
       idToken: idToken,
       code: code,
     );
-    final token = await FirebaseMessaging.instance.getToken();
-    await registerNotification(token!);
+    try {
+      var token = await FirebaseMessaging.instance.getToken();
+      await registerNotification(token!);
+    } catch (e) {
+      print(e);
+    }
     var instance = await SharedPreferences.getInstance();
     instance.setBool('google', true);
     main.google = true;

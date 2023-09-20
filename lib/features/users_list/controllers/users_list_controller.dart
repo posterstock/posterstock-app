@@ -11,6 +11,10 @@ final usersListControllerProvider = Provider<UsersListController>(
 class UsersListController {
   final UserListStateHolder userListStateHolder;
   final usersListRepository = UsersListRepository();
+  bool gotAll = false;
+  bool? followers;
+  int? id;
+  bool loading = false;
 
   UsersListController({
     required this.userListStateHolder,
@@ -18,16 +22,34 @@ class UsersListController {
 
   void clearUsers() {
     userListStateHolder.clearState();
+    usersListRepository.clear();
+    loading = false;
+    id = null;
+    followers = null;
+    print(this.id);
+    print(this.followers);
+    print('end1');
   }
 
   Future<void> getUsers({
     bool followers = false,
     required int id,
   }) async {
+    if (loading) return;
+    loading = true;
+    if (this.id != id || followers != this.followers) {
+      gotAll = false;
+      userListStateHolder.clearState();
+    }
+    this.id = id;
+    this.followers = followers;
+    if (gotAll) return;
     final users = await usersListRepository.getPosts(
       followers: followers,
       id: id,
     );
-    userListStateHolder.setState(users);
+    gotAll = users.$2;
+    userListStateHolder.setState(users.$1);
+    loading = false;
   }
 }

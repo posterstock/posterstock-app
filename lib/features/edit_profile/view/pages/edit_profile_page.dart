@@ -541,7 +541,6 @@ class _ProfileDescriptionFieldState
             setState(() {});
           },
           onTap: () {
-            print(screenHeight);
             if (screenHeight - 950 < 0) {
               EditProfilePage.animateScrollTo(950 - screenHeight, widget.controller);
             }

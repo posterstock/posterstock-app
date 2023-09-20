@@ -33,17 +33,8 @@ class AuthService {
           },
         ),
       );
-      print("THIS IS TOKEN SEND TO BACKEND");
-      print(response.data);
-      print(response.headers);
       return response.data;
     } on DioError catch (e) {
-      print("THIS IS TOKEN SEND TO BACKEND ERROR");
-      print(e.type);
-      print(e.response?.statusCode);
-      print(e.response?.statusMessage);
-      print(e.response?.data);
-      print(e.response?.headers);
       rethrow;
     }
   }
@@ -60,17 +51,8 @@ class AuthService {
           },
         ),
       );
-      print("THIS IS TOKEN REMOVE FROM BACKEND");
-      print(response.data);
-      print(response.headers);
       return response.data;
     } on DioError catch (e) {
-      print("THIS IS TOKEN REMOVE FROM BACKEND ERROR");
-      print(e.type);
-      print(e.response?.statusCode);
-      print(e.response?.statusMessage);
-      print(e.response?.data);
-      print(e.response?.headers);
       rethrow;
     }
   }
@@ -83,7 +65,6 @@ class AuthService {
     String? clientID,
     String? state,
   }) async {
-    print(code);
     try {
       final response = await _dio.post(
         'auth/signinup',
@@ -103,12 +84,8 @@ class AuthService {
           },
         }),
       );
-      print(response.data);
-      print(response.headers);
       return response.data;
     } on DioError catch (e) {
-      print(e.response?.data);
-      print(e.response?.headers);
       rethrow;
     }
   }
@@ -138,12 +115,8 @@ class AuthService {
           },
         }),
       );
-      print(response.data);
-      print(response.headers);
       return response.data;
     } on DioError catch (e) {
-      print(e.response?.data);
-      print(e.response?.headers);
       rethrow;
     }
   }

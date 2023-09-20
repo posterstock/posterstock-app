@@ -89,10 +89,29 @@ class CreatePosterController {
         image!.$2,
         description,
       );
-      if (profileInfoStateHolder != null) {
-        print("REBUILLDDDPoster");
-        profileControllerApi.getUserInfo(profileInfoStateHolder!.username);
-      }
+      profileControllerApi.getUserInfo(null);
+    } catch (e) {
+      print(e);
+    }
+    createPosterChoseMovieStateHolder.updateValue(null);
+    createPosterChosenPosterStateHolder.updateValue(null);
+    createPosterSearchStateHolder.updateValue('');
+    createPosterSearchListStateHolder.setValue(
+      null,
+    );
+    createPosterImagesStateHolder.setValue([]);
+  }
+
+  Future<void> createBookmark() async {
+    var mediaState = createPosterChoseMovieStateHolder.state;
+    var image = createPosterChosenPosterStateHolder.state;
+    try {
+      /*await createPosterRepository.createPoster(
+        mediaState!.id,
+        mediaState.type.name,
+        image!.$2
+      );*/
+      profileControllerApi.getUserInfo(null);
     } catch (e) {
       print(e);
     }

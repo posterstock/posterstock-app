@@ -10,13 +10,19 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/features/create_list/repository/create_list_repository.dart';
 import 'package:poster_stock/features/create_list/state_holders/chosen_cover_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/create_list_chosen_poster_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/gallery_index_state_holder.dart';
+import 'package:poster_stock/features/create_list/state_holders/list_search_posters_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/pick_cover_gallery_state_holder.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
+import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
+import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
+import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_posts_state_holder.dart';
+import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 final pickCoverControllerProvider = Provider<PickCoverController>(
@@ -31,20 +37,30 @@ final pickCoverControllerProvider = Provider<PickCoverController>(
     createListChosenPosterStateHolder: ref.watch(
       createListChosenPosterStateHolderProvider.notifier,
     ),
+    profileControllerApi: ref.watch(profileControllerApiProvider),
+    searchPostsStateHolder:
+        ref.watch(listSearchPostsStateHolderProvider.notifier),
+    myProfileInfoStateHolder: ref.watch(myProfileInfoStateHolderProvider.notifier),
   ),
 );
 
 class PickCoverController {
   final PickCoverGalleryStateHolder allImagesStateHolder;
+  final ListSearchPostsStateHolder searchPostsStateHolder;
   final ChosenCoverStateHolder chosenCoverStateHolder;
   final GalleryIndexStateHolder galleryIndexStateHolder;
   final List<(int, String)> createListChosenPosterState;
   final CreateListChosenPosterStateHolder createListChosenPosterStateHolder;
+  final ProfileControllerApi profileControllerApi;
+  final MyProfileInfoStateHolder myProfileInfoStateHolder;
   final repository = CreateListRepository();
+  bool gotAllPosts = false;
+  String? searchValue = null;
   List<int> loadingPages = [];
   int? max;
   List<String> paths = [];
   bool loading = false;
+  bool loadedAll = false;
 
   PickCoverController({
     required this.allImagesStateHolder,
@@ -52,6 +68,9 @@ class PickCoverController {
     required this.galleryIndexStateHolder,
     required this.createListChosenPosterState,
     required this.createListChosenPosterStateHolder,
+    required this.profileControllerApi,
+    required this.searchPostsStateHolder,
+    required this.myProfileInfoStateHolder,
   });
 
   void clearAll() {
@@ -65,69 +84,31 @@ class PickCoverController {
     required BuildContext context,
   }) async {
     try {
+      bool generated = chosenCoverStateHolder.state == null;
       Uint8List? image = await showScreenshot(context);
       bool? value = await repository.createList(
         title: title,
         description: description,
         posters: createListChosenPosterState.map((e) => e.$1).toList(),
         image: image,
+        generated: generated,
       );
+      profileControllerApi.getUserInfo(null);
       if (value == false) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.black.withOpacity(0.8),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0)),
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.all(8.0),
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-            content: Row(
-              children: [
-                SvgPicture.asset(
-                  'assets/images/dark_logo.svg',
-                  width: 36,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    'List not created',
-                    style: context.textStyles.bodyRegular!.copyWith(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBars.build(
+            context,
+            null,
+            'List not created',
           ),
         );
       }
     } catch (e) {
-      print(e);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.black.withOpacity(0.8),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
-          behavior: SnackBarBehavior.floating,
-          margin: EdgeInsets.all(8.0),
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          content: Row(
-            children: [
-              SvgPicture.asset(
-                'assets/images/dark_logo.svg',
-                width: 36,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  'Loading cover error. Default cover will be used.',
-                  style: context.textStyles.bodyRegular!.copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBars.build(
+          context,
+          null,
+          'Loading cover error. Default cover will be used.',
         ),
       );
     }
@@ -147,7 +128,6 @@ class PickCoverController {
       return File(chosenCoverStateHolder.state!).readAsBytesSync();
     }
     int width = MediaQuery.of(context).size.width.toInt();
-    int height = MediaQuery.of(context).size.height.toInt();
     Widget widget;
     List<String> images = createListChosenPosterState.map((e) => e.$2).toList();
     List<Uint8List> data = [];
@@ -162,32 +142,11 @@ class PickCoverController {
         await precacheImage(MemoryImage(wid.data as Uint8List), context);
         data.add(wid.data as Uint8List);
       } catch (e) {
-        print(e);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.black.withOpacity(0.8),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0)),
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.all(8.0),
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-            content: Row(
-              children: [
-                SvgPicture.asset(
-                  'assets/images/dark_logo.svg',
-                  width: 36,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    'Loading cover error. Default cover will be used.',
-                    style: context.textStyles.bodyRegular!.copyWith(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBars.build(
+            context,
+            null,
+            'Loading cover error. Default cover will be used.',
           ),
         );
         return null;
@@ -230,10 +189,8 @@ class PickCoverController {
           rethrow;
         }
       }
-      print(18);
       return im;
     } else {
-      print("unmount");
       throw Exception();
     }
   }
@@ -261,12 +218,11 @@ class PickCoverController {
       end: page + 30,
       type: RequestType.image,
     );
-    print("BOBA${assets.length} ${max} $page");
     List<String> files = [];
     try {
       for (var future in assets) {
         var path = (await future.fileWithSubtype.timeout(
-          Duration(seconds: 5),
+          const Duration(seconds: 5),
         ))
             ?.path;
         if (path != null) {
@@ -281,9 +237,30 @@ class PickCoverController {
       );
     } catch (e) {
       loading = false;
-      print("EEERRROOOR");
-      print(e);
     }
     loading = false;
+  }
+
+  Future<void> updateSearch(String value) async {
+    gotAllPosts = false;
+    bool stop = false;
+    if (searchValue != value) {
+      loadedAll = false;
+      searchPostsStateHolder.clearState();
+    }
+    searchValue = value;
+    await Future.delayed(const Duration(milliseconds: 500), () {
+      if (searchValue != value) {
+        loadedAll = false;
+        stop = true;
+      }
+    });
+    if (loadedAll) return;
+    if (stop) return;
+    final list = await repository.searchPosts(value, myProfileInfoStateHolder.state!.id);
+    loadedAll = list.$2;
+    if (searchValue == value) {
+      searchPostsStateHolder.updateState(list.$1);
+    }
   }
 }

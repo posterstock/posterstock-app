@@ -8,12 +8,14 @@ class MultiplePostSingleModel {
   final String years;
   final String image;
   final String title;
+  final String? description;
 
   MultiplePostSingleModel({
     required this.id,
     required this.years,
     required this.image,
     required this.title,
+    this.description,
   });
 
   factory MultiplePostSingleModel.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,7 @@ class MultiplePostSingleModel {
           : '${json['start_year']} - ${json['end_year']}',
       image: json['preview_image'] as String,
       title: json['title'] as String,
+      description: json['description'] as String,
     );
   }
 }
@@ -56,14 +59,15 @@ class MultiplePostModel extends PostBaseModel {
           description: description,
         );
 
-  factory MultiplePostModel.fromJson(Map<String, Object?> json) {
-    print("ZHOPA");
-    print(json);
+  factory MultiplePostModel.fromJson(Map<String, Object?> json, {bool previewPrimary = false}) {
     const List<Color> avatar = [
       Color(0xfff09a90),
       Color(0xfff3d376),
       Color(0xff92bdf4),
     ];
+    final img = (previewPrimary ?
+    (json['preview_image'] as String? ?? json['image'] as String?) : (json['image'] as String? ?? json['preview_image'] as String?)) ?? '';
+    final image = img == 'https://api.posterstock.co/images/' ? 'https://api.posterstock.co/images/default_list_cover.png' : img;
     return MultiplePostModel(
       id: json['id'] as int,
       name: json['title'] as String,
@@ -89,7 +93,7 @@ class MultiplePostModel extends PostBaseModel {
             (e) => MultiplePostSingleModel.fromJson(e),
           )
           .toList() ?? [],
-      image: json['image'] as String?,
+      image: image,
     );
   }
 

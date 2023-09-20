@@ -43,7 +43,6 @@ class PostBase extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print(key);
     final anyPost = index == null
         ? null
         : ref.watch(homePagePostsStateHolderProvider)?[index!];
@@ -115,6 +114,8 @@ class PostBase extends ConsumerWidget {
                         time: post?[0].time ?? multPost?.time,
                         user: user,
                         showFollowButton: poster == null,
+                        type: post == null ? InfoDialogType.list : InfoDialogType.post,
+                        entityId: post?[0].id ?? multPost?.id ?? -1,
                       ),
                     )
                   ],
@@ -155,6 +156,10 @@ class UserInfoTile extends ConsumerWidget {
     this.showSettings = true,
     this.behavior,
     this.controller,
+    this.onInfoTap,
+    required this.type,
+    required this.entityId,
+    this.myEntity,
   }) : super(key: key);
 
   final bool loading;
@@ -165,30 +170,28 @@ class UserInfoTile extends ConsumerWidget {
   final bool showSettings;
   final HitTestBehavior? behavior;
   final ScrollController? controller;
+  final void Function()? onInfoTap;
+  final InfoDialogType type;
+  final int entityId;
+  final bool? myEntity;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ShimmerLoader(
       loaded: !loading,
-      child: GestureDetector(
-        behavior: behavior,
-        onVerticalDragUpdate: (v) {
-          if (controller != null) {
-            controller!.jumpTo((controller!.offset ?? 0) - v.delta.dy);
-          }
-        },
+      child: InkWell(
         onTap: () {
           if (user == null) return;
           ref.watch(router)!.pushNamed(
               '/${user!.username}'
           );
         },
-        child: Container(
-          color: Colors.transparent,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            IgnorePointer(
+              ignoring: true,
+              child: Padding(
                 padding: const EdgeInsets.only(top: 4.0),
                 child: CircleAvatar(
                   radius: 20,
@@ -206,144 +209,150 @@ class UserInfoTile extends ConsumerWidget {
                       : const SizedBox(),
                 ),
               ),
-              const SizedBox(
-                width: 12,
-              ),
-              Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: 40,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: (showFollowButton) &&
-                                    (!(user?.followed ?? true))
-                                ? MediaQuery.of(context).size.width -
-                                    70 -
-                                    179 +
-                                    42
-                                : null,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                ExpandChecker(
-                                  expand: (showFollowButton) &&
-                                      (!(user?.followed ?? true)),
-                                  child: TextOrContainer(
-                                    text: user?.name,
-                                    style: context.textStyles.calloutBold!
-                                        .copyWith(
-                                            color: darkBackground
-                                                ? context
-                                                    .colors.textsBackground!
-                                                : context.colors.textsPrimary),
-                                    emptyWidth: 146,
-                                    emptyHeight: 17,
-                                    overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(
+              width: 12,
+            ),
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 40,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: (showFollowButton) &&
+                                  (!(user?.followed ?? true))
+                              ? MediaQuery.of(context).size.width -
+                                  70 -
+                                  179 +
+                                  42
+                              : null,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              ExpandChecker(
+                                expand: (showFollowButton) &&
+                                    (!(user?.followed ?? true)),
+                                child: TextOrContainer(
+                                  text: user?.name,
+                                  style: context.textStyles.calloutBold!
+                                      .copyWith(
+                                          color: darkBackground
+                                              ? context
+                                                  .colors.textsBackground!
+                                              : context.colors.textsPrimary),
+                                  emptyWidth: 146,
+                                  emptyHeight: 17,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 12,
+                              ),
+                              if (!((showFollowButton) &&
+                                  (!(user?.followed ?? true))))
+                                Text(
+                                  time ?? '',
+                                  style:
+                                      context.textStyles.footNote!.copyWith(
+                                    color: darkBackground
+                                        ? context.colors.textsBackground!
+                                            .withOpacity(0.8)
+                                        : context.colors.textsDisabled,
                                   ),
                                 ),
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                if (!((showFollowButton) &&
-                                    (!(user?.followed ?? true))))
-                                  Text(
-                                    time ?? '',
-                                    style:
-                                        context.textStyles.footNote!.copyWith(
-                                      color: darkBackground
-                                          ? context.colors.textsBackground!
-                                              .withOpacity(0.8)
-                                          : context.colors.textsDisabled,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                          if (loading)
-                            SizedBox(
-                              height: 3,
-                            ),
-                          if (!loading) Spacer(),
-                          TextOrContainer(
-                            text: user?.username == null
-                                ? null
-                                : '@${user!.username}',
-                            style: context.textStyles.caption1!.copyWith(
-                              color: darkBackground
-                                  ? context.colors.textsBackground!
-                                      .withOpacity(0.8)
-                                  : context.colors.textsSecondary,
-                            ),
-                            emptyWidth: 120,
-                            emptyHeight: 12,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (!(user?.followed ?? true) && (!loading) && showFollowButton)
-                SizedBox(
-                  width: TextInfoService.textSize(
-                              AppLocalizations.of(context)!.follow,
-                              context.textStyles.calloutBold!)
-                          .width +
-                      32,
-                  child: AppTextButton(
-                    text: AppLocalizations.of(context)!.follow,
-                    onTap: () async {
-                      print(1);
-                      ref.read(homePagePostsControllerProvider).setFollowId(
-                            user!.id,
-                            user!.followed,
-                          );
-                      await ref.read(profileControllerApiProvider).follow(
-                            user!.id,
-                            user!.followed,
-                          );
-                    },
-                  ),
-                ),
-              if (!loading && showSettings)
-                GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                      context: context,
-                      backgroundColor: Colors.transparent,
-                      isScrollControlled: true,
-                      builder: (context) => GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          color: Colors.transparent,
-                          child: OtherProfileDialog(
-                            user1: user!,
+                            ],
                           ),
                         ),
-                      ),
-                    );
+                        if (loading)
+                          SizedBox(
+                            height: 3,
+                          ),
+                        if (!loading) Spacer(),
+                        TextOrContainer(
+                          text: user?.username == null
+                              ? null
+                              : '@${user!.username}',
+                          style: context.textStyles.caption1!.copyWith(
+                            color: darkBackground
+                                ? context.colors.textsBackground!
+                                    .withOpacity(0.8)
+                                : context.colors.textsSecondary,
+                          ),
+                          emptyWidth: 120,
+                          emptyHeight: 12,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (!(user?.followed ?? true) && (!loading) && showFollowButton)
+              SizedBox(
+                width: TextInfoService.textSize(
+                            AppLocalizations.of(context)!.follow,
+                            context.textStyles.calloutBold!)
+                        .width +
+                    32,
+                child: AppTextButton(
+                  text: AppLocalizations.of(context)!.follow,
+                  onTap: () async {
+                    ref.read(homePagePostsControllerProvider).setFollowId(
+                          user!.id,
+                          user!.followed,
+                        );
+                    await ref.read(profileControllerApiProvider).follow(
+                          user!.id,
+                          user!.followed,
+                        );
                   },
-                  child: Container(
-                    color: Colors.transparent,
-                    padding: const EdgeInsets.fromLTRB(16.0, 5.0, 0.0, 5.0),
-                    child: SvgPicture.asset(
-                      'assets/icons/ic_dots.svg',
-                      width: 24,
-                      colorFilter: ColorFilter.mode(
-                        context.colors.iconsLayer!,
-                        BlendMode.srcIn,
+                ),
+              ),
+            if (!loading && showSettings)
+              GestureDetector(
+                onTap: () {
+                  if (onInfoTap != null) {
+                    onInfoTap!();
+                    return;
+                  }
+                  showModalBottomSheet(
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    isScrollControlled: true,
+                    builder: (context) => GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        color: Colors.transparent,
+                        child: OtherProfileDialog(
+                          user1: user!,
+                          type: type,
+                          entityId: entityId,
+                          myEntity: myEntity,
+                        ),
                       ),
+                    ),
+                  );
+                },
+                child: Container(
+                  color: Colors.transparent,
+                  padding: const EdgeInsets.fromLTRB(16.0, 5.0, 0.0, 5.0),
+                  child: SvgPicture.asset(
+                    'assets/icons/ic_dots.svg',
+                    width: 24,
+                    colorFilter: ColorFilter.mode(
+                      context.colors.iconsLayer!,
+                      BlendMode.srcIn,
                     ),
                   ),
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
       ),
     );

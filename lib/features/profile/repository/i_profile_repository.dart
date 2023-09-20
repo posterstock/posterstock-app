@@ -12,4 +12,6 @@ abstract class IProfileRepository {
   Future<List<ListBaseModel>?> getProfileLists(int? id);
 
   Future<void> follow(int? id, bool follow);
+
+  Future<(List<PostMovieModel>?, bool)> getMyBookmarks({bool restart = false});
 }

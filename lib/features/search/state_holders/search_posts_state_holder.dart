@@ -24,6 +24,15 @@ class SearchPostsStateHolder extends StateNotifier<List<PostMovieModel>?> {
     state = [...?state];
   }
 
+  void deleteId(int id) {
+    for (int i = 0; i < (state?.length ?? 0); i++) {
+      if (state![i].id == id) {
+        state?.removeAt(i);
+      }
+    }
+    state = [...?state];
+  }
+
   void setState(List<PostMovieModel>? newValue) {
     state = newValue;
   }

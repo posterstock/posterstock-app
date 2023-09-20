@@ -3,7 +3,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
+import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
+import 'package:poster_stock/features/notifications/state_holders/notifications_count_state_holder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../main.dart';
@@ -14,7 +18,6 @@ const String darwinNotificationCategoryPlain = 'plainCategory';
 String? initLink;
 
 void bgHandler (NotificationResponse response, StackRouter? router) {
-  print("HOLY CRAP");
   var splittedUrl = response.payload?.split('/') ?? [];
   bool hasHttp = splittedUrl[0].startsWith('http');
   splittedUrl.removeAt(0);
@@ -51,13 +54,11 @@ const DarwinInitializationSettings initializationSettingsDarwin =
 @pragma('vm:entry-point')
 void onDidReceiveLocalNotification(
     int? id, String? title, String? body, String? payload) async {
-  print("onDidReceiveLocalNotification");
   // display a dialog with the notification details, tap ok to go to another page
   initLink = payload;
 }
 
-Future<void> initPushes(StackRouter? router) async {
-  print('ABOBA');
+Future<void> initPushes(StackRouter? routerLocal, WidgetRef ref) async {
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
     alert: true,
     badge: true,
@@ -80,29 +81,20 @@ Future<void> initPushes(StackRouter? router) async {
 
   /// Слушатель получения пушей из Firebase
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    debugPrint('Got a message whilst in the foreground!');
-    debugPrint('Message data: ${message.data}');
-    debugPrint('Message n: ${message.notification}');
-
-    showPush(message);
+    showPush(message, ref: ref);
   });
 
   FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
-    debugPrint('Got a message whilst in the foreground!');
-    debugPrint('Message data: ${message.data}');
-    debugPrint('Message n: ${message.notification}');
 
-    showPush(message);
+    showPush(message, ref: ref);
   });
 
   FirebaseMessaging.instance.getInitialMessage().then((value) {
     flutterLocalNotificationsPlugin
         .getNotificationAppLaunchDetails()
         .then((value) async {
-      print("HIVAVA");
-      print(value);
       if (value?.didNotificationLaunchApp != true) return;
-      bgHandler(value!.notificationResponse!, router);
+      bgHandler(value!.notificationResponse!, routerLocal);
     });
   });
 
@@ -112,12 +104,8 @@ Future<void> initPushes(StackRouter? router) async {
     initializationSettings,
     //onDidReceiveBackgroundNotificationResponse: bgHandler,
     onDidReceiveNotificationResponse: (response) {
-      print('RECIEVED');
-      if (router != null) {
-        for (var a in router.stack) {
-          print(a.routeData.path);
-        }
-        router.pushNamed(response.payload!);
+      if (routerLocal != null) {
+        routerLocal.pushNamed(response.payload!);
       }
     }
   );
@@ -125,9 +113,7 @@ Future<void> initPushes(StackRouter? router) async {
 
 /// Метод который показывает сам пуш. По дефолту сделано, чтобы показывало все с
 /// поля notification, но можно всё поменять на data
-void showPush(RemoteMessage message) async {
-  print(message.notification);
-  print(message.data);
+void showPush(RemoteMessage message, {WidgetRef? ref}) async {
   flutterLocalNotificationsPlugin.show(
     message.hashCode,
     message.data['text'].split(' ')[0],
@@ -146,6 +132,11 @@ void showPush(RemoteMessage message) async {
     ),
     payload: message.data['deep_link'],
   );
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.reload();
+  int count = prefs.getInt('notification_count') ?? 0;
+  prefs.setInt('notification_count', count + 1);
+  ref?.read(notificationsCountStateHolderProvider.notifier).updateState(count + 1);
 }
 
 const DarwinNotificationDetails iosNotificationDetails =

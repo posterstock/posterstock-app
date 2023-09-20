@@ -13,6 +13,10 @@ class PosterStateHolder extends StateNotifier<PostMovieModel?> {
     state = post;
   }
 
+  Future<void> updateBookmarked(bool bookmarked) async {
+    state = state?.copyWith(hasBookmarked: bookmarked);
+  }
+
   Future<void> clear() async {
     state = null;
   }

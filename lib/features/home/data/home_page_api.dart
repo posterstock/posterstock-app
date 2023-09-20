@@ -43,32 +43,21 @@ class HomePageApi implements IHomePageApi {
   @override
   Future<(Map<String, dynamic>?, bool)?> getPosts(
       {bool getNewPosts = false}) async {
-    print(122324);
-    print(getNewPosts);
     if (loadedAll && !getNewPosts) return null;
     try {
-      print(token);
       final response = await _dio.get('api/feed/',
           options: Options(headers: {'Authorization': 'Bearer $token'}),
           queryParameters: {
             'cursor': getNewPosts ? null : postsCursor,
           });
-      print(2123213);
       if (!getNewPosts && !(response.data['has_more'] as bool)) {
         loadedAll = true;
       } else if (!getNewPosts) {
         loadedAll = false;
       }
       if (!getNewPosts) postsCursor = response.data['next_cursor'] as String?;
-      print(response.data['entries'].forEach(
-          (value) => value.forEach((key, value) => print('$key:$value'))));
-      print(response.data['entries']
-          .forEach((el) => print('SS${el['is_suggested']}')));
       return (response.data as Map<String, dynamic>?, loadedAll);
     } on DioError catch (e) {
-      print(122314);
-      print(e.response);
-      print(e.response?.headers);
       rethrow;
     }
   }
@@ -83,7 +72,6 @@ class HomePageApi implements IHomePageApi {
             headers: {'Authorization': 'Bearer $token'},
           ),
         );
-        print(response);
       } else {
         var response = await _dio.post(
           'api/posters/$id/unlike/',
@@ -91,10 +79,8 @@ class HomePageApi implements IHomePageApi {
             headers: {'Authorization': 'Bearer $token'},
           ),
         );
-        print(response);
       }
     } on DioError catch (e) {
-      print(e.response);
       rethrow;
     }
   }
@@ -109,7 +95,6 @@ class HomePageApi implements IHomePageApi {
             headers: {'Authorization': 'Bearer $token'},
           ),
         );
-        print(response);
       } else {
         var response = await _dio.post(
           'api/lists/$id/unlike/',
@@ -117,10 +102,8 @@ class HomePageApi implements IHomePageApi {
             headers: {'Authorization': 'Bearer $token'},
           ),
         );
-        print(response);
       }
     } on DioError catch (e) {
-      print(e.response);
       rethrow;
     }
   }

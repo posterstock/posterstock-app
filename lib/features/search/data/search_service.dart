@@ -23,7 +23,7 @@ class SearchService {
     _dio.interceptors.add(SuperTokensInterceptorWrapper(client: _dio));
   }
 
-  Future<(List<dynamic>, bool)> searchUsers(String searchValue) async {
+  Future<(List<dynamic>?, bool)> searchUsers(String searchValue) async {
     if (searchValue.isEmpty) return ([], false);
     token = await SuperTokens.getAccessToken();
     try {
@@ -44,14 +44,14 @@ class SearchService {
       print(response.data);
       gotAllUsers = !response.data['has_more'];
       nextCursorUsers = response.data['next_cursor'];
-      return (response.data['users'] as List<dynamic>, gotAllUsers);
+      return (response.data['users'] as List<dynamic>?, gotAllUsers);
     } on DioError catch (e) {
       print(e.response);
       rethrow;
     }
   }
 
-  Future<(List<dynamic>, bool)> searchPosters(String searchValue) async {
+  Future<(List<dynamic>?, bool)> searchPosters(String searchValue) async {
     if (searchValue.isEmpty) return ([], false);
     token = await SuperTokens.getAccessToken();
     try {
@@ -72,14 +72,14 @@ class SearchService {
       gotAllPosts = !response.data['has_more'];
       nextCursorPosts = response.data['next_cursor'];
       print(response.data);
-      return (response.data['posters'] as List<dynamic>, gotAllPosts);
+      return (response.data['posters'] as List<dynamic>?, gotAllPosts);
     } on DioError catch (e) {
       print(e.response);
       rethrow;
     }
   }
 
-  Future<(List<dynamic>, bool)> searchLists(String searchValue) async {
+  Future<(List<dynamic>?, bool)> searchLists(String searchValue) async {
     if (searchValue.isEmpty) return ([], false);
     token = await SuperTokens.getAccessToken();
     try {
@@ -99,8 +99,7 @@ class SearchService {
           });
       gotAllLists = !response.data['has_more'];
       nextCursorLists = response.data['next_cursor'];
-      print(response.data);
-      return (response.data['lists'] as List<dynamic>, gotAllLists);
+      return (response.data['lists'] as List<dynamic>?, gotAllLists);
     } on DioError catch (e) {
       print(e.response);
       rethrow;

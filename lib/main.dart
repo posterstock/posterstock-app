@@ -16,6 +16,7 @@ import 'package:poster_stock/common/constants/languages.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/helpers/custom_scroll_behavior.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
+import 'package:poster_stock/features/poster/state_holder/page_transition_controller_state_holder.dart';
 import 'package:poster_stock/features/settings/controllers/app_language_controller.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
@@ -51,43 +52,61 @@ void main() async {
   SuperTokens.init(
     apiDomain: 'https://api.posterstock.co/',
   );
+  try {
+    PhotoManager.clearFileCache();
+  } catch (e) {
+    debugPrint(e.toString());
+  }
+  try {
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestPermission();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  } catch (e) {
+    debugPrint(e.toString());
+  }
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    TokenKeeper.token =
+        prefs.getString('token') == '' ? null : prefs.getString('token');
+    initTheme = prefs.getString('theme');
+    google = prefs.getBool('google') ?? false;
+    apple = prefs.getBool('apple') ?? false;
+    email = prefs.getString('email');
+  } catch (e) {
+    debugPrint(e.toString());
+  }
 
-  PhotoManager.clearFileCache();
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.requestPermission();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  final fcmToken = await FirebaseMessaging.instance.getToken();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  final prefs = await SharedPreferences.getInstance();
-  debugPrint("FCM TOKEN $fcmToken");
-  TokenKeeper.token =
-      prefs.getString('token') == '' ? null : prefs.getString('token');
-  var instance = await SharedPreferences.getInstance();
-  initTheme = instance.getString('theme');
-  google = instance.getBool('google') ?? false;
-  apple = instance.getBool('apple') ?? false;
-  email = instance.getString('email');
-
-  runApp(ProviderScope(child: App()));
+  runApp(const ProviderScope(child: App()));
 }
 
-class App extends ConsumerWidget {
-  App({Key? key}) : super(key: key);
+class App extends ConsumerStatefulWidget {
+  const App({Key? key}) : super(key: key);
 
-  AppRouter? _appRouter;
+  static AppRouter? _appRouter;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    if (_appRouter == null) {
-      _appRouter = AppRouter();
-      initPushes(_appRouter!);
+  ConsumerState<App> createState() => _AppState();
+}
+
+class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
+  late final AnimationController pageTransitionController = AnimationController(
+    vsync: this,
+    value: 1,
+    duration: Duration.zero,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    if (App._appRouter == null) {
+      App._appRouter = AppRouter();
+      initPushes(App._appRouter!, ref);
     }
     if (initTheme != null) {
-      print(initTheme);
       if (initTheme == 'Themes.dark') {
         Future(() {
           ref
@@ -124,8 +143,7 @@ class App extends ConsumerWidget {
     List<Locale> locales = langs.map((e) => e.locale).toList();
     if (rtr == null) {
       Future(() {
-        print("HEELL NOOO");
-        ref.read(router.notifier).setRouter(_appRouter);
+        ref.read(router.notifier).setRouter(App._appRouter);
       });
     }
     if (appLocale == null) {
@@ -141,11 +159,12 @@ class App extends ConsumerWidget {
         }
       });
     }
+    ref.read(pageTransitionControllerStateHolder.notifier).updateState(pageTransitionController);
     return MaterialApp.router(
-      routerConfig: _appRouter!.config(deepLinkBuilder: (deepLink) {
+      routerConfig: App._appRouter!.config(deepLinkBuilder: (deepLink) {
         if (initLink != null) {
           var route =
-              _appRouter!.matcher.match(initLink!)?[0].toPageRouteInfo();
+              App._appRouter!.matcher.match(initLink!)?[0].toPageRouteInfo();
           if (route != null) {
             if (route is NavigationRoute) return DeepLink([route]);
             return DeepLink([AuthRoute(), route, ...?route.initialChildren]);

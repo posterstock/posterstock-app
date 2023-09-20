@@ -293,7 +293,7 @@ class AuthPage extends ConsumerWidget {
           );
       if (success && context.mounted) {
         ref.watch(router)!.pushAndPopUntil(
-          const NavigationRoute(),
+          NavigationRoute(),
           predicate: (route) {
             return false;
           },
@@ -301,7 +301,6 @@ class AuthPage extends ConsumerWidget {
       }
       ref.read(authControllerProvider).stopLoading();
     } catch (e) {
-      print(e);
       ref.read(authControllerProvider).stopLoading();
     }
   }
@@ -323,7 +322,6 @@ class AuthPage extends ConsumerWidget {
       );
       var result = await googleSignIn.signIn();
       var tokens = await result?.authentication;
-      print(tokens?.accessToken);
       bool success = await ref.read(authControllerProvider).authGoogle(
             accessToken: tokens?.accessToken,
             idToken: tokens?.idToken,
@@ -332,14 +330,13 @@ class AuthPage extends ConsumerWidget {
           );
       if (success && context.mounted) {
         ref.watch(router)!.pushAndPopUntil(
-          const NavigationRoute(),
+          NavigationRoute(),
           predicate: (route) {
             return false;
           },
         );
       }
     } catch (e) {
-      print(e);
       ref.read(authControllerProvider).stopLoading();
     }
     ref.read(authControllerProvider).stopLoading();
@@ -363,7 +360,6 @@ class AuthPage extends ConsumerWidget {
         }
         if (!exists) {
           ref.watch(router)!.pushNamed('/auth/sign_up').then((value) {
-            print(value);
             ref.read(authControllerProvider).stopLoading();
             ref.read(signUpControllerProvider)
               ..setName('')

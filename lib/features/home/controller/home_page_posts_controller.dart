@@ -34,7 +34,7 @@ class HomePagePostsController {
         await homePagePostsState.updateStateEnd(result?.$1);
       }
     } catch (e) {
-      print("ss$e");
+      print(e);
     }
     gettingPosts = false;
   }

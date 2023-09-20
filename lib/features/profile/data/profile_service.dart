@@ -4,6 +4,8 @@ import 'package:poster_stock/common/data/dio_keeper.dart';
 class ProfileService {
   final Dio _dio = DioKeeper.getDio();
 
+  String? bookmarksCursor;
+
   Future<List<Map<String, dynamic>>> getUserPosts(int? id) async {
     final response = await _dio.get(
       'api/posters/users/$id',
@@ -30,14 +32,28 @@ class ProfileService {
     return result;
   }
 
+  Future<(List<dynamic>?, bool)> getMyBookmarks({bool restart = false}) async {
+    if (restart) {
+      bookmarksCursor = null;
+    }
+    final response = await _dio.get(
+      'api/bookmarks/my',
+      queryParameters: {
+        'cursor' : bookmarksCursor,
+      }
+    );
+    bookmarksCursor = response.data['next_cursor'];
+    return (response.data['entries'] as List<dynamic>?, !response.data['has_more']);
+  }
+
   @override
   Future<Map<String, dynamic>> getProfileInfo(dynamic id) async {
+    print(id);
+    print('fewf');
     try {
-      print('AA$id');
       if (id == null) {
-        print('ABOA');
+        print("NULL");
         try {
-          print(17);
           final response = await _dio.get(
             'api/profiles/',
             options: Options(
@@ -53,11 +69,13 @@ class ProfileService {
       }
       Response response;
       if (id is String) {
+        print("STRING");
         response = await _dio.get(
           'api/users/u/$id',
           options: Options(headers: {}),
         );
       } else {
+        print("INT");
         response = await _dio.get(
           'api/users/$id',
           options: Options(headers: {}),
