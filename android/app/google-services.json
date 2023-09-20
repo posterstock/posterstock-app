@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "405674784124-buqlusrif3nur8sqk7li6u1ruq6votji.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.thedirection.posterstock",
+            "certificate_hash": "56cc53244aa6f797683100482646612014335654"
+          }
+        },
+        {
           "client_id": "405674784124-d5duv0tpgj9q88sd08bu1md6plu0hj6b.apps.googleusercontent.com",
           "client_type": 3
         }

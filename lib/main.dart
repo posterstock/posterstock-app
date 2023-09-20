@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -16,7 +18,6 @@ import 'package:poster_stock/common/constants/languages.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/helpers/custom_scroll_behavior.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
-import 'package:poster_stock/features/poster/state_holder/page_transition_controller_state_holder.dart';
 import 'package:poster_stock/features/settings/controllers/app_language_controller.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
@@ -52,6 +53,7 @@ void main() async {
   SuperTokens.init(
     apiDomain: 'https://api.posterstock.co/',
   );
+
   try {
     PhotoManager.clearFileCache();
   } catch (e) {
@@ -60,19 +62,24 @@ void main() async {
   try {
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+        AndroidFlutterLocalNotificationsPlugin>()
         ?.requestPermission();
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
   } catch (e) {
     debugPrint(e.toString());
   }
   try {
     final prefs = await SharedPreferences.getInstance();
     TokenKeeper.token =
-        prefs.getString('token') == '' ? null : prefs.getString('token');
+    prefs.getString('token') == '' ? null : prefs.getString('token');
     initTheme = prefs.getString('theme');
     google = prefs.getBool('google') ?? false;
     apple = prefs.getBool('apple') ?? false;
@@ -107,6 +114,7 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
       initPushes(App._appRouter!, ref);
     }
     if (initTheme != null) {
+      print(initTheme);
       if (initTheme == 'Themes.dark') {
         Future(() {
           ref
