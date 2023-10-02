@@ -278,10 +278,10 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         color: context.colors.textsAction!,
                       ),
                       onTap: () async {
-                        bool success = await ref
+                        await ref
                             .read(signUpControllerProvider)
                             .processAuth();
-                        if (success && context.mounted) {
+                        if (context.mounted) {
                           ref.watch(router)!.pushAndPopUntil(
                             NavigationRoute(),
                             predicate: (route) {

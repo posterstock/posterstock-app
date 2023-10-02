@@ -6,11 +6,8 @@ import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class SnackBars {
-  static SnackBar build(
-    BuildContext context,
-    String? image,
-    String text,
-  ) {
+  static SnackBar build(BuildContext context, String? image, String text,
+      {Duration? duration}) {
     final shimmer = ShimmerLoader(
       child: Container(
         color: context.colors.backgroundsSecondary,
@@ -20,6 +17,7 @@ class SnackBars {
       backgroundColor: Colors.black.withOpacity(0.8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       behavior: SnackBarBehavior.floating,
+      duration: duration ?? Duration(seconds: 4),
       margin: const EdgeInsets.all(8.0),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       content: Row(

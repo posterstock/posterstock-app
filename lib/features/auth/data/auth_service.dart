@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:poster_stock/common/data/exceptions.dart';
 import 'package:poster_stock/features/auth/data/handlers/auth_handler.dart';
 import 'package:supertokens_flutter/dio.dart';
@@ -33,13 +32,18 @@ class AuthService {
           },
         ),
       );
+      print("SUCCESS");
+      print(response.data);
       return response.data;
     } on DioError catch (e) {
-      rethrow;
+      print(e.response?.data);
+      print(e.response?.headers);
     }
   }
 
   Future<void> removeFCMToken(String token, String userToken) async {
+    print(token);
+    print(userToken);
     try {
       final response = await _dio.delete(
         'api/notifications/drop/$token/',
@@ -51,8 +55,12 @@ class AuthService {
           },
         ),
       );
+      print("HHEHEHEHEHHEHE");
+      print(response.data);
       return response.data;
     } on DioError catch (e) {
+      print(e.response?.headers);
+      print(e.response?.data);
       rethrow;
     }
   }

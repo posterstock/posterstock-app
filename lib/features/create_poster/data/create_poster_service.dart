@@ -18,6 +18,30 @@ class CreatePosterService {
     _dio.interceptors.add(SuperTokensInterceptorWrapper(client: _dio));
   }
 
+  Future<void> createBookmark(int mediaId, String mediaType, String image) async {
+    token = await SuperTokens.getAccessToken();
+    try {
+      var response = await _dio.post(
+        '/api/bookmarks/',
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
+        data: jsonEncode(
+          {
+            "media_id": mediaId,
+            "media_type": mediaType,
+            "poster_image": '/${image.split('/').last}',
+          },
+        ),
+      );
+      print(response.data);
+      return response.data;
+    } on DioError catch (e) {
+      print(e.response?.headers);
+      rethrow;
+    }
+  }
+
   Future<void> createPoster(
       int mediaId, String mediaType, String image, String description) async {
     token = await SuperTokens.getAccessToken();
@@ -45,6 +69,7 @@ class CreatePosterService {
   }
 
   Future<List<dynamic>> getSearchMedia(String searchValue) async {
+    if (searchValue.isEmpty) return [];
     token = await SuperTokens.getAccessToken();
     try {
       var response = await _dio.get('api/media/search',

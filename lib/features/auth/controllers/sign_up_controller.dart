@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/state_holders/auth_id_state_holder.dart';
@@ -127,13 +128,14 @@ class SignUpController {
         deviceId: deviceId,
         email: email
       );
-      try {
-        token = await FirebaseMessaging.instance.getToken();
-      } catch (e) {
-        print(e);
-      }
     } catch (e) {
       codeErrorStateHolder.setValue("Wrong code");
+      return false;
+    }
+    try {
+      token = await FirebaseMessaging.instance.getToken();
+    } catch (e) {
+      print(e);
     }
     if (token != null) {
       try {
@@ -146,7 +148,7 @@ class SignUpController {
     var instance = await SharedPreferences.getInstance();
     instance.setString('email', email);
     main.email = email;
-    return token != null;
+    return true;
   }
 
   Future<bool> processAuth() async {
@@ -161,13 +163,14 @@ class SignUpController {
         login: username,
         email: email,
       );
-     try {
-       token = await FirebaseMessaging.instance.getToken();
-     } catch (e) {
-       print(e);
-     }
     } catch (e) {
       codeErrorStateHolder.setValue("Wrong code");
+      return false;
+    }
+    try {
+      token = await FirebaseMessaging.instance.getToken();
+    } catch (e) {
+      print(e);
     }
     if (token != null) {
       try {
@@ -180,7 +183,7 @@ class SignUpController {
     var instance = await SharedPreferences.getInstance();
     instance.setString('email', email);
     main.email = email;
-    return token != null;
+    return true;
   }
 
   Future<void> removeFCMToken() async {
@@ -194,6 +197,15 @@ class SignUpController {
   Future<void> registerNotification(String token) async {
     final userToken = await SuperTokens.getAccessToken();
     if (userToken == null) throw Exception();
-    await repository.registerNotification(token, userToken);
+    try {
+      await removeFCMToken();
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    try {
+      await repository.registerNotification(token, userToken);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 }

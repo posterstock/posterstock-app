@@ -38,9 +38,12 @@ class ProfileControllerApi {
   final HomePagePostsStateHolder homePagePostsStateHolder;
   final MyProfileInfoStateHolder myProfileInfoStateHolder;
   dynamic gettingUser = 'profile';
+  bool gttgUser = false;
   bool cancelled = false;
   bool gotAllBookmarks = false;
   bool gettingBookmarks = false;
+  bool gotAllPosts = false;
+  bool gettingPosts = false;
   late final CancelableCompleter completer;
 
   ProfileControllerApi({
@@ -69,6 +72,7 @@ class ProfileControllerApi {
   }
 
   Future<void> updateBookmarks() async {
+    if (gttgUser) return;
     if (gotAllBookmarks) return;
     if (gettingBookmarks) return;
         gettingBookmarks = true;
@@ -79,9 +83,25 @@ class ProfileControllerApi {
     gettingBookmarks = false;
   }
 
+  Future<void> updatePosts(int id) async {
+    if (gttgUser) return;
+    if (gotAllPosts) return;
+    if (gettingPosts) return;
+    print("GGGGGG");
+    gettingPosts = true;
+    var result = await repo.getProfilePosts(id);
+    final posts = result.$1;
+    gotAllPosts = result.$2;
+    print("UPDATING");
+    print(posts);
+    profilePostsStateHolder.updateState(posts);
+    gettingPosts = false;
+  }
+
   Future<void> getUserInfo(dynamic usernameOrId) async {
     print(usernameOrId);
     if (gettingUser == usernameOrId) return;
+    gttgUser = true;
     try {
       completer.completeOperation(
         CancelableOperation.fromFuture(
@@ -90,7 +110,9 @@ class ProfileControllerApi {
               gotAllBookmarks = false;
               gettingUser = usernameOrId;
               final user = await repo.getProfileInfo(usernameOrId);
-              var posts = await repo.getProfilePosts(user.id);
+              var postsResponse = await repo.getProfilePosts(user.id, restart: true);
+              var posts = postsResponse.$1;
+              gotAllPosts = postsResponse.$2;
               var lists = await repo.getProfileLists(user.id);
               List<PostMovieModel>? bookmarks;
               if (usernameOrId == null) {
@@ -132,6 +154,7 @@ class ProfileControllerApi {
                 gotAllBookmarks = false;
               }
               profileInfoStateHolder.updateState(user);
+              print("SETTING");
               profilePostsStateHolder.setState(posts);
               profileListsStateHolder.setState(lists);
               profileBookmarksStateHolder.setState(bookmarks);
@@ -140,8 +163,10 @@ class ProfileControllerApi {
               }
               //print(profilePostsStateHolder.state);
               gettingUser = 'profile';
+              gttgUser = false;
             } catch (e) {
               gettingUser = 'profile';
+              gttgUser = false;
             }
           }),
         ),

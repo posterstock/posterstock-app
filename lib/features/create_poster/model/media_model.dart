@@ -7,7 +7,6 @@ class MediaModel {
   int id;
   int startYear;
   int? endYear;
-  String mainPoster;
   String title;
   MediaType type;
 
@@ -18,7 +17,6 @@ class MediaModel {
     required this.type,
     required this.startYear,
     required this.endYear,
-    required this.mainPoster,
   });
 
   factory MediaModel.fromJson(Map<String, Object?> json) {
@@ -28,7 +26,6 @@ class MediaModel {
       type: json['type'] == 'tv' ? MediaType.tv : MediaType.movie,
       startYear: json['start_year'] as int,
       endYear: json['end_year'] as int?,
-      mainPoster: json['main_poster'] as String,
     );
   }
 }

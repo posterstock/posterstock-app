@@ -1,18 +1,16 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
+import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
-import 'package:poster_stock/features/create_list/view/pick_cover_dialog.dart';
+import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
 import 'package:poster_stock/features/edit_profile/controller/profile_controller.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/avatar_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/controller/edit_profile_controller.dart';
@@ -23,6 +21,7 @@ import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_nam
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_username_error_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_username_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
+import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 @RoutePage()
@@ -419,7 +418,8 @@ class _UsernameFieldProfileState extends ConsumerState<UsernameFieldProfile> {
       ),
       onTap: () {
         if (screenHeight - 900 < 0) {
-          EditProfilePage.animateScrollTo(900 - screenHeight, widget.controller);
+          EditProfilePage.animateScrollTo(
+              900 - screenHeight, widget.controller);
         }
       },
       onChanged: (value) {
@@ -542,7 +542,8 @@ class _ProfileDescriptionFieldState
           },
           onTap: () {
             if (screenHeight - 950 < 0) {
-              EditProfilePage.animateScrollTo(950 - screenHeight, widget.controller);
+              EditProfilePage.animateScrollTo(
+                  950 - screenHeight, widget.controller);
             }
           },
         ),
@@ -592,24 +593,30 @@ class ProfilePhotoDialog extends ConsumerWidget {
                         ),
                         Expanded(
                           child: InkWell(
-                            onTap: () {
+                            onTap: () async {
                               Navigator.pop(context);
-                              showModalBottomSheet(
-                                context: context,
-                                backgroundColor: Colors.transparent,
-                                isScrollControlled: true,
-                                useSafeArea: true,
-                                builder: (context) => PickCoverDialog(
-                                  onItemTap: (BuildContext context,
-                                      WidgetRef ref, String image) {
-                                    ref
-                                        .read(profileControllerProvider)
-                                        .setPhoto(
-                                            File(image).readAsBytesSync());
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              );
+                              XFile? image;
+                              try {
+                                image = await ImagePicker().pickImage(
+                                  source: ImageSource.gallery,
+                                );
+                              } catch (e) {
+                                scaffoldMessengerKey.currentState?.showSnackBar(
+                                  SnackBars.build(
+                                      context, null, "Could not pick image"),
+                                );
+                                return;
+                              }
+                              if (image == null) {
+                                scaffoldMessengerKey.currentState?.showSnackBar(
+                                  SnackBars.build(
+                                      context, null, "Could not pick image"),
+                                );
+                                return;
+                              }
+                              ref
+                                  .read(pickCoverControllerProvider)
+                                  .setImage(image.path);
                             },
                             child: Center(
                               child: Text(

@@ -74,9 +74,9 @@ class _CupertinoDialogFactory implements DialogFactory {
       actions: actions
           .map((action) => CupertinoDialogAction(
                 onPressed: action.handler,
-                child: Text(action.title),
                 isDefaultAction: action.isDefault,
                 isDestructiveAction: action.isDestructive,
+                child: Text(action.title),
               ))
           .toList(growable: false),
     );

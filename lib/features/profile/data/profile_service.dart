@@ -5,18 +5,28 @@ class ProfileService {
   final Dio _dio = DioKeeper.getDio();
 
   String? bookmarksCursor;
+  String? postsCursor;
+  int? id;
 
-  Future<List<Map<String, dynamic>>> getUserPosts(int? id) async {
+  Future<(List<Map<String, dynamic>>?, bool)> getUserPosts(int? id, {bool restart = false}) async {
+    print(id != this.id);
+    if (id != this.id) postsCursor = null;
+    if (restart) postsCursor = null;
+    this.id = id;
     final response = await _dio.get(
       'api/posters/users/$id',
       options: Options(headers: {}),
+        queryParameters: {
+          'cursor' : postsCursor,
+        }
     );
     final List<Map<String, dynamic>> result = [];
     print(response);
-    for (var a in response.data) {
+    postsCursor = response.data['next_cursor'];
+    for (var a in response.data['posters'] ?? []) {
       result.add(a);
     }
-    return result;
+    return (result, !response.data['has_more']);
   }
 
   Future<List<Map<String, dynamic>>> getUserLists(int? id) async {

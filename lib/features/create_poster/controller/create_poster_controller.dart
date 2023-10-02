@@ -106,11 +106,11 @@ class CreatePosterController {
     var mediaState = createPosterChoseMovieStateHolder.state;
     var image = createPosterChosenPosterStateHolder.state;
     try {
-      /*await createPosterRepository.createPoster(
+      await createPosterRepository.createBookmark(
         mediaState!.id,
         mediaState.type.name,
         image!.$2
-      );*/
+      );
       profileControllerApi.getUserInfo(null);
     } catch (e) {
       print(e);

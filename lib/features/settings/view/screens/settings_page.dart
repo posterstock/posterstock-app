@@ -367,13 +367,16 @@ class SettingsPage extends ConsumerWidget {
                             onTap: () async {
                               final prefs =
                                   await SharedPreferences.getInstance();
-                              await ref.read(signUpControllerProvider).removeFCMToken();
+                              try {
+                                await ref.read(signUpControllerProvider)
+                                    .removeFCMToken();
+                              } catch (_) {}
                               await SuperTokens.signOut();
                               TokenKeeper.token = null;
-                              prefs.remove('token');
-                              prefs.remove('google');
-                              prefs.remove('apple');
-                              prefs.remove('email');
+                              await prefs.remove('token');
+                              await prefs.remove('google');
+                              await prefs.remove('apple');
+                              await prefs.remove('email');
                               apple = false;
                               google = false;
                               email = null;

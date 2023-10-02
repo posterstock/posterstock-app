@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
@@ -63,9 +64,10 @@ void main() async {
   try {
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.requestPermission();
     await Firebase.initializeApp(
+      name: "Posterstock",
       options: DefaultFirebaseOptions.currentPlatform,
     );
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -80,7 +82,7 @@ void main() async {
   try {
     final prefs = await SharedPreferences.getInstance();
     TokenKeeper.token =
-    prefs.getString('token') == '' ? null : prefs.getString('token');
+        prefs.getString('token') == '' ? null : prefs.getString('token');
     initTheme = prefs.getString('theme');
     google = prefs.getBool('google') ?? false;
     apple = prefs.getBool('apple') ?? false;
@@ -168,7 +170,11 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
         }
       });
     }
-    ref.read(pageTransitionControllerStateHolder.notifier).updateState(pageTransitionController);
+    Future(() {
+      ref
+          .read(pageTransitionControllerStateHolder.notifier)
+          .updateState(pageTransitionController);
+    });
     return MaterialApp.router(
       routerConfig: App._appRouter!.config(deepLinkBuilder: (deepLink) {
         if (initLink != null) {

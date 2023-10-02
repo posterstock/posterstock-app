@@ -10,6 +10,14 @@ class ProfilePostsStateHolder extends StateNotifier<List<PostMovieModel>?> {
   ProfilePostsStateHolder(super.state);
 
   void updateState(List<PostMovieModel>? list) {
+    for (int i = 0; i < (list?.length ?? 0); i++) {
+      for (int j = 0; j < (state?.length ?? 0); j++) {
+        if (list![i].id == state![j].id) {
+          state!.removeAt(j);
+          j--;
+        }
+      }
+    }
     state = [...(state ?? []), ...?list];
   }
 

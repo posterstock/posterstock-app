@@ -34,18 +34,18 @@ class ProfileRepository implements IProfileRepository {
   }
 
   @override
-  Future<List<PostMovieModel>> getProfilePosts(int? id) async {
+  Future<(List<PostMovieModel>? , bool)> getProfilePosts(int? id, {bool restart = false}) async {
     try {
-      final result = (await profileService.getUserPosts(id));
-      return result
-          .map(
+      final result = (await profileService.getUserPosts(id, restart: restart));
+      return (result.$1
+          ?.map(
             (e) => PostMovieModel.fromJson(e, previewPrimary: true),
           )
-          .toList();
+          .toList(), result.$2);
     } catch (e) {
       print(e);
     }
-    return [];
+    return (<PostMovieModel>[], false);
   }
 
   @override

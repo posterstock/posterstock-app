@@ -24,6 +24,7 @@ import UserNotifications
     override func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken : Data){
      print("X__APNS: \(String(describing: deviceToken))")
         Messaging.messaging().apnsToken = deviceToken;
+        super.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
      //Messaging.messaging().setAPNSToken(deviceToken, type:MessagingAPNSTokenType.prod )
      }
      

@@ -17,7 +17,8 @@ class Comment {
     return Comment(
       id: json['id'],
       text: json['text'],
-      time: _getTimeString(DateTime.fromMillisecondsSinceEpoch(json['created_at'] * 1000)),
+      time: _getTimeString(
+          DateTime.fromMillisecondsSinceEpoch(json['created_at'] * 1000)),
       model: UserModel.fromJson(json['user']),
     );
   }
@@ -35,5 +36,19 @@ class Comment {
       return "${diff.inMinutes} minute${diff.inMinutes > 1 ? "s" : ''} ago";
     }
     return "Less than a minute ago";
+  }
+
+  Comment copyWith({
+    int? id,
+    String? text,
+    String? time,
+    UserModel? model,
+  }) {
+    return Comment(
+      id: id ?? this.id,
+      text: text ?? this.text,
+      time: time ?? this.time,
+      model: model ?? this.model,
+    );
   }
 }

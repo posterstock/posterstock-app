@@ -4,10 +4,10 @@
 <dict>
 	<key>CLIENT_ID</key>
 	<string>405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com</string>
-	<key>SERVER_CLIENT_ID</key>
-    <string>405674784124-k6n0rjpfh2n5vc9m682tmj1i7af1h3hl.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
 	<string>com.googleusercontent.apps.405674784124-v0infd39p5s4skn9s89cg57a6i00ferr</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>405674784124-buqlusrif3nur8sqk7li6u1ruq6votji.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyB-A1ZnM_EQz2oDBmf_JU07vvvVproNWpQ</string>
 	<key>GCM_SENDER_ID</key>

@@ -66,18 +66,9 @@ class DialogHelper {
         progress: controller.stream,
         duration: defaultDuration,
         style: AppearStyle.opacity,
-        child: Stack(
-          children: <Widget>[
-            GestureDetector(
-              onTap: () => dialog.closable ? hide(context) : (){},
-              child: Container(
-                color: backgroundColor,
-              ),
-            ),
-            dialog
-          ],
-        ),
+        child: dialog,
       ),
+      maintainState: true,
     );
 
     _currentController.add(

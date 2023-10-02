@@ -29,4 +29,20 @@ class CommentsStateHolder extends StateNotifier<List<Comment>?> {
   Future<void> clearComments() async {
     state = null;
   }
+
+  Future<void> setFollowed(int id, bool followed) async {
+    for (int i = 0; i < (state?.length ?? 0); i++) {
+      if (state![i].model.id == id) {
+        print(state![i]);
+        state![i] = state![i].copyWith(
+          model: state![i].model.copyWith(
+                followed: followed,
+              ),
+        );
+        print(state![i]);
+      }
+    }
+    print("NF");
+    state = [...?state];
+  }
 }

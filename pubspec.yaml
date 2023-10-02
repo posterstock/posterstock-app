@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 publish_to: 'none'
 
-version: 1.0.0+6
+version: 1.0.0+8
 
 environment:
   sdk: '^3.0.0'
@@ -29,7 +29,7 @@ dependencies:
   equatable: ^2.0.5
   vibration: ^1.8.1
   flutter_keyboard_visibility: ^5.4.1
-  image_picker: ^1.0.0
+  image_picker: ^1.0.4
   supertokens_flutter: ^0.2.5
   dio: ^4.0.6
   sign_in_with_apple: ^5.0.0
@@ -37,7 +37,7 @@ dependencies:
   firebase_core: ^2.15.0
   logger: ^1.4.0
   shared_preferences: ^2.2.0
-  firebase_messaging: ^14.6.5
+  firebase_messaging: ^14.6.8
   flutter_local_notifications: ^15.1.0+1
   davinci: ^2.1.1
   transparent_image: ^2.0.1

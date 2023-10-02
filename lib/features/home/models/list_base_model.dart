@@ -5,11 +5,13 @@ class ListBaseModel {
   final String title;
   final String image;
   final UserModel? user;
+  final int? postersCount;
 
   ListBaseModel({
     required this.id,
     required this.title,
     required this.image,
+    this.postersCount,
     this.user,
   });
 
@@ -20,6 +22,7 @@ class ListBaseModel {
       id: json['id'],
       title: json['title'],
       image: image == 'https://api.posterstock.co/images/' ? 'https://api.posterstock.co/images/default_list_cover.png' : image,
+      postersCount: json['posters_count'],
     );
   }
 

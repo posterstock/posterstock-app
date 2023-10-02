@@ -84,5 +84,9 @@
 	<true/>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSAllowsLocalNetworking</key>
+    <false/>
+    <key>FirebaseAppDelegateProxyEnabled</key>
+    <true/>
 </dict>
 </plist>

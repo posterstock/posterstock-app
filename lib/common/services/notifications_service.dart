@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:auto_route/auto_route.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +20,7 @@ const String darwinNotificationCategoryPlain = 'plainCategory';
 
 String? initLink;
 
-void bgHandler (NotificationResponse response, StackRouter? router) {
+void bgHandler(NotificationResponse response, StackRouter? router) {
   var splittedUrl = response.payload?.split('/') ?? [];
   bool hasHttp = splittedUrl[0].startsWith('http');
   splittedUrl.removeAt(0);
@@ -85,7 +88,6 @@ Future<void> initPushes(StackRouter? routerLocal, WidgetRef ref) async {
   });
 
   FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
-
     showPush(message, ref: ref);
   });
 
@@ -100,29 +102,49 @@ Future<void> initPushes(StackRouter? routerLocal, WidgetRef ref) async {
 
   var initializationSettings = InitializationSettings(
       android: initialzationSettingsAndroid, iOS: initializationSettingsDarwin);
-  await flutterLocalNotificationsPlugin.initialize(
-    initializationSettings,
-    //onDidReceiveBackgroundNotificationResponse: bgHandler,
-    onDidReceiveNotificationResponse: (response) {
-      if (routerLocal != null) {
-        routerLocal.pushNamed(response.payload!);
-      }
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+      //onDidReceiveBackgroundNotificationResponse: bgHandler,
+      onDidReceiveNotificationResponse: (response) {
+    if (routerLocal != null) {
+      routerLocal.pushNamed(response.payload!);
     }
-  );
+  });
 }
 
 /// Метод который показывает сам пуш. По дефолту сделано, чтобы показывало все с
 /// поля notification, но можно всё поменять на data
+@pragma('vm:entry-point')
 void showPush(RemoteMessage message, {WidgetRef? ref}) async {
+  print(message.data);
+  BigPictureStyleInformation? bigPictureStyleInformation;
+  try {
+    final Response response = await Dio().get(
+      (message.data['text'] as String).contains("followed")
+          ? message.data['profile_url']
+          : message.data['entity_image'],
+      options: Options(
+        responseType: ResponseType.bytes,
+      ),
+    );
+    bigPictureStyleInformation = BigPictureStyleInformation(
+      ByteArrayAndroidBitmap.fromBase64String(base64Encode(response.data)),
+      hideExpandedLargeIcon: true,
+      largeIcon:
+          ByteArrayAndroidBitmap.fromBase64String(base64Encode(response.data)),
+    );
+  } catch (e) {
+    print(e);
+  }
   flutterLocalNotificationsPlugin.show(
     message.hashCode,
-    message.data['text'].split(' ')[0],
     message.data['text'],
+    message.data['comment'],
     NotificationDetails(
       android: AndroidNotificationDetails(
         channel.id,
         channel.name,
-        //channel.description,
+        channelDescription: channel.description,
+        largeIcon: bigPictureStyleInformation?.largeIcon,
         color: Colors.transparent,
         icon: "@mipmap/ic_notification",
         importance: Importance.max,
@@ -136,7 +158,9 @@ void showPush(RemoteMessage message, {WidgetRef? ref}) async {
   await prefs.reload();
   int count = prefs.getInt('notification_count') ?? 0;
   prefs.setInt('notification_count', count + 1);
-  ref?.read(notificationsCountStateHolderProvider.notifier).updateState(count + 1);
+  ref
+      ?.read(notificationsCountStateHolderProvider.notifier)
+      .updateState(count + 1);
 }
 
 const DarwinNotificationDetails iosNotificationDetails =

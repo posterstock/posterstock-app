@@ -14,6 +14,9 @@ import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
+import 'package:poster_stock/features/create_poster/controller/create_poster_controller.dart';
+import 'package:poster_stock/features/create_poster/model/media_model.dart';
+import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_likes_state_holder.dart';
@@ -101,15 +104,20 @@ class _PosterPageState extends ConsumerState<PosterPage>
                 );
           }
         } else if (rtr.topRoute.name != 'PosterRoute' &&
+            rtr.stack.length - 2 >= 0 &&
             rtr.stack[rtr.stack.length - 2].name == 'PosterRoute') {
           Future.delayed(Duration(milliseconds: 400), () {
             disabled = 0;
-            setState(() {});
+            if (mounted) {
+              setState(() {});
+            }
           });
         } else {
           Future.delayed(Duration(milliseconds: 400), () {
             disabled = 1;
-            setState(() {});
+            if (mounted) {
+              setState(() {});
+            }
           });
         }
         Future(() async {
@@ -119,6 +127,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
           }
           if (el == null) {
             ref.read(commentsControllerProvider).clear();
+            return;
           }
           final post = ref.watch(posterStateHolderProvider);
           if (post?.id == el!.pathParams.getInt('id')) return;
@@ -382,9 +391,12 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                             ),
                                             child: UserInfoTile(
                                               type: InfoDialogType.postComment,
-                                              myEntity: post?.author.id == ref.watch(myProfileInfoStateHolderProvider)?.id,
+                                              myEntity: post?.author.id ==
+                                                  ref
+                                                      .watch(
+                                                          myProfileInfoStateHolderProvider)
+                                                      ?.id,
                                               entityId: comments![index].id,
-
                                               showFollowButton: false,
                                               user: comments![index].model,
                                               controller: scrollController,
@@ -763,9 +775,14 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                               post.id,
                                               !(post.hasBookmarked ?? true),
                                             );
-                                        final myself = ref.watch(profileInfoStateHolderProvider)?.mySelf;
+                                        final myself = ref
+                                            .watch(
+                                                profileInfoStateHolderProvider)
+                                            ?.mySelf;
                                         if (myself != false) {
-                                          ref.read(profileControllerApiProvider)
+                                          ref
+                                              .read(
+                                                  profileControllerApiProvider)
                                               .getUserInfo(null);
                                         }
                                       }
@@ -787,13 +804,48 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      //TODO dialog
+                                      ref
+                                          .read(createPosterControllerProvider)
+                                          .chooseMovie(
+                                            MediaModel(
+                                              id: post!.mediaId!,
+                                              title: post.name,
+                                              type: post.mediaType == 'movie'
+                                                  ? MediaType.movie
+                                                  : MediaType.tv,
+                                              startYear: int.parse(
+                                                  post.year.split(" - ")[0]),
+                                              endYear: post.year
+                                                              .split(" - ")
+                                                              .length ==
+                                                          1 ||
+                                                      post.year
+                                                          .split(" - ")[1]
+                                                          .isEmpty
+                                                  ? null
+                                                  : int.parse(
+                                                      post.year.split(" - ")[1],
+                                                    ),
+                                            ),
+                                          );
+                                      if (post?.hasInCollection == false) {
+                                        showModalBottomSheet(
+                                          context: context,
+                                          backgroundColor: Colors.transparent,
+                                          isScrollControlled: true,
+                                          useSafeArea: true,
+                                          builder: (context) =>
+                                              const CreatePosterDialog(),
+                                        );
+                                      }
                                     },
                                     child: SizedBox(
                                       width: 24,
                                       height: 24,
                                       child: Image.asset(
-                                        'assets/images/ic_collection.png',
+                                        post?.hasInCollection == true
+                                            ? 'assets/images/ic_collection_filled.png'
+                                            : 'assets/images/ic_collection.png',
                                         color: context.colors.iconsDefault!,
                                         colorBlendMode: BlendMode.srcIn,
                                       ),
@@ -1274,17 +1326,21 @@ class PosterActionsDialog extends ConsumerWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: SizedBox(
-        height: (myPoster?.id != post.author.id) ? 490 : 450,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Column(
+        height: 490 -
+            ((myPoster?.id != post.author.id) ? 0 : 40) -
+            ((post.hasInCollection == true) ? 0 : 40),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16.0),
                   child: SizedBox(
-                    height: (myPoster?.id != post.author.id) ? 384 : 344,
+                    height: 384 -
+                        ((myPoster?.id != post.author.id) ? 0 : 40) -
+                        ((post.hasInCollection == true) ? 0 : 40),
                     child: Material(
                       color: context.colors.backgroundsPrimary,
                       child: Column(
@@ -1300,33 +1356,35 @@ class PosterActionsDialog extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          Divider(
-                            height: 0.5,
-                            thickness: 0.5,
-                            color: context.colors.fieldsDefault,
-                          ),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.transparent,
-                                  builder: (context) => AddToListDialog(),
-                                );
-                              },
-                              child: Center(
-                                //TODO REMOVE THIS IF THIS MOVIE NOT IN COLLECTION
-                                child: Text(
-                                  'Add to list',
-                                  style:
-                                      context.textStyles.bodyRegular!.copyWith(
-                                    color: context.colors.textsPrimary,
+                          if (post.hasInCollection == true)
+                            Divider(
+                              height: 0.5,
+                              thickness: 0.5,
+                              color: context.colors.fieldsDefault,
+                            ),
+                          if (post.hasInCollection == true)
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    builder: (context) => AddToListDialog(),
+                                  );
+                                },
+                                child: Center(
+                                  //TODO REMOVE THIS IF THIS MOVIE NOT IN COLLECTION
+                                  child: Text(
+                                    'Add to list',
+                                    style: context.textStyles.bodyRegular!
+                                        .copyWith(
+                                      color: context.colors.textsPrimary,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
                           Divider(
                             height: 0.5,
                             thickness: 0.5,
@@ -1408,6 +1466,10 @@ class PosterActionsDialog extends ConsumerWidget {
                                           author: post.author.copyWith(
                                               followed:
                                                   !post.author.followed)));
+                                  ref.read(profileControllerApiProvider).follow(
+                                        post!.author.id,
+                                        post!.author.followed,
+                                      );
                                 },
                                 child: Center(
                                   child: Text(
@@ -1466,7 +1528,7 @@ class PosterActionsDialog extends ConsumerWidget {
                                   );
                                 } else {
                                   try {
-                                    ref
+                                    await ref
                                         .read(commentsControllerProvider)
                                         .deletePost(post.id);
                                     scaffoldMessengerKey.currentState
@@ -1477,12 +1539,11 @@ class PosterActionsDialog extends ConsumerWidget {
                                         'Deleted successfully',
                                       ),
                                     );
-                                    ref
-                                        .read(profileControllerApiProvider)
-                                        .getUserInfo(null);
                                     Navigator.pop(context);
                                     AutoRouter.of(context).pop();
                                   } catch (e) {
+                                    print("FEF");
+                                    print(e);
                                     scaffoldMessengerKey.currentState
                                         ?.showSnackBar(
                                       SnackBars.build(
@@ -1492,6 +1553,9 @@ class PosterActionsDialog extends ConsumerWidget {
                                       ),
                                     );
                                   }
+                                  ref
+                                      .read(profileControllerApiProvider)
+                                      .getUserInfo(null);
                                 }
                               },
                               child: Center(

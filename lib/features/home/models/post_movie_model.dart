@@ -9,13 +9,19 @@ class PostMovieModel extends PostBaseModel {
   final String year;
   final String imagePath;
   final bool? hasBookmarked;
+  final bool? hasInCollection;
   final String? tmdbLink;
+  final String? mediaType;
+  final int? mediaId;
 
   PostMovieModel({
     required this.year,
     required this.imagePath,
     this.hasBookmarked,
+    this.hasInCollection,
     this.tmdbLink,
+    this.mediaId,
+    this.mediaType,
     required int id,
     required String name,
     required UserModel author,
@@ -47,6 +53,7 @@ class PostMovieModel extends PostBaseModel {
       id: json['id'] as int? ?? -1,
       liked: json['has_liked'] as bool? ?? false,
       hasBookmarked: json['has_bookmarked'] as bool?,
+      hasInCollection: false,
       year: (json['end_year'] as int?) == null
           ? (json['start_year'] as int).toString()
           : '${(json['start_year'] as int).toString()} - ${(json['end_year'] as int?).toString()}',
@@ -77,6 +84,8 @@ class PostMovieModel extends PostBaseModel {
       comments: json['comments_count'] as int? ?? 0,
       description: json['description'] as String?,
       tmdbLink: json['tmdb_link'] as String?,
+      mediaId: json['media_id'] as int?,
+      mediaType: json['media_type'] as String?,
     );
   }
 
@@ -94,10 +103,12 @@ class PostMovieModel extends PostBaseModel {
     int? comments,
     String? description,
     bool? hasBookmarked,
+    bool? hasInCollection,
   }) {
     return PostMovieModel(
       year: year ?? this.year,
       hasBookmarked: hasBookmarked ?? this.hasBookmarked,
+      hasInCollection: hasInCollection ?? this.hasInCollection,
       imagePath: imagePath ?? this.imagePath,
       id: id ?? this.id,
       name: name ?? this.name,
@@ -108,6 +119,9 @@ class PostMovieModel extends PostBaseModel {
       likes: likes ?? this.likes,
       comments: comments ?? this.comments,
       description: description ?? this.description,
+      mediaId: mediaId,
+      mediaType: mediaType,
+      tmdbLink: tmdbLink,
     );
   }
 

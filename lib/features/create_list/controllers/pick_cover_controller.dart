@@ -57,6 +57,7 @@ class PickCoverController {
   bool gotAllPosts = false;
   String? searchValue = null;
   List<int> loadingPages = [];
+  int page = 0;
   int? max;
   List<String> paths = [];
   bool loading = false;
@@ -195,50 +196,17 @@ class PickCoverController {
     }
   }
 
-  Future<void> loadPage(int page) async {
+  Future<void> loadPage() async {
     if (loading) return;
-    if (max != null && page > max!) return;
-    if (loadingPages.contains(page)) return;
-    loading = true;
-    loadingPages.add(page);
-    var manager = await PhotoManager.requestPermissionExtend();
-    if (!manager.isAuth) {
-      loading = false;
-      return;
-    }
-    if (max == null) {
-      max ??= await PhotoManager.getAssetCount(
-        type: RequestType.image,
-      );
-      galleryIndexStateHolder.setPage(0);
-    }
-    galleryIndexStateHolder.setPage(page + 30);
     var assets = await PhotoManager.getAssetListRange(
       start: page,
-      end: page + 30,
+      end: page+30,
       type: RequestType.image,
     );
-    List<String> files = [];
-    try {
-      for (var future in assets) {
-        var path = (await future.fileWithSubtype.timeout(
-          const Duration(seconds: 5),
-        ))
-            ?.path;
-        if (path != null) {
-          //if (paths.contains(file.path)) { continue;}
-          //paths.add(file.path);
-          files.add(path);
-        }
-      }
-      allImagesStateHolder.addElements(
-        files,
-        page,
-      );
-    } catch (e) {
-      loading = false;
-    }
-    loading = false;
+    page += 30;
+    if (assets.isEmpty) return;
+    allImagesStateHolder.addElements(assets);
+    loadPage();
   }
 
   Future<void> updateSearch(String value) async {
@@ -249,6 +217,7 @@ class PickCoverController {
       searchPostsStateHolder.clearState();
     }
     searchValue = value;
+    if (searchValue?.isEmpty != false) return;
     await Future.delayed(const Duration(milliseconds: 500), () {
       if (searchValue != value) {
         loadedAll = false;

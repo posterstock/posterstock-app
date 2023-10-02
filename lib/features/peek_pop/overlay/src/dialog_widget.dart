@@ -31,7 +31,7 @@ class DialogWidget extends StatelessWidget {
     DialogStyle? style,
     required Widget child,
     this.closable = true
-  }): _widget = DialogFactory(style ?? DialogHelper.defaultStyle).custom(child);
+  }): _widget = DialogFactory(DialogHelper.defaultStyle).custom(child);
 
   @override
   Widget build(BuildContext context) {

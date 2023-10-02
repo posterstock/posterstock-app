@@ -44,7 +44,7 @@ class ListService {
   Future<List> getComments(int id) async {
     try {
       final response = await _dio.get(
-        'api/lists/$id/comments',
+        'api/lists/$id/comments/private',
         options: Options(
           contentType: 'application/json',
           headers: {
@@ -84,7 +84,7 @@ class ListService {
     }
   }
 
-  Future<Map<String, dynamic>> deleteList(int id) async {
+  Future<void> deleteList(int id) async {
     try {
       final response = await _dio.delete(
         'api/lists/$id/',

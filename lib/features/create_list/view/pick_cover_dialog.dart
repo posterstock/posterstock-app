@@ -29,6 +29,9 @@ class _PickCoverDialogState extends ConsumerState<PickCoverDialog> {
   @override
   void initState() {
     super.initState();
+    Future(() {
+      ref.read(pickCoverControllerProvider).loadPage();
+    });
   }
 
   @override
@@ -39,7 +42,6 @@ class _PickCoverDialogState extends ConsumerState<PickCoverDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final page = ref.watch(galleryIndexStateHolderProvider);
     final images = ref.watch(pickCoverGalleryStateHolderProvider);
     dragController.addListener(() {
       if (dragController.size < 0.1) {
@@ -103,26 +105,23 @@ class _PickCoverDialogState extends ConsumerState<PickCoverDialog> {
                 delegate: SliverChildBuilderDelegate(
                   addAutomaticKeepAlives: false,
                   (context, index) {
-                    if (images.length <= page &&
-                        index % 30 == 0 &&
-                        !ref
-                            .watch(pickCoverControllerProvider)
-                            .loadingPages
-                            .contains(index)) {
-                      Future(() {
-                        ref.read(pickCoverControllerProvider).loadPage(page);
-                      });
-                    }
                     return Container(
                       key: Key(index.toString()),
                       color: context.colors.backgroundsSecondary,
-                      child: images.length > index && images[index] != null
-                          ? GalleryCover(
-                              key: Key(images[index]!),
-                              image: images[index]!,
-                              onTap: widget.onItemTap,
-                            )
-                          : const SizedBox(),
+                      child: images.length <= index || images[index] == null
+                          ? SizedBox()
+                          : FutureBuilder(
+                            future: images[index]!.file,
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) return SizedBox();
+                              print(snapshot.data);
+                              return GalleryCover(
+                                  key: Key("image${images[index]!.id}"),
+                                  image: snapshot.data!.path,
+                                  onTap: widget.onItemTap,
+                                );
+                            }
+                          ),
                     );
                   },
                 ),
@@ -161,7 +160,6 @@ class GalleryCover extends ConsumerStatefulWidget {
 }
 
 class _GalleryCoverState extends ConsumerState<GalleryCover> {
-
   @override
   void initState() {
     super.initState();

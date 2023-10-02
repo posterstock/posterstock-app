@@ -9,7 +9,6 @@ import 'package:flutter/widgets.dart';
 // blur makes background blurred
 enum AppearStyle {
   opacity,
-  blur
 }
 
 // Uses to animate dialog appearance
@@ -60,8 +59,10 @@ class _AppearWidgetState extends State<AppearWidget> with SingleTickerProviderSt
     return AnimatedBuilder(
       animation: _controller,
       child: widget._child,
-      builder: (_, child) => _getWidget(child, _controller.value)
-    );
+      builder: (_, child) => Opacity(
+      opacity: _controller.value,
+      child: child,
+    ));
   }
 
   Widget _getWidget(Widget? child, double progress) {
@@ -71,27 +72,11 @@ class _AppearWidgetState extends State<AppearWidget> with SingleTickerProviderSt
           opacity: progress,
           child: child,
         );
-
-      case AppearStyle.blur:
       default:
-        return Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: progress * 2,
-                sigmaY: progress * 2
-              ),
-              child: Container(
-                color: Color(0x00000000),
-              ),
-            ),
-            Opacity(
-              opacity: progress,
-              child: child,
-            )
-          ],
-        );
+      return Opacity(
+        opacity: progress,
+        child: child,
+      );
     }
   }
 }

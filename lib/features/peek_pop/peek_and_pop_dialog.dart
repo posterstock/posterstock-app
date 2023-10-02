@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vibration/vibration.dart';
@@ -31,6 +32,7 @@ class PeekAndPopDialog extends StatefulWidget {
 class _PeekAndPopDialogState extends State<PeekAndPopDialog> {
   Timer? _timer;
   bool long = false;
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -38,21 +40,38 @@ class _PeekAndPopDialogState extends State<PeekAndPopDialog> {
       child: BlocConsumer<PeekAndPopDialogCubit, bool>(
         listener: (context, isVisble) async {
           if (isVisble) {
-            DialogHelper().show(context,
-                DialogWidget.custom(closable: true, child: widget.dialog));
+            DialogHelper().show(
+              context,
+              DialogWidget.custom(closable: true, child: widget.dialog),
+            );
           } else {
             DialogHelper().hide(context);
           }
         },
         builder: (context, state) {
+          print('rev');
           return Listener(
             onPointerUp: (details) {
-              _timer?.cancel(); context.read<PeekAndPopDialogCubit>().updateState(false); Future((){long = false;});
+              _timer?.cancel();
+              context.read<PeekAndPopDialogCubit>().updateState(false);
+              Future(() {
+                long = false;
+              });
             },
             child: GestureDetector(
-              onTap: () {if (!long) widget.onTap();},
-              onPanCancel: () {_timer?.cancel();} ,
-              onPanEnd: (d) { _timer?.cancel(); context.read<PeekAndPopDialogCubit>().updateState(false); Future((){long = false;});} ,
+              onTap: () {
+                if (!long) widget.onTap();
+              },
+              onPanCancel: () {
+                _timer?.cancel();
+              },
+              onPanEnd: (d) {
+                _timer?.cancel();
+                context.read<PeekAndPopDialogCubit>().updateState(false);
+                Future(() {
+                  long = false;
+                });
+              },
               onPanDown: (_) => {
                 _timer = Timer(const Duration(milliseconds: 500), () {
                   long = true;
@@ -62,7 +81,7 @@ class _PeekAndPopDialogState extends State<PeekAndPopDialog> {
                   }
                   context.read<PeekAndPopDialogCubit>().updateState(true);
                   if (Platform.isIOS) {
-                    Vibration.vibrate(duration: 20, amplitude: 50);
+                    HapticFeedback.heavyImpact();
                   } else {
                     Vibration.vibrate(duration: 50, amplitude: 100);
                   }

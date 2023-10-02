@@ -91,7 +91,12 @@ class AuthController {
   Future<void> registerNotification(String token) async {
     final userToken = await SuperTokens.getAccessToken();
     if (userToken == null) throw Exception();
-    await repository.registerNotification(token, userToken);
+    try {
+      await repository.removeFCMToken(token, userToken);
+    } catch (e) {}
+    try {
+      await repository.registerNotification(token, userToken);
+    } catch (e) {}
   }
 
   Future<bool> authApple({

@@ -8,6 +8,10 @@ class CreatePosterRepository {
     await service.createPoster(mediaId, mediaType, image, description);
   }
 
+  Future<void> createBookmark(int mediaId, String mediaType, String image) async {
+    await service.createBookmark(mediaId, mediaType, image);
+  }
+
   Future<List<MediaModel>> getSearchMedia(String searchValue) async {
     return (await service.getSearchMedia(searchValue))
         .map((e) => MediaModel.fromJson(e))

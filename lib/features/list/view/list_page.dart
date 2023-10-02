@@ -18,6 +18,7 @@ import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/list/controller/list_controller.dart';
 import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
+import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
@@ -119,11 +120,13 @@ class _ListPageState extends ConsumerState<ListPage>
     final posts = ref.watch(listsStateHolderProvider);
     if (posts == null) {
       Future(() async {
-        var el = ref
-            .watch(router)!
-            .stackData
-            .lastWhere((element) => element.route.path == '/list/:id');
-        ref.read(listsControllerProvider).getPost(el.pathParams.getInt('id'));
+        try {
+          var el = ref
+              .watch(router)!
+              .stackData
+              .lastWhere((element) => element.route.path == '/list/:id');
+          ref.read(listsControllerProvider).getPost(el.pathParams.getInt('id'));
+        } catch (e) {}
       });
     }
     final comments = ref.watch(commentsStateHolderProvider);
@@ -489,7 +492,7 @@ class CollectionInfoWidget extends ConsumerWidget {
             height: ((post?.posters.length ?? 0) % 3 == 0
                     ? (post?.posters.length ?? 0) / 3
                     : (post?.posters.length ?? 0) ~/ 3 + 1) *
-                212,
+                220,
             child: GridView.builder(
               padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(
@@ -601,6 +604,12 @@ class ListActionsDialog extends ConsumerWidget {
                                               followed: !list.author.followed),
                                         ),
                                       );
+                                  ref
+                                      .read(profileControllerApiProvider)
+                                      .follow(
+                                    list!.author.id,
+                                    list!.author.followed,
+                                  );
                                 },
                                 child: Center(
                                   child: Text(
@@ -668,6 +677,7 @@ class ListActionsDialog extends ConsumerWidget {
                                         ),
                                       );
                                     } catch (_) {
+                                      print(_);
                                       scaffoldMessengerKey.currentState?.showSnackBar(
                                         SnackBars.build(
                                           context,

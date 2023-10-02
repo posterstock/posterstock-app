@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:poster_stock/common/data/dio_keeper.dart';
+import 'package:poster_stock/features/home/models/list_base_model.dart';
+import 'package:poster_stock/features/home/models/multiple_post_model.dart';
+import 'package:poster_stock/features/home/models/post_movie_model.dart';
 
 class PostService {
   final Dio _dio = DioKeeper.getDio();
@@ -62,10 +65,29 @@ class PostService {
     }
   }
 
+  Future<bool> getInCollection(int id) async {
+    try {
+      final response = await _dio.get('api/posters/collection/$id',
+          options: Options(
+            contentType: 'application/json',
+            headers: {
+              'accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+          ),
+      );
+      print(response.data);
+      return response.data['has_in_collection'];
+    } on DioError catch (e) {
+      print(e.response?.headers);
+      rethrow;
+    }
+  }
+
   Future<List> getComments(int id) async {
     try {
       final response = await _dio.get(
-        'api/posters/$id/comments',
+        'api/posters/$id/comments/private',
         options: Options(
           contentType: 'application/json',
           headers: {
@@ -138,7 +160,7 @@ class PostService {
     }
   }
 
-  Future<Map<String, dynamic>> deletePost(int id) async {
+  Future<void> deletePost(int id) async {
     try {
       final response = await _dio.delete(
         'api/posters/$id/',
@@ -155,6 +177,36 @@ class PostService {
     } on DioError catch (e) {
       print(18);
       print(e.response);
+      print(e.response?.data);
+      print(e.response?.headers);
+      rethrow;
+    }
+  }
+
+  Future<void> addPosterToList(MultiplePostModel listId, int postId) async {
+    try {
+      var idPosters = listId.posters.map((e) => e.id).toList()..add(postId);
+      print(idPosters);
+      final response = await _dio.post(
+        'api/lists/${listId.id}/',
+        options: Options(
+          contentType: 'application/json',
+          headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+        ),
+        data: jsonEncode({
+          'title' : listId.name,
+          'posters' : idPosters,
+          'description' : listId.description,
+        }),
+      );
+      print(response.data);
+      return response.data;
+    } on DioError catch (_) {
+      print(_.response?.headers);
+      print(_.response?.data);
       rethrow;
     }
   }

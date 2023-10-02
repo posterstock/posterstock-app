@@ -1,3 +1,5 @@
+import 'package:poster_stock/features/home/models/list_base_model.dart';
+import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/poster/data/comments_service.dart';
 import 'package:poster_stock/features/poster/model/comment.dart';
@@ -27,8 +29,17 @@ class PostRepository {
     return PostMovieModel.fromJson(await service.getPost(id));
   }
 
+  Future<bool> getInCollection(int id) async {
+    return await service.getInCollection(id);
+  }
+
+
   Future<void> deletePost(int id) async {
     await service.deletePost(id);
+  }
+
+  Future<void> addPosterToList(MultiplePostModel listId, int posterId) async {
+    await service.addPosterToList(listId,posterId);
   }
 
 

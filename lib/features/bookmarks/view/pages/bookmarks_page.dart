@@ -1,4 +1,6 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -84,25 +86,50 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
             ),
           ),
           Expanded(
-            child: NotificationListener<ScrollUpdateNotification>(
-              onNotification: (info) {
-                if (info.metrics.pixels >= info.metrics.maxScrollExtent - MediaQuery.of(context).size.height) {
-                  ref.read(bookmarksControllerProvider).getBookmarks();
-                }
-                return true;
-              },
-              child: ListView.separated(
-                itemCount: bookmarks?.length ?? 0,
-                itemBuilder: (context, index) {
-                  return posts[index];
-                },
-                separatorBuilder: (context, index) => Divider(
-                  height: 0.5,
-                  thickness: 0.5,
-                  color: context.colors.fieldsDefault,
-                ),
-              ),
-            ),
+            child: bookmarks?.isNotEmpty != true
+                ? Center(
+                    child: bookmarks == null
+                        ? defaultTargetPlatform != TargetPlatform.android
+                            ? const CupertinoActivityIndicator(
+                                radius: 10,
+                              )
+                            : SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: context.colors.iconsDisabled!,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                        : Text(
+                            'No one has added this poster',
+                            style: context.textStyles.subheadlineBold!.copyWith(
+                              color: context.colors.textsDisabled,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                  )
+                : NotificationListener<ScrollUpdateNotification>(
+                    onNotification: (info) {
+                      if (info.metrics.pixels >=
+                          info.metrics.maxScrollExtent -
+                              MediaQuery.of(context).size.height) {
+                        ref.read(bookmarksControllerProvider).getBookmarks();
+                      }
+                      return true;
+                    },
+                    child: ListView.separated(
+                      itemCount: bookmarks?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        return posts[index];
+                      },
+                      separatorBuilder: (context, index) => Divider(
+                        height: 0.5,
+                        thickness: 0.5,
+                        color: context.colors.fieldsDefault,
+                      ),
+                    ),
+                  ),
           )
         ],
       ),

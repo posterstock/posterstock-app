@@ -17,6 +17,7 @@ import 'package:poster_stock/features/create_poster/state_holder/create_poster_s
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_search_state_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
+import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class CreatePosterDialog extends ConsumerStatefulWidget {
@@ -273,6 +274,22 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                                         .ellipsis,
                                                               ),
                                                             ),
+                                                            if (chosenMovie.endYear != null)
+                                                              Text(
+                                                                ' - ${chosenMovie
+                                                                    .endYear}',
+                                                                style: context
+                                                                    .textStyles
+                                                                    .caption1!
+                                                                    .copyWith(
+                                                                  color: context
+                                                                      .colors
+                                                                      .textsSecondary,
+                                                                  overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                                ),
+                                                              ),
                                                           ],
                                                         ),
                                                       ),
@@ -513,6 +530,20 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                   .read(createPosterLoadingStateHolderProvider
                                       .notifier)
                                   .updateValue(true);
+                              final currPost =
+                                  ref.read(posterStateHolderProvider);
+                              final createId = ref.read(
+                                  createPosterChoseMovieStateHolderProvider);
+                              print("ABBB");
+                              print("${currPost?.name} ${createId?.title}");
+                              print("${currPost?.year} ${'${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}'}");
+                              if (currPost?.name == createId?.title && currPost?.year == '${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}') {
+                                ref
+                                    .read(posterStateHolderProvider.notifier)
+                                    .updateState(
+                                      currPost!.copyWith(hasInCollection: true),
+                                    );
+                              }
                               await ref
                                   .read(createPosterControllerProvider)
                                   .createPoster(descController.text);
@@ -546,7 +577,31 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                 AppTextButton(
                                   text: "Add bookmark",
                                   disabled: chosenMovie == null,
-                                  onTap: () {},
+                                  onTap: () async {
+                                    try {
+                                      ref
+                                          .read(
+                                              createPosterLoadingStateHolderProvider
+                                                  .notifier)
+                                          .updateValue(true);
+                                      await ref
+                                          .read(createPosterControllerProvider)
+                                          .createBookmark();
+                                    } catch (_) {
+                                      print(_);
+                                    }
+                                    ref
+                                        .read(
+                                            createPosterLoadingStateHolderProvider
+                                                .notifier)
+                                        .updateValue(false);
+                                    if (context.mounted) {
+                                      Navigator.pop(context);
+                                      ref
+                                          .read(menuControllerProvider)
+                                          .switchMenu();
+                                    }
+                                  },
                                 ),
                                 const SizedBox(width: 16),
                               ],
