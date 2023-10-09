@@ -31,7 +31,7 @@ class ProfileService {
 
   Future<List<Map<String, dynamic>>> getUserLists(int? id) async {
     final response = await _dio.get(
-      'api/lists/users/$id',
+      'api/lists/users/$id/',
       options: Options(headers: {}),
     );
     print(response);
@@ -60,6 +60,7 @@ class ProfileService {
   Future<Map<String, dynamic>> getProfileInfo(dynamic id) async {
     print(id);
     print('fewf');
+    print("SHIIT");
     try {
       if (id == null) {
         print("NULL");
@@ -76,18 +77,19 @@ class ProfileService {
         } catch (e) {
           rethrow;
         }
+        return {};
       }
       Response response;
       if (id is String) {
         print("STRING");
         response = await _dio.get(
-          'api/users/u/$id',
+          'api/users/u/$id/',
           options: Options(headers: {}),
         );
       } else {
         print("INT");
         response = await _dio.get(
-          'api/users/$id',
+          'api/users/$id/',
           options: Options(headers: {}),
         );
       }
@@ -109,7 +111,7 @@ class ProfileService {
         print(1);
         try {
           final response = await _dio.post(
-            '/api/users/$id/follow/',
+            '/api/users/$id/follow',
           );
           print(12);
           print(response.statusCode);
@@ -122,7 +124,7 @@ class ProfileService {
       }
       print(2);
       final response = await _dio.post(
-        '/api/users/$id/unfollow/',
+        '/api/users/$id/unfollow',
       );
       print(11);
       print(response.statusCode);

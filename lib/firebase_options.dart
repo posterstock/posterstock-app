@@ -47,7 +47,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCQeEIdDu7QRSnesdbl4oO_aaN_b5XNBm0',
+    apiKey: 'AIzaSyD_A5x91wx7KR1n3K_17J76YOFY0W8GsN8',
     appId: '1:405674784124:android:489ccce8f1b8819e1420f9',
     messagingSenderId: '405674784124',
     projectId: 'posterstock-td',

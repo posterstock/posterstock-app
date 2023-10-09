@@ -70,7 +70,7 @@ class CreatePosterController {
     createPosterChoseMovieStateHolder.updateValue(movie);
     createPosterChosenPosterStateHolder.updateValue(null);
     var chosenMovie = createPosterChoseMovieStateHolder.state;
-    var images = await createPosterRepository.getMediaPosters(
+    var images = movie == null ? null : await createPosterRepository.getMediaPosters(
         chosenMovie!.type.name, chosenMovie.id);
     createPosterImagesStateHolder.setValue(images ?? []);
   }

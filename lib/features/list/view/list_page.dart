@@ -23,6 +23,7 @@ import 'package:poster_stock/features/profile/state_holders/my_profile_info_stat
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../common/services/text_info_service.dart';
 import '../../poster/view/pages/poster_page/poster_page.dart';
@@ -630,13 +631,14 @@ class ListActionsDialog extends ConsumerWidget {
                           Expanded(
                             child: InkWell(
                               onTap: () {
-                                scaffoldMessengerKey.currentState?.showSnackBar(
+                                Share.share("posterstock.co/list/${list.id}");
+                                /*scaffoldMessengerKey.currentState?.showSnackBar(
                                   SnackBars.build(
                                     context,
                                     null,
                                     'Not available yet',
                                   ),
-                                );
+                                );*/
                               },
                               child: Center(
                                 child: Text(

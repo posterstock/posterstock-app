@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -38,6 +37,7 @@ import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../../../common/helpers/hero_dialog_route.dart';
@@ -973,6 +973,7 @@ class _CommentTextFieldState extends ConsumerState<CommentTextField> {
                     color: context.colors.textsDisabled,
                   ),
                 ),
+                textCapitalization: TextCapitalization.sentences,
                 onChanged: (value) {
                   setState(() {});
                 },
@@ -1490,13 +1491,8 @@ class PosterActionsDialog extends ConsumerWidget {
                           Expanded(
                             child: InkWell(
                               onTap: () {
-                                scaffoldMessengerKey.currentState?.showSnackBar(
-                                  SnackBars.build(
-                                    context,
-                                    null,
-                                    'Not available yet',
-                                  ),
-                                );
+                                Share.share(
+                                    "posterstock.co/${post.author.username}/${post.id}");
                               },
                               child: Center(
                                 child: Text(
@@ -1553,9 +1549,15 @@ class PosterActionsDialog extends ConsumerWidget {
                                       ),
                                     );
                                   }
-                                  ref
+                                  final myself = ref
+                                      .watch(
+                                      profileInfoStateHolderProvider)
+                                      ?.mySelf;
+                                  if (myself != false) {
+                                    ref
                                       .read(profileControllerApiProvider)
                                       .getUserInfo(null);
+                                  }
                                 }
                               },
                               child: Center(

@@ -23,7 +23,7 @@ class AuthService {
   Future<void> registerNotification(String token, String userToken) async {
     try {
       final response = await _dio.post(
-        'api/notifications/register/$token/',
+        'api/notifications/register/$token',
         options: Options(
           contentType: 'text/plain; charset=utf-8',
           headers: {
@@ -46,7 +46,7 @@ class AuthService {
     print(userToken);
     try {
       final response = await _dio.delete(
-        'api/notifications/drop/$token/',
+        'api/notifications/drop/$token',
         options: Options(
           contentType: 'text/plain; charset=utf-8',
           headers: {

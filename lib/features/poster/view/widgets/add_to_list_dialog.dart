@@ -36,8 +36,8 @@ class AddToListDialog extends ConsumerWidget {
       },
       child: GestureDetector(
         onTap: () {
-          Navigator.pop(context);
           ref.watch(myListsStateHolderProvider.notifier).clear();
+          Navigator.pop(context);
         },
         child: Scaffold(
           backgroundColor: Colors.transparent,
@@ -47,8 +47,8 @@ class AddToListDialog extends ConsumerWidget {
               children: [
                 GestureDetector(
                   onTap: () {
-                    Navigator.pop(context);
                     ref.watch(myListsStateHolderProvider.notifier).clear();
+                    Navigator.pop(context);
                   },
                   child: Container(
                     color: Colors.transparent,
@@ -74,8 +74,8 @@ class AddToListDialog extends ConsumerWidget {
                           onNotification: (info) {
                             if (_controller.pixels != 0 &&
                                 _controller.pixels <= 5.0) {
-                              Navigator.pop(context);
                               ref.watch(myListsStateHolderProvider.notifier).clear();
+                              Navigator.pop(context);
                             }
                             return true;
                           },
@@ -100,24 +100,28 @@ class AddToListDialog extends ConsumerWidget {
                                 ),
                                 SizedBox(height: lists == null ? 100 : 10.5),
                                 if (lists == null)
-                                  Center(
-                                    child: defaultTargetPlatform !=
-                                            TargetPlatform.android
-                                        ? CupertinoActivityIndicator(
-                                            radius: 10.0,
-                                            color:
-                                                context.colors.textsBackground!,
-                                          )
-                                        : SizedBox(
-                                            width: 16,
-                                            height: 16,
-                                            child: CircularProgressIndicator(
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 80.0),
+                                    child: Center(
+                                      child: defaultTargetPlatform !=
+                                              TargetPlatform.android
+                                          ? CupertinoActivityIndicator(
+                                              radius: 10.0,
                                               color:
-                                                  context.colors.textsBackground!,
-                                              strokeWidth: 2,
+                                                  context.colors.textsSecondary!,
+                                            )
+                                          : SizedBox(
+                                              width: 16,
+                                              height: 16,
+                                              child: CircularProgressIndicator(
+                                                color:
+                                                    context.colors.textsSecondary!,
+                                                strokeWidth: 2,
+                                              ),
                                             ),
-                                          ),
+                                    ),
                                   ),
+                                if (lists != null)
                                 ...List.generate(
                                   lists?.length ?? 0,
                                   (index) => CustomInkWell(
@@ -128,8 +132,8 @@ class AddToListDialog extends ConsumerWidget {
                                           thickness: 0.5,
                                           color: context.colors.fieldsDefault,
                                         ),
-                                        SizedBox(
-                                          height: 52,
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 15.0),
                                           child: Row(
                                             children: [
                                               const SizedBox(width: 19),
@@ -140,6 +144,7 @@ class AddToListDialog extends ConsumerWidget {
                                                       .textStyles.bodyRegular,
                                                 ),
                                               ),
+                                              const SizedBox(width: 16),
                                               Text(
                                                 lists![index].postersCount.toString() + ' posters',
                                                 style: context
@@ -171,8 +176,8 @@ class AddToListDialog extends ConsumerWidget {
                                             );
                                       } catch (e) {
                                         snack?.close();
-                                        Navigator.pop(context);
                                         ref.watch(myListsStateHolderProvider.notifier).clear();
+                                        Navigator.pop(context);
                                         if (context.mounted) {
                                           scaffoldMessengerKey.currentState
                                               ?.showSnackBar(
@@ -185,8 +190,8 @@ class AddToListDialog extends ConsumerWidget {
                                         }
                                       }
                                       snack?.close();
-                                      Navigator.pop(context);
                                       ref.watch(myListsStateHolderProvider.notifier).clear();
+                                      Navigator.pop(context);
                                     },
                                   ),
                                 ),

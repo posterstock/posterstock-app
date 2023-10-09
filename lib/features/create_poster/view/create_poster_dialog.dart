@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/helpers/custom_ink_well.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
@@ -45,6 +46,89 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
     super.dispose();
   }
 
+  Future<bool> tryExit() async {
+    bool? exit = await showDialog(
+      context: context,
+      builder: (context) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 38.0),
+        child: Center(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16.0),
+            child: Container(
+              height: 132,
+              decoration: BoxDecoration(
+                color: context.colors.backgroundsPrimary,
+                borderRadius: BorderRadius.circular(16.0),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x29000000),
+                    offset: Offset(0, 16),
+                    blurRadius: 24,
+                    spreadRadius: 0,
+                  )
+                ],
+              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'Do you want to discard\nthe ${widget.bookmark ? 'bookmark' : 'post'}?',
+                        style: context.textStyles.bodyBold,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    height: 0.5,
+                    thickness: 0.5,
+                    color: context.colors.fieldsDefault,
+                  ),
+                  SizedBox(
+                    height: 52,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: CustomInkWell(
+                            onTap: () {
+                              Navigator.pop(context, true);
+                            },
+                            child: Center(
+                              child: Text(
+                                'Discard',
+                                style: context.textStyles.bodyRegular!.copyWith(
+                                  color: context.colors.textsError,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: CustomInkWell(
+                            onTap: () {
+                              Navigator.pop(context, false);
+                            },
+                            child: Center(
+                              child: Text(
+                                'Cancel',
+                                style: context.textStyles.bodyRegular,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    return exit ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     focus.addListener(() {
@@ -64,9 +148,11 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
     if (searchText != searchController.text) {
       searchController.text = searchText;
     }
-    dragController.addListener(() {
+    dragController.addListener(() async {
       if (dragController.size < 0.1) {
         if (!disposed) {
+          bool exit = await tryExit();
+          if (!exit) return;
           ref.read(createPosterControllerProvider).choosePoster(null);
           ref.read(createPosterControllerProvider).chooseMovie(null);
           ref.read(createPosterControllerProvider).updateSearch('');
@@ -103,14 +189,12 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
     if (widget.bookmark) constValue = 480;
     return WillPopScope(
       onWillPop: () async {
-        await showDialog(
-          context: context,
-          builder: (context) => const SizedBox(),
-        );
+        bool exit = await tryExit();
+        if (!exit) return false;
         ref.read(createPosterControllerProvider).choosePoster(null);
         ref.read(createPosterControllerProvider).chooseMovie(null);
         ref.read(createPosterControllerProvider).updateSearch('');
-        return true;
+        return exit;
       },
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -123,7 +207,9 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
               bottom: 0,
               right: 0,
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
+                  bool exit = await tryExit();
+                  if (!exit) return;
                   ref.read(createPosterControllerProvider).choosePoster(null);
                   ref.read(createPosterControllerProvider).chooseMovie(null);
                   ref.read(createPosterControllerProvider).updateSearch('');
@@ -274,10 +360,11 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                                         .ellipsis,
                                                               ),
                                                             ),
-                                                            if (chosenMovie.endYear != null)
+                                                            if (chosenMovie
+                                                                    .endYear !=
+                                                                null)
                                                               Text(
-                                                                ' - ${chosenMovie
-                                                                    .endYear}',
+                                                                ' - ${chosenMovie.endYear}',
                                                                 style: context
                                                                     .textStyles
                                                                     .caption1!
@@ -286,8 +373,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                                       .colors
                                                                       .textsSecondary,
                                                                   overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
+                                                                      TextOverflow
+                                                                          .ellipsis,
                                                                 ),
                                                               ),
                                                           ],
@@ -536,8 +623,11 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                   createPosterChoseMovieStateHolderProvider);
                               print("ABBB");
                               print("${currPost?.name} ${createId?.title}");
-                              print("${currPost?.year} ${'${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}'}");
-                              if (currPost?.name == createId?.title && currPost?.year == '${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}') {
+                              print(
+                                  "${currPost?.year} ${'${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}'}");
+                              if (currPost?.name == createId?.title &&
+                                  currPost?.year ==
+                                      '${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}') {
                                 ref
                                     .read(posterStateHolderProvider.notifier)
                                     .updateState(

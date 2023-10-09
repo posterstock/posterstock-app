@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:poster_stock/common/constants/durations.dart';
+import 'package:poster_stock/common/helpers/string_extension.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
@@ -80,10 +81,23 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     ),
   );
 
+  StackRouter? rter;
+
+  @override
+  void dispose() {
+    rter?.removeListener(listenerContent);
+    super.dispose();
+  }
+
+  void listenerContent() {
+    getProfile();
+  }
+
   @override
   void initState() {
     super.initState();
     Future(() {
+      print(-2);
       ref.read(profileControllerApiProvider).clearUser();
     });
     animationController = AnimationController(
@@ -94,13 +108,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     );
     Future(() {
       try {
-        var profile = ref.watch(profileInfoStateHolderProvider);
-        var rtr = ref.watch(router);
-        rtr!.addListener(() {
-          if (profile == null) {
-            getProfile();
-          }
-        });
+        rter = ref.watch(router);
+        rter!.addListener(listenerContent);
       } catch (_) {}
     });
   }
@@ -114,22 +123,42 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     Future(() {
       if (rtr!.topRoute.path == 'profile' && anyProfile?.id != myProfile?.id) {
         Future(() {
+          print(-4);
           ref.read(profileControllerApiProvider).clearUser();
         });
       }
       RouteData? el;
       try {
-        if (ref.watch(router)!.topRoute.path == '/:username') {
+        var rttr = ref.watch(router);
+        int i1 = -1;
+        int i2 = -1;
+        int i3 = -1;
+        try {
+          i1 = rttr?.stack.lastIndexWhere((element) => element.routeData.path == '/:username') ?? 0;
+        } catch (e) {}
+        try {
+          i2 = rttr?.stack.lastIndexWhere((element) => element.routeData.path == '/users/:id') ?? 0;
+        } catch (e) {}
+        try {
+          i3 = rttr?.stack.lastIndexWhere((element) => element.routeData.path == '/') ?? 0;
+        } catch (e) {}
+        print(i1);
+        print(i2);
+        print(i3);
+        print(rttr?.stack.last.routeData.path);
+        //if (ref.watch(router)!.topRoute.path == '/:username' && anyProfile?.username != ref.watch(router)!.topRoute.pathParams.getString('username')) {
+        if (i1 > i2 && i1 > i3 && anyProfile?.username != ref.watch(router)!.topRoute.pathParams.getString('username')) {
           el = ref.watch(router)!.topRoute;
+          print(el.pathParams.getString('username'));
           ref
               .read(profileControllerApiProvider)
               .getUserInfo(el.pathParams.getString('username'));
-        } else if (ref.watch(router)!.topRoute.path == '/users/:id') {
+        } else if (i2 > i1 && i2 > i3  && anyProfile?.id != ref.watch(router)!.topRoute.pathParams.getInt('id')) {
           el = ref.watch(router)!.topRoute;
           ref
               .read(profileControllerApiProvider)
               .getUserInfo(el.pathParams.getInt('id'));
-        } else if (ref.watch(router)!.topRoute.path == 'profile') {
+        } else if (i3 > i1 && i3 > i2 && (anyProfile?.id == null || anyProfile?.id != myProfile?.id)) {
           print("GG${ref.watch(router)!.topRoute.path}");
           ref.read(profileControllerApiProvider).getUserInfo(null);
         }
@@ -140,25 +169,27 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     loading = false;
   }
 
-  bool? homeProfileRoute;
-
   @override
   Widget build(BuildContext context) {
     final rtr = ref.watch(router);
-    homeProfileRoute ??= rtr?.topRoute.path == 'profile';
     var anyProfile = ref.watch(profileInfoStateHolderProvider);
     var myProfile = ref.watch(myProfileInfoStateHolderProvider);
     UserDetailsModel? profile;
+    print("KEKEKEKE");
+    print(anyProfile);
     if (anyProfile != null) {
       profile = anyProfile;
     } else if (rtr!.topRoute.path == 'profile' &&
         anyProfile?.id != myProfile?.id) {
+      print("SHEEEEESH ${anyProfile?.id} ${myProfile?.id}");
       Future(() {
+        print(-3);
         ref.read(profileControllerApiProvider).clearUser();
       });
       profile = myProfile;
     }
     if (anyProfile == null) {
+      print("SHEEESH");
       getProfile();
     }
     myself = (profile?.id == myProfile?.id);
@@ -246,6 +277,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                   alignment: Alignment.centerLeft,
                                   child: GestureDetector(
                                     onTap: () async {
+                                      print(-5);
                                       ref
                                           .read(profileControllerApiProvider)
                                           .clearUser();

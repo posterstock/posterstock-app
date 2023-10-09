@@ -67,7 +67,7 @@ class PostService {
 
   Future<bool> getInCollection(int id) async {
     try {
-      final response = await _dio.get('api/posters/collection/$id',
+      final response = await _dio.get('api/posters/collection/$id/',
           options: Options(
             contentType: 'application/json',
             headers: {
@@ -87,7 +87,7 @@ class PostService {
   Future<List> getComments(int id) async {
     try {
       final response = await _dio.get(
-        'api/posters/$id/comments/private',
+        'api/posters/$id/comments/private/',
         options: Options(
           contentType: 'application/json',
           headers: {

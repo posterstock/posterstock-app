@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
@@ -600,6 +601,11 @@ class ProfilePhotoDialog extends ConsumerWidget {
                                 image = await ImagePicker().pickImage(
                                   source: ImageSource.gallery,
                                 );
+                                if (image == null) throw Exception();
+                                ref
+                                    .read(profileControllerProvider)
+                                    .setPhoto(
+                                    File(image!.path).readAsBytesSync(),);
                               } catch (e) {
                                 scaffoldMessengerKey.currentState?.showSnackBar(
                                   SnackBars.build(

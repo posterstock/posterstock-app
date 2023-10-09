@@ -11,6 +11,8 @@ class ProfileInfoStateHolder extends StateNotifier<UserDetailsModel?> {
   ProfileInfoStateHolder(super.state);
 
   void updateState(UserDetailsModel? user) {
+    print(user);
+    print("SHIR");
     state = user;
   }
 

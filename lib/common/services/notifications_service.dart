@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:dio/dio.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
 import 'package:poster_stock/features/notifications/state_holders/notifications_count_state_holder.dart';
@@ -117,6 +119,7 @@ Future<void> initPushes(StackRouter? routerLocal, WidgetRef ref) async {
 void showPush(RemoteMessage message, {WidgetRef? ref}) async {
   print(message.data);
   BigPictureStyleInformation? bigPictureStyleInformation;
+  String filePath = "";
   try {
     final Response response = await Dio().get(
       (message.data['text'] as String).contains("followed")
@@ -126,6 +129,15 @@ void showPush(RemoteMessage message, {WidgetRef? ref}) async {
         responseType: ResponseType.bytes,
       ),
     );
+    if (Platform.isIOS) {
+      var documentDirectory = await getApplicationDocumentsDirectory();
+      var firstPath = "${documentDirectory.path}/images/account";
+      var filePathAndName = '${documentDirectory.path}/images/account/pic.png';
+      filePath = filePathAndName;
+      await Directory(firstPath).create(recursive: true);
+      File file2 = File(filePathAndName);
+      file2.writeAsBytesSync(response.data);
+    }
     bigPictureStyleInformation = BigPictureStyleInformation(
       ByteArrayAndroidBitmap.fromBase64String(base64Encode(response.data)),
       hideExpandedLargeIcon: true,
@@ -135,6 +147,11 @@ void showPush(RemoteMessage message, {WidgetRef? ref}) async {
   } catch (e) {
     print(e);
   }
+  DarwinNotificationDetails iosNotificationDetails = DarwinNotificationDetails(
+      categoryIdentifier: darwinNotificationCategoryPlain,
+      attachments: filePath.isEmpty ? [] : [
+        DarwinNotificationAttachment(filePath),
+      ]);
   flutterLocalNotificationsPlugin.show(
     message.hashCode,
     message.data['text'],
@@ -162,8 +179,3 @@ void showPush(RemoteMessage message, {WidgetRef? ref}) async {
       ?.read(notificationsCountStateHolderProvider.notifier)
       .updateState(count + 1);
 }
-
-const DarwinNotificationDetails iosNotificationDetails =
-    DarwinNotificationDetails(
-  categoryIdentifier: darwinNotificationCategoryPlain,
-);

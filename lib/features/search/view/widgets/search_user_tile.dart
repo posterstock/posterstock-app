@@ -29,7 +29,7 @@ class SearchUserTile extends ConsumerWidget {
     return InkWell(
       onTap: () {
         ref.watch(router)!.pushNamed(
-          '/${user.username}'
+          '/${user.username}/'
         );
       },
       child: Padding(

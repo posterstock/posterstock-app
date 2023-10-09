@@ -58,6 +58,7 @@ class ProfileControllerApi {
   }
 
   Future<void> clearUser() async {
+    print("CLEARING");
     gettingUser = 'profile';
     gotAllBookmarks = false;
     await profileInfoStateHolder.clearState();
@@ -99,7 +100,7 @@ class ProfileControllerApi {
   }
 
   Future<void> getUserInfo(dynamic usernameOrId) async {
-    print(usernameOrId);
+    print("GETTING");
     if (gettingUser == usernameOrId) return;
     gttgUser = true;
     try {

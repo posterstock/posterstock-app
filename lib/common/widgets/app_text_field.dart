@@ -29,6 +29,7 @@ class AppTextField extends StatefulWidget {
     this.maxLines,
     this.minLines,
     this.style,
+    this.textCapitalization,
   }) : super(key: key);
   final String hint;
   final Function(String)? onSubmitted;
@@ -51,6 +52,7 @@ class AppTextField extends StatefulWidget {
   final int? maxLines;
   final int? minLines;
   final TextStyle? style;
+  final TextCapitalization? textCapitalization;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -91,6 +93,7 @@ class _AppTextFieldState extends State<AppTextField> {
       child: Stack(
         children: [
           TextField(
+            textCapitalization: widget.textCapitalization ?? TextCapitalization.none,
             autofocus: widget.autofocus!,
             onTap: widget.onTap,
             keyboardType: widget.keyboardType,

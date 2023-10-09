@@ -67,14 +67,14 @@ class HomePageApi implements IHomePageApi {
     try {
       if (like) {
         var response = await _dio.post(
-          'api/posters/$id/like/',
+          'api/posters/$id/like',
           options: Options(
             headers: {'Authorization': 'Bearer $token'},
           ),
         );
       } else {
         var response = await _dio.post(
-          'api/posters/$id/unlike/',
+          'api/posters/$id/unlike',
           options: Options(
             headers: {'Authorization': 'Bearer $token'},
           ),
@@ -90,14 +90,14 @@ class HomePageApi implements IHomePageApi {
     try {
       if (like) {
         var response = await _dio.post(
-          'api/lists/$id/like/',
+          'api/lists/$id/like',
           options: Options(
             headers: {'Authorization': 'Bearer $token'},
           ),
         );
       } else {
         var response = await _dio.post(
-          'api/lists/$id/unlike/',
+          'api/lists/$id/unlike',
           options: Options(
             headers: {'Authorization': 'Bearer $token'},
           ),
