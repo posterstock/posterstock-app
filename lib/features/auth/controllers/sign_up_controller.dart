@@ -187,11 +187,14 @@ class SignUpController {
   }
 
   Future<void> removeFCMToken() async {
-    var fcmToken = await FirebaseMessaging.instance.getToken();
-    final userToken = await SuperTokens.getAccessToken();
-    if (userToken == null) return;
-    if (fcmToken == null) return;
-    await repository.removeFCMToken(fcmToken, userToken);
+    /*
+    Если все таки нужно на бэке удалять токен, то всё расскоментировать и метод удаления FCM теокена в конец поставить!
+     */
+    await FirebaseMessaging.instance.deleteToken();
+    // final userToken = await SuperTokens.getAccessToken();
+    // if (userToken == null) return;
+    // if (fcmToken == null) return;
+    // await repository.removeFCMToken(fcmToken, userToken);
   }
 
   Future<void> registerNotification(String token) async {
