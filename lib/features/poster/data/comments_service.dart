@@ -11,7 +11,7 @@ class PostService {
 
   Future<Map<String, dynamic>> postComment(int id, String text) async {
     try {
-      final response = await _dio.post('api/posters/$id/comment/',
+      final response = await _dio.post('api/posters/$id/comment',
           options: Options(
             contentType: 'application/json',
             headers: {
@@ -31,7 +31,7 @@ class PostService {
   Future<void> deleteComment(int postId, int id) async {
     try {
       await _dio.delete(
-        '/api/posters/$postId/comments/$id/',
+        '/api/posters/$postId/comments/$id',
         options: Options(
           contentType: 'application/json',
           headers: {
@@ -48,7 +48,7 @@ class PostService {
 
   Future<Map<String, dynamic>> postCommentList(int id, String text) async {
     try {
-      final response = await _dio.post('api/lists/$id/comment/',
+      final response = await _dio.post('api/lists/$id/comment',
           options: Options(
             contentType: 'application/json',
             headers: {
@@ -109,7 +109,7 @@ class PostService {
       Response response;
       if (bookmarked) {
         response = await _dio.post(
-          '/api/posters/$id/bookmark/',
+          '/api/posters/$id/bookmark',
           options: Options(
             contentType: 'application/json',
             headers: {
@@ -120,7 +120,7 @@ class PostService {
         );
       } else {
         response = await _dio.post(
-          '/api/posters/$id/unbookmark/',
+          '/api/posters/$id/unbookmark',
           options: Options(
             contentType: 'application/json',
             headers: {
@@ -188,7 +188,7 @@ class PostService {
       var idPosters = listId.posters.map((e) => e.id).toList()..add(postId);
       print(idPosters);
       final response = await _dio.post(
-        'api/lists/${listId.id}/',
+        'api/lists/${listId.id}',
         options: Options(
           contentType: 'application/json',
           headers: {

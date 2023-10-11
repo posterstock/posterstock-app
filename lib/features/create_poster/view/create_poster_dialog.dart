@@ -129,6 +129,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
     return exit ?? false;
   }
 
+  bool popping = false;
+
   @override
   Widget build(BuildContext context) {
     focus.addListener(() {
@@ -150,15 +152,23 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
     }
     dragController.addListener(() async {
       if (dragController.size < 0.1) {
-        if (!disposed) {
+        if (!disposed && !popping) {
+          popping = true;
           bool exit = await tryExit();
-          if (!exit) return;
+          if (!exit) {
+            dragController
+                .animateTo(0.7,
+                    duration: Duration(milliseconds: 200), curve: Curves.linear)
+                .then((value) => popping = false);
+            return;
+          }
           ref.read(createPosterControllerProvider).choosePoster(null);
           ref.read(createPosterControllerProvider).chooseMovie(null);
           ref.read(createPosterControllerProvider).updateSearch('');
+          popping = false;
+          disposed = true;
           Navigator.pop(context);
         }
-        disposed = true;
       }
     });
     if (focus.hasFocus || focusSec.hasFocus) {

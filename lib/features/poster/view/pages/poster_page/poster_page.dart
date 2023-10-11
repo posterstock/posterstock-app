@@ -154,7 +154,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
         scrollController.offset == imageHeight! - 18) return;
     WidgetsBinding.instance.addPostFrameCallback(
       (_) {
-        int durationValue = (200 *
+        /*int durationValue = (200 *
                 (1 -
                     (posterController!.value - imageHeight! / 2).abs() /
                         (imageHeight! / 2)))
@@ -173,10 +173,10 @@ class _PosterPageState extends ConsumerState<PosterPage>
             duration: Duration(milliseconds: durationValue),
             curve: Curves.linear,
           );
-        }
+        }*/
       },
     );
-    if (up == false ||
+    /*if (up == false ||
         posterController!.value > imageHeight! * 0.5 && up != true) {
       posterController!.animateTo(
         imageHeight!,
@@ -187,7 +187,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
         0,
         duration: const Duration(milliseconds: 300),
       );
-    }
+    }*/
   }
 
   final shimmer = ShimmerLoader(
@@ -319,12 +319,12 @@ class _PosterPageState extends ConsumerState<PosterPage>
                           imageHeight! - notification.metrics.pixels);
                     }
                   }
-                  if (notification is ScrollEndNotification) {
+                  /*if (notification is ScrollEndNotification) {
                     if (notification.metrics.pixels > imageHeight!)
                       return false;
                     if (notification.metrics.pixels < 0) return false;
                     jumpToEnd();
-                  }
+                  }*/
                   return true;
                 },
                 child: Stack(

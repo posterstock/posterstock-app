@@ -50,7 +50,7 @@ class CreateListService {
     bool created = false;
     try {
       var response = await _dio.post(
-        'api/lists/',
+        'api/lists',
         data: jsonEncode({
           'description': description,
           'posters': posters,
@@ -76,7 +76,7 @@ class CreateListService {
         });
         print(base64Encode(image));
         var response1 = await _dio.post(
-          'api/lists/${response.data['id']}/image/',
+          'api/lists/${response.data['id']}/image',
           options: Options(
             headers: {'content-type': 'multipart/form-data'},
           ),

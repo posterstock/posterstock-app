@@ -22,7 +22,7 @@ class CreatePosterService {
     token = await SuperTokens.getAccessToken();
     try {
       var response = await _dio.post(
-        '/api/bookmarks/',
+        '/api/bookmarks',
         options: Options(
           headers: {'Authorization': 'Bearer $token'},
         ),
@@ -47,7 +47,7 @@ class CreatePosterService {
     token = await SuperTokens.getAccessToken();
     try {
       var response = await _dio.post(
-        '/api/posters/',
+        '/api/posters',
         options: Options(
           headers: {'Authorization': 'Bearer $token'},
         ),

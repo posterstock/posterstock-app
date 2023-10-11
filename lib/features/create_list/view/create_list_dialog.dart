@@ -143,6 +143,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
     return exit ?? false;
   }
 
+  bool popping = false;
   @override
   Widget build(BuildContext context) {
     final image = ref.watch(chosenCoverStateHolderProvider);
@@ -161,14 +162,23 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
     }
     dragController.addListener(() async {
       if (dragController.size < 0.1) {
-        if (!disposed) {
+        if (!disposed && !popping) {
+          popping = true;
           bool exit = await tryExit();
-          if (!exit) return;
+          if (!exit) {
+            dragController.animateTo(
+              0.7,
+              duration: Duration(milliseconds: 300),
+              curve: Curves.linear,
+            ).then((value) => popping = false);
+            return;
+          }
           ref.read(pickCoverControllerProvider).clearAll();
           ref.read(listSearchValueStateHolderProvider.notifier).clearState();
+          popping = false;
+          disposed = true;
           Navigator.pop(context);
         }
-        disposed = true;
       }
     });
     focus.addListener(() {

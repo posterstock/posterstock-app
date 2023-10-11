@@ -45,7 +45,7 @@ class EditProfileApi {
     print("$name $username $description");
     try {
       var response = await _dio.post(
-        'api/profiles/',
+        'api/profiles',
         options: Options(
           headers: {'Authorization': 'Bearer $token'},
         ),
@@ -56,7 +56,7 @@ class EditProfileApi {
       );
       try {
         var r1 = await _dio.post(
-          'api/profiles/username/',
+          'api/profiles/username',
           options: Options(
             headers: {'Authorization': 'Bearer $token'},
           ),
@@ -87,7 +87,7 @@ class EditProfileApi {
         "image": MultipartFile.fromBytes(pnImage),
       });
       var responseImage = await _dio.post(
-        'api/profiles/image/',
+        'api/profiles/image',
         options: Options(
           headers: {'content-type': 'multipart/form-data'},
         ),

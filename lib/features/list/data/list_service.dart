@@ -8,7 +8,7 @@ class ListService {
 
   Future<Map<String, dynamic>> postComment(int id, String text) async {
     try {
-      final response = await _dio.post('api/lists/$id/comment/',
+      final response = await _dio.post('api/lists/$id/comment',
           options: Options(
             contentType: 'application/json',
             headers: {
