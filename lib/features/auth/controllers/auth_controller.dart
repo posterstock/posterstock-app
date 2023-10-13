@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/data/exceptions.dart';
 import 'package:poster_stock/common/state_holders/intl_state_holder.dart';
@@ -88,15 +89,30 @@ class AuthController {
     }
   }
 
-  Future<void> registerNotification(String token) async {
+  Future<void> removeFCMToken() async {
+    /*
+    Если все таки нужно на бэке удалять токен, то всё расскоментировать и метод удаления FCM теокена в конец поставить!
+     */
+    await FirebaseMessaging.instance.deleteToken();
+    // final userToken = await SuperTokens.getAccessToken();
+    // if (userToken == null) return;
+    // if (fcmToken == null) return;
+    // await repository.removeFCMToken(fcmToken, userToken);
+  }
+
+  Future<void> registerNotification() async {
     final userToken = await SuperTokens.getAccessToken();
     if (userToken == null) throw Exception();
     try {
-      await repository.removeFCMToken(token, userToken);
-    } catch (e) {}
+      //await removeFCMToken();
+    } catch (e) {
+      debugPrint(e.toString());
+    }
     try {
-      await repository.registerNotification(token, userToken);
-    } catch (e) {}
+      await repository.registerNotification((await FirebaseMessaging.instance.getToken())!, userToken);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   Future<bool> authApple({
@@ -116,8 +132,7 @@ class AuthController {
       state: state,
     );
     try {
-      var token = await FirebaseMessaging.instance.getToken();
-      await registerNotification(token!);
+      await registerNotification();
     } catch (e) {
       print(e);
     }
@@ -138,8 +153,7 @@ class AuthController {
       code: code,
     );
     try {
-      var token = await FirebaseMessaging.instance.getToken();
-      await registerNotification(token!);
+      await registerNotification();
     } catch (e) {
       print(e);
     }

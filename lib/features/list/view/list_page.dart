@@ -669,6 +669,7 @@ class ListActionsDialog extends ConsumerWidget {
                                 } else {
                                     try {
                                       await ref.read(listsControllerProvider).deleteList(list.id);
+                                      ref.read(profileControllerApiProvider).getUserInfo(null);
                                       Navigator.of(context).pop();
                                       ref.watch(router)!.pop();
                                       scaffoldMessengerKey.currentState?.showSnackBar(

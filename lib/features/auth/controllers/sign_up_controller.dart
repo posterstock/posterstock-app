@@ -132,18 +132,7 @@ class SignUpController {
       codeErrorStateHolder.setValue("Wrong code");
       return false;
     }
-    try {
-      token = await FirebaseMessaging.instance.getToken();
-    } catch (e) {
-      print(e);
-    }
-    if (token != null) {
-      try {
-        await registerNotification(token);
-      } catch (e) {
-        print(e);
-      }
-    }
+    await registerNotification();
     signUpLoadingStateHolder.setValue(false);
     var instance = await SharedPreferences.getInstance();
     instance.setString('email', email);
@@ -167,18 +156,7 @@ class SignUpController {
       codeErrorStateHolder.setValue("Wrong code");
       return false;
     }
-    try {
-      token = await FirebaseMessaging.instance.getToken();
-    } catch (e) {
-      print(e);
-    }
-    if (token != null) {
-      try {
-        await registerNotification(token);
-      } catch (e) {
-        print(e);
-      }
-    }
+    await registerNotification();
     signUpLoadingStateHolder.setValue(false);
     var instance = await SharedPreferences.getInstance();
     instance.setString('email', email);
@@ -197,16 +175,11 @@ class SignUpController {
     // await repository.removeFCMToken(fcmToken, userToken);
   }
 
-  Future<void> registerNotification(String token) async {
+  Future<void> registerNotification() async {
     final userToken = await SuperTokens.getAccessToken();
     if (userToken == null) throw Exception();
     try {
-      await removeFCMToken();
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-    try {
-      await repository.registerNotification(token, userToken);
+      await repository.registerNotification((await FirebaseMessaging.instance.getToken())!, userToken);
     } catch (e) {
       debugPrint(e.toString());
     }

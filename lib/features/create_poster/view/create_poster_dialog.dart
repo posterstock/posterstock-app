@@ -591,129 +591,135 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
               ),
             ),
             if (!focus.hasFocus && searchController.text.isEmpty ||
-                chosenMovie != null)
+                chosenMovie != null && dragController.isAttached)
               Positioned(
                 bottom: 0,
                 left: 0,
                 right: 0,
-                child: Column(
-                  children: [
-                    Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: context.colors.fieldsDefault,
-                    ),
-                    Container(
-                      height: 17.5,
-                      color: context.colors.backgroundsPrimary,
-                    ),
-                    if (!widget.bookmark)
+                child: AnimatedBuilder(
+                  animation: dragController,
+                  builder: (context, child) {
+                    return Transform.translate(offset: Offset(0,!dragController.isAttached ? 0 : dragController.size >=0.2 ? 0 : (0.2 - dragController.size) * MediaQuery.of(context).size.height), child: child!,);
+                  },
+                  child: Column(
+                    children: [
+                      Divider(
+                        height: 1,
+                        thickness: 1,
+                        color: context.colors.fieldsDefault,
+                      ),
                       Container(
+                        height: 17.5,
                         color: context.colors.backgroundsPrimary,
-                        child: DescriptionTextField(
-                          focus: focusSec,
-                          hint:
-                              'Share your one-line review with your audience, it matters for them.',
-                          showDivider: false,
-                          button: 'Add poster',
-                          buttonAddCheck: chosenCover != null,
-                          buttonLoading:
-                              ref.watch(createPosterLoadingStateHolderProvider),
-                          maxSymbols: 280,
-                          controller: descController,
-                          onTap: () async {
-                            try {
+                      ),
+                      if (!widget.bookmark)
+                        Container(
+                          color: context.colors.backgroundsPrimary,
+                          child: DescriptionTextField(
+                            focus: focusSec,
+                            hint:
+                                'Share your one-line review with your audience, it matters for them.',
+                            showDivider: false,
+                            button: 'Add poster',
+                            buttonAddCheck: chosenCover != null,
+                            buttonLoading:
+                                ref.watch(createPosterLoadingStateHolderProvider),
+                            maxSymbols: 280,
+                            controller: descController,
+                            onTap: () async {
+                              try {
+                                ref
+                                    .read(createPosterLoadingStateHolderProvider
+                                        .notifier)
+                                    .updateValue(true);
+                                final currPost =
+                                    ref.read(posterStateHolderProvider);
+                                final createId = ref.read(
+                                    createPosterChoseMovieStateHolderProvider);
+                                print("ABBB");
+                                print("${currPost?.name} ${createId?.title}");
+                                print(
+                                    "${currPost?.year} ${'${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}'}");
+                                if (currPost?.name == createId?.title &&
+                                    currPost?.year ==
+                                        '${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}') {
+                                  ref
+                                      .read(posterStateHolderProvider.notifier)
+                                      .updateState(
+                                        currPost!.copyWith(hasInCollection: true),
+                                      );
+                                }
+                                await ref
+                                    .read(createPosterControllerProvider)
+                                    .createPoster(descController.text);
+                              } catch (_) {
+                                print(_);
+                              }
                               ref
                                   .read(createPosterLoadingStateHolderProvider
                                       .notifier)
-                                  .updateValue(true);
-                              final currPost =
-                                  ref.read(posterStateHolderProvider);
-                              final createId = ref.read(
-                                  createPosterChoseMovieStateHolderProvider);
-                              print("ABBB");
-                              print("${currPost?.name} ${createId?.title}");
-                              print(
-                                  "${currPost?.year} ${'${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}'}");
-                              if (currPost?.name == createId?.title &&
-                                  currPost?.year ==
-                                      '${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}') {
-                                ref
-                                    .read(posterStateHolderProvider.notifier)
-                                    .updateState(
-                                      currPost!.copyWith(hasInCollection: true),
-                                    );
+                                  .updateValue(false);
+                              if (context.mounted) {
+                                Navigator.pop(context);
+                                ref.read(menuControllerProvider).switchMenu();
                               }
-                              await ref
-                                  .read(createPosterControllerProvider)
-                                  .createPoster(descController.text);
-                            } catch (_) {
-                              print(_);
-                            }
-                            ref
-                                .read(createPosterLoadingStateHolderProvider
-                                    .notifier)
-                                .updateValue(false);
-                            if (context.mounted) {
-                              Navigator.pop(context);
-                              ref.read(menuControllerProvider).switchMenu();
-                            }
-                          },
-                        ),
-                      ),
-                    if (widget.bookmark)
-                      Container(
-                        color: context.colors.backgroundsPrimary,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).padding.bottom,
+                            },
                           ),
-                          child: Container(
-                            height: 36,
-                            color: context.colors.backgroundsPrimary,
-                            child: Row(
-                              children: [
-                                const Spacer(),
-                                AppTextButton(
-                                  text: "Add bookmark",
-                                  disabled: chosenMovie == null,
-                                  onTap: () async {
-                                    try {
+                        ),
+                      if (widget.bookmark)
+                        Container(
+                          color: context.colors.backgroundsPrimary,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).padding.bottom,
+                            ),
+                            child: Container(
+                              height: 36,
+                              color: context.colors.backgroundsPrimary,
+                              child: Row(
+                                children: [
+                                  const Spacer(),
+                                  AppTextButton(
+                                    text: "Add bookmark",
+                                    disabled: chosenMovie == null,
+                                    onTap: () async {
+                                      try {
+                                        ref
+                                            .read(
+                                                createPosterLoadingStateHolderProvider
+                                                    .notifier)
+                                            .updateValue(true);
+                                        await ref
+                                            .read(createPosterControllerProvider)
+                                            .createBookmark();
+                                      } catch (_) {
+                                        print(_);
+                                      }
                                       ref
                                           .read(
                                               createPosterLoadingStateHolderProvider
                                                   .notifier)
-                                          .updateValue(true);
-                                      await ref
-                                          .read(createPosterControllerProvider)
-                                          .createBookmark();
-                                    } catch (_) {
-                                      print(_);
-                                    }
-                                    ref
-                                        .read(
-                                            createPosterLoadingStateHolderProvider
-                                                .notifier)
-                                        .updateValue(false);
-                                    if (context.mounted) {
-                                      Navigator.pop(context);
-                                      ref
-                                          .read(menuControllerProvider)
-                                          .switchMenu();
-                                    }
-                                  },
-                                ),
-                                const SizedBox(width: 16),
-                              ],
+                                          .updateValue(false);
+                                      if (context.mounted) {
+                                        Navigator.pop(context);
+                                        ref
+                                            .read(menuControllerProvider)
+                                            .switchMenu();
+                                      }
+                                    },
+                                  ),
+                                  const SizedBox(width: 16),
+                                ],
+                              ),
                             ),
                           ),
                         ),
+                      Container(
+                        height: MediaQuery.of(context).padding.bottom,
+                        color: context.colors.backgroundsPrimary,
                       ),
-                    Container(
-                      height: MediaQuery.of(context).padding.bottom,
-                      color: context.colors.backgroundsPrimary,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
           ],

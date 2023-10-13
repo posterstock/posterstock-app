@@ -87,7 +87,7 @@ class ListService {
   Future<void> deleteList(int id) async {
     try {
       final response = await _dio.delete(
-        'api/lists/$id/',
+        'api/lists/$id',
         options: Options(
           contentType: 'application/json',
           headers: {

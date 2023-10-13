@@ -10,6 +10,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
+import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/features/auth/controllers/auth_controller.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_error_state_holder.dart';
@@ -17,6 +18,7 @@ import 'package:poster_stock/features/auth/state_holders/auth_loading_state_hold
 import 'package:poster_stock/features/auth/view/pages/sign_up_page.dart';
 import 'package:poster_stock/features/auth/view/widgets/auth_button.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
+import 'package:poster_stock/main.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -301,6 +303,7 @@ class AuthPage extends ConsumerWidget {
       }
       ref.read(authControllerProvider).stopLoading();
     } catch (e) {
+      //scaffoldMessengerKey.currentState?.showSnackBar(SnackBars.build(context, null, e.toString()));
       ref.read(authControllerProvider).stopLoading();
     }
   }
@@ -313,7 +316,7 @@ class AuthPage extends ConsumerWidget {
             ? '405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com'
             : '405674784124-buqlusrif3nur8sqk7li6u1ruq6votji.apps.googleusercontent.com',
         serverClientId:
-            '405674784124-k6n0rjpfh2n5vc9m682tmj1i7af1h3hl.apps.googleusercontent.com',
+            '405674784124-o5mimp1gieo999o67s4ourrna4s0e1u5.apps.googleusercontent.com',
         scopes: [
           'openid',
           'https://www.googleapis.com/auth/userinfo.profile',
@@ -326,7 +329,6 @@ class AuthPage extends ConsumerWidget {
             accessToken: tokens?.accessToken,
             idToken: tokens?.idToken,
             code: result?.serverAuthCode,
-            //code: tokens.,
           );
       if (success && context.mounted) {
         ref.watch(router)!.pushAndPopUntil(
@@ -337,6 +339,7 @@ class AuthPage extends ConsumerWidget {
         );
       }
     } catch (e) {
+      //scaffoldMessengerKey.currentState?.showSnackBar(SnackBars.build(context, null, e.toString()));
       ref.read(authControllerProvider).stopLoading();
     }
     ref.read(authControllerProvider).stopLoading();

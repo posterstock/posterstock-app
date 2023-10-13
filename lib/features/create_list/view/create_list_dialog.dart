@@ -418,179 +418,185 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  child: Column(
-                    children: [
-                      Divider(
-                        height: 0.5,
-                        thickness: 0.5,
-                        color: context.colors.fieldsDefault,
-                      ),
-                      Container(
-                        color: context.colors.backgroundsPrimary,
-                        height: 56,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                textCapitalization:
-                                    TextCapitalization.sentences,
-                                controller: nameController,
-                                decoration: InputDecoration(
-                                  hintText: 'List name',
-                                  hintStyle:
-                                      context.textStyles.callout!.copyWith(
-                                    color: context.colors.textsDisabled,
+                  child: AnimatedBuilder(
+                    animation: dragController,
+                    builder: (context, child) {
+                      return Transform.translate(offset: Offset(0,!dragController.isAttached ? 0 : dragController.size >=0.3 ? 0 : (0.3 - dragController.size) * MediaQuery.of(context).size.height), child: child!,);
+                    },
+                    child: Column(
+                      children: [
+                        Divider(
+                          height: 0.5,
+                          thickness: 0.5,
+                          color: context.colors.fieldsDefault,
+                        ),
+                        Container(
+                          color: context.colors.backgroundsPrimary,
+                          height: 56,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  textCapitalization:
+                                      TextCapitalization.sentences,
+                                  controller: nameController,
+                                  decoration: InputDecoration(
+                                    hintText: 'List name',
+                                    hintStyle:
+                                        context.textStyles.callout!.copyWith(
+                                      color: context.colors.textsDisabled,
+                                    ),
+                                    filled: true,
+                                    fillColor: context.colors.backgroundsPrimary,
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 20.0,
+                                      vertical: 12.0,
+                                    ),
                                   ),
-                                  filled: true,
-                                  fillColor: context.colors.backgroundsPrimary,
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 20.0,
-                                    vertical: 12.0,
+                                  style: context.textStyles.callout!.copyWith(
+                                    color: context.colors.textsPrimary,
                                   ),
+                                  onChanged: (value) {
+                                    if (nameController.text.length > 70) {
+                                      nameController.text =
+                                          nameController.text.substring(0, 70);
+                                    }
+                                    setState(() {});
+                                  },
                                 ),
-                                style: context.textStyles.callout!.copyWith(
-                                  color: context.colors.textsPrimary,
-                                ),
-                                onChanged: (value) {
-                                  if (nameController.text.length > 70) {
-                                    nameController.text =
-                                        nameController.text.substring(0, 70);
-                                  }
-                                  setState(() {});
-                                },
                               ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                dragController
-                                    .animateTo(
-                                  0.7,
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.linear,
-                                )
-                                    .then((value) async {
-                                  XFile? image;
-                                  try {
-                                    image = await ImagePicker().pickImage(
-                                      source: ImageSource.gallery,
-                                    );
-                                  } catch (e) {
-                                    scaffoldMessengerKey.currentState
-                                        ?.showSnackBar(
-                                      SnackBars.build(context, null,
-                                          "Could not pick image"),
-                                    );
-                                    return;
-                                  }
-                                  if (image == null) {
-                                    scaffoldMessengerKey.currentState
-                                        ?.showSnackBar(
-                                      SnackBars.build(context, null,
-                                          "Could not pick image"),
-                                    );
-                                    return;
-                                  }
-                                  ref
-                                      .read(pickCoverControllerProvider)
-                                      .setImage(image!.path);
-                                });
-                              },
-                              child: Container(
-                                color: context.colors.backgroundsPrimary,
-                                child: image == null
-                                    ? Row(
-                                        children: [
-                                          Text(
-                                            'Upload cover',
-                                            style: context.textStyles.caption2!
-                                                .copyWith(
-                                              color:
-                                                  context.colors.textsDisabled,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          SvgPicture.asset(
-                                            'assets/icons/ic_pick_photo.svg',
-                                            width: 24,
-                                          ),
-                                          //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
-                                          const SizedBox(width: 16),
-                                        ],
-                                      )
-                                    : Row(
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(2.0),
-                                            child: SizedBox(
-                                              width: 36,
-                                              height: 24,
-                                              child: Image.file(
-                                                File(image),
-                                                fit: BoxFit.cover,
-                                                cacheWidth: 24,
+                              GestureDetector(
+                                onTap: () {
+                                  dragController
+                                      .animateTo(
+                                    0.7,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.linear,
+                                  )
+                                      .then((value) async {
+                                    XFile? image;
+                                    try {
+                                      image = await ImagePicker().pickImage(
+                                        source: ImageSource.gallery,
+                                      );
+                                    } catch (e) {
+                                      scaffoldMessengerKey.currentState
+                                          ?.showSnackBar(
+                                        SnackBars.build(context, null,
+                                            "Could not pick image"),
+                                      );
+                                      return;
+                                    }
+                                    if (image == null) {
+                                      scaffoldMessengerKey.currentState
+                                          ?.showSnackBar(
+                                        SnackBars.build(context, null,
+                                            "Could not pick image"),
+                                      );
+                                      return;
+                                    }
+                                    ref
+                                        .read(pickCoverControllerProvider)
+                                        .setImage(image!.path);
+                                  });
+                                },
+                                child: Container(
+                                  color: context.colors.backgroundsPrimary,
+                                  child: image == null
+                                      ? Row(
+                                          children: [
+                                            Text(
+                                              'Upload cover',
+                                              style: context.textStyles.caption2!
+                                                  .copyWith(
+                                                color:
+                                                    context.colors.textsDisabled,
                                               ),
                                             ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          GestureDetector(
-                                            onTap: () {
-                                              ref
-                                                  .read(
-                                                      pickCoverControllerProvider)
-                                                  .removeImage();
-                                            },
-                                            child: SvgPicture.asset(
-                                              'assets/icons/ic_trash.svg',
+                                            const SizedBox(width: 10),
+                                            SvgPicture.asset(
+                                              'assets/icons/ic_pick_photo.svg',
                                               width: 24,
                                             ),
-                                          ),
-                                          //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
-                                          const SizedBox(width: 16),
-                                        ],
-                                      ),
-                              ),
-                            )
-                          ],
+                                            //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
+                                            const SizedBox(width: 16),
+                                          ],
+                                        )
+                                      : Row(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(2.0),
+                                              child: SizedBox(
+                                                width: 36,
+                                                height: 24,
+                                                child: Image.file(
+                                                  File(image),
+                                                  fit: BoxFit.cover,
+                                                  cacheWidth: 24,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            GestureDetector(
+                                              onTap: () {
+                                                ref
+                                                    .read(
+                                                        pickCoverControllerProvider)
+                                                    .removeImage();
+                                              },
+                                              child: SvgPicture.asset(
+                                                'assets/icons/ic_trash.svg',
+                                                width: 24,
+                                              ),
+                                            ),
+                                            //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
+                                            const SizedBox(width: 16),
+                                          ],
+                                        ),
+                                ),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                      Container(
-                        color: context.colors.backgroundsPrimary,
-                        child: DescriptionTextField(
-                          buttonAddCheck: nameController.text.isNotEmpty &&
-                              ref
-                                      .watch(
-                                          createListChosenPosterStateHolderProvider)
-                                      .length >
-                                  2 &&
-                              ref
-                                      .watch(
-                                          createListChosenPosterStateHolderProvider)
-                                      .length <
-                                  31,
-                          controller: descriptionController,
-                          buttonLoading: loading,
-                          onTap: () async {
-                            loading = true;
-                            setState(() {});
-                            await ref
-                                .read(pickCoverControllerProvider)
-                                .createList(
-                                  title: nameController.text,
-                                  description: descriptionController.text,
-                                  context: context,
-                                );
-                            if (context.mounted) {
-                              Navigator.pop(context);
-                              ref.read(menuControllerProvider).switchMenu();
-                            }
-                            loading = false;
-                            setState(() {});
-                          },
+                        Container(
+                          color: context.colors.backgroundsPrimary,
+                          child: DescriptionTextField(
+                            buttonAddCheck: nameController.text.isNotEmpty &&
+                                ref
+                                        .watch(
+                                            createListChosenPosterStateHolderProvider)
+                                        .length >
+                                    2 &&
+                                ref
+                                        .watch(
+                                            createListChosenPosterStateHolderProvider)
+                                        .length <
+                                    31,
+                            controller: descriptionController,
+                            buttonLoading: loading,
+                            onTap: () async {
+                              loading = true;
+                              setState(() {});
+                              await ref
+                                  .read(pickCoverControllerProvider)
+                                  .createList(
+                                    title: nameController.text,
+                                    description: descriptionController.text,
+                                    context: context,
+                                  );
+                              if (context.mounted) {
+                                Navigator.pop(context);
+                                ref.read(menuControllerProvider).switchMenu();
+                              }
+                              loading = false;
+                              setState(() {});
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
             ],

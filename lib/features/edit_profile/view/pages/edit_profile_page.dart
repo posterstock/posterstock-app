@@ -595,7 +595,6 @@ class ProfilePhotoDialog extends ConsumerWidget {
                         Expanded(
                           child: InkWell(
                             onTap: () async {
-                              Navigator.pop(context);
                               XFile? image;
                               try {
                                 image = await ImagePicker().pickImage(
@@ -605,24 +604,19 @@ class ProfilePhotoDialog extends ConsumerWidget {
                                 ref
                                     .read(profileControllerProvider)
                                     .setPhoto(
-                                    File(image!.path).readAsBytesSync(),);
+                                    File(image.path).readAsBytesSync(),);
+                                await ref
+                                    .read(pickCoverControllerProvider)
+                                    .setImage(image.path);
+                                Navigator.pop(context);
                               } catch (e) {
+                                print(e);
                                 scaffoldMessengerKey.currentState?.showSnackBar(
                                   SnackBars.build(
                                       context, null, "Could not pick image"),
                                 );
                                 return;
                               }
-                              if (image == null) {
-                                scaffoldMessengerKey.currentState?.showSnackBar(
-                                  SnackBars.build(
-                                      context, null, "Could not pick image"),
-                                );
-                                return;
-                              }
-                              ref
-                                  .read(pickCoverControllerProvider)
-                                  .setImage(image.path);
                             },
                             child: Center(
                               child: Text(

@@ -10,7 +10,7 @@ class SnackBars {
       {Duration? duration}) {
     final shimmer = ShimmerLoader(
       child: Container(
-        color: context.colors.backgroundsSecondary,
+        color: !context.mounted ? Colors.black : context.colors.backgroundsSecondary,
       ),
     );
     return SnackBar(
@@ -48,7 +48,7 @@ class SnackBars {
           Expanded(
             child: Text(
               text,
-              style: context.textStyles.bodyRegular!.copyWith(
+              style: !context.mounted ? TextStyle(color: Colors.white) : context.textStyles.bodyRegular!.copyWith(
                 color: Colors.white,
               ),
             ),

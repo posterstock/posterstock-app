@@ -163,7 +163,7 @@ class PostService {
   Future<void> deletePost(int id) async {
     try {
       final response = await _dio.delete(
-        'api/posters/$id/',
+        'api/posters/$id',
         options: Options(
           contentType: 'application/json',
           headers: {

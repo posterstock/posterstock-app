@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,7 @@ import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
+import 'package:poster_stock/features/notifications/state_holders/notifications_count_state_holder.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_value_state_holder.dart';
@@ -368,8 +370,11 @@ class SettingsPage extends ConsumerWidget {
                               final prefs =
                                   await SharedPreferences.getInstance();
                               try {
-                                await ref.read(signUpControllerProvider)
+                               await ref.read(signUpControllerProvider)
                                     .removeFCMToken();
+                                ref
+                                    ?.read(notificationsCountStateHolderProvider.notifier).updateState(0);
+                                await FirebaseMessaging.instance.deleteToken();
                               } catch (_) {}
                               await SuperTokens.signOut();
                               TokenKeeper.token = null;
