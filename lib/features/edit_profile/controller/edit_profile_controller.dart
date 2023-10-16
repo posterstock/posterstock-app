@@ -10,6 +10,7 @@ import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_nam
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_username_error_state_holder.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_username_state_holder.dart';
+import 'package:poster_stock/features/edit_profile/state_holder/loading_state_holder.dart';
 
 final editProfileControllerProvider = Provider<EditProfileController>(
   (ref) => EditProfileController(
@@ -25,6 +26,7 @@ final editProfileControllerProvider = Provider<EditProfileController>(
     editProfileUsernameStateHolder: ref.watch(editProfileUsernameStateHolder),
     editProfileAvatarStateHolder: ref.watch(avatarStateHolderProvider),
     avatarStateHolder: ref.watch(avatarStateHolderProvider.notifier),
+      editProfileLoadingStateHolder: ref.watch(editProfileLoadingStateHolder.notifier),
   ),
 );
 
@@ -32,6 +34,7 @@ class EditProfileController {
   final EditProfileUsernameErrorStateHolder editProfileUsernameErrorStateHolder;
   final EditProfileNameErrorStateHolder editProfileNameErrorStateHolder;
   final EditProfileDescriptionErrorStateHolder editProfileDescriptionErrorSH;
+  final EditProfileLoadingStateHolder editProfileLoadingStateHolder;
   final AvatarStateHolder avatarStateHolder;
   final String? editProfileUsernameStateHolder;
   final String? editProfileNameStateHolder;
@@ -50,6 +53,7 @@ class EditProfileController {
     required this.editProfileAvatarStateHolder,
     required this.avatarStateHolder,
     required this.localizations,
+    required this.editProfileLoadingStateHolder,
   });
 
   void setWrongSymbolsErrorUsername() {
@@ -64,6 +68,10 @@ class EditProfileController {
   void setTooLongErrorUsername() {
     editProfileUsernameErrorStateHolder
         .updateError(localizations!.usernameCantExceed32);
+  }
+
+  void setLoading(bool value) {
+    editProfileLoadingStateHolder.updateValue(value);
   }
 
   void setTooShortErrorUsername() {

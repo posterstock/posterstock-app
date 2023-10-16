@@ -34,7 +34,7 @@ dependencies:
   supertokens_flutter: ^0.2.5
   dio: ^4.0.6
   sign_in_with_apple: ^5.0.0
-  google_sign_in: ^6.1.4
+  flutter_appauth: ^6.0.2
   firebase_core: ^2.15.0
   logger: ^1.4.0
   shared_preferences: ^2.2.0
@@ -47,6 +47,7 @@ dependencies:
   cached_network_image: ^3.2.3
   firebase_crashlytics: ^3.3.5
   path_provider: ^2.1.1
+  google_sign_in: ^6.1.5
 
 
 dev_dependencies:

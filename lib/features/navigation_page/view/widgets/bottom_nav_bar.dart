@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -201,10 +202,10 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                           )
                         : CircleAvatar(
                             radius: 12,
-                            backgroundImage: Image.network(
+                            backgroundColor: Colors.transparent,
+                            backgroundImage: CachedNetworkImageProvider(
                               myProfile!.imagePath!,
-                              fit: BoxFit.cover,
-                            ).image,
+                            ),
                           ),
                     activeIcon: myProfile?.imagePath == null
                         ? SvgPicture.asset(
@@ -229,11 +230,9 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                                 child: Center(
                                   child: CircleAvatar(
                                     radius: 12,
-                                    backgroundColor: Colors.transparent,
-                                    backgroundImage: Image.network(
+                                    backgroundImage: CachedNetworkImageProvider(
                                       myProfile!.imagePath!,
-                                      fit: BoxFit.cover,
-                                    ).image,
+                                    ),
                                   ),
                                 ),
                               ),

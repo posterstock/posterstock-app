@@ -1428,7 +1428,7 @@ class OtherProfileDialog extends ConsumerWidget {
                                   case InfoDialogType.postComment:
                                     {
                                       try {
-                                        ref
+                                        await ref
                                             .read(commentsControllerProvider)
                                             .deleteComment(
                                                 postId!.id, entityId!);
