@@ -116,16 +116,21 @@ class LoginPage extends ConsumerWidget {
                       color: context.colors.textsAction!,
                     ),
                     onTap: () async {
+                      print("SIGNING");
                       bool success = await ref
                           .read(signUpControllerProvider)
                           .processSignIn();
-                      if (success && context.mounted) {
-                        ref.watch(router)!.pushAndPopUntil(
+                      if (success) {
+                        print("PUSHING");
+                        print(ref.watch(router)!.stack.map((e) => e.routeData.path));
+                        await ref.watch(router)!.pushNamed('/');
+                        //ref.watch(router)!.removeWhere((route) => route is AuthRoute);
+                        /*ref.watch(router)!.pushAndPopUntil(
                           NavigationRoute(),
                           predicate: (route) {
                             return false;
                           },
-                        );
+                        );*/
                       }
                     },
                   ),

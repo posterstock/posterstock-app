@@ -15,7 +15,7 @@ class HomePagePostsRepository implements IHomePagePostsRepository {
       final apiResult = await api.getPosts(getNewPosts: getNesPosts);
       if (apiResult == null) return null;
       List<PostBaseModel> result = [];
-      final list = apiResult.$1?['entries'];
+      final list = apiResult.$1?['entries'] ?? [];
       for (var element in list) {
         if (element['type'] == 'poster') {
           result.add(PostMovieModel.fromJson(element, previewPrimary: true));

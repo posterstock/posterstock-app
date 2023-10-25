@@ -17,6 +17,7 @@ import 'package:poster_stock/features/auth/state_holders/sign_up_loading_state_h
 import 'package:poster_stock/features/auth/state_holders/sign_up_username_error_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/username_state_holder.dart';
 import 'package:poster_stock/features/auth/view/widgets/auth_button.dart';
+import 'package:poster_stock/features/navigation_page/view/navigation_page.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -278,16 +279,18 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         color: context.colors.textsAction!,
                       ),
                       onTap: () async {
-                        await ref
+                        bool success = await ref
                             .read(signUpControllerProvider)
                             .processAuth();
-                        if (context.mounted) {
-                          ref.watch(router)!.pushAndPopUntil(
+                        if (success) {
+                          await ref.watch(router)!.pushNamed('/');
+                          //ref.watch(router)!.removeWhere((route) => route is AuthRoute);
+                          /*ref.watch(router)!.pushAndPopUntil(
                             NavigationRoute(),
                             predicate: (route) {
                               return false;
                             },
-                          );
+                          );*/
                         }
                       },
                     ),

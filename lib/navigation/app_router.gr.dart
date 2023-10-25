@@ -260,7 +260,7 @@ class AuthRouteArgs {
 /// [_i2.BookmarksPage]
 class BookmarksRoute extends _i19.PageRouteInfo<BookmarksRouteArgs> {
   BookmarksRoute({
-    _i20.Key? key,
+    _i21.Key? key,
     int id = 0,
     List<_i19.PageRouteInfo>? children,
   }) : super(
@@ -284,7 +284,7 @@ class BookmarksRouteArgs {
     this.id = 0,
   });
 
-  final _i20.Key? key;
+  final _i21.Key? key;
 
   final int id;
 

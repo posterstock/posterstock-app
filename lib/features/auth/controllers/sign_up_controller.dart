@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/state_holders/auth_id_state_holder.dart';
 import 'package:poster_stock/features/auth/repository/auth_repository.dart';
 import 'package:poster_stock/features/auth/state_holders/code_error_state_holder.dart';
@@ -118,6 +119,7 @@ class SignUpController {
   }
 
   Future<bool> processSignIn() async {
+    print("SN");
     codeErrorStateHolder.setValue(null);
     signUpLoadingStateHolder.setValue(true);
     String? token;
@@ -129,14 +131,17 @@ class SignUpController {
         email: email
       );
     } catch (e) {
+      signUpLoadingStateHolder.setValue(false);
       codeErrorStateHolder.setValue("Wrong code");
       return false;
     }
     await registerNotification();
-    signUpLoadingStateHolder.setValue(false);
     var instance = await SharedPreferences.getInstance();
-    instance.setString('email', email);
     main.email = email;
+    signUpLoadingStateHolder.setValue(false);
+    instance.setString('email', email);
+    TokenKeeper.token = await SuperTokens.getAccessToken();
+    print("TRUE");
     return true;
   }
 
@@ -153,14 +158,16 @@ class SignUpController {
         email: email,
       );
     } catch (e) {
+      signUpLoadingStateHolder.setValue(false);
       codeErrorStateHolder.setValue("Wrong code");
       return false;
     }
     await registerNotification();
     signUpLoadingStateHolder.setValue(false);
     var instance = await SharedPreferences.getInstance();
-    instance.setString('email', email);
     main.email = email;
+    instance.setString('email', email);
+    TokenKeeper.token = await SuperTokens.getAccessToken();
     return true;
   }
 
@@ -177,10 +184,12 @@ class SignUpController {
 
   Future<void> registerNotification() async {
     final userToken = await SuperTokens.getAccessToken();
+    print (userToken == null);
     if (userToken == null) throw Exception();
     try {
       await repository.registerNotification((await FirebaseMessaging.instance.getToken())!, userToken);
     } catch (e) {
+      print("ERRRRR");
       debugPrint(e.toString());
     }
   }

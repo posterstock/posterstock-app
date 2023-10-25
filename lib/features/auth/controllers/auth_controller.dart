@@ -146,11 +146,13 @@ class AuthController {
     String? accessToken,
     String? idToken,
     String? code,
+    String? clientId,
   }) async {
     await repository.authGoogle(
       accessToken: accessToken,
       idToken: idToken,
       code: code,
+      clientId: clientId,
     );
     try {
       await registerNotification();

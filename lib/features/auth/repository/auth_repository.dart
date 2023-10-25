@@ -64,11 +64,13 @@ class AuthRepository {
     String? accessToken,
     String? idToken,
     String? code,
+    String? clientId,
   }) async {
     await _service.authGoogle(
       idToken: idToken,
       accessToken: accessToken,
       code: code,
+      clientId: clientId,
     );
   }
 }

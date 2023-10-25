@@ -84,11 +84,11 @@ class AuthService {
         ),
         data: jsonEncode({
           "thirdPartyId": "apple",
-          "clientType": Platform.isIOS ? "ios" : "android",
+          //"clientType": Platform.isIOS ? "IOS" : "android",
           "code": code ?? '',
           "state": state ?? '',
           "redirectURI": "https://api.posterstock.co/auth/callback/apple",
-          "callback_apple_body": {
+          "oAuthTokens": {
             "code": code ?? '',
             "state": state ?? '',
           },
@@ -96,6 +96,7 @@ class AuthService {
       );
       return response.data;
     } on DioError catch (e) {
+      print(e.response?.data);
       print(e.response?.headers);
       rethrow;
     }
@@ -105,6 +106,7 @@ class AuthService {
     String? accessToken,
     String? idToken,
     String? code,
+    String? clientId,
   }) async {
     try {
       final response = await _dio.post(
@@ -118,9 +120,9 @@ class AuthService {
           "clientType": Platform.isIOS ? "ios" : "android",
           "redirectURI": "https://api.posterstock.co/auth/callback/google",
           "clientId":
-              '405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com',
+              clientId,
           'code': code,
-          "authCodeResponse": {
+          "oAuthTokens": {
             "access_token": accessToken,
             "id_token": idToken,
           },
@@ -128,7 +130,9 @@ class AuthService {
       );
       return response.data;
     } on DioError catch (e) {
-      print(e);
+      print(e.response);
+      print(e.response?.data);
+      print(e.response?.headers);
       rethrow;
     }
   }

@@ -53,10 +53,10 @@ class ProfileRepository implements IProfileRepository {
     try {
       final result = (await profileService.getUserLists(id));
       return result
-          .map(
+          ?.map(
             (e) => ListBaseModel.fromJson(e, previewPrimary: true),
           )
-          .toList();
+          .toList() ?? [];
     } catch (e) {
       print(e);
     }

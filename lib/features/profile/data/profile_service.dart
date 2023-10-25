@@ -29,17 +29,22 @@ class ProfileService {
     return (result, !response.data['has_more']);
   }
 
-  Future<List<Map<String, dynamic>>> getUserLists(int? id) async {
-    final response = await _dio.get(
-      'api/lists/users/$id/',
-      options: Options(headers: {}),
-    );
-    print(response);
-    final List<Map<String, dynamic>> result = [];
-    for (var a in response.data) {
-      result.add(a);
+  Future<List<Map<String, dynamic>>?> getUserLists(int? id) async {
+    try {
+      final response = await _dio.get(
+        'api/lists/users/$id/',
+        options: Options(headers: {}),
+      );
+      print(response);
+      final List<Map<String, dynamic>> result = [];
+      for (var a in response.data) {
+        result.add(a);
+      }
+      return result;
+    } on DioError catch (e) {
+      print(e.response?.headers);
+      print(e.response?.data);
     }
-    return result;
   }
 
   Future<(List<dynamic>?, bool)> getMyBookmarks({bool restart = false}) async {

@@ -9,8 +9,4 @@ class Languages {
   factory Languages.english() {
     return Languages(languageName: "English", locale:  Locale('en', 'US'),);
   }
-
-  factory Languages.russian() {
-    return Languages(languageName: "Русский", locale: Locale('ru', 'RU'),);
-  }
 }

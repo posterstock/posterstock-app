@@ -12,4 +12,8 @@ class HomePageScrollControllerStateHolder
     extends StateNotifier<ScrollController> {
   HomePageScrollControllerStateHolder(ScrollController controller)
       : super(controller);
+
+  void setController() {
+    state = ScrollController();
+  }
 }

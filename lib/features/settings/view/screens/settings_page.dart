@@ -9,7 +9,11 @@ import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
+import 'package:poster_stock/features/auth/controllers/auth_controller.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
+import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
+import 'package:poster_stock/features/home/state_holders/home_page_scroll_controller_state_holder.dart';
+import 'package:poster_stock/features/navigation_page/view/navigation_page.dart';
 import 'package:poster_stock/features/notifications/state_holders/notifications_count_state_holder.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
@@ -78,8 +82,8 @@ class SettingsPage extends ConsumerWidget {
                   SettingsButton(
                     onTap: () {
                       ref.watch(router)!.push(
-                        const ChooseLanguageRoute(),
-                      );
+                            const ChooseLanguageRoute(),
+                          );
                     },
                     child: Row(
                       children: [
@@ -117,62 +121,62 @@ class SettingsPage extends ConsumerWidget {
                     ),
                   ),
                   if (email != null)
-                  const SizedBox(
-                    height: 24,
-                  ),
+                    const SizedBox(
+                      height: 24,
+                    ),
                   if (email != null)
-                  SettingsButton(
-                    onTap: () {
-                      scaffoldMessengerKey.currentState?.showSnackBar(
-                        SnackBars.build(
-                          context,
-                          null,
-                          'Сhanging the email is currently not possible. Please contact support.',
-                        ),
-                      );
-                      /*ref.watch(router)!.push(
+                    SettingsButton(
+                      onTap: () {
+                        scaffoldMessengerKey.currentState?.showSnackBar(
+                          SnackBars.build(
+                            context,
+                            null,
+                            'Сhanging the email is currently not possible. Please contact support.',
+                          ),
+                        );
+                        /*ref.watch(router)!.push(
                         ChangeEmailRoute(),
                       );*/
-                    },
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 129,
-                          child: Text(
-                            'Email',
-                            style: context.textStyles.bodyRegular,
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            email!,
-                            maxLines: 1,
-                            textAlign: TextAlign.right,
-                            overflow: TextOverflow.ellipsis,
-                            style: context.textStyles.bodyRegular!.copyWith(
-                              color: context.colors.textsSecondary,
+                      },
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 129,
+                            child: Text(
+                              'Email',
+                              style: context.textStyles.bodyRegular,
                             ),
                           ),
-                        ),
-                        const SizedBox(
-                          width: 16,
-                        ),
-                        Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 14,
-                          color: context.colors.iconsDisabled,
-                        ),
-                      ],
+                          Expanded(
+                            child: Text(
+                              email!,
+                              maxLines: 1,
+                              textAlign: TextAlign.right,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.textStyles.bodyRegular!.copyWith(
+                                color: context.colors.textsSecondary,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 16,
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 14,
+                            color: context.colors.iconsDisabled,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
                   if (email == null)
-                  const SizedBox(
-                    height: 24,
-                  ),
+                    const SizedBox(
+                      height: 24,
+                    ),
                   if (email == null)
-                  DoubleButton(
-                    onTap1: () {
-                      /*showModalBottomSheet(
+                    DoubleButton(
+                      onTap1: () {
+                        /*showModalBottomSheet(
                         context: context,
                         builder: (context) => GestureDetector(
                           onTap: () {
@@ -189,55 +193,55 @@ class SettingsPage extends ConsumerWidget {
                         backgroundColor: Colors.transparent,
                         isScrollControlled: true,
                       );*/
-                    },
-                    onTap2: () {},
-                    child1: Row(
-                      children: [
-                        Text(
-                          'Connected Google Account',
-                          style: context.textStyles.bodyRegular,
-                        ),
-                        const Spacer(),
-                        if (google)
-                        Text(
-                          '􀆅',
-                          style: context.textStyles.headline!.copyWith(
-                            color: context.colors.iconsActive,
-                          ),
-                        ),
-                      ],
-                    ),
-                    child2: Row(
-                      children: [
-                        Text(
-                          'Connected Apple Account',
-                          style: context.textStyles.bodyRegular,
-                        ),
-                        const Spacer(),
-                        if (apple)
+                      },
+                      onTap2: () {},
+                      child1: Row(
+                        children: [
                           Text(
-                            '􀆅',
-                            style: context.textStyles.headline!.copyWith(
-                              color: context.colors.iconsActive,
-                            ),
+                            'Connected Google Account',
+                            style: context.textStyles.bodyRegular,
                           ),
-                      ],
-                    ),
-                  ),
-                  if (email == null)
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  if (email == null)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16.0),
-                    child: Text(
-                      'Manage Google or Apple accounts to Posterstock\nto log in',
-                      style: context.textStyles.footNote!.copyWith(
-                        color: context.colors.textsSecondary,
+                          const Spacer(),
+                          if (google)
+                            Text(
+                              '􀆅',
+                              style: context.textStyles.headline!.copyWith(
+                                color: context.colors.iconsActive,
+                              ),
+                            ),
+                        ],
+                      ),
+                      child2: Row(
+                        children: [
+                          Text(
+                            'Connected Apple Account',
+                            style: context.textStyles.bodyRegular,
+                          ),
+                          const Spacer(),
+                          if (apple)
+                            Text(
+                              '􀆅',
+                              style: context.textStyles.headline!.copyWith(
+                                color: context.colors.iconsActive,
+                              ),
+                            ),
+                        ],
                       ),
                     ),
-                  ),
+                  if (email == null)
+                    const SizedBox(
+                      height: 8,
+                    ),
+                  if (email == null)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        'Manage Google or Apple accounts to Posterstock\nto log in',
+                        style: context.textStyles.footNote!.copyWith(
+                          color: context.colors.textsSecondary,
+                        ),
+                      ),
+                    ),
                   const SizedBox(
                     height: 24,
                   ),
@@ -370,12 +374,16 @@ class SettingsPage extends ConsumerWidget {
                               final prefs =
                                   await SharedPreferences.getInstance();
                               try {
-                               await ref.read(signUpControllerProvider)
+                                await ref
+                                    .read(signUpControllerProvider)
                                     .removeFCMToken();
                                 ref
-                                    ?.read(notificationsCountStateHolderProvider.notifier).updateState(0);
+                                    ?.read(notificationsCountStateHolderProvider
+                                        .notifier)
+                                    .updateState(0);
                                 await FirebaseMessaging.instance.deleteToken();
                               } catch (_) {}
+                              try {
                               await SuperTokens.signOut();
                               TokenKeeper.token = null;
                               await prefs.remove('token');
@@ -384,21 +392,12 @@ class SettingsPage extends ConsumerWidget {
                               await prefs.remove('email');
                               apple = false;
                               google = false;
-                              email = null;
-                              if (context.mounted) {
-                                ref.watch(router)!
-                                    .pushAndPopUntil(
-                                  AuthRoute(),
-                                  predicate: (value) => false,
-                                )
-                                    .then(
-                                  (value) {
-                                    if (context.mounted) {
-                                      Navigator.pop(context);
-                                    }
-                                  },
-                                );
-                              }
+                              email = null; } catch (e) {}
+                              ref.read(authControllerProvider).stopLoading();
+                              ref.watch(router)!.pushAndPopUntil(AuthRoute(),
+                                  predicate: (value) => false);
+                              if (Navigator.canPop(context))
+                              Navigator.pop(context);
                             },
                           ),
                         ),

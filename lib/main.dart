@@ -149,7 +149,6 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
     final Locale systemLocale = WidgetsBinding.instance.window.locale;
     List<Languages> langs = [
       Languages.english(),
-      Languages.russian(),
     ];
     List<Locale> locales = langs.map((e) => e.locale).toList();
     if (rtr == null) {
