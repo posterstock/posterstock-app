@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,6 +22,8 @@ import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_nam
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_name_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_username_error_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_username_state_holder.dart';
+import 'package:poster_stock/features/edit_profile/state_holder/loading_state_holder.dart';
+import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -148,12 +151,29 @@ class EditProfilePage extends ConsumerWidget {
                                 descriptionError)
                             ? null
                             : () async {
+                          ref.read(editProfileControllerProvider).setLoading(true);
                                 await ref
                                     .read(editProfileControllerProvider)
                                     .save();
+                                await ref.read(profileControllerApiProvider).getUserInfo(null);
+                          ref.read(editProfileControllerProvider).setLoading(false);
                                 ref.watch(router)!.pop();
                               },
-                        child: const Text('Save'),
+                        child: ref.watch(editProfileLoadingStateHolder) ? Center(
+                          child: defaultTargetPlatform != TargetPlatform.android
+                              ? CupertinoActivityIndicator(
+                            radius: 10.0,
+                            color: context.colors.buttonsPrimary!,
+                          )
+                              : SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              color: context.colors.buttonsPrimary!,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        ) : const Text('Save'),
                       ),
                     ],
                   ),
