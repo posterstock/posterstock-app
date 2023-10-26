@@ -121,9 +121,7 @@ class LoginPage extends ConsumerWidget {
                           .read(signUpControllerProvider)
                           .processSignIn();
                       if (success) {
-                        print("PUSHING");
-                        print(ref.watch(router)!.stack.map((e) => e.routeData.path));
-                        await ref.watch(router)!.pushNamed('/');
+                        await ref.watch(router)!.replaceNamed('/');
                         //ref.watch(router)!.removeWhere((route) => route is AuthRoute);
                         /*ref.watch(router)!.pushAndPopUntil(
                           NavigationRoute(),

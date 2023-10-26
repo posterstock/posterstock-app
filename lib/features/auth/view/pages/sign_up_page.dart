@@ -283,7 +283,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                             .read(signUpControllerProvider)
                             .processAuth();
                         if (success) {
-                          await ref.watch(router)!.pushNamed('/');
+                          await ref.watch(router)!.replaceNamed('/');
                           //ref.watch(router)!.removeWhere((route) => route is AuthRoute);
                           /*ref.watch(router)!.pushAndPopUntil(
                             NavigationRoute(),

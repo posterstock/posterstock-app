@@ -8,6 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/state_holders/auth_id_state_holder.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
+import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/create_list/view/create_list_dialog.dart';
 import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
@@ -19,6 +20,7 @@ import 'package:poster_stock/features/navigation_page/view/widgets/bottom_nav_ba
 import 'package:poster_stock/features/notifications/state_holders/notifications_count_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/page_transition_controller_state_holder.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
+import 'package:poster_stock/main.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -49,6 +51,16 @@ class NavigationPage extends ConsumerWidget {
         }
       }
     });
+    Future(() {
+      print(TokenKeeper.token);
+      print(18881);
+      if (TokenKeeper.token == null) {
+        rtr?.replaceNamed(
+          '/auth',
+        );
+        scaffoldMessengerKey.currentState?.showSnackBar(SnackBars.build(context, null, "Authentication error"));
+      }
+    });
     final pageTransitionController =
         ref.watch(pageTransitionControllerStateHolder)!;
     return AnimatedBuilder(
@@ -56,7 +68,10 @@ class NavigationPage extends ConsumerWidget {
       builder: (context, child) {
         return Transform.translate(
           offset: Offset(
-            -MediaQuery.of(context).size.width * 0.3 + pageTransitionController.value * MediaQuery.of(context).size.width * 0.3,
+            -MediaQuery.of(context).size.width * 0.3 +
+                pageTransitionController.value *
+                    MediaQuery.of(context).size.width *
+                    0.3,
             0,
           ),
           child: child,

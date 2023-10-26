@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/data/exceptions.dart';
+import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/state_holders/intl_state_holder.dart';
 import 'package:poster_stock/features/auth/repository/auth_repository.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_error_state_holder.dart';
@@ -131,14 +132,16 @@ class AuthController {
       clientId: clientId,
       state: state,
     );
+    var instance = await SharedPreferences.getInstance();
+    instance.setBool('apple', true);
+    main.apple = true;
+    TokenKeeper.token = await SuperTokens.getAccessToken();
+    print(TokenKeeper.token);
     try {
       await registerNotification();
     } catch (e) {
       print(e);
     }
-    var instance = await SharedPreferences.getInstance();
-    instance.setBool('apple', true);
-    main.apple = true;
     return true;
   }
 
@@ -154,14 +157,16 @@ class AuthController {
       code: code,
       clientId: clientId,
     );
+    var instance = await SharedPreferences.getInstance();
+    instance.setBool('google', true);
+    main.google = true;
+    TokenKeeper.token = await SuperTokens.getAccessToken();
+    print(TokenKeeper.token);
     try {
       await registerNotification();
     } catch (e) {
       print(e);
     }
-    var instance = await SharedPreferences.getInstance();
-    instance.setBool('google', true);
-    main.google = true;
     return true;
   }
 }

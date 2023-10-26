@@ -128,8 +128,11 @@ class AuthService {
           },
         }),
       );
+      print(response.data);
+      print(response.headers);
       return response.data;
     } on DioError catch (e) {
+      print("FFF");
       print(e.response);
       print(e.response?.data);
       print(e.response?.headers);

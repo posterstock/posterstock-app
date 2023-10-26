@@ -52,16 +52,6 @@ class AuthPage extends ConsumerWidget {
     final errorState = ref.watch(authErrorStateHolderProvider);
     final theme = ref.watch(themeStateHolderProvider);
     var rtr = ref.watch(router);
-    rtr?.addListener(() {
-      print(ref.watch(router)!.stack.map((e) => e.routeData.path).toList());
-      if (TokenKeeper.token != null) {
-        if (rtr.topRoute.path == '/auth') {
-          rtr.replaceNamed(
-            '/',
-          );
-        }
-      }
-    });
     if (TokenKeeper.token != null) {
       Future(() {
         if (rtr?.topRoute.path == '/auth') {
@@ -298,8 +288,10 @@ class AuthPage extends ConsumerWidget {
             state: credential.state,
             clientId: credential.identityToken,
           );
-      if (success && context.mounted) {
-        await ref.watch(router)!.pushNamed('/');
+      print(success);
+      print(12);
+      if (success) {
+        await ref.watch(router)!.replaceNamed('/');
         /*ref.watch(router)!.pushAndPopUntil(
           NavigationRoute(),
           predicate: (route) {
@@ -308,7 +300,7 @@ class AuthPage extends ConsumerWidget {
         );*/
       }
       ref.read(authControllerProvider).stopLoading();
-      ref.watch(router)!.removeWhere((route) => route.path != '/');
+      //ref.watch(router)!.removeWhere((route) => route.path != '/');
     } catch (e) {
       //scaffoldMessengerKey.currentState?.showSnackBar(SnackBars.build(context, null, e.toString()));
       ref.read(authControllerProvider).stopLoading();
@@ -344,10 +336,10 @@ class AuthPage extends ConsumerWidget {
                     ? '405674784124-buqlusrif3nur8sqk7li6u1ruq6votji.apps.googleusercontent.com'
                     : '405674784124-srh0usjhjk28idl1mhqj1oo3ipktujlb.apps.googleusercontent.com'),
           );
-      if (success && context.mounted) {
-        await ref.watch(router)!.pushNamed('/');
+      if (success) {
+        print("OKEE");
         ref.read(authControllerProvider).stopLoading();
-        ref.watch(router)!.removeWhere((route) => route.path != '/');
+        await ref.watch(router)!.replaceNamed('/');
         /*ref.watch(router)!.pushAndPopUntil(
           NavigationRoute(),
           predicate: (route) {
@@ -368,7 +360,7 @@ class AuthPage extends ConsumerWidget {
           ?.showSnackBar(SnackBars.build(context, null, e.toString()));
       ref.read(authControllerProvider).stopLoading();
     }
-    ref.read(authControllerProvider).stopLoading();
+    //ref.read(authControllerProvider).stopLoading();
   }
 
   void checkEmail(WidgetRef ref, String value, BuildContext context) {
