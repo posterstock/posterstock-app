@@ -30,6 +30,7 @@ class PostService {
 
   Future<void> deleteComment(int postId, int id) async {
     try {
+      print('/api/posters/$postId/comments/$id');
       await _dio.delete(
         '/api/posters/$postId/comments/$id',
         options: Options(
