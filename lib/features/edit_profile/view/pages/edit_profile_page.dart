@@ -18,11 +18,11 @@ import 'package:poster_stock/features/edit_profile/state_holder/avatar_state_hol
 import 'package:poster_stock/features/edit_profile/controller/edit_profile_controller.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_description_error_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_description_state_holder.dart';
+import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_loading_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_name_error.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_name_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_username_error_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_username_state_holder.dart';
-import 'package:poster_stock/features/edit_profile/state_holder/loading_state_holder.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/main.dart';

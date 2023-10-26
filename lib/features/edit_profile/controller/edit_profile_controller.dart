@@ -5,12 +5,12 @@ import 'package:poster_stock/features/edit_profile/repository/edit_profile_repos
 import 'package:poster_stock/features/edit_profile/state_holder/avatar_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_description_error_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_description_state_holder.dart';
+import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_loading_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_name_error.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_name_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_username_error_state_holder.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_username_state_holder.dart';
-import 'package:poster_stock/features/edit_profile/state_holder/loading_state_holder.dart';
 
 final editProfileControllerProvider = Provider<EditProfileController>(
   (ref) => EditProfileController(

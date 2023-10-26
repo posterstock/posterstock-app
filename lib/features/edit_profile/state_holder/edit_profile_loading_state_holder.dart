@@ -13,4 +13,8 @@ class EditProfileLoadingStateHolder extends StateNotifier<bool> {
   void updateValue(bool value) {
     state = value;
   }
+
+  void clearValue() {
+    state = false;
+  }
 }
