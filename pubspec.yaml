@@ -34,7 +34,6 @@ dependencies:
   supertokens_flutter: ^0.2.5
   dio: ^4.0.6
   sign_in_with_apple: ^5.0.0
-  flutter_appauth: ^6.0.2
   firebase_core: ^2.15.0
   logger: ^1.4.0
   shared_preferences: ^2.2.0
