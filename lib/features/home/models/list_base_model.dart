@@ -21,7 +21,7 @@ class ListBaseModel {
     return ListBaseModel(
       id: json['id'],
       title: json['title'],
-      image: image == 'https://api.posterstock.co/images/' ? 'https://api.posterstock.co/images/default_list_cover.png' : image,
+      image: image == 'https://api.posterstock.com/images/' ? 'https://api.posterstock.com/images/default_list_cover.png' : image,
       postersCount: json['posters_count'],
     );
   }

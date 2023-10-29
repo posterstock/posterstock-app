@@ -181,18 +181,20 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
                         padding: EdgeInsets.only(
                             top: (MediaQuery.of(context).size.height - 155) *
                                 0.4),
-                        child: defaultTargetPlatform != TargetPlatform.android
-                            ? const CupertinoActivityIndicator(
-                                radius: 10,
-                              )
-                            : SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  color: context.colors.iconsDisabled!,
-                                  strokeWidth: 2,
+                        child: Center(
+                          child: defaultTargetPlatform != TargetPlatform.android
+                              ? const CupertinoActivityIndicator(
+                                  radius: 10,
+                                )
+                              : SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    color: context.colors.iconsDisabled!,
+                                    strokeWidth: 2,
+                                  ),
                                 ),
-                              ),
+                        ),
                       );
                     }
                     if (users!.isEmpty) {

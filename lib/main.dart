@@ -53,7 +53,7 @@ String? email;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SuperTokens.init(
-    apiDomain: 'https://api.posterstock.co/',
+    apiDomain: 'https://api.posterstock.com/',
   );
 
   try {

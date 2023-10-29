@@ -7,7 +7,7 @@ class DioKeeper {
   static Dio getDio() {
     final Dio dio = Dio(
       BaseOptions(
-        baseUrl: 'https://api.posterstock.co/',
+        baseUrl: 'https://api.posterstock.com/',
         connectTimeout: 10000,
         receiveTimeout: 10000,
         maxRedirects: 5,

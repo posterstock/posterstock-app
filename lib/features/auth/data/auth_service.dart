@@ -12,7 +12,7 @@ import 'package:supertokens_flutter/supertokens.dart';
 class AuthService {
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: 'https://api.posterstock.co/',
+      baseUrl: 'https://api.posterstock.com/',
       connectTimeout: 10000,
       receiveTimeout: 10000,
     ),
@@ -87,11 +87,22 @@ class AuthService {
           //"clientType": Platform.isIOS ? "IOS" : "android",
           "code": code ?? '',
           "state": state ?? '',
-          "redirectURI": "https://api.posterstock.co/auth/callback/apple",
-          "oAuthTokens": {
-            "code": code ?? '',
-            "state": state ?? '',
-          },
+          //"redirectURI": "https://api.posterstock.com/auth/callback/apple",
+          /*"oAuthTokens": {
+            "access_token": code,
+            "id_token": clientID,
+          },*/
+          "redirectURIInfo": {
+            "redirectURIOnProviderDashboard":
+            "https://api.posterstock.com/auth/callback/apple",
+            "redirectURIQueryParams": {
+              "code": code,
+              "user": {
+                "name": {"firstName": name, "lastName": surname},
+                "email": email,
+              }
+            }
+          }
         }),
       );
       return response.data;
@@ -107,6 +118,10 @@ class AuthService {
     String? idToken,
     String? code,
     String? clientId,
+    String? name,
+    String? surname,
+    String? email,
+
   }) async {
     try {
       final response = await _dio.post(
@@ -118,9 +133,8 @@ class AuthService {
         data: jsonEncode({
           "thirdPartyId": "google",
           "clientType": Platform.isIOS ? "ios" : "android",
-          "redirectURI": "https://api.posterstock.co/auth/callback/google",
-          "clientId":
-              clientId,
+          "redirectURI": "https://api.posterstock.com/auth/callback/google",
+          "clientId": clientId,
           'code': code,
           "oAuthTokens": {
             "access_token": accessToken,

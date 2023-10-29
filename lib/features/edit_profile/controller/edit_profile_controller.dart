@@ -85,6 +85,11 @@ class EditProfileController {
         .updateError(localizations!.nameCantExceed32);
   }
 
+  void setTooShortErrorName() {
+    editProfileNameErrorStateHolder
+        .updateError("Name should not be empty");
+  }
+
   void removeNameError() {
     editProfileNameErrorStateHolder.clearError();
   }

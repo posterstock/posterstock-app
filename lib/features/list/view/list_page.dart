@@ -266,10 +266,13 @@ class _ListPageState extends ConsumerState<ListPage>
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            comments![index - 1].text,
-                                            style:
-                                                context.textStyles.subheadline!,
+                                          Padding(
+                                            padding: const EdgeInsets.only(right:16.0),
+                                            child: Text(
+                                              comments![index - 1].text,
+                                              style:
+                                                  context.textStyles.subheadline!,
+                                            ),
                                           ),
                                           SizedBox(height: 12),
                                           if (index - 1 != comments.length - 1)
@@ -631,7 +634,7 @@ class ListActionsDialog extends ConsumerWidget {
                           Expanded(
                             child: InkWell(
                               onTap: () {
-                                Share.share("posterstock.co/list/${list.id}");
+                                Share.share("posterstock.com/list/${list.id}");
                                 /*scaffoldMessengerKey.currentState?.showSnackBar(
                                   SnackBars.build(
                                     context,

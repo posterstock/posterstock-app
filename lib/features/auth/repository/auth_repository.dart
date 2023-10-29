@@ -1,4 +1,5 @@
 import 'package:poster_stock/features/auth/data/auth_service.dart';
+import 'package:poster_stock/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthRepository {
@@ -65,12 +66,18 @@ class AuthRepository {
     String? idToken,
     String? code,
     String? clientId,
+    String? name,
+    String? surname,
+    String? email,
   }) async {
     await _service.authGoogle(
       idToken: idToken,
       accessToken: accessToken,
       code: code,
       clientId: clientId,
+      name: name,
+      surname: surname,
+      email: email,
     );
   }
 }

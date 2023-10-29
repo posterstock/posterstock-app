@@ -50,7 +50,7 @@ class LoginPage extends ConsumerWidget {
                     height: 30,
                   ),
                   Text(
-                    emailState ?? 'test@email.ru',
+                    emailState ?? 'test@email.com',
                     style: context.textStyles.callout!.copyWith(
                       color: context.colors.textsSecondary,
                     ),

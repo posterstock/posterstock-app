@@ -149,13 +149,18 @@ class AuthController {
     String? accessToken,
     String? idToken,
     String? code,
-    String? clientId,
+    String? clientId,String? name,
+    String? surname,
+    String? email,
   }) async {
     await repository.authGoogle(
       accessToken: accessToken,
       idToken: idToken,
       code: code,
       clientId: clientId,
+      name: name,
+      surname: surname,
+      email: email,
     );
     var instance = await SharedPreferences.getInstance();
     instance.setBool('google', true);

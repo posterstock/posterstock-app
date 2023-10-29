@@ -28,6 +28,14 @@
             "package_name": "com.thedirection.posterstock",
             "certificate_hash": "fa8fee97c9062ff38da409b67ebeac929dc73804"
           }
+        },
+        {
+          "client_id": "405674784124-feinalps3vlsof8gt0rhfss7jujj7pfb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.thedirection.posterstock",
+            "certificate_hash": "9bbf1876c10ddefcfb34f58477f65770efd59b31"
+          }
         }
       ],
       "api_key": [

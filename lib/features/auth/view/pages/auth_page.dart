@@ -334,7 +334,10 @@ class AuthPage extends ConsumerWidget {
                 ? '405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com'
                 : (kDebugMode
                     ? '405674784124-buqlusrif3nur8sqk7li6u1ruq6votji.apps.googleusercontent.com'
-                    : '405674784124-srh0usjhjk28idl1mhqj1oo3ipktujlb.apps.googleusercontent.com'),
+                    : "405674784124-feinalps3vlsof8gt0rhfss7jujj7pfb.apps.googleusercontent.com"),
+            //: '405674784124-srh0usjhjk28idl1mhqj1oo3ipktujlb.apps.googleusercontent.com'),
+            name: result?.displayName,
+            email: result?.email,
           );
       if (success) {
         print("OKEE");

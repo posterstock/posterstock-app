@@ -1492,7 +1492,7 @@ class PosterActionsDialog extends ConsumerWidget {
                             child: InkWell(
                               onTap: () {
                                 Share.share(
-                                    "posterstock.co/${post.author.username}/${post.id}");
+                                    "posterstock.com/${post.author.username}/${post.id}");
                               },
                               child: Center(
                                 child: Text(

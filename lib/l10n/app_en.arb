@@ -22,7 +22,7 @@
     "createBookmark" : "Create a bookmark",
     "createList" : "Create a list",
     "nameCantExceed32" : "Name can't exceed 32 characters",
-    "usernameCantExceed32" : "Username can't exceed 32 characters",
+    "usernameCantExceed32" : "Username can't exceed 16 characters",
     "usernameMinLength5" : "Minimum length is 5 characters",
     "textReply" : "Write your comment",
     "reply" : "Reply",

@@ -294,6 +294,12 @@ class EditProfilePage extends ConsumerWidget {
                                     .setTooLongErrorName();
                                 return;
                               }
+                              if (value.isEmpty) {
+                                ref
+                                    .read(editProfileControllerProvider)
+                                    .setTooShortErrorName();
+                                return;
+                              }
                               ref
                                   .read(editProfileControllerProvider)
                                   .removeNameError();
@@ -453,7 +459,7 @@ class _UsernameFieldProfileState extends ConsumerState<UsernameFieldProfile> {
           ref.read(editProfileControllerProvider).setTooShortErrorUsername();
           return;
         }
-        if (value.length > 32) {
+        if (value.length > 16) {
           ref.read(editProfileControllerProvider).setTooLongErrorUsername();
           return;
         }

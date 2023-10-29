@@ -5,7 +5,7 @@ import 'package:supertokens_flutter/supertokens.dart';
 class SearchService {
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: 'https://api.posterstock.co/',
+      baseUrl: 'https://api.posterstock.com/',
       connectTimeout: 10000,
       receiveTimeout: 10000,
     ),

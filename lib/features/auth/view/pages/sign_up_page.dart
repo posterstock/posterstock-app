@@ -79,7 +79,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
       ref.read(signUpControllerProvider).setTooShortErrorUserName();
       return;
     }
-    if (value.length > 32) {
+    if (value.length > 16) {
       ref.read(signUpControllerProvider).setTooLongErrorUserName();
       return;
     }

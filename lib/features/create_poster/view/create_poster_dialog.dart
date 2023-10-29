@@ -41,6 +41,14 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
   bool disposed = false;
 
   @override
+  void initState() {
+    super.initState();
+    Future(() {
+      focus.requestFocus();
+    });
+  }
+
+  @override
   void dispose() {
     disposed = true;
     super.dispose();
@@ -426,7 +434,62 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                 ),
                                 pinned: true,
                               ),
-                              if (searchText.isEmpty || chosenMovie != null)
+                              if (searchText.isEmpty && chosenMovie == null)
+                                SliverToBoxAdapter(
+                                  child: IgnorePointer(
+                                    child: AnimatedBuilder(
+                                      animation: dragController,
+                                      builder: (context, child) {
+                                        return SizedBox(
+                                          height: EdgeInsets.fromViewPadding(
+                                                              View.of(context)
+                                                                  .viewInsets,
+                                                              View.of(context)
+                                                                  .devicePixelRatio)
+                                                          .bottom -
+                                                      100 >
+                                                  0
+                                              ? EdgeInsets.fromViewPadding(
+                                                      View.of(context).viewInsets,
+                                                      View.of(context)
+                                                          .devicePixelRatio)
+                                                  .bottom
+                                              : 0,
+                                          child: child,
+                                        );
+                                      },
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            SvgPicture.asset(
+                                              widget.bookmark
+                                                  ? 'assets/icons/ic_bookmark_second.svg'
+                                                  : 'assets/icons/ic_collection_second.svg',
+                                              width: 48,
+                                              colorFilter: ColorFilter.mode(
+                                                context.colors.textsDisabled!,
+                                                BlendMode.srcIn,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              "Enter the title of the movie or series\nyou'd like to add to your ${widget.bookmark == true ?  "bookmarks." : "collection."}",
+                                              style: context
+                                                  .textStyles.subheadlineBold!
+                                                  .copyWith(
+                                                color:
+                                                    context.colors.textsDisabled!,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              if (chosenMovie != null)
                                 SliverToBoxAdapter(
                                   child: SizedBox(
                                     height: 160,
@@ -599,7 +662,17 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                 child: AnimatedBuilder(
                   animation: dragController,
                   builder: (context, child) {
-                    return Transform.translate(offset: Offset(0,!dragController.isAttached ? 0 : dragController.size >=0.2 ? 0 : (0.2 - dragController.size) * MediaQuery.of(context).size.height), child: child!,);
+                    return Transform.translate(
+                      offset: Offset(
+                          0,
+                          !dragController.isAttached
+                              ? 0
+                              : dragController.size >= 0.2
+                                  ? 0
+                                  : (0.2 - dragController.size) *
+                                      MediaQuery.of(context).size.height),
+                      child: child!,
+                    );
                   },
                   child: Column(
                     children: [
@@ -622,8 +695,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                             showDivider: false,
                             button: 'Add poster',
                             buttonAddCheck: chosenCover != null,
-                            buttonLoading:
-                                ref.watch(createPosterLoadingStateHolderProvider),
+                            buttonLoading: ref
+                                .watch(createPosterLoadingStateHolderProvider),
                             maxSymbols: 280,
                             controller: descController,
                             onTap: () async {
@@ -646,7 +719,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                   ref
                                       .read(posterStateHolderProvider.notifier)
                                       .updateState(
-                                        currPost!.copyWith(hasInCollection: true),
+                                        currPost!
+                                            .copyWith(hasInCollection: true),
                                       );
                                 }
                                 await ref
@@ -690,7 +764,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                     .notifier)
                                             .updateValue(true);
                                         await ref
-                                            .read(createPosterControllerProvider)
+                                            .read(
+                                                createPosterControllerProvider)
                                             .createBookmark();
                                       } catch (_) {
                                         print(_);
