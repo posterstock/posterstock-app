@@ -106,6 +106,19 @@ class ProfileService {
     }
   }
 
+  Future<bool?> getBlocked(int id) async {
+    try {
+      final response = await _dio.post(
+        '/api/users/$id/blocked',
+      );
+      return response.data as bool;
+    } on DioError catch (e) {
+      print(e.response?.headers);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> follow(int? id, bool follow) async {
     print(12);
     print(follow);

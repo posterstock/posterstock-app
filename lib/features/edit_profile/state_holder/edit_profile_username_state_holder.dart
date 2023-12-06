@@ -11,6 +11,7 @@ class EditProfileUsernameStateHolder extends StateNotifier<String?> {
   EditProfileUsernameStateHolder(super.state);
 
   void updateValue(String value) {
+    print("HH$value");
     state = value;
   }
 

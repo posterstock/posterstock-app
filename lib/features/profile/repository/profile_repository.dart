@@ -12,8 +12,10 @@ class ProfileRepository implements IProfileRepository {
   @override
   Future<UserDetailsModel> getProfileInfo(dynamic id) async {
     final result = (await profileService.getProfileInfo(id));
+    final blocked = (await profileService.getBlocked(result['id'] as int));
     return UserDetailsModel.fromJson(result).copyWith(
       mySelf: id == null,
+      blocked: blocked,
     );
   }
 

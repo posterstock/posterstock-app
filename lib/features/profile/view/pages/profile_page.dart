@@ -22,7 +22,11 @@ import 'package:poster_stock/common/widgets/list_grid_widget.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
 import 'package:poster_stock/features/create_list/state_holders/list_search_posters_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/lists_search_value_state_holder.dart';
+import 'package:poster_stock/features/edit_profile/api/edit_profile_api.dart';
+import 'package:poster_stock/features/edit_profile/controller/edit_profile_controller.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/avatar_state_holder.dart';
+import 'package:poster_stock/features/edit_profile/view/pages/edit_profile_page.dart';
+import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
@@ -120,12 +124,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     final rtr = ref.watch(router);
     var anyProfile = ref.watch(profileInfoStateHolderProvider);
     var myProfile = ref.watch(myProfileInfoStateHolderProvider);
-    Future(() {
-      if (rtr!.topRoute.path == 'profile' && anyProfile?.id != myProfile?.id) {
-        Future(() {
-          print(-4);
-          ref.read(profileControllerApiProvider).clearUser();
-        });
+    await Future(() {
+      if (rtr!.topRoute.path == '/' && anyProfile?.id != myProfile?.id) {
+        Future(() {ref.read(profileControllerApiProvider).clearUser();});
       }
       RouteData? el;
       try {
@@ -133,33 +134,57 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
         int i1 = -1;
         int i2 = -1;
         int i3 = -1;
+        print(rttr!.topRoute.path + "  r3");
         try {
-          i1 = rttr?.stack.lastIndexWhere((element) => element.routeData.path == '/:username') ?? 0;
+          i1 = rttr?.stack.lastIndexWhere(
+                  (element) => element.routeData.path == '/:username') ??
+              0;
         } catch (e) {}
         try {
-          i2 = rttr?.stack.lastIndexWhere((element) => element.routeData.path == '/users/:id') ?? 0;
+          i2 = rttr?.stack.lastIndexWhere(
+                  (element) => element.routeData.path == '/users/:id') ??
+              0;
         } catch (e) {}
         try {
-          i3 = rttr?.stack.lastIndexWhere((element) => element.routeData.path == '/') ?? 0;
+          print("EEEE");
+          i3 = rttr?.stack
+                  .lastIndexWhere((element) => element.routeData.path == '/') ??
+              0;
+          print(i3.toString() + "    1212");
+        } catch (e) {}
+        try {
+          if(rttr.stack.last.routeData.path == '/') {
+            i3 = rttr.stack.length + 1;
+          }
         } catch (e) {}
         print(i1);
         print(i2);
         print(i3);
         print(rttr?.stack.last.routeData.path);
         //if (ref.watch(router)!.topRoute.path == '/:username' && anyProfile?.username != ref.watch(router)!.topRoute.pathParams.getString('username')) {
-        if (i1 > i2 && i1 > i3 && anyProfile?.username != ref.watch(router)!.topRoute.pathParams.getString('username')) {
+        if (i1 > i2 &&
+            i1 > i3 &&
+            anyProfile?.username !=
+                ref.watch(router)!.topRoute.pathParams.getString('username')) {
           el = ref.watch(router)!.topRoute;
           print(el.pathParams.getString('username'));
           ref
               .read(profileControllerApiProvider)
               .getUserInfo(el.pathParams.getString('username'));
-        } else if (i2 > i1 && i2 > i3  && anyProfile?.id != ref.watch(router)!.topRoute.pathParams.getInt('id')) {
+        } else if (i2 > i1 &&
+            i2 > i3 &&
+            anyProfile?.id !=
+                ref.watch(router)!.topRoute.pathParams.getInt('id')) {
           el = ref.watch(router)!.topRoute;
           ref
               .read(profileControllerApiProvider)
               .getUserInfo(el.pathParams.getInt('id'));
-        } else if (i3 > i1 && i3 > i2 && (anyProfile?.id == null || anyProfile?.id != myProfile?.id)) {
+        } else if (i3 > i1 &&
+            i3 > i2 &&
+            (anyProfile?.id == null || anyProfile?.id != myProfile?.id)) {
           print("GG${ref.watch(router)!.topRoute.path}");
+          ref.read(profileControllerApiProvider).getUserInfo(null);
+        } else if (ref.read(profileInfoStateHolderProvider) == null) {
           ref.read(profileControllerApiProvider).getUserInfo(null);
         }
       } catch (e) {
@@ -175,17 +200,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     var anyProfile = ref.watch(profileInfoStateHolderProvider);
     var myProfile = ref.watch(myProfileInfoStateHolderProvider);
     UserDetailsModel? profile;
-    print("KEKEKEKE");
-    print(anyProfile);
     if (anyProfile != null) {
       profile = anyProfile;
     } else if (rtr!.topRoute.path == 'profile' &&
         anyProfile?.id != myProfile?.id) {
       print("SHEEEEESH ${anyProfile?.id} ${myProfile?.id}");
-      Future(() {
-        print(-3);
-        ref.read(profileControllerApiProvider).clearUser();
-      });
       profile = myProfile;
     }
     if (anyProfile == null) {
@@ -324,6 +343,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                 context: context,
                                 builder: (context) => OtherProfileDialog(
                                   user: profile,
+                                  block: true,
                                 ),
                                 backgroundColor: Colors.transparent,
                               );
@@ -360,42 +380,76 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                             ),
                             Row(
                               children: [
-                                CircleAvatar(
-                                  radius: 40,
-                                  backgroundImage: profile.imagePath != null
-                                      ? Image.network(
-                                          profile.imagePath!,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, obj, trace) {
-                                            return shimmer;
-                                          },
-                                          loadingBuilder:
-                                              (context, child, event) {
-                                            if (event?.cumulativeBytesLoaded !=
-                                                event?.expectedTotalBytes) {
+                                GestureDetector(
+                                  onTap: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      backgroundColor: Colors.transparent,
+                                      isScrollControlled: true,
+                                      useSafeArea: true,
+                                      builder: (context) => GestureDetector(
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Container(
+                                          height: double.infinity,
+                                          color: Colors.transparent,
+                                          child: const ProfilePhotoDialog(),
+                                        ),
+                                      ),
+                                    ).then((value) async {
+                                      await ref
+                                          .read(editProfileControllerProvider)
+                                          .save(
+                                            name: profile!.name,
+                                            username: profile.username,
+                                            description: profile.description,
+                                          );
+                                      await ref
+                                          .read(profileControllerApiProvider)
+                                          .getUserInfo(null);
+                                    });
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 40,
+                                    backgroundImage: profile.imagePath != null
+                                        ? Image.network(
+                                            profile.imagePath!,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, obj, trace) {
                                               return shimmer;
-                                            }
-                                            return child;
-                                          },
-                                        ).image
-                                      : null,
-                                  backgroundColor: profile.color,
-                                  child: profile.imagePath == null
-                                      ? Text(
-                                          getAvatarName(profile.name)
-                                                  .toUpperCase()
-                                                  .isEmpty
-                                              ? getAvatarName(profile.username)
-                                                  .toUpperCase()
-                                              : getAvatarName(profile.name)
-                                                  .toUpperCase(),
-                                          style: context.textStyles.title3!
-                                              .copyWith(
-                                            color:
-                                                context.colors.textsBackground,
-                                          ),
-                                        )
-                                      : const SizedBox(),
+                                            },
+                                            loadingBuilder:
+                                                (context, child, event) {
+                                              if (event
+                                                      ?.cumulativeBytesLoaded !=
+                                                  event?.expectedTotalBytes) {
+                                                return shimmer;
+                                              }
+                                              return child;
+                                            },
+                                          ).image
+                                        : null,
+                                    backgroundColor: profile.color,
+                                    child: profile.imagePath == null
+                                        ? Text(
+                                            getAvatarName(profile.name)
+                                                    .toUpperCase()
+                                                    .isEmpty
+                                                ? getAvatarName(
+                                                        profile.username)
+                                                    .toUpperCase()
+                                                : getAvatarName(profile.name)
+                                                    .toUpperCase(),
+                                            style: context.textStyles.title3!
+                                                .copyWith(
+                                              color: context
+                                                  .colors.textsBackground,
+                                            ),
+                                          )
+                                        : const SizedBox(),
+                                  ),
                                 ),
                                 const SizedBox(
                                   width: 38,
@@ -494,61 +548,92 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    ShimmerLoader(
-                                      loaded: profile != null,
-                                      child: TextOrContainer(
-                                        text: profile.name,
-                                        style: context.textStyles.headline,
-                                        emptyWidth: 150,
-                                        emptyHeight: 20,
-                                      ),
+                                    TextOrContainer(
+                                      text: profile.name,
+                                      style: context.textStyles.headline,
+                                      emptyWidth: 150,
+                                      emptyHeight: 20,
                                     ),
-                                    const SizedBox(height: 8),
-                                    if (profile == null)
-                                      const ShimmerLoader(
-                                          child: TextOrContainer(
-                                        text: null,
-                                        emptyWidth: 80,
-                                        emptyHeight: 20,
-                                      )),
-                                    if (profile != null)
-                                      Row(
-                                        children: [
-                                          SvgPicture.asset(
-                                            'assets/icons/ic_collection.svg',
-                                            colorFilter: ColorFilter.mode(
-                                              context.colors.iconsDefault!,
-                                              BlendMode.srcIn,
+                                    Row(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            tabController?.animateTo(0);
+                                          },
+                                          child: Container(
+                                            color: Colors.transparent,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8.0),
+                                              child: Row(
+                                                children: [
+                                                  SvgPicture.asset(
+                                                    'assets/icons/ic_collection.svg',
+                                                    colorFilter:
+                                                        ColorFilter.mode(
+                                                      context
+                                                          .colors.iconsDefault!,
+                                                      BlendMode.srcIn,
+                                                    ),
+                                                    width: 16,
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    profile.posters.toString(),
+                                                    style: context
+                                                        .textStyles.caption1!
+                                                        .copyWith(
+                                                            color: context
+                                                                .colors
+                                                                .textsPrimary),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                            width: 16,
                                           ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            profile.posters.toString(),
-                                            style: context.textStyles.caption1!
-                                                .copyWith(
-                                                    color: context
-                                                        .colors.textsPrimary),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          SvgPicture.asset(
-                                            'assets/icons/ic_lists.svg',
-                                            colorFilter: ColorFilter.mode(
-                                              context.colors.iconsDefault!,
-                                              BlendMode.srcIn,
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            tabController?.animateTo(
+                                                tabController!.length - 1);
+                                          },
+                                          child: Container(
+                                            color: Colors.transparent,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8.0),
+                                              child: Row(
+                                                children: [
+                                                  const SizedBox(width: 12),
+                                                  SvgPicture.asset(
+                                                    'assets/icons/ic_lists.svg',
+                                                    colorFilter:
+                                                        ColorFilter.mode(
+                                                      context
+                                                          .colors.iconsDefault!,
+                                                      BlendMode.srcIn,
+                                                    ),
+                                                    width: 16,
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    profile.lists.toString() ??
+                                                        '0',
+                                                    style: context
+                                                        .textStyles.caption1!
+                                                        .copyWith(
+                                                            color: context
+                                                                .colors
+                                                                .textsPrimary),
+                                                  ),
+                                                  const SizedBox(width: 8.0),
+                                                ],
+                                              ),
                                             ),
-                                            width: 16,
                                           ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            profile.lists.toString() ?? '0',
-                                            style: context.textStyles.caption1!
-                                                .copyWith(
-                                                    color: context
-                                                        .colors.textsPrimary),
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
+                                    ),
                                   ],
                                 ),
                                 const Spacer(),
@@ -1192,6 +1277,7 @@ class OtherProfileDialog extends ConsumerWidget {
     this.type,
     this.entityId,
     this.myEntity,
+    this.block = false,
   })  : assert(user == null || user1 == null),
         super(key: key);
 
@@ -1200,6 +1286,7 @@ class OtherProfileDialog extends ConsumerWidget {
   final InfoDialogType? type;
   final int? entityId;
   final bool? myEntity;
+  final bool block;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1207,7 +1294,10 @@ class OtherProfileDialog extends ConsumerWidget {
     final postId = ref.watch(posterStateHolderProvider);
     final listId = ref.watch(listsStateHolderProvider);
     int itemsCount = 0;
-    if (user?.id != myself?.id && user1?.id != myself?.id) itemsCount += 2;
+    if (user?.id != myself?.id && user1?.id != myself?.id) {
+      itemsCount += 2;
+      if (block) itemsCount++;
+    }
     if (user?.id == myself?.id ||
         user1?.id == myself?.id ||
         myEntity == true && type == InfoDialogType.postComment ||
@@ -1351,6 +1441,70 @@ class OtherProfileDialog extends ConsumerWidget {
                                       color: context.colors.textsError,
                                     ),
                                   ),
+                                  const SizedBox(width: 16),
+                                ],
+                              ),
+                            ),
+                          ),
+                        if (user?.id != myself?.id &&
+                            user1?.id != myself?.id &&
+                            block)
+                          Divider(
+                            height: 0.5,
+                            thickness: 0.5,
+                            color: context.colors.fieldsDefault,
+                          ),
+                        if (user?.id != myself?.id &&
+                            user1?.id != myself?.id &&
+                            block)
+                          InkWell(
+                            onTap: () {
+                              if ((user?.id ?? user1?.id) == null) {
+                                scaffoldMessengerKey.currentState?.showSnackBar(
+                                  SnackBars.build(
+                                    context,
+                                    null,
+                                    'An error occured',
+                                  ),
+                                );
+                                return;
+                              }
+                              if (user?.blocked == true) {
+                                EditProfileApi().unblockAccount(
+                                    id: (user?.id ?? user1?.id)!);
+                              } else {
+                                EditProfileApi()
+                                    .blockAccount(id: (user?.id ?? user1?.id)!);
+                              }
+                              ref
+                                  .read(profileInfoStateHolderProvider.notifier)
+                                  .updateState(ref
+                                      .watch(profileInfoStateHolderProvider)!
+                                      .copyWith(
+                                          blocked: !(ref
+                                                  .watch(
+                                                      profileInfoStateHolderProvider)
+                                                  ?.blocked ??
+                                              false)));
+                              Navigator.pop(context);
+                              //ref.watch(router)?.popUntil((route) => route.data?.path == '/');
+                              //ref.read(homePagePostsControllerProvider).blockUser((user?.id ?? user1?.id)!);
+                              //ref.read(pageTransitionControllerStateHolder)?.animateTo(ref.read(pageTransitionControllerStateHolder)?.upperBound ?? 0, duration: Duration.zero);
+                            },
+                            child: SizedBox(
+                              height: 52,
+                              width: double.infinity,
+                              child: Row(
+                                children: [
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    user?.blocked == true ? 'Unblock' : 'Block',
+                                    style: context.textStyles.bodyRegular!
+                                        .copyWith(
+                                      color: context.colors.textsError,
+                                    ),
+                                  ),
+                                  const Spacer(),
                                   const SizedBox(width: 16),
                                 ],
                               ),
@@ -1662,7 +1816,7 @@ class ProfileTabBar extends AnimatedWidget {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 14.0),
           child: Text(
-            "Collection",
+            "Watched",
             style: animation.value >= 0 && animation.value <= 0.5
                 ? context.textStyles.subheadlineBold
                 : context.textStyles.subheadline,
@@ -1672,7 +1826,7 @@ class ProfileTabBar extends AnimatedWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 14.0),
             child: Text(
-              "Bookmarks",
+              "Watchlist",
               style: animation.value > 0.5 && animation.value <= 1.5
                   ? context.textStyles.subheadlineBold
                   : context.textStyles.subheadline,

@@ -44,6 +44,10 @@ class HomePagePostsController {
     repository.setLike(id, value);
   }
 
+  Future<void> blockUser(int id) async {
+    homePagePostsState.blockUser(id);
+  }
+
   Future<void> setLikeIdList(int id, bool value) async {
     homePagePostsState.setLikeIdList(id, value);
     repository.setLikeList(id, value);

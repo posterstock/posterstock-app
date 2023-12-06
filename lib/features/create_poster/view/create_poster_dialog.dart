@@ -55,6 +55,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
   }
 
   Future<bool> tryExit() async {
+    if (searchController.text.isEmpty) return true;
     bool? exit = await showDialog(
       context: context,
       builder: (context) => Padding(
@@ -99,6 +100,12 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                         Expanded(
                           child: CustomInkWell(
                             onTap: () {
+                              print(dragController.size);
+                              dragController.animateTo(
+                                0,
+                                duration: Duration(milliseconds: dragController.size < 1 ? 1 :  300),
+                                curve: Curves.linear,
+                              );
                               Navigator.pop(context, true);
                             },
                             child: Center(
@@ -179,7 +186,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
         }
       }
     });
-    if (focus.hasFocus || focusSec.hasFocus) {
+    if ((focus.hasFocus || focusSec.hasFocus) && !disposed && !popping) {
       dragController
           .animateTo(
         1,
@@ -216,7 +223,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
       },
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        resizeToAvoidBottomInset: true,
+        resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
             Positioned(
@@ -298,8 +305,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                           const SizedBox(height: 22),
                                           Text(
                                             widget.bookmark
-                                                ? 'Add bookmark'
-                                                : 'Add poster',
+                                                ? 'Add to Watchlist'
+                                                : 'Add poster to Watched',
                                             style: context.textStyles.bodyBold,
                                           ),
                                           const SizedBox(height: 17),
@@ -440,21 +447,23 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                     child: AnimatedBuilder(
                                       animation: dragController,
                                       builder: (context, child) {
-                                        return SizedBox(
-                                          height: EdgeInsets.fromViewPadding(
-                                                              View.of(context)
-                                                                  .viewInsets,
-                                                              View.of(context)
-                                                                  .devicePixelRatio)
-                                                          .bottom -
-                                                      100 >
-                                                  0
-                                              ? EdgeInsets.fromViewPadding(
-                                                      View.of(context).viewInsets,
-                                                      View.of(context)
-                                                          .devicePixelRatio)
-                                                  .bottom
-                                              : 0,
+                                        return Transform.translate(
+                                          offset: Offset(
+                                            0,
+                                            !dragController.isAttached
+                                                ? 0
+                                                : (MediaQuery.of(context)
+                                                            .size
+                                                            .height -
+                                                        370 -
+                                                        MediaQuery.of(context)
+                                                            .padding
+                                                            .top -
+                                                        MediaQuery.of(context)
+                                                            .viewInsets
+                                                            .bottom) /
+                                                    2,
+                                          ),
                                           child: child,
                                         );
                                       },
@@ -475,12 +484,12 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                             ),
                                             const SizedBox(height: 5),
                                             Text(
-                                              "Enter the title of the movie or series\nyou'd like to add to your ${widget.bookmark == true ?  "bookmarks." : "collection."}",
+                                              "Enter the title of the movie or series\nyou'd like to add to your ${widget.bookmark == true ? "Watchlist." : "Watched."}",
                                               style: context
                                                   .textStyles.subheadlineBold!
                                                   .copyWith(
-                                                color:
-                                                    context.colors.textsDisabled!,
+                                                color: context
+                                                    .colors.textsDisabled!,
                                               ),
                                             )
                                           ],
@@ -655,8 +664,9 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
             ),
             if (!focus.hasFocus && searchController.text.isEmpty ||
                 chosenMovie != null && dragController.isAttached)
-              Positioned(
-                bottom: 0,
+              AnimatedPositioned(
+                duration: Duration.zero,
+                bottom: MediaQuery.of(context).viewInsets.bottom,
                 left: 0,
                 right: 0,
                 child: AnimatedBuilder(

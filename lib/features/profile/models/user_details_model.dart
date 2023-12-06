@@ -15,6 +15,7 @@ class UserDetailsModel {
   final bool mySelf;
   final int posters;
   final int lists;
+  final bool? blocked;
 
   UserDetailsModel({
     required this.id,
@@ -29,6 +30,7 @@ class UserDetailsModel {
     this.lists = 0,
     this.description,
     this.imagePath,
+    this.blocked,
   });
 
   factory UserDetailsModel.fromJson(Map<String, Object?> json) {
@@ -65,6 +67,7 @@ class UserDetailsModel {
     bool? mySelf,
     int? posters,
     int? lists,
+    bool? blocked,
   }) {
     return UserDetailsModel(
       id: id ?? this.id,
@@ -79,6 +82,7 @@ class UserDetailsModel {
       posters: posters ?? this.posters,
       lists: lists ?? this.lists,
       color: color,
+      blocked: blocked ?? this.blocked,
     );
   }
 }

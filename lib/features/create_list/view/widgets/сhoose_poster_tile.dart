@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -50,18 +51,14 @@ class ChoosePosterTile extends ConsumerWidget {
                   color: context.colors.backgroundsSecondary,
                   height: 160,
                   width: double.infinity,
-                  child: Image.network(
-                    imagePath ?? '',
+                  child: CachedNetworkImage(
+                    imageUrl: imagePath ?? '',
                     fit: BoxFit.cover,
-                    errorBuilder: (context, obj, trace) {
+                    errorWidget: (context, obj, trace) {
                       return shimmer;
                     },
-                    loadingBuilder: (context, child, event) {
-                      if (event?.cumulativeBytesLoaded !=
-                          event?.expectedTotalBytes) {
-                        return shimmer;
-                      }
-                      return child;
+                    placeholder: (context, value) {
+                      return shimmer;
                     },
                     key: Key(imagePath ?? ''),
                   ),

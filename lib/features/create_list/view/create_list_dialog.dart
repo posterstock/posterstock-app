@@ -20,6 +20,7 @@ import 'package:poster_stock/features/create_list/view/pick_cover_dialog.dart';
 import 'package:poster_stock/features/create_list/view/widgets/%D1%81hoose_poster_tile.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
+import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_posts_state_holder.dart';
@@ -43,6 +44,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
   final FocusNode focus = FocusNode();
   bool disposed = false;
   bool loading = false;
+  bool exiting = false;
 
   @override
   void initState() {
@@ -60,90 +62,112 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
     super.dispose();
   }
 
-  Future<bool> tryExit() async {
+  Future<bool> tryExit(WidgetRef ref) async {
+    print(exiting);
+    if (exiting) return false;
+    exiting = true;
+    var list = ref.read(listSearchValueStateHolderProvider);
+    print(list);
+    if (list.isEmpty) {
+      exiting = false;
+      ref.read(menuControllerProvider).switchMenu();
+      return true;
+    }
     bool? exit = await showDialog(
       context: context,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 38.0),
-        child: Center(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16.0),
-            child: Container(
-              height: 132,
-              decoration: BoxDecoration(
-                color: context.colors.backgroundsPrimary,
-                borderRadius: BorderRadius.circular(16.0),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x29000000),
-                    offset: Offset(0, 16),
-                    blurRadius: 24,
-                    spreadRadius: 0,
-                  )
-                ],
-              ),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        'Do you want to discard\nthe list?',
-                        style: context.textStyles.bodyBold,
-                        textAlign: TextAlign.center,
+      builder: (context) => WillPopScope(
+        onWillPop: () async {
+          exiting = false;
+          return true;
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 38.0),
+          child: Center(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16.0),
+              child: Container(
+                height: 132,
+                decoration: BoxDecoration(
+                  color: context.colors.backgroundsPrimary,
+                  borderRadius: BorderRadius.circular(16.0),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x29000000),
+                      offset: Offset(0, 16),
+                      blurRadius: 24,
+                      spreadRadius: 0,
+                    )
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          'Do you want to discard\nthe list?',
+                          style: context.textStyles.bodyBold,
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
-                  ),
-                  Divider(
-                    height: 0.5,
-                    thickness: 0.5,
-                    color: context.colors.fieldsDefault,
-                  ),
-                  SizedBox(
-                    height: 52,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: CustomInkWell(
-                            onTap: () {
-                              Navigator.pop(context, true);
-                            },
-                            child: Center(
-                              child: Text(
-                                'Discard',
-                                style: context.textStyles.bodyRegular!.copyWith(
-                                  color: context.colors.textsError,
+                    Divider(
+                      height: 0.5,
+                      thickness: 0.5,
+                      color: context.colors.fieldsDefault,
+                    ),
+                    SizedBox(
+                      height: 52,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: CustomInkWell(
+                              onTap: () {
+                                exiting = false;
+                                ref.read(menuControllerProvider).switchMenu();
+                                Navigator.pop(context, true);
+                              },
+                              child: Center(
+                                child: Text(
+                                  'Discard',
+                                  style: context.textStyles.bodyRegular!.copyWith(
+                                    color: context.colors.textsError,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          child: CustomInkWell(
-                            onTap: () {
-                              Navigator.pop(context, false);
-                            },
-                            child: Center(
-                              child: Text(
-                                'Cancel',
-                                style: context.textStyles.bodyRegular,
+                          Expanded(
+                            child: CustomInkWell(
+                              onTap: () {
+                                exiting = false;
+                                Navigator.pop(context, false);
+                              },
+                              child: Center(
+                                child: Text(
+                                  'Cancel',
+                                  style: context.textStyles.bodyRegular,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
     );
+    print(exit);
+    exiting = false;
     return exit ?? false;
   }
 
   bool popping = false;
+
   @override
   Widget build(BuildContext context) {
     final image = ref.watch(chosenCoverStateHolderProvider);
@@ -152,6 +176,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
     final postersSearch = ref.watch(listSearchPostsStateHolderProvider);
     final me = ref.watch(myProfileInfoStateHolderProvider);
     if (posts == null) {
+      print("NUUKLL");
       ref.read(profileControllerApiProvider).getUserInfo(null);
     }
     List<PostMovieModel>? posters;
@@ -161,23 +186,27 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
       posters = postersSearch;
     }
     dragController.addListener(() async {
+      print(dragController.size);
       if (dragController.size < 0.1) {
         if (!disposed && !popping) {
           popping = true;
-          bool exit = await tryExit();
+          bool exit = await tryExit(ref);
           if (!exit) {
-            dragController.animateTo(
-              0.7,
-              duration: Duration(milliseconds: 300),
-              curve: Curves.linear,
-            ).then((value) => popping = false);
+            await dragController
+                .animateTo(
+                  0.7,
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.linear,
+                );
+            popping = false;
+            disposed = false;
             return;
           }
           ref.read(pickCoverControllerProvider).clearAll();
           ref.read(listSearchValueStateHolderProvider.notifier).clearState();
           popping = false;
           disposed = true;
-          Navigator.pop(context);
+          if (Navigator.of(context).canPop()) Navigator.of(context).pop();
         }
       }
     });
@@ -185,7 +214,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
       if (focus.hasFocus) {
         dragController.animateTo(
           1,
-          duration: Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 300),
           curve: Curves.linear,
         );
       }
@@ -193,11 +222,11 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
     });
     return WillPopScope(
       onWillPop: () async {
-        bool exit = await tryExit();
+        if (disposed) return false;
+        bool exit = await tryExit(ref);
         if (!exit) return false;
         ref.read(listSearchValueStateHolderProvider.notifier).clearState();
         ref.read(pickCoverControllerProvider).clearAll();
-        Navigator.pop(context);
         return exit;
       },
       child: GestureDetector(
@@ -216,12 +245,13 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                 right: 0,
                 child: GestureDetector(
                   onTap: () async {
-                    bool exit = await tryExit();
+                    bool exit = await tryExit(ref);
                     if (!exit) return;
                     ref
                         .read(listSearchValueStateHolderProvider.notifier)
                         .clearState();
                     ref.read(pickCoverControllerProvider).clearAll();
+                    print("POP BBB");
                     Navigator.pop(context);
                   },
                   child: Container(
@@ -234,6 +264,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                 minChildSize: 0,
                 initialChildSize: 0.7,
                 maxChildSize: 1,
+                shouldCloseOnMinExtent: false,
                 snap: true,
                 snapSizes: const [0.7, 1],
                 builder: (context, controller) {
@@ -284,7 +315,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                         ),
                                         const SizedBox(height: 22),
                                         Text(
-                                          'Create list',
+                                          'Create a List',
                                           style: context.textStyles.bodyBold,
                                         ),
                                         const SizedBox(height: 0.5),
@@ -292,7 +323,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                         const SizedBox(height: 16.5),
                                         SizedBox(
                                           height: 36,
-                                          child: posters?.isEmpty == true
+                                          child: posters?.isEmpty == true && searchController.text.isEmpty
                                               ? null
                                               : AppTextField(
                                                   searchField: true,
@@ -400,14 +431,15 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                             ),
                           ),
                         ),
-                        if (!focus.hasFocus)
-                          SizedBox(
+                        if (!focus.hasFocus && !popping && !disposed)
+                          const SizedBox(
                             height: 146,
                           ),
-                        Container(
-                          color: context.colors.backgroundsPrimary,
-                          height: MediaQuery.of(context).padding.bottom,
-                        ),
+                        if (!focus.hasFocus && !popping && !disposed)
+                          Container(
+                            color: context.colors.backgroundsPrimary,
+                            height: MediaQuery.of(context).padding.bottom,
+                          ),
                       ],
                     ),
                   );
@@ -421,7 +453,17 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                   child: AnimatedBuilder(
                     animation: dragController,
                     builder: (context, child) {
-                      return Transform.translate(offset: Offset(0,!dragController.isAttached ? 0 : dragController.size >=0.3 ? 0 : (0.3 - dragController.size) * MediaQuery.of(context).size.height), child: child!,);
+                      return Transform.translate(
+                        offset: Offset(
+                            0,
+                            !dragController.isAttached
+                                ? 0
+                                : dragController.size >= 0.3
+                                    ? 0
+                                    : (0.3 - dragController.size) *
+                                        MediaQuery.of(context).size.height),
+                        child: child!,
+                      );
                     },
                     child: Column(
                       children: [
@@ -447,7 +489,8 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                       color: context.colors.textsDisabled,
                                     ),
                                     filled: true,
-                                    fillColor: context.colors.backgroundsPrimary,
+                                    fillColor:
+                                        context.colors.backgroundsPrimary,
                                     border: InputBorder.none,
                                     contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 20.0,
@@ -508,10 +551,11 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                           children: [
                                             Text(
                                               'Upload cover',
-                                              style: context.textStyles.caption2!
+                                              style: context
+                                                  .textStyles.caption2!
                                                   .copyWith(
-                                                color:
-                                                    context.colors.textsDisabled,
+                                                color: context
+                                                    .colors.textsDisabled,
                                               ),
                                             ),
                                             const SizedBox(width: 10),
@@ -587,6 +631,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                     context: context,
                                   );
                               if (context.mounted) {
+                                print("POP CCC");
                                 Navigator.pop(context);
                                 ref.read(menuControllerProvider).switchMenu();
                               }

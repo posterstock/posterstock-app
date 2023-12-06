@@ -7,7 +7,9 @@ import 'package:poster_stock/features/home/state_holders/home_page_scroll_contro
 import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/navigation_route_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/view/widgets/plus_button.dart';
+import 'package:poster_stock/features/notifications/controllers/notifications_controller.dart';
 import 'package:poster_stock/features/notifications/state_holders/notifications_count_state_holder.dart';
+import 'package:poster_stock/features/notifications/state_holders/notifications_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -133,6 +135,9 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                       ref
                           .read(notificationsCountStateHolderProvider.notifier)
                           .updateState(0);
+                      Future(() {
+                        ref.watch(notificationsStateHolderProvider.notifier).clear();
+                      });
                     },
                     icon: Stack(
                       children: [

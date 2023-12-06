@@ -24,6 +24,7 @@ import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_nam
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_username_error_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_username_state_holder.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
+import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -72,8 +73,8 @@ class EditProfilePage extends ConsumerWidget {
     final usernameError = ref.watch(editProfileUsernameErrorStateHolder);
     final nameError = ref.watch(editProfileNameErrorStateHolder);
     final descriptionError = ref.watch(editProfileDescriptionErrorStateHolder);
-    final initialName = ref.watch(profileInfoStateHolderProvider)?.name;
-    final initialPhoto = ref.watch(profileInfoStateHolderProvider);
+    final initialName = ref.watch(myProfileInfoStateHolderProvider)?.name;
+    final initialPhoto = ref.watch(myProfileInfoStateHolderProvider)?.imagePath;
     if (ref.read(editProfileNameStateHolder) == null) {
       Future(() {
         ref
@@ -151,29 +152,38 @@ class EditProfilePage extends ConsumerWidget {
                                 descriptionError)
                             ? null
                             : () async {
-                          ref.read(editProfileControllerProvider).setLoading(true);
+                                ref
+                                    .read(editProfileControllerProvider)
+                                    .setLoading(true);
                                 await ref
                                     .read(editProfileControllerProvider)
                                     .save();
-                                await ref.read(profileControllerApiProvider).getUserInfo(null);
-                          ref.read(editProfileControllerProvider).setLoading(false);
+                                await ref
+                                    .read(profileControllerApiProvider)
+                                    .getUserInfo(null);
+                                ref
+                                    .read(editProfileControllerProvider)
+                                    .setLoading(false);
                                 ref.watch(router)!.pop();
                               },
-                        child: ref.watch(editProfileLoadingStateHolder) ? Center(
-                          child: defaultTargetPlatform != TargetPlatform.android
-                              ? CupertinoActivityIndicator(
-                            radius: 10.0,
-                            color: context.colors.buttonsPrimary!,
-                          )
-                              : SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              color: context.colors.buttonsPrimary!,
-                              strokeWidth: 2,
-                            ),
-                          ),
-                        ) : const Text('Save'),
+                        child: ref.watch(editProfileLoadingStateHolder)
+                            ? Center(
+                                child: defaultTargetPlatform !=
+                                        TargetPlatform.android
+                                    ? CupertinoActivityIndicator(
+                                        radius: 10.0,
+                                        color: context.colors.buttonsPrimary!,
+                                      )
+                                    : SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                          color: context.colors.buttonsPrimary!,
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                              )
+                            : const Text('Save'),
                       ),
                     ],
                   ),
@@ -201,10 +211,10 @@ class EditProfilePage extends ConsumerWidget {
                       radius: 50,
                       backgroundColor: avatarColor,
                       backgroundImage: photo == null
-                          ? (initialPhoto?.imagePath == null
+                          ? (initialPhoto == null
                               ? null
                               : Image.network(
-                                  initialPhoto!.imagePath!,
+                                  initialPhoto,
                                   fit: BoxFit.cover,
                                 ).image)
                           : Image.memory(
@@ -400,6 +410,7 @@ class UsernameFieldProfile extends ConsumerStatefulWidget {
 class _UsernameFieldProfileState extends ConsumerState<UsernameFieldProfile> {
   TextEditingController? controller;
   final FocusNode focusNode = FocusNode();
+  String? initialUsername;
 
   @override
   Widget build(BuildContext context) {
@@ -409,12 +420,14 @@ class _UsernameFieldProfileState extends ConsumerState<UsernameFieldProfile> {
     final screenHeight = (MediaQuery.of(context).size.height -
         MediaQuery.of(context).viewInsets.bottom);
     final usernameError = ref.watch(editProfileUsernameErrorStateHolder);
-    final initialUsername = ref.watch(profileInfoStateHolderProvider)?.username;
-    Future(() {
-      ref
-          .read(editProfileUsernameStateHolder.notifier)
-          .updateValue(initialUsername ?? '');
-    });
+    if (initialUsername == null) {
+      initialUsername ??= ref.watch(myProfileInfoStateHolderProvider)?.username;
+      Future(() {
+        ref
+            .read(editProfileUsernameStateHolder.notifier)
+            .updateValue(initialUsername ?? '');
+      });
+    }
     controller ??= TextEditingController(text: initialUsername ?? '');
     return TextField(
       controller: controller,
@@ -451,10 +464,7 @@ class _UsernameFieldProfileState extends ConsumerState<UsernameFieldProfile> {
       },
       onChanged: (value) {
         ref.read(editProfileUsernameStateHolder.notifier).updateValue(value);
-        if (value.isEmpty) {
-          ref.read(editProfileControllerProvider).removeUsernameError();
-          return;
-        }
+        print(value);
         if (value.length < 5) {
           ref.read(editProfileControllerProvider).setTooShortErrorUsername();
           return;
@@ -500,7 +510,7 @@ class _ProfileDescriptionFieldState
     final screenHeight = (MediaQuery.of(context).size.height -
         MediaQuery.of(context).viewInsets.bottom);
     final initialDescription =
-        ref.watch(profileInfoStateHolderProvider)?.description;
+        ref.watch(myProfileInfoStateHolderProvider)?.description;
     if (ref.read(editProfileDescriptionStateHolder) == null) {
       Future(() {
         ref
@@ -627,10 +637,9 @@ class ProfilePhotoDialog extends ConsumerWidget {
                                   source: ImageSource.gallery,
                                 );
                                 if (image == null) throw Exception();
-                                ref
-                                    .read(profileControllerProvider)
-                                    .setPhoto(
-                                    File(image.path).readAsBytesSync(),);
+                                ref.read(profileControllerProvider).setPhoto(
+                                      await File(image.path).readAsBytes(),
+                                    );
                                 await ref
                                     .read(pickCoverControllerProvider)
                                     .setImage(image.path);
@@ -666,9 +675,15 @@ class ProfilePhotoDialog extends ConsumerWidget {
                                   .pickImage(source: ImageSource.camera);
                               final image = await xfile?.readAsBytes();
                               if (image != null) {
+                                print(image);
                                 ref
                                     .read(profileControllerProvider)
                                     .setPhoto(image);
+                              } else {
+                                scaffoldMessengerKey.currentState?.showSnackBar(
+                                  SnackBars.build(
+                                      context, null, "Could not pick image"),
+                                );
                               }
                             },
                             child: Center(

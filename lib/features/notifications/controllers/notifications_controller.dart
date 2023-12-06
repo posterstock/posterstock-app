@@ -25,10 +25,14 @@ class NotificationsController {
     if (loading) return;
     loading = true;
     try {
-      if (getNewPosts) {
+      if (getNewPosts && !loadedAll) {
+        final result = await repo.getNotifications(getNewPosts: true);
+        if (result.isEmpty) {
+          loadedAll = true;
+        }
         notificationsState
-            .updateStateStart(await repo.getNotifications(getNewPosts: true));
-      } else if (!loadedAll) {
+            .updateStateStart(result);
+      } else {
         var nots = await repo.getNotifications();
         if (nots.isEmpty) {
           loadedAll = true;

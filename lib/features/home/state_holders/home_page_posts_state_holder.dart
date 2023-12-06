@@ -86,6 +86,18 @@ class HomePagePostsStateHolder
     }
   }
 
+  Future<void> blockUser(int id) async {
+    for (int i = 0; i < (state?.length ?? 0); i++) {
+      for (int j = 0; j < (state?[i].length ?? 0); j++) {
+        if (state![i][j].author.id == id) {
+          state![i].removeAt(j);
+          j--;
+        }
+      }
+    }
+    state = [...?state];
+  }
+
   Future<void> setLikeIdList(int id, bool value) async {
     for (int i = 0; i < (state?.length ?? 0); i++) {
       for (int j = 0; j < (state?[i].length ?? 0); j++) {

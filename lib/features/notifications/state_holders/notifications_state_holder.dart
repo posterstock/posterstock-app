@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/notification_model.dart';
@@ -8,7 +10,11 @@ final notificationsStateHolderProvider =
 );
 
 class NotificationsStateHolder extends StateNotifier<List<NotificationModel>?> {
-  NotificationsStateHolder(super.state);
+  NotificationsStateHolder(super.state) {
+    Timer timer = Timer(const Duration(minutes: 1), () {
+      state = [...?state];
+    });
+  }
 
   void updateState(List<NotificationModel> list) {
     if (list.isEmpty && state != null) return;
@@ -30,5 +36,9 @@ class NotificationsStateHolder extends StateNotifier<List<NotificationModel>?> {
     state?.sort((a, b) => a.time.isAfter(b.time) ? 0 : 1);
     list?.sort((a, b) => a.time.isAfter(b.time) ? 0 : 1);
     state = [...list, ...?state];
+  }
+
+  void clear() {
+    state = null;
   }
 }

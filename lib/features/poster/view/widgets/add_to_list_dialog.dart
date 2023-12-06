@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
+import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/features/poster/controller/comments_controller.dart';
 import 'package:poster_stock/features/poster/state_holder/my_lists_state_holder.dart';
@@ -28,6 +29,18 @@ class AddToListDialog extends ConsumerWidget {
           ref.read(commentsControllerProvider).getMyLists();
         } catch (e) {}
       });
+    }
+    final allSizes = lists?.map(
+      (e) => TextInfoService.textSizeConstWidth(
+              e.title,
+              context.textStyles.bodyRegular!,
+              MediaQuery.of(context).size.width - 32 - 19 - 200)
+          .height,
+    );
+    double size = 0;
+    for (var a in (allSizes ?? const Iterable.empty())) {
+      size += a;
+      size += 80;
     }
     return WillPopScope(
       onWillPop: () async {
@@ -57,9 +70,8 @@ class AddToListDialog extends ConsumerWidget {
                 DraggableScrollableSheet(
                   //shouldCloseOnMinExtent: true,
                   controller: _controller,
-                  snapSizes: const [0.5, 1],
                   minChildSize: 0,
-                  initialChildSize: 0.5,
+                  initialChildSize: size / MediaQuery.of(context).size.height,
                   maxChildSize: 1,
                   snap: true,
                   builder: (context, controller) => ClipRRect(
@@ -74,7 +86,9 @@ class AddToListDialog extends ConsumerWidget {
                           onNotification: (info) {
                             if (_controller.pixels != 0 &&
                                 _controller.pixels <= 5.0) {
-                              ref.watch(myListsStateHolderProvider.notifier).clear();
+                              ref
+                                  .watch(myListsStateHolderProvider.notifier)
+                                  .clear();
                               Navigator.pop(context);
                             }
                             return true;
@@ -107,94 +121,108 @@ class AddToListDialog extends ConsumerWidget {
                                               TargetPlatform.android
                                           ? CupertinoActivityIndicator(
                                               radius: 10.0,
-                                              color:
-                                                  context.colors.textsSecondary!,
+                                              color: context
+                                                  .colors.textsSecondary!,
                                             )
                                           : SizedBox(
                                               width: 16,
                                               height: 16,
                                               child: CircularProgressIndicator(
-                                                color:
-                                                    context.colors.textsSecondary!,
+                                                color: context
+                                                    .colors.textsSecondary!,
                                                 strokeWidth: 2,
                                               ),
                                             ),
                                     ),
                                   ),
                                 if (lists != null)
-                                ...List.generate(
-                                  lists?.length ?? 0,
-                                  (index) => CustomInkWell(
-                                    child: Column(
-                                      children: [
-                                        Divider(
-                                          height: 0.5,
-                                          thickness: 0.5,
-                                          color: context.colors.fieldsDefault,
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 15.0),
-                                          child: Row(
-                                            children: [
-                                              const SizedBox(width: 19),
-                                              Expanded(
-                                                child: Text(
-                                                  lists![index].title,
-                                                  style: context
-                                                      .textStyles.bodyRegular,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 16),
-                                              Text(
-                                                lists![index].postersCount.toString() + ' posters',
-                                                style: context
-                                                    .textStyles.footNote!.copyWith(color: context.colors.textsSecondary),
-                                              ),
-                                              const SizedBox(width: 16),
-                                            ],
+                                  ...List.generate(
+                                    lists?.length ?? 0,
+                                    (index) => CustomInkWell(
+                                      child: Column(
+                                        children: [
+                                          Divider(
+                                            height: 0.5,
+                                            thickness: 0.5,
+                                            color: context.colors.fieldsDefault,
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    onTap: () async {
-                                      var snack = scaffoldMessengerKey
-                                          .currentState
-                                          ?.showSnackBar(
-                                        SnackBars.build(
-                                          context,
-                                          null,
-                                          'Adding poster to list...',
-                                          duration: const Duration(minutes: 2),
-                                        ),
-                                      );
-                                      try {
-                                        await ref
-                                            .read(commentsControllerProvider)
-                                            .addPosterToList(
-                                              lists![index].id,
-                                              post!.id,
-                                            );
-                                      } catch (e) {
-                                        snack?.close();
-                                        ref.watch(myListsStateHolderProvider.notifier).clear();
-                                        Navigator.pop(context);
-                                        if (context.mounted) {
-                                          scaffoldMessengerKey.currentState
-                                              ?.showSnackBar(
-                                            SnackBars.build(
-                                              context,
-                                              null,
-                                              'Could not update list',
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 15.0),
+                                            child: Row(
+                                              children: [
+                                                const SizedBox(width: 19),
+                                                Expanded(
+                                                  child: Text(
+                                                    lists![index].title,
+                                                    style: context
+                                                        .textStyles.bodyRegular,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 16),
+                                                Text(
+                                                  lists![index]
+                                                          .postersCount
+                                                          .toString() +
+                                                      ' posters',
+                                                  style: context
+                                                      .textStyles.footNote!
+                                                      .copyWith(
+                                                          color: context.colors
+                                                              .textsSecondary),
+                                                ),
+                                                const SizedBox(width: 16),
+                                              ],
                                             ),
-                                          );
+                                          ),
+                                        ],
+                                      ),
+                                      onTap: () async {
+                                        var snack = scaffoldMessengerKey
+                                            .currentState
+                                            ?.showSnackBar(
+                                          SnackBars.build(
+                                            context,
+                                            null,
+                                            'Adding poster to list...',
+                                            duration:
+                                                const Duration(minutes: 2),
+                                          ),
+                                        );
+                                        try {
+                                          await ref
+                                              .read(commentsControllerProvider)
+                                              .addPosterToList(
+                                                lists![index].id,
+                                                post!.id,
+                                              );
+                                        } catch (e) {
+                                          snack?.close();
+                                          ref
+                                              .watch(myListsStateHolderProvider
+                                                  .notifier)
+                                              .clear();
+                                          Navigator.pop(context);
+                                          if (context.mounted) {
+                                            scaffoldMessengerKey.currentState
+                                                ?.showSnackBar(
+                                              SnackBars.build(
+                                                context,
+                                                null,
+                                                'Could not update list',
+                                              ),
+                                            );
+                                          }
                                         }
-                                      }
-                                      snack?.close();
-                                      ref.watch(myListsStateHolderProvider.notifier).clear();
-                                      Navigator.pop(context);
-                                    },
+                                        snack?.close();
+                                        ref
+                                            .watch(myListsStateHolderProvider
+                                                .notifier)
+                                            .clear();
+                                        Navigator.pop(context);
+                                      },
+                                    ),
                                   ),
-                                ),
                               ],
                             ),
                           ),

@@ -6,11 +6,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
+import 'package:poster_stock/common/helpers/custom_ink_well.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/auth/controllers/auth_controller.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
+import 'package:poster_stock/features/auth/data/auth_service.dart';
+import 'package:poster_stock/features/edit_profile/api/edit_profile_api.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_scroll_controller_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/view/navigation_page.dart';
@@ -370,6 +373,41 @@ class SettingsPage extends ConsumerWidget {
                           color: Colors.transparent,
                           child: AreYouSureDialog(
                             actionText: 'Logout',
+                            secondAction: 'Delete account with all data',
+                            onTapSecond: () async {
+                              bool delete = await treDelete(context);
+                              if (!delete) return;
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              try {
+                                await ref
+                                    .read(signUpControllerProvider)
+                                    .removeFCMToken();
+                                ref
+                                    ?.read(notificationsCountStateHolderProvider
+                                        .notifier)
+                                    .updateState(0);
+                                await FirebaseMessaging.instance.deleteToken();
+                              } catch (_) {}
+                              try {
+                                try {
+                                  await EditProfileApi().deleteAccount();
+                                } catch (e) {}
+                                TokenKeeper.token = null;
+                                await prefs.remove('token');
+                                await prefs.remove('google');
+                                await prefs.remove('apple');
+                                await prefs.remove('email');
+                                apple = false;
+                                google = false;
+                                email = null;
+                              } catch (e) {}
+                              ref.read(authControllerProvider).stopLoading();
+                              ref.watch(router)!.pushAndPopUntil(AuthRoute(),
+                                  predicate: (value) => false);
+                              if (Navigator.canPop(context))
+                                Navigator.pop(context);
+                            },
                             onTap: () async {
                               final prefs =
                                   await SharedPreferences.getInstance();
@@ -384,20 +422,21 @@ class SettingsPage extends ConsumerWidget {
                                 await FirebaseMessaging.instance.deleteToken();
                               } catch (_) {}
                               try {
-                              await SuperTokens.signOut();
-                              TokenKeeper.token = null;
-                              await prefs.remove('token');
-                              await prefs.remove('google');
-                              await prefs.remove('apple');
-                              await prefs.remove('email');
-                              apple = false;
-                              google = false;
-                              email = null; } catch (e) {}
+                                await SuperTokens.signOut();
+                                TokenKeeper.token = null;
+                                await prefs.remove('token');
+                                await prefs.remove('google');
+                                await prefs.remove('apple');
+                                await prefs.remove('email');
+                                apple = false;
+                                google = false;
+                                email = null;
+                              } catch (e) {}
                               ref.read(authControllerProvider).stopLoading();
                               ref.watch(router)!.pushAndPopUntil(AuthRoute(),
                                   predicate: (value) => false);
                               if (Navigator.canPop(context))
-                              Navigator.pop(context);
+                                Navigator.pop(context);
                             },
                           ),
                         ),
@@ -454,6 +493,95 @@ class SettingsPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<bool> treDelete(BuildContext context) async {
+    bool? exit = await showDialog(
+      context: context,
+      builder: (context) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 38.0),
+        child: Center(
+          child: Material(
+            color: Colors.transparent,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16.0),
+              child: Container(
+                height: 132,
+                decoration: BoxDecoration(
+                  color: context.colors.backgroundsPrimary,
+                  borderRadius: BorderRadius.circular(16.0),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x29000000),
+                      offset: Offset(0, 16),
+                      blurRadius: 24,
+                      spreadRadius: 0,
+                    )
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text(
+                            'Are you sure you want to delete all your user data?',
+                            style: context.textStyles.bodyBold,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Divider(
+                      height: 0.5,
+                      thickness: 0.5,
+                      color: context.colors.fieldsDefault,
+                    ),
+                    SizedBox(
+                      height: 52,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: CustomInkWell(
+                              onTap: () {
+                                Navigator.pop(context, true);
+                              },
+                              child: Center(
+                                child: Text(
+                                  'Delete',
+                                  style: context.textStyles.bodyRegular!.copyWith(
+                                    color: context.colors.textsError,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: CustomInkWell(
+                              onTap: () {
+                                Navigator.pop(context, false);
+                              },
+                              child: Center(
+                                child: Text(
+                                  'Cancel',
+                                  style: context.textStyles.bodyRegular,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    return exit ?? false;
   }
 
   Future<void> saveTheme(Themes theme) async {
@@ -653,18 +781,22 @@ class AreYouSureDialog extends ConsumerWidget {
   const AreYouSureDialog({
     Key? key,
     required this.actionText,
+    required this.secondAction,
     required this.onTap,
+    required this.onTapSecond,
   }) : super(key: key);
 
   final String actionText;
+  final String secondAction;
   final void Function() onTap;
+  final void Function() onTapSecond;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Align(
       alignment: Alignment.bottomCenter,
       child: SizedBox(
-        height: 200,
+        height: 252,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
@@ -672,7 +804,7 @@ class AreYouSureDialog extends ConsumerWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(16.0),
                 child: SizedBox(
-                  height: 88,
+                  height: 140,
                   child: Material(
                     color: context.colors.backgroundsPrimary,
                     child: Column(
@@ -699,6 +831,26 @@ class AreYouSureDialog extends ConsumerWidget {
                             child: Center(
                               child: Text(
                                 actionText,
+                                style: context.textStyles.bodyRegular!.copyWith(
+                                  color: context.colors.textsPrimary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          height: 0.5,
+                          thickness: 0.5,
+                          color: context.colors.fieldsDefault,
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              onTapSecond();
+                            },
+                            child: Center(
+                              child: Text(
+                                secondAction,
                                 style: context.textStyles.bodyRegular!.copyWith(
                                   color: context.colors.textsError,
                                 ),

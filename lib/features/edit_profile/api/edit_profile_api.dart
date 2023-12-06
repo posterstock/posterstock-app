@@ -36,6 +36,48 @@ class EditProfileApi {
     );
   }
 
+  Future<void> deleteAccount() async {
+    try {
+      await _dio.delete(
+        '/api/profiles/irreversible',
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
+      );
+    } on DioError catch(e) {
+      print(e.message);
+      rethrow;
+    }
+  }
+
+  Future<void> blockAccount({required int id}) async {
+    try {
+      await _dio.post(
+        '/api/users/$id/block',
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
+      );
+    } on DioError catch(e) {
+      print(e.message);
+      rethrow;
+    }
+  }
+
+  Future<void> unblockAccount({required int id}) async {
+    try {
+      await _dio.post(
+        '/api/users/$id/unblock',
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
+      );
+    } on DioError catch(e) {
+      print(e.message);
+      rethrow;
+    }
+  }
+
   Future<void> save({
     required String name,
     required String username,
@@ -44,17 +86,23 @@ class EditProfileApi {
   }) async {
     print("$name $username $description");
     try {
-      var response = await _dio.post(
-        'api/profiles',
-        options: Options(
-          headers: {'Authorization': 'Bearer $token'},
-        ),
-        data: jsonEncode({
-          if (description != null) "description": description,
-          "name": name,
-        }),
-      );
       try {
+        var response = await _dio.post(
+          'api/profiles',
+          options: Options(
+            headers: {'Authorization': 'Bearer $token'},
+          ),
+          data: jsonEncode({
+            if (description != null) "description": description,
+            "name": name,
+          }),
+        );
+      } catch (e) {
+
+      }
+      try {
+        print(19);
+        print(username);
         var r1 = await _dio.post(
           'api/profiles/username',
           options: Options(
@@ -65,8 +113,10 @@ class EditProfileApi {
           }),
         );
         print(r1.data);
-      } catch (e) {
-        print(e);
+        print(r1.headers);
+      } on DioError catch (e) {
+        print(e.response?.data);
+        print(e.response?.headers);
       }
       if (avatar == null) return;
       Image? img = decodeImage(avatar);
@@ -93,7 +143,6 @@ class EditProfileApi {
         ),
         data: formData,
       );
-      print(response);
       print(responseImage);
     } on DioError catch (e) {
       print(e.response);

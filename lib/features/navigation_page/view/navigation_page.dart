@@ -226,7 +226,10 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                 showModalBottomSheet(
                   context: context,
                   backgroundColor: Colors.transparent,
+                  useRootNavigator: true,
                   isScrollControlled: true,
+                  enableDrag: false,
+                  isDismissible: false,
                   useSafeArea: true,
                   builder: (context) => const CreateListDialog(),
                 );
@@ -249,6 +252,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                   context: context,
                   backgroundColor: Colors.transparent,
                   isScrollControlled: true,
+                  enableDrag: false,
                   useSafeArea: true,
                   builder: (context) => const CreatePosterDialog(
                     bookmark: true,
@@ -271,6 +275,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                   backgroundColor: Colors.transparent,
                   isScrollControlled: true,
                   useSafeArea: true,
+                  enableDrag: false,
                   builder: (context) => const CreatePosterDialog(),
                 );
               },

@@ -56,10 +56,10 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
           AppBar(
             backgroundColor: context.colors.backgroundsPrimary,
             elevation: 0,
-            leadingWidth: 130,
+            leadingWidth: 80,
             toolbarHeight: 42,
             titleSpacing: 0,
-            centerTitle: true,
+            centerTitle: false,
             leading: Align(
               alignment: Alignment.centerLeft,
               child: GestureDetector(
@@ -81,7 +81,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
               ),
             ),
             title: Text(
-              'Your bookmarks',
+              'Watchlist: Community posters',
               style: context.textStyles.bodyBold,
             ),
           ),

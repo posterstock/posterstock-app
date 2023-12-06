@@ -105,11 +105,11 @@ class EditProfileController {
     avatarStateHolder.removePhoto();
   }
 
-  Future<void> save() async {
+  Future<void> save({String? name, String? username, String? description}) async {
     await repository.save(
-      name: editProfileNameStateHolder!,
-      username: editProfileUsernameStateHolder!,
-      description: editProfileDescriptionSH!,
+      name: name ?? editProfileNameStateHolder!,
+      username: username ?? editProfileUsernameStateHolder!,
+      description: description ?? editProfileDescriptionSH!,
       avatar: editProfileAvatarStateHolder,
     );
   }
