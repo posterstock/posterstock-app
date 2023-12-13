@@ -353,7 +353,12 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
                           crossAxisCount: 2,
                           crossAxisSpacing: 13.0,
                           mainAxisSpacing: 16.0,
-                          mainAxisExtent: ((MediaQuery.of(context).size.width - 16.0 * 3) / 2) / 540 * 300 + 23,
+                          mainAxisExtent:
+                              ((MediaQuery.of(context).size.width - 16.0 * 3) /
+                                          2) /
+                                      540 *
+                                      300 +
+                                  23,
                         ),
                         itemCount: lists.length,
                         itemBuilder: (context, index) {

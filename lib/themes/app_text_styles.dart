@@ -82,7 +82,7 @@ class AppAllTextStyles extends AppTextStyles {
             height: 20 / 15,
             letterSpacing: -0.5,
             color: colors.textsPrimary,
-              fontFamilyFallback: ['SF-Pro-Display'],
+            fontFamilyFallback: ['SF-Pro-Display'],
           ),
           subheadline: TextStyle(
             fontFamily: 'SF-Pro-Text',
