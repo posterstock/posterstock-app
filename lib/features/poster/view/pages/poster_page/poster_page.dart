@@ -1492,7 +1492,7 @@ class PosterActionsDialog extends ConsumerWidget {
                             child: InkWell(
                               onTap: () {
                                 Share.share(
-                                    "posterstock.com/${post.author.username}/${post.id}");
+                                    "https://posterstock.com/${post.author.username}/${post.id}");
                               },
                               child: Center(
                                 child: Text(
@@ -1550,13 +1550,12 @@ class PosterActionsDialog extends ConsumerWidget {
                                     );
                                   }
                                   final myself = ref
-                                      .watch(
-                                      profileInfoStateHolderProvider)
+                                      .watch(profileInfoStateHolderProvider)
                                       ?.mySelf;
                                   if (myself != false) {
                                     ref
-                                      .read(profileControllerApiProvider)
-                                      .getUserInfo(null);
+                                        .read(profileControllerApiProvider)
+                                        .getUserInfo(null);
                                   }
                                 }
                               },

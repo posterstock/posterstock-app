@@ -1,10 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/constants/durations.dart';
+import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
@@ -18,16 +18,14 @@ import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/list/controller/list_controller.dart';
 import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
+import 'package:poster_stock/features/poster/view/pages/poster_page/poster_page.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
+import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:share_plus/share_plus.dart';
-
-import '../../../common/services/text_info_service.dart';
-import '../../poster/view/pages/poster_page/poster_page.dart';
-import '../../profile/view/pages/profile_page.dart';
 
 @RoutePage()
 class ListPage extends ConsumerStatefulWidget {
@@ -247,7 +245,11 @@ class _ListPageState extends ConsumerState<ListPage>
                                   ),
                                   child: UserInfoTile(
                                     type: InfoDialogType.listComment,
-                                    myEntity: posts?.author.id == ref.watch(myProfileInfoStateHolderProvider)?.id,
+                                    myEntity: posts?.author.id ==
+                                        ref
+                                            .watch(
+                                                myProfileInfoStateHolderProvider)
+                                            ?.id,
                                     entityId: comments?[index - 1].id ?? -1,
                                     showFollowButton: false,
                                     user: comments?[index - 1].model,
@@ -267,11 +269,12 @@ class _ListPageState extends ConsumerState<ListPage>
                                             CrossAxisAlignment.start,
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.only(right:16.0),
+                                            padding: const EdgeInsets.only(
+                                                right: 16.0),
                                             child: Text(
                                               comments![index - 1].text,
-                                              style:
-                                                  context.textStyles.subheadline!,
+                                              style: context
+                                                  .textStyles.subheadline!,
                                             ),
                                           ),
                                           SizedBox(height: 12),
@@ -549,9 +552,7 @@ class CollectionInfoWidget extends ConsumerWidget {
 }
 
 class ListActionsDialog extends ConsumerWidget {
-  const ListActionsDialog({
-    Key? key,
-  }) : super(key: key);
+  const ListActionsDialog({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -570,7 +571,7 @@ class ListActionsDialog extends ConsumerWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16.0),
                   child: SizedBox(
-                    height: list!.author.id != myself?.id ? 190 : 145,
+                    height: list.author.id != myself?.id ? 190 : 145,
                     child: Material(
                       color: context.colors.backgroundsPrimary,
                       child: Column(
@@ -586,20 +587,20 @@ class ListActionsDialog extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          if (list!.author.id != myself?.id)
+                          if (list.author.id != myself?.id)
                             Divider(
                               height: 0.5,
                               thickness: 0.5,
                               color: context.colors.fieldsDefault,
                             ),
-                          if (list!.author.id != myself?.id)
+                          if (list.author.id != myself?.id)
                             Expanded(
                               child: InkWell(
                                 onTap: () {
                                   ref
                                       .read(homePagePostsControllerProvider)
-                                      .setFollowId(list!.author.id,
-                                          !list!.author.followed);
+                                      .setFollowId(list.author.id,
+                                          !list.author.followed);
                                   ref
                                       .read(listsStateHolderProvider.notifier)
                                       .updateState(
@@ -608,18 +609,16 @@ class ListActionsDialog extends ConsumerWidget {
                                               followed: !list.author.followed),
                                         ),
                                       );
-                                  ref
-                                      .read(profileControllerApiProvider)
-                                      .follow(
-                                    list!.author.id,
-                                    list!.author.followed,
-                                  );
+                                  ref.read(profileControllerApiProvider).follow(
+                                        list.author.id,
+                                        list.author.followed,
+                                      );
                                 },
                                 child: Center(
                                   child: Text(
-                                    '${list!.author!.followed ? 'Un' : 'F'}ollow ${list!.author!.name}',
-                                    style:
-                                        context.textStyles.bodyRegular!.copyWith(
+                                    '${list.author.followed ? 'Un' : 'F'}ollow ${list.author.name}',
+                                    style: context.textStyles.bodyRegular!
+                                        .copyWith(
                                       color: context.colors.textsPrimary,
                                     ),
                                   ),
@@ -633,20 +632,13 @@ class ListActionsDialog extends ConsumerWidget {
                           ),
                           Expanded(
                             child: InkWell(
-                              onTap: () {
-                                Share.share("posterstock.com/list/${list.id}");
-                                /*scaffoldMessengerKey.currentState?.showSnackBar(
-                                  SnackBars.build(
-                                    context,
-                                    null,
-                                    'Not available yet',
-                                  ),
-                                );*/
-                              },
+                              onTap: () => Share.share(
+                                  "https://posterstock.com/list/${list.id}"),
                               child: Center(
                                 child: Text(
                                   'Share',
-                                  style: context.textStyles.bodyRegular!.copyWith(
+                                  style:
+                                      context.textStyles.bodyRegular!.copyWith(
                                     color: context.colors.textsPrimary,
                                   ),
                                 ),
@@ -662,7 +654,8 @@ class ListActionsDialog extends ConsumerWidget {
                             child: InkWell(
                               onTap: () async {
                                 if (list.author.id != myself?.id) {
-                                  scaffoldMessengerKey.currentState?.showSnackBar(
+                                  scaffoldMessengerKey.currentState
+                                      ?.showSnackBar(
                                     SnackBars.build(
                                       context,
                                       null,
@@ -670,28 +663,34 @@ class ListActionsDialog extends ConsumerWidget {
                                     ),
                                   );
                                 } else {
-                                    try {
-                                      await ref.read(listsControllerProvider).deleteList(list.id);
-                                      ref.read(profileControllerApiProvider).getUserInfo(null);
-                                      Navigator.of(context).pop();
-                                      ref.watch(router)!.pop();
-                                      scaffoldMessengerKey.currentState?.showSnackBar(
-                                        SnackBars.build(
-                                          context,
-                                          null,
-                                          'List deleted successfully',
-                                        ),
-                                      );
-                                    } catch (_) {
-                                      print(_);
-                                      scaffoldMessengerKey.currentState?.showSnackBar(
-                                        SnackBars.build(
-                                          context,
-                                          null,
-                                          'Could not delete list',
-                                        ),
-                                      );
-                                    }
+                                  try {
+                                    await ref
+                                        .read(listsControllerProvider)
+                                        .deleteList(list.id);
+                                    ref
+                                        .read(profileControllerApiProvider)
+                                        .getUserInfo(null);
+                                    Navigator.of(context).pop();
+                                    ref.watch(router)!.pop();
+                                    scaffoldMessengerKey.currentState
+                                        ?.showSnackBar(
+                                      SnackBars.build(
+                                        context,
+                                        null,
+                                        'List deleted successfully',
+                                      ),
+                                    );
+                                  } catch (_) {
+                                    print(_);
+                                    scaffoldMessengerKey.currentState
+                                        ?.showSnackBar(
+                                      SnackBars.build(
+                                        context,
+                                        null,
+                                        'Could not delete list',
+                                      ),
+                                    );
+                                  }
                                 }
                               },
                               child: Center(
@@ -699,7 +698,8 @@ class ListActionsDialog extends ConsumerWidget {
                                   list.author.id != myself?.id
                                       ? 'Report'
                                       : 'Delete',
-                                  style: context.textStyles.bodyRegular!.copyWith(
+                                  style:
+                                      context.textStyles.bodyRegular!.copyWith(
                                     color: context.colors.textsError,
                                   ),
                                 ),
@@ -711,9 +711,7 @@ class ListActionsDialog extends ConsumerWidget {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 12,
-                ),
+                const SizedBox(height: 12),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16.0),
                   child: SizedBox(
@@ -721,9 +719,7 @@ class ListActionsDialog extends ConsumerWidget {
                     child: Material(
                       color: context.colors.backgroundsPrimary,
                       child: InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
+                        onTap: () => Navigator.pop(context),
                         child: Center(
                           child: Text(
                             'Cancel',
