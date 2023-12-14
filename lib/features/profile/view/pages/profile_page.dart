@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
@@ -7,12 +6,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_native_splash/cli_commands.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
 import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/helpers/string_extension.dart';
+import 'package:poster_stock/common/menu/menu_dialog.dart';
+import 'package:poster_stock/common/menu/menu_state.dart';
+import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
@@ -24,22 +24,16 @@ import 'package:poster_stock/features/create_list/state_holders/list_search_post
 import 'package:poster_stock/features/create_list/state_holders/lists_search_value_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/api/edit_profile_api.dart';
 import 'package:poster_stock/features/edit_profile/controller/edit_profile_controller.dart';
-import 'package:poster_stock/features/edit_profile/state_holder/avatar_state_holder.dart';
 import 'package:poster_stock/features/edit_profile/view/pages/edit_profile_page.dart';
-import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/list/controller/list_controller.dart';
 import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
-import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
-import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
-import 'package:poster_stock/features/navigation_page/state_holder/navigation_route_state_holder.dart';
 import 'package:poster_stock/features/peek_pop/peek_and_pop_dialog.dart';
 import 'package:poster_stock/features/poster/controller/comments_controller.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
-import 'package:poster_stock/features/poster/state_holder/page_transition_controller_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
@@ -53,8 +47,7 @@ import 'package:poster_stock/features/search/state_holders/search_posts_state_ho
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
-
-import '../../../../common/services/text_info_service.dart';
+import 'package:share_plus/share_plus.dart';
 
 @RoutePage()
 class ProfilePage extends ConsumerStatefulWidget {
@@ -72,7 +65,12 @@ class ProfilePage extends ConsumerStatefulWidget {
 class _ProfilePageState extends ConsumerState<ProfilePage>
     with TickerProviderStateMixin {
   TabController? tabController;
-  late final AnimationController animationController;
+  late final animationController = AnimationController(
+    vsync: this,
+    lowerBound: 0,
+    upperBound: 1,
+    duration: const Duration(milliseconds: 300),
+  );
   final scrollController = ScrollController();
   final searchController = TextEditingController();
   final focusNode = FocusNode();
@@ -100,22 +98,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   @override
   void initState() {
     super.initState();
-    Future(() {
-      print(-2);
-      ref.read(profileControllerApiProvider).clearUser();
-    });
-    animationController = AnimationController(
-      vsync: this,
-      lowerBound: 0,
-      upperBound: 1,
-      duration: const Duration(milliseconds: 300),
-    );
-    Future(() {
-      try {
-        rter = ref.watch(router);
-        rter!.addListener(listenerContent);
-      } catch (_) {}
-    });
+    Future(() => ref.read(profileControllerApiProvider).clearUser());
+    Future(() => ref.read(router)!.addListener(listenerContent));
   }
 
   Future<void> getProfile() async {
@@ -126,7 +110,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     var myProfile = ref.watch(myProfileInfoStateHolderProvider);
     await Future(() {
       if (rtr!.topRoute.path == '/' && anyProfile?.id != myProfile?.id) {
-        Future(() {ref.read(profileControllerApiProvider).clearUser();});
+        Future(() {
+          ref.read(profileControllerApiProvider).clearUser();
+        });
       }
       RouteData? el;
       try {
@@ -146,28 +132,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
               0;
         } catch (e) {}
         try {
-          print("EEEE");
           i3 = rttr?.stack
                   .lastIndexWhere((element) => element.routeData.path == '/') ??
               0;
-          print(i3.toString() + "    1212");
         } catch (e) {}
         try {
-          if(rttr.stack.last.routeData.path == '/') {
+          if (rttr.stack.last.routeData.path == '/') {
             i3 = rttr.stack.length + 1;
           }
         } catch (e) {}
-        print(i1);
-        print(i2);
-        print(i3);
-        print(rttr?.stack.last.routeData.path);
-        //if (ref.watch(router)!.topRoute.path == '/:username' && anyProfile?.username != ref.watch(router)!.topRoute.pathParams.getString('username')) {
         if (i1 > i2 &&
             i1 > i3 &&
             anyProfile?.username !=
                 ref.watch(router)!.topRoute.pathParams.getString('username')) {
           el = ref.watch(router)!.topRoute;
-          print(el.pathParams.getString('username'));
           ref
               .read(profileControllerApiProvider)
               .getUserInfo(el.pathParams.getString('username'));
@@ -182,7 +160,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
         } else if (i3 > i1 &&
             i3 > i2 &&
             (anyProfile?.id == null || anyProfile?.id != myProfile?.id)) {
-          print("GG${ref.watch(router)!.topRoute.path}");
           ref.read(profileControllerApiProvider).getUserInfo(null);
         } else if (ref.read(profileInfoStateHolderProvider) == null) {
           ref.read(profileControllerApiProvider).getUserInfo(null);
@@ -204,13 +181,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
       profile = anyProfile;
     } else if (rtr!.topRoute.path == 'profile' &&
         anyProfile?.id != myProfile?.id) {
-      print("SHEEEEESH ${anyProfile?.id} ${myProfile?.id}");
       profile = myProfile;
     }
-    if (anyProfile == null) {
-      print("SHEEESH");
-      getProfile();
-    }
+    if (anyProfile == null) getProfile();
     myself = (profile?.id == myProfile?.id);
     if (myself == true && tabController?.length != 3) {
       tabController = TabController(
@@ -279,8 +252,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                 .height
                             : 0),
                 backgroundColor: context.colors.backgroundsPrimary,
-                centerTitle: true,
                 leading: const SizedBox(),
+                centerTitle: true,
                 title: const SizedBox(),
                 flexibleSpace: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,7 +269,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                   alignment: Alignment.centerLeft,
                                   child: GestureDetector(
                                     onTap: () async {
-                                      print(-5);
                                       ref
                                           .read(profileControllerApiProvider)
                                           .clearUser();
@@ -305,7 +277,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                     child: Container(
                                       color: Colors.transparent,
                                       padding: const EdgeInsets.only(
-                                          left: 7.0, right: 31.0),
+                                        left: 7,
+                                        right: 31,
+                                      ),
                                       child: SvgPicture.asset(
                                         'assets/icons/back_icon.svg',
                                         width: 18,
@@ -325,28 +299,30 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                         ),
                         const Spacer(),
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async {
                             if (myself || widget.username == 'profile') {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (context) {
-                                  return MyProfileDialog(
-                                    animationController: animationController,
-                                    scrollController: scrollController,
-                                    focusNode: focusNode,
-                                  );
-                                },
-                                backgroundColor: Colors.transparent,
-                              );
+                              // showModalBottomSheet(
+                              //   context: context,
+                              //   builder: (context) {
+                              //     return MyProfileDialog(
+                              //       animationController: animationController,
+                              //       scrollController: scrollController,
+                              //       focusNode: focusNode,
+                              //     );
+                              //   },
+                              //   backgroundColor: Colors.transparent,
+                              // );
+                              await newModalProfile();
                             } else {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (context) => OtherProfileDialog(
-                                  user: profile,
-                                  block: true,
-                                ),
-                                backgroundColor: Colors.transparent,
-                              );
+                              // showModalBottomSheet(
+                              //   context: context,
+                              //   builder: (context) => OtherProfileDialog(
+                              //     user: profile,
+                              //     block: true,
+                              //   ),
+                              //   backgroundColor: Colors.transparent,
+                              // );
+                              await newModalUser();
                             }
                           },
                           child: Container(
@@ -694,9 +670,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                 SliverFillRemaining(
                   child: Center(
                     child: defaultTargetPlatform != TargetPlatform.android
-                        ? const CupertinoActivityIndicator(
-                            radius: 10,
-                          )
+                        ? const CupertinoActivityIndicator(radius: 10)
                         : SizedBox(
                             width: 20,
                             height: 20,
@@ -778,7 +752,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                         searchController.clear();
                                       },
                                       onChanged: (value) {
-                                        print(value);
                                         ref
                                             .read(pickCoverControllerProvider)
                                             .updateSearch(value);
@@ -790,9 +763,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                       },
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 12,
-                                  ),
+                                  const SizedBox(width: 12),
                                   CupertinoButton(
                                     padding: EdgeInsets.zero,
                                     child: Text(
@@ -850,6 +821,71 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
       }
     }
     return result;
+  }
+
+  Future<void> newModalProfile() async {
+    final profile = ref.read(myProfileInfoStateHolderProvider)!;
+    final result = await MenuDialog.showBottom(
+      context,
+      MenuState(profile.name, [
+        MenuItem(
+          'assets/icons/ic_gear.svg',
+          "Settings",
+        ),
+        MenuItem(
+          'assets/icons/ic_share.svg',
+          "Share Profile",
+        ),
+        MenuItem(
+          'assets/icons/search.svg',
+          "Search",
+        ),
+      ]),
+    );
+    final item = result as MenuItem;
+    switch (item.title) {
+      case "Settings":
+        ref.read(router)!.push(const SettingsRoute());
+        break;
+      case "Share Profile":
+        await Share.share('https://posterstock.com/${profile.username}');
+        break;
+      case "Search":
+        break;
+    }
+  }
+
+  Future<void> newModalUser() async {
+    final profile = ref.read(profileInfoStateHolderProvider)!;
+    final result = await MenuDialog.showBottom(
+      context,
+      MenuState(profile.name, [
+        MenuItem(
+          'assets/icons/ic_share.svg',
+          "Share",
+        ),
+        MenuItem(
+          'assets/icons/search.svg',
+          "Search",
+        ),
+        MenuItem(
+          'assets/icons/ic_hand.svg',
+          "Block",
+          true,
+        ),
+      ]),
+    );
+    final item = result as MenuItem;
+    switch (item.title) {
+      case "Share":
+        await Share.share('https://posterstock.com/${profile.username}');
+        break;
+      case "Search":
+        ref.read(router)!.push(const SettingsRoute());
+        break;
+      case "Block":
+        break;
+    }
   }
 }
 
@@ -1759,9 +1795,7 @@ class MyProfileDialog extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 12,
-                  ),
+                  const SizedBox(height: 12),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16.0),
                     child: SizedBox(

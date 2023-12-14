@@ -1,9 +1,6 @@
-import 'dart:convert';
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -13,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:poster_stock/common/constants/languages.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
@@ -117,7 +113,6 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
       initPushes(App._appRouter!, ref);
     }
     if (initTheme != null) {
-      print(initTheme);
       if (initTheme == 'Themes.dark') {
         Future(() {
           ref

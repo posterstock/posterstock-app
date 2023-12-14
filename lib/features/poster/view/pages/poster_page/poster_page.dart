@@ -9,17 +9,19 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/constants/durations.dart';
+import 'package:poster_stock/common/helpers/hero_dialog_route.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
+import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
 import 'package:poster_stock/features/create_poster/controller/create_poster_controller.dart';
 import 'package:poster_stock/features/create_poster/model/media_model.dart';
 import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
-import 'package:poster_stock/features/home/state_holders/home_page_likes_state_holder.dart';
 import 'package:poster_stock/features/home/view/helpers/custom_bounce_physic.dart';
+import 'package:poster_stock/features/home/view/widgets/movie_card.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
@@ -35,14 +37,9 @@ import 'package:poster_stock/features/profile/state_holders/my_profile_info_stat
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/main.dart';
-import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-
-import '../../../../../common/helpers/hero_dialog_route.dart';
-import '../../../../../common/widgets/app_text_button.dart';
-import '../../../../home/view/widgets/movie_card.dart';
 
 @RoutePage()
 class PosterPage extends ConsumerStatefulWidget {
@@ -106,18 +103,16 @@ class _PosterPageState extends ConsumerState<PosterPage>
         } else if (rtr.topRoute.name != 'PosterRoute' &&
             rtr.stack.length - 2 >= 0 &&
             rtr.stack[rtr.stack.length - 2].name == 'PosterRoute') {
-          Future.delayed(Duration(milliseconds: 400), () {
+          Future.delayed(const Duration(milliseconds: 400), () {
             disabled = 0;
-            if (mounted) {
-              setState(() {});
-            }
+            if (!mounted) return;
+            setState(() {});
           });
         } else {
-          Future.delayed(Duration(milliseconds: 400), () {
+          Future.delayed(const Duration(milliseconds: 400), () {
             disabled = 1;
-            if (mounted) {
-              setState(() {});
-            }
+            if (!mounted) return;
+            setState(() {});
           });
         }
         Future(() async {
@@ -130,7 +125,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
             return;
           }
           final post = ref.watch(posterStateHolderProvider);
-          if (post?.id == el!.pathParams.getInt('id')) return;
+          if (post?.id == el.pathParams.getInt('id')) return;
           ref.read(commentsControllerProvider).clear();
           ref
               .read(commentsControllerProvider)
@@ -143,51 +138,9 @@ class _PosterPageState extends ConsumerState<PosterPage>
     });
   }
 
-  @override
-  void didChangeDependencies() {
-    print('upd');
-    super.didChangeDependencies();
-  }
-
   void jumpToEnd({bool? up}) {
     if (scrollController.offset == 0 ||
         scrollController.offset == imageHeight! - 18) return;
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        /*int durationValue = (200 *
-                (1 -
-                    (posterController!.value - imageHeight! / 2).abs() /
-                        (imageHeight! / 2)))
-            .round();
-        if (durationValue < 150) durationValue = 150;
-        if (up == false ||
-            posterController!.value > imageHeight! * 0.5 && up != true) {
-          scrollController.animateTo(
-            0,
-            duration: Duration(milliseconds: durationValue),
-            curve: Curves.linear,
-          );
-        } else {
-          scrollController.animateTo(
-            imageHeight! - 18,
-            duration: Duration(milliseconds: durationValue),
-            curve: Curves.linear,
-          );
-        }*/
-      },
-    );
-    /*if (up == false ||
-        posterController!.value > imageHeight! * 0.5 && up != true) {
-      posterController!.animateTo(
-        imageHeight!,
-        duration: const Duration(milliseconds: 300),
-      );
-    } else {
-      posterController!.animateTo(
-        0,
-        duration: const Duration(milliseconds: 300),
-      );
-    }*/
   }
 
   final shimmer = ShimmerLoader(
@@ -216,10 +169,10 @@ class _PosterPageState extends ConsumerState<PosterPage>
         if (el == null) return;
         ref
             .read(commentsControllerProvider)
-            .getPost(el!.pathParams.getInt('id'));
+            .getPost(el.pathParams.getInt('id'));
         ref
             .read(commentsControllerProvider)
-            .updateComments(el!.pathParams.getInt('id'));
+            .updateComments(el.pathParams.getInt('id'));
       });
     }
     if (posterController == null) {
@@ -235,7 +188,6 @@ class _PosterPageState extends ConsumerState<PosterPage>
     return WillPopScope(
       onWillPop: () async {
         if (popped) {
-          print(1323);
           popped = false;
           return true;
         }
@@ -319,12 +271,6 @@ class _PosterPageState extends ConsumerState<PosterPage>
                           imageHeight! - notification.metrics.pixels);
                     }
                   }
-                  /*if (notification is ScrollEndNotification) {
-                    if (notification.metrics.pixels > imageHeight!)
-                      return false;
-                    if (notification.metrics.pixels < 0) return false;
-                    jumpToEnd();
-                  }*/
                   return true;
                 },
                 child: Stack(
@@ -398,7 +344,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                                       ?.id,
                                               entityId: comments![index].id,
                                               showFollowButton: false,
-                                              user: comments![index].model,
+                                              user: comments[index].model,
                                               controller: scrollController,
                                               time: comments[index].time,
                                               behavior:
@@ -408,9 +354,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                           const SizedBox(height: 12),
                                           Row(
                                             children: [
-                                              const SizedBox(
-                                                width: 68,
-                                              ),
+                                              const SizedBox(width: 68),
                                               Expanded(
                                                 child: Column(
                                                   crossAxisAlignment:
@@ -519,7 +463,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                                     builder: (context) {
                                                   return ImageDialog(
                                                     image: CachedNetworkImage(
-                                                      imageUrl: post!.imagePath,
+                                                      imageUrl: post.imagePath,
                                                       fit: BoxFit.cover,
                                                       placeholderFadeInDuration:
                                                           Durations
@@ -667,8 +611,8 @@ class _PosterPageState extends ConsumerState<PosterPage>
                           : UserInfoTile(
                               type: InfoDialogType.post,
                               entityId: post.id,
-                              user: post!.author,
-                              time: post!.time,
+                              user: post.author,
+                              time: post.time,
                               controller: scrollController,
                               darkBackground: true,
                               showSettings: false,
@@ -708,12 +652,10 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                     showModalBottomSheet(
                                       context: context,
                                       builder: (context) => GestureDetector(
-                                        onTap: () {
-                                          Navigator.pop(context);
-                                        },
+                                        onTap: () => Navigator.pop(context),
                                         child: Container(
                                           color: Colors.transparent,
-                                          child: PosterActionsDialog(),
+                                          child: const PosterActionsDialog(),
                                         ),
                                       ),
                                       backgroundColor: Colors.transparent,
@@ -828,7 +770,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                                     ),
                                             ),
                                           );
-                                      if (post?.hasInCollection == false) {
+                                      if (post.hasInCollection == false) {
                                         showModalBottomSheet(
                                           context: context,
                                           backgroundColor: Colors.transparent,
@@ -863,7 +805,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                         bottom: 0,
                         left: 0,
                         right: 0,
-                        child: CommentTextField(id: post!.id),
+                        child: CommentTextField(id: post.id),
                       )
                   ],
                 ),
