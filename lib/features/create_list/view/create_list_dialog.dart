@@ -129,7 +129,8 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                               child: Center(
                                 child: Text(
                                   'Discard',
-                                  style: context.textStyles.bodyRegular!.copyWith(
+                                  style:
+                                      context.textStyles.bodyRegular!.copyWith(
                                     color: context.colors.textsError,
                                   ),
                                 ),
@@ -192,12 +193,11 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
           popping = true;
           bool exit = await tryExit(ref);
           if (!exit) {
-            await dragController
-                .animateTo(
-                  0.7,
-                  duration: Duration(milliseconds: 300),
-                  curve: Curves.linear,
-                );
+            await dragController.animateTo(
+              0.7,
+              duration: Duration(milliseconds: 300),
+              curve: Curves.linear,
+            );
             popping = false;
             disposed = false;
             return;
@@ -323,7 +323,8 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                         const SizedBox(height: 16.5),
                                         SizedBox(
                                           height: 36,
-                                          child: posters?.isEmpty == true && searchController.text.isEmpty
+                                          child: posters?.isEmpty == true &&
+                                                  searchController.text.isEmpty
                                               ? null
                                               : AppTextField(
                                                   searchField: true,
@@ -771,9 +772,7 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
               overflow: TextOverflow.visible,
               color: context.colors.textsPrimary,
             ),
-            onChanged: (value) {
-              setState(() {});
-            },
+            onChanged: (_) => setState(() {}),
           ),
         ),
         Container(
@@ -782,16 +781,14 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
           child: Row(
             children: [
               const Spacer(),
-              if (descriptionController!.text.isNotEmpty)
-                Text(
-                  '${descriptionController!.text.length}/${widget.maxSymbols}',
-                  style: context.textStyles.footNote!.copyWith(
-                    color:
-                        descriptionController!.text.length > widget.maxSymbols
-                            ? context.colors.textsError
-                            : context.colors.textsDisabled,
-                  ),
+              Text(
+                '${descriptionController!.text.length}/${widget.maxSymbols}',
+                style: context.textStyles.footNote!.copyWith(
+                  color: descriptionController!.text.length > widget.maxSymbols
+                      ? context.colors.textsError
+                      : context.colors.textsDisabled,
                 ),
+              ),
               const SizedBox(width: 12),
               SizedBox(
                 height: 32,

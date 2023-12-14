@@ -103,7 +103,9 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                               print(dragController.size);
                               dragController.animateTo(
                                 0,
-                                duration: Duration(milliseconds: dragController.size < 1 ? 1 :  300),
+                                duration: Duration(
+                                    milliseconds:
+                                        dragController.size < 1 ? 1 : 300),
                                 curve: Curves.linear,
                               );
                               Navigator.pop(context, true);
@@ -719,10 +721,6 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                     ref.read(posterStateHolderProvider);
                                 final createId = ref.read(
                                     createPosterChoseMovieStateHolderProvider);
-                                print("ABBB");
-                                print("${currPost?.name} ${createId?.title}");
-                                print(
-                                    "${currPost?.year} ${'${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}'}");
                                 if (currPost?.name == createId?.title &&
                                     currPost?.year ==
                                         '${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}') {
