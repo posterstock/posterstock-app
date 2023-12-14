@@ -427,9 +427,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                         : const SizedBox(),
                                   ),
                                 ),
-                                const SizedBox(
-                                  width: 38,
-                                ),
+                                const SizedBox(width: 38),
                                 GestureDetector(
                                   onTap: () {
                                     if (profile != null) {
@@ -450,9 +448,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                           emptyWidth: 35,
                                           emptyHeight: 20,
                                         ),
-                                        const SizedBox(
-                                          height: 3,
-                                        ),
+                                        const SizedBox(height: 3),
                                         Text(
                                           AppLocalizations.of(context)!
                                               .followers,
@@ -466,9 +462,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                     ),
                                   ),
                                 ),
-                                const SizedBox(
-                                  width: 36,
-                                ),
+                                const SizedBox(width: 36),
                                 GestureDetector(
                                   onTap: () {
                                     if (profile != null) {
@@ -489,17 +483,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                         ShimmerLoader(
                                           loaded: profile != null,
                                           child: TextOrContainer(
-                                            text: profile.following == null
-                                                ? null
-                                                : profile.following.toString(),
+                                            text: profile.following?.toString(),
                                             style: context.textStyles.headline,
                                             emptyWidth: 35,
                                             emptyHeight: 20,
                                           ),
                                         ),
-                                        const SizedBox(
-                                          height: 3,
-                                        ),
+                                        const SizedBox(height: 3),
                                         Text(
                                           AppLocalizations.of(context)!
                                               .following,
@@ -516,9 +506,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                 const Spacer(),
                               ],
                             ),
-                            SizedBox(
-                              height: profile == null ? 20 : 12,
-                            ),
+                            SizedBox(height: profile == null ? 20 : 12),
                             Row(
                               children: [
                                 Column(
