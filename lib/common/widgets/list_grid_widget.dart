@@ -62,6 +62,7 @@ class GroupListItemWidget extends StatelessWidget {
           style: context.textStyles.caption2!.copyWith(
             color: context.colors.textsPrimary,
           ),
+          textAlign: TextAlign.center,
           maxLines: 1,
         ),
       ],
