@@ -4,14 +4,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/menu/menu_dialog.dart';
+import 'package:poster_stock/common/menu/menu_state.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/bookmarks/controller/bookmarks_controller.dart';
 import 'package:poster_stock/features/bookmarks/state_holders/bookmark_list_state_holder.dart';
-import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 @RoutePage()
 class BookmarksPage extends ConsumerStatefulWidget {
@@ -84,6 +84,20 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
               'Watchlist: Community posters',
               style: context.textStyles.bodyBold,
             ),
+            actions: [
+              IconButton(
+                onPressed: () => _showMenu(context),
+                icon: SvgPicture.asset(
+                  'assets/icons/ic_dots.svg',
+                  width: 24,
+                  height: 24,
+                  colorFilter: ColorFilter.mode(
+                    context.colors.iconsDefault!,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+            ],
           ),
           Expanded(
             child: bookmarks?.isNotEmpty != true
@@ -134,5 +148,41 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
         ],
       ),
     );
+  }
+
+  void _showMenu(BuildContext context) async {
+    final result = await MenuDialog.showBottom(
+      context,
+      MenuState(null, [
+        MenuItem(
+          'assets/icons/ic_arrow_out.svg',
+          "Open to TMDB",
+        ),
+        MenuItem(
+          'assets/icons/ic_play_circle.svg',
+          "Where to watch",
+        ),
+        MenuItem(
+          'assets/icons/ic_collection_second.svg',
+          "Add to Watched",
+        ),
+        MenuItem(
+          'assets/icons/ic_trash2.svg',
+          "Delete",
+          true,
+        ),
+      ]),
+    );
+    final item = result as MenuItem;
+    switch (item.title) {
+      case "Open to TMDB":
+        break;
+      case "Where to watch":
+        break;
+      case "Add to Watched":
+        break;
+      case "Delete":
+        break;
+    }
   }
 }

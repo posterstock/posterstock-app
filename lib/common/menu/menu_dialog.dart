@@ -40,14 +40,15 @@ class MenuDialog extends StatelessWidget {
               ),
               child: const SizedBox(width: 36, height: 4),
             )),
-        Text(
-          state.title,
-          style: const TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF212121),
+        if (state.title != null)
+          Text(
+            state.title!,
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF212121),
+            ),
           ),
-        ),
         ...state.items
             .map(
               (it) => InkWell(

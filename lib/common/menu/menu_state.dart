@@ -1,5 +1,5 @@
 class MenuState {
-  final String title;
+  final String? title;
   final List<MenuItem> items;
 
   MenuState(this.title, this.items);
