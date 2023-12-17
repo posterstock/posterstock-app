@@ -312,7 +312,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                               //   },
                               //   backgroundColor: Colors.transparent,
                               // );
-                              await newModalProfile();
+                              await newModalProfile(context);
                             } else {
                               // showModalBottomSheet(
                               //   context: context,
@@ -811,7 +811,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     return result;
   }
 
-  Future<void> newModalProfile() async {
+  Future<void> newModalProfile(BuildContext context) async {
     final profile = ref.read(myProfileInfoStateHolderProvider)!;
     final result = await MenuDialog.showBottom(
       context,
