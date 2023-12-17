@@ -25,7 +25,7 @@ import 'package:poster_stock/features/profile/state_holders/profile_posts_state_
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
-final pickCoverControllerProvider = Provider<PickCoverController>(
+final pickCoverControllerProvider = Provider.autoDispose<PickCoverController>(
   (ref) => PickCoverController(
     allImagesStateHolder:
         ref.watch(pickCoverGalleryStateHolderProvider.notifier),
@@ -40,7 +40,8 @@ final pickCoverControllerProvider = Provider<PickCoverController>(
     profileControllerApi: ref.watch(profileControllerApiProvider),
     searchPostsStateHolder:
         ref.watch(listSearchPostsStateHolderProvider.notifier),
-    myProfileInfoStateHolder: ref.watch(myProfileInfoStateHolderProvider.notifier),
+    myProfileInfoStateHolder:
+        ref.watch(myProfileInfoStateHolderProvider.notifier),
   ),
 );
 
@@ -200,7 +201,7 @@ class PickCoverController {
     if (loading) return;
     var assets = await PhotoManager.getAssetListRange(
       start: page,
-      end: page+30,
+      end: page + 30,
       type: RequestType.image,
     );
     page += 30;
@@ -226,7 +227,8 @@ class PickCoverController {
     });
     if (loadedAll) return;
     if (stop) return;
-    final list = await repository.searchPosts(value, myProfileInfoStateHolder.state!.id);
+    final list =
+        await repository.searchPosts(value, myProfileInfoStateHolder.state!.id);
     loadedAll = list.$2;
     if (searchValue == value) {
       searchPostsStateHolder.updateState(list.$1);

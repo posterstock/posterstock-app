@@ -13,7 +13,7 @@ import 'package:poster_stock/features/profile/state_holders/profile_posts_state_
 import '../repository/profile_repository.dart';
 import '../state_holders/profile_info_state_holder.dart';
 
-final profileControllerApiProvider = Provider<ProfileControllerApi>(
+final profileControllerApiProvider = Provider.autoDispose<ProfileControllerApi>(
   (ref) => ProfileControllerApi(
     profileInfoStateHolder: ref.watch(profileInfoStateHolderProvider.notifier),
     profilePostsStateHolder:
@@ -75,7 +75,7 @@ class ProfileControllerApi {
     if (gttgUser) return;
     if (gotAllBookmarks) return;
     if (gettingBookmarks) return;
-        gettingBookmarks = true;
+    gettingBookmarks = true;
     var result = await repo.getMyBookmarks();
     final bookmarks = result.$1;
     gotAllBookmarks = result.$2;
@@ -109,7 +109,8 @@ class ProfileControllerApi {
               gotAllBookmarks = false;
               gettingUser = usernameOrId;
               final user = await repo.getProfileInfo(usernameOrId);
-              var postsResponse = await repo.getProfilePosts(user.id, restart: true);
+              var postsResponse =
+                  await repo.getProfilePosts(user.id, restart: true);
               var posts = postsResponse.$1;
               gotAllPosts = postsResponse.$2;
               var lists = await repo.getProfileLists(user.id);
@@ -121,7 +122,7 @@ class ProfileControllerApi {
               }
               if (gettingUser != usernameOrId) return;
               lists = lists
-                ?.map(
+                  ?.map(
                     (e) => e = e.copyWith(
                       user: UserModel(
                         id: user.id,

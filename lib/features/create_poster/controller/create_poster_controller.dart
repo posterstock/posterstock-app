@@ -10,7 +10,8 @@ import 'package:poster_stock/features/profile/controllers/profile_controller.dar
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 
-final createPosterControllerProvider = Provider<CreatePosterController>(
+final createPosterControllerProvider =
+    Provider.autoDispose<CreatePosterController>(
   (ref) => CreatePosterController(
     createPosterSearchStateHolder: ref.watch(
       createPosterSearchStateHolderNotifier.notifier,
@@ -70,8 +71,10 @@ class CreatePosterController {
     createPosterChoseMovieStateHolder.updateValue(movie);
     createPosterChosenPosterStateHolder.updateValue(null);
     var chosenMovie = createPosterChoseMovieStateHolder.state;
-    var images = movie == null ? null : await createPosterRepository.getMediaPosters(
-        chosenMovie!.type.name, chosenMovie.id);
+    var images = movie == null
+        ? null
+        : await createPosterRepository.getMediaPosters(
+            chosenMovie!.type.name, chosenMovie.id);
     createPosterImagesStateHolder.setValue(images ?? []);
   }
 
@@ -107,10 +110,7 @@ class CreatePosterController {
     var image = createPosterChosenPosterStateHolder.state;
     try {
       await createPosterRepository.createBookmark(
-        mediaState!.id,
-        mediaState.type.name,
-        image!.$2
-      );
+          mediaState!.id, mediaState.type.name, image!.$2);
       profileControllerApi.getUserInfo(null);
     } catch (e) {
       print(e);
