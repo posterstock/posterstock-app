@@ -708,42 +708,42 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                   .toDouble(),
                               child: Row(
                                 children: [
-                                  GestureDetector(
-                                    onTap: () async {
-                                      if (post != null) {
-                                        await ref
-                                            .read(commentsControllerProvider)
-                                            .setBookmarked(
-                                              post.id,
-                                              !(post.hasBookmarked ?? true),
-                                            );
-                                        final myself = ref
-                                            .watch(
-                                                profileInfoStateHolderProvider)
-                                            ?.mySelf;
-                                        if (myself != false) {
-                                          ref
-                                              .read(
-                                                  profileControllerApiProvider)
-                                              .getUserInfo(null);
-                                        }
-                                      }
-                                    },
-                                    child: SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: Image.asset(
-                                        post?.hasBookmarked == true
-                                            ? 'assets/images/ic_bookmarks_filled.png'
-                                            : 'assets/images/ic_bookmarks.png',
-                                        color: context.colors.iconsDefault!,
-                                        colorBlendMode: BlendMode.srcIn,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 20,
-                                  ),
+                                  // GestureDetector(
+                                  //   onTap: () async {
+                                  //     if (post != null) {
+                                  //       await ref
+                                  //           .read(commentsControllerProvider)
+                                  //           .setBookmarked(
+                                  //             post.id,
+                                  //             !(post.hasBookmarked ?? true),
+                                  //           );
+                                  //       final myself = ref
+                                  //           .watch(
+                                  //               profileInfoStateHolderProvider)
+                                  //           ?.mySelf;
+                                  //       if (myself != false) {
+                                  //         ref
+                                  //             .read(
+                                  //                 profileControllerApiProvider)
+                                  //             .getUserInfo(null);
+                                  //       }
+                                  //     }
+                                  //   },
+                                  //   child: SizedBox(
+                                  //     width: 24,
+                                  //     height: 24,
+                                  //     child: Image.asset(
+                                  //       post?.hasBookmarked == true
+                                  //           ? 'assets/images/ic_bookmarks_filled.png'
+                                  //           : 'assets/images/ic_bookmarks.png',
+                                  //       color: context.colors.iconsDefault!,
+                                  //       colorBlendMode: BlendMode.srcIn,
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  // const SizedBox(
+                                  //   width: 20,
+                                  // ),
                                   GestureDetector(
                                     onTap: () {
                                       ref
@@ -782,16 +782,18 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                       }
                                     },
                                     child: SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: Image.asset(
-                                        post?.hasInCollection == true
-                                            ? 'assets/images/ic_collection_filled.png'
-                                            : 'assets/images/ic_collection.png',
-                                        color: context.colors.iconsDefault!,
-                                        colorBlendMode: BlendMode.srcIn,
-                                      ),
-                                    ),
+                                        width: 24,
+                                        height: 24,
+                                        child: SvgPicture.asset(
+                                            'assets/icons/ic_collections_add.svg')
+                                        // child: Image.asset(
+                                        //   post?.hasInCollection == true
+                                        //       ? 'assets/images/ic_collection_filled.png'
+                                        //       : 'assets/images/ic_collection.png',
+                                        //   color: context.colors.iconsDefault!,
+                                        //   colorBlendMode: BlendMode.srcIn,
+                                        // ),
+                                        ),
                                   ),
                                 ],
                               ),
