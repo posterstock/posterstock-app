@@ -25,7 +25,8 @@ final signUpControllerProvider = Provider<SignUpController>(
   (ref) => SignUpController(
     usernameErrorState:
         ref.watch(signUpUsernameErrorStateHolderProvider.notifier),
-    signUpLoadingStateHolder: ref.watch(signupLoadingStateHolderProvider.notifier),
+    signUpLoadingStateHolder:
+        ref.watch(signupLoadingStateHolderProvider.notifier),
     nameErrorState: ref.watch(signUpNameErrorStateHolderProvider.notifier),
     nameState: ref.watch(nameStateHolderProvider.notifier),
     usernameState: ref.watch(usernameStateHolderProvider.notifier),
@@ -125,11 +126,7 @@ class SignUpController {
     String? token;
     try {
       await repository.confirmCode(
-        code: code,
-        sessionId: sessionId,
-        deviceId: deviceId,
-        email: email
-      );
+          code: code, sessionId: sessionId, deviceId: deviceId, email: email);
     } catch (e) {
       signUpLoadingStateHolder.setValue(false);
       codeErrorStateHolder.setValue("Wrong code");
@@ -149,12 +146,13 @@ class SignUpController {
     signUpLoadingStateHolder.setValue(true);
     String? token;
     try {
-     await repository.confirmCode(
+      await repository.confirmCode(
         code: code,
         sessionId: sessionId,
         deviceId: deviceId,
         name: name,
-        login: username,
+        login: username.toLowerCase(),
+        // login: username,
         email: email,
       );
     } catch (e) {
@@ -184,10 +182,11 @@ class SignUpController {
 
   Future<void> registerNotification() async {
     final userToken = await SuperTokens.getAccessToken();
-    print (userToken == null);
+    print(userToken == null);
     if (userToken == null) throw Exception();
     try {
-      await repository.registerNotification((await FirebaseMessaging.instance.getToken())!, userToken);
+      await repository.registerNotification(
+          (await FirebaseMessaging.instance.getToken())!, userToken);
     } catch (e) {
       print("ERRRRR");
       debugPrint(e.toString());
