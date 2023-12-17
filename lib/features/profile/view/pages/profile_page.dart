@@ -570,7 +570,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                                 children: [
                                                   const SizedBox(width: 12),
                                                   SvgPicture.asset(
-                                                    'assets/icons/ic_lists.svg',
+                                                    'assets/icons/lists.svg',
                                                     colorFilter:
                                                         ColorFilter.mode(
                                                       context
