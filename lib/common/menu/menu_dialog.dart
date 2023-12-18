@@ -74,24 +74,37 @@ class _MenuItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final color =
         item.danger ? const Color(0xFFF24822) : const Color(0xFF212121);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const Divider(thickness: 0.5, color: Color(0xFFF2F2F2)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(children: [
-            SvgPicture.asset(
-              item.asset,
-              width: 24,
-              height: 24,
-              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+    return SizedBox(
+      height: 52,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Divider(thickness: 0.5, color: Color(0xFFF2F2F2)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  item.asset,
+                  width: 24,
+                  height: 24,
+                  colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    item.title,
+                    style: context.textStyles.bodyRegular!.copyWith(
+                      color: color,
+                    ),
+                  ),
+                )
+              ],
             ),
-            const SizedBox(width: 8),
-            Expanded(child: Text(item.title, style: TextStyle(color: color)))
-          ]),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 }
