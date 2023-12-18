@@ -86,8 +86,7 @@ class EditProfileController {
   }
 
   void setTooShortErrorName() {
-    editProfileNameErrorStateHolder
-        .updateError("Name should not be empty");
+    editProfileNameErrorStateHolder.updateError("Name should not be empty");
   }
 
   void removeNameError() {
@@ -105,10 +104,13 @@ class EditProfileController {
     avatarStateHolder.removePhoto();
   }
 
-  Future<void> save({String? name, String? username, String? description}) async {
+  Future<void> save(
+      {String? name, String? username, String? description}) async {
     await repository.save(
       name: name ?? editProfileNameStateHolder!,
-      username: username ?? editProfileUsernameStateHolder!,
+      // username: username ?? editProfileUsernameStateHolder!,
+      username: username?.toLowerCase() ??
+          editProfileUsernameStateHolder!.toLowerCase(),
       description: description ?? editProfileDescriptionSH!,
       avatar: editProfileAvatarStateHolder,
     );
