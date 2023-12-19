@@ -77,7 +77,7 @@ class _MenuItemWidget extends StatelessWidget {
     return SizedBox(
       height: 52,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Divider(thickness: 0.5, color: Color(0xFFF2F2F2)),
           Padding(

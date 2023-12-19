@@ -165,7 +165,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
           "Where to watch",
         ),
         MenuItem(
-          'assets/icons/ic_collection_second.svg',
+          'assets/icons/ic_collection_semibold.svg',
           "Add to Watched",
         ),
         MenuItem(
