@@ -11,6 +11,7 @@ class MenuDialog extends StatelessWidget {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: false,
+      backgroundColor: context.colors.backgroundsPrimary,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(12),
@@ -34,7 +35,7 @@ class MenuDialog extends StatelessWidget {
         Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Material(
-              color: const Color(0xFFE0E0E0),
+              color: context.colors.slidersTrack,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(2),
               ),
@@ -73,13 +74,13 @@ class _MenuItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color =
-        item.danger ? const Color(0xFFF24822) : const Color(0xFF212121);
+        item.danger ? context.colors.textsError! : context.colors.textsPrimary!;
     return SizedBox(
       height: 52,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Divider(thickness: 0.5, color: Color(0xFFF2F2F2)),
+          Divider(thickness: 0.5, color: context.colors.fieldsDefault),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
