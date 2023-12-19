@@ -615,7 +615,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                     }
                                   },
                                   text: (myself ?? false)
-                                      ? context.txt.edit
+                                      ? context.txt.edit.capitalize()
                                       : ((profile.followed ?? true)
                                           ? context.txt.profile_following
                                               .capitalize()
