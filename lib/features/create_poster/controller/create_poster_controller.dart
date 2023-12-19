@@ -9,6 +9,7 @@ import 'package:poster_stock/features/create_poster/state_holder/create_poster_s
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
+import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 
 final createPosterControllerProvider =
     Provider.autoDispose<CreatePosterController>(
@@ -30,6 +31,7 @@ final createPosterControllerProvider =
     ),
     profileControllerApi: ref.read(profileControllerApiProvider),
     profileInfoStateHolder: ref.watch(profileInfoStateHolderProvider),
+    languages: ref.watch(chosenLanguageStateHolder.notifier),
   ),
 );
 
@@ -43,6 +45,7 @@ class CreatePosterController {
   final UserDetailsModel? profileInfoStateHolder;
   final CreatePosterRepository createPosterRepository =
       CreatePosterRepository();
+  final ChosenLanguageStateHolder languages;
 
   CreatePosterController({
     required this.createPosterSearchStateHolder,
@@ -52,6 +55,7 @@ class CreatePosterController {
     required this.createPosterSearchListStateHolder,
     required this.profileControllerApi,
     required this.profileInfoStateHolder,
+    required this.languages,
   });
 
   void updateSearch(String value) async {
@@ -86,12 +90,8 @@ class CreatePosterController {
     var mediaState = createPosterChoseMovieStateHolder.state;
     var image = createPosterChosenPosterStateHolder.state;
     try {
-      await createPosterRepository.createPoster(
-        mediaState!.id,
-        mediaState.type.name,
-        image!.$2,
-        description,
-      );
+      await createPosterRepository.createPoster(mediaState!.id,
+          mediaState.type.name, image!.$2, description, languages.state!);
       profileControllerApi.getUserInfo(null);
     } catch (e) {
       print(e);
@@ -110,7 +110,11 @@ class CreatePosterController {
     var image = createPosterChosenPosterStateHolder.state;
     try {
       await createPosterRepository.createBookmark(
-          mediaState!.id, mediaState.type.name, image!.$2);
+        mediaState!.id,
+        mediaState.type.name,
+        image!.$2,
+        languages.state!,
+      );
       profileControllerApi.getUserInfo(null);
     } catch (e) {
       print(e);

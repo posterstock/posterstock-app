@@ -1,15 +1,18 @@
+import 'package:poster_stock/common/constants/languages.dart';
 import 'package:poster_stock/features/create_poster/data/create_poster_service.dart';
 import 'package:poster_stock/features/create_poster/model/media_model.dart';
 
 class CreatePosterRepository {
   final service = CreatePosterService();
 
-  Future<void> createPoster(int mediaId, String mediaType, String image, String description) async {
-    await service.createPoster(mediaId, mediaType, image, description);
+  Future<void> createPoster(int mediaId, String mediaType, String image,
+      String description, Languages lang) async {
+    await service.createPoster(mediaId, mediaType, image, description, lang);
   }
 
-  Future<void> createBookmark(int mediaId, String mediaType, String image) async {
-    await service.createBookmark(mediaId, mediaType, image);
+  Future<void> createBookmark(
+      int mediaId, String mediaType, String image, Languages lang) async {
+    await service.createBookmark(mediaId, mediaType, image, lang);
   }
 
   Future<List<MediaModel>> getSearchMedia(String searchValue) async {
@@ -19,7 +22,8 @@ class CreatePosterRepository {
   }
 
   Future<List<String>?> getMediaPosters(String mediaType, int mediaId) async {
-    final result = (await service.getMediaPosters(mediaType, mediaId))['posters'];
+    final result =
+        (await service.getMediaPosters(mediaType, mediaId))['posters'];
     List<String> resultStr = [];
     for (var a in result) {
       resultStr.add(a.toString());

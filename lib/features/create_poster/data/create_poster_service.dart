@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:poster_stock/common/constants/languages.dart';
 import 'package:supertokens_flutter/dio.dart';
 import 'package:supertokens_flutter/supertokens.dart';
 
@@ -18,7 +19,8 @@ class CreatePosterService {
     _dio.interceptors.add(SuperTokensInterceptorWrapper(client: _dio));
   }
 
-  Future<void> createBookmark(int mediaId, String mediaType, String image) async {
+  Future<void> createBookmark(
+      int mediaId, String mediaType, String image, Languages lang) async {
     token = await SuperTokens.getAccessToken();
     try {
       var response = await _dio.post(
@@ -31,6 +33,7 @@ class CreatePosterService {
             "media_id": mediaId,
             "media_type": mediaType,
             "poster_image": '/${image.split('/').last}',
+            "lang": lang.locale.toLanguageTag(),
           },
         ),
       );
@@ -42,8 +45,8 @@ class CreatePosterService {
     }
   }
 
-  Future<void> createPoster(
-      int mediaId, String mediaType, String image, String description) async {
+  Future<void> createPoster(int mediaId, String mediaType, String image,
+      String description, Languages lang) async {
     token = await SuperTokens.getAccessToken();
     try {
       var response = await _dio.post(
@@ -57,6 +60,7 @@ class CreatePosterService {
             "media_id": mediaId,
             "media_type": mediaType,
             "poster_image": '/${image.split('/').last}',
+            "lang": lang.locale.toLanguageTag(),
           },
         ),
       );
@@ -87,7 +91,8 @@ class CreatePosterService {
     }
   }
 
-  Future<Map<String, dynamic>> getMediaPosters(String mediaType, int mediaId) async {
+  Future<Map<String, dynamic>> getMediaPosters(
+      String mediaType, int mediaId) async {
     print(mediaType);
     print(mediaId);
     token = await SuperTokens.getAccessToken();
