@@ -7,10 +7,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/menu/menu_dialog.dart';
 import 'package:poster_stock/common/menu/menu_state.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
+import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/bookmarks/controller/bookmarks_controller.dart';
 import 'package:poster_stock/features/bookmarks/state_holders/bookmark_list_state_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
+import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 @RoutePage()
@@ -178,6 +180,14 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
       case "Open to TMDB":
         break;
       case "Where to watch":
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBars.build(
+            context,
+            null,
+            //TODO: localize
+            "Not available yet",
+          ),
+        );
         break;
       case "Add to Watched":
         break;
