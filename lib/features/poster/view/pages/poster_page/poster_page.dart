@@ -781,19 +781,30 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                         );
                                       }
                                     },
-                                    child: SizedBox(
-                                        width: 24,
-                                        height: 24,
-                                        child: SvgPicture.asset(
-                                            'assets/icons/ic_collections_add.svg')
-                                        // child: Image.asset(
-                                        //   post?.hasInCollection == true
-                                        //       ? 'assets/images/ic_collection_filled.png'
-                                        //       : 'assets/images/ic_collection.png',
-                                        //   color: context.colors.iconsDefault!,
-                                        //   colorBlendMode: BlendMode.srcIn,
-                                        // ),
-                                        ),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        showModalBottomSheet(
+                                          context: context,
+                                          isScrollControlled: true,
+                                          backgroundColor: Colors.transparent,
+                                          builder: (context) =>
+                                              AddToListDialog(),
+                                        );
+                                      },
+                                      child: SizedBox(
+                                          width: 24,
+                                          height: 24,
+                                          child: SvgPicture.asset(
+                                              'assets/icons/ic_collections_add.svg')
+                                          // child: Image.asset(
+                                          //   post?.hasInCollection == true
+                                          //       ? 'assets/images/ic_collection_filled.png'
+                                          //       : 'assets/images/ic_collection.png',
+                                          //   color: context.colors.iconsDefault!,
+                                          //   colorBlendMode: BlendMode.srcIn,
+                                          // ),
+                                          ),
+                                    ),
                                   ),
                                 ],
                               ),
