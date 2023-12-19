@@ -67,20 +67,20 @@ class PostBase extends ConsumerWidget {
         onTap: () {
           if (post != null) {
             ref.watch(router)!.push(
-              PosterRoute(
-                postId: post[pageHolder.page].id,
-                likes: post[pageHolder.page].likes,
-                liked: post[pageHolder.page].liked,
-                comments: post[pageHolder.page].comments,
-              ),
-            );
+                  PosterRoute(
+                    postId: post[pageHolder.page].id,
+                    likes: post[pageHolder.page].likes,
+                    liked: post[pageHolder.page].liked,
+                    comments: post[pageHolder.page].comments,
+                  ),
+                );
           }
           if (multPost != null) {
             ref.watch(router)!.push(
-              ListRoute(
-                id: multPost.id,
-              ),
-            );
+                  ListRoute(
+                    id: multPost.id,
+                  ),
+                );
           }
         },
         child: ShimmerLoader(
@@ -99,7 +99,7 @@ class PostBase extends ConsumerWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: 68.0),
                         child: Text(
-                          AppLocalizations.of(context)!.sugPost,
+                          AppLocalizations.of(context)!.home_feed_suggestions,
                           style: context.textStyles.caption1!.copyWith(
                             color: context.colors.textsDisabled,
                           ),
@@ -114,7 +114,9 @@ class PostBase extends ConsumerWidget {
                         time: post?[0].time ?? multPost?.time,
                         user: user,
                         showFollowButton: poster == null,
-                        type: post == null ? InfoDialogType.list : InfoDialogType.post,
+                        type: post == null
+                            ? InfoDialogType.list
+                            : InfoDialogType.post,
                         entityId: post?[0].id ?? multPost?.id ?? -1,
                       ),
                     )
@@ -127,7 +129,8 @@ class PostBase extends ConsumerWidget {
                   poster: poster,
                   pageHolder: pageHolder,
                 ),
-              if (post == null && multPost == null && poster == null || post != null && poster == null)
+              if (post == null && multPost == null && poster == null ||
+                  post != null && poster == null)
                 MovieCard(
                   key: key,
                   index: index!,
@@ -182,9 +185,7 @@ class UserInfoTile extends ConsumerWidget {
       child: InkWell(
         onTap: () {
           if (user == null) return;
-          ref.watch(router)!.pushNamed(
-              '/${user!.username}'
-          );
+          ref.watch(router)!.pushNamed('/${user!.username}');
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -201,7 +202,9 @@ class UserInfoTile extends ConsumerWidget {
                   backgroundColor: user?.color,
                   child: user?.imagePath == null && !loading
                       ? Text(
-                          getAvatarName(user?.name ?? 'AA', user?.username ?? '').toUpperCase(),
+                          getAvatarName(
+                                  user?.name ?? 'AA', user?.username ?? '')
+                              .toUpperCase(),
                           style: context.textStyles.subheadlineBold!.copyWith(
                             color: context.colors.textsBackground,
                           ),
@@ -223,13 +226,13 @@ class UserInfoTile extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(
-                          width: (showFollowButton) &&
-                                  (!(user?.followed ?? true))
-                              ? MediaQuery.of(context).size.width -
-                                  70 -
-                                  179 +
-                                  42
-                              : null,
+                          width:
+                              (showFollowButton) && (!(user?.followed ?? true))
+                                  ? MediaQuery.of(context).size.width -
+                                      70 -
+                                      179 +
+                                      42
+                                  : null,
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -241,8 +244,7 @@ class UserInfoTile extends ConsumerWidget {
                                   style: context.textStyles.calloutBold!
                                       .copyWith(
                                           color: darkBackground
-                                              ? context
-                                                  .colors.textsBackground!
+                                              ? context.colors.textsBackground!
                                               : context.colors.textsPrimary),
                                   emptyWidth: 146,
                                   emptyHeight: 17,
@@ -256,8 +258,7 @@ class UserInfoTile extends ConsumerWidget {
                                   (!(user?.followed ?? true))))
                                 Text(
                                   time ?? '',
-                                  style:
-                                      context.textStyles.footNote!.copyWith(
+                                  style: context.textStyles.footNote!.copyWith(
                                     color: darkBackground
                                         ? context.colors.textsBackground!
                                             .withOpacity(0.8)

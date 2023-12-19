@@ -53,7 +53,7 @@ class ChooseLanguagePage extends ConsumerWidget {
                   ),
                 ),
                 title: Text(
-                  'Language',
+                  context.txt.settings_language,
                   style: context.textStyles.bodyBold,
                 ),
               ),
@@ -65,8 +65,10 @@ class ChooseLanguagePage extends ConsumerWidget {
                     MultipleSettingsButton(
                       onTaps: [
                         () {
-                        print(Languages.english().languageName);
-                          ref.read(appLanguageControllerProvider).updateLanguage(
+                          print(Languages.english().languageName);
+                          ref
+                              .read(appLanguageControllerProvider)
+                              .updateLanguage(
                                 Languages.english(),
                               );
                         },
@@ -75,7 +77,7 @@ class ChooseLanguagePage extends ConsumerWidget {
                         Row(
                           children: [
                             Text(
-                              'English',
+                              context.txt.settings_english,
                               style: context.textStyles.bodyRegular,
                             ),
                             const Spacer(),
@@ -85,6 +87,7 @@ class ChooseLanguagePage extends ConsumerWidget {
                                     .languageCode ==
                                 'en')
                               Text(
+                                //TODO: localize
                                 '􀆅',
                                 style: context.textStyles.headline!.copyWith(
                                   color: context.colors.iconsActive,

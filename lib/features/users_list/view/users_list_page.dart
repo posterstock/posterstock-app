@@ -94,7 +94,9 @@ class _UsersListPageState extends ConsumerState<UsersListPage> {
               backgroundColor: context.colors.backgroundsPrimary,
               centerTitle: true,
               title: Text(
-                widget.following ? 'Following' : 'Followers',
+                widget.following
+                    ? context.txt.profile_following
+                    : context.txt.profile_followers,
                 style: context.textStyles.bodyBold,
               ),
               floating: true,

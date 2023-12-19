@@ -125,13 +125,14 @@ class AuthPage extends ConsumerWidget {
                         ),
                         const SizedBox(height: 9),
                         Text(
-                          AppLocalizations.of(context)!.welcome,
+                          AppLocalizations.of(context)!.login_welcome_title,
                           style: context.textStyles.title2!,
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 34),
                         AppTextField(
-                          hint: AppLocalizations.of(context)!.enterEmail,
+                          hint: AppLocalizations.of(context)!
+                              .login_welcome_email_hint,
                           onSubmitted: (value) {
                             checkEmail(ref, value, context);
                           },
@@ -156,14 +157,14 @@ class AuthPage extends ConsumerWidget {
                                 ref, textEditingController.text, context);
                           },
                           child: Text(
-                            AppLocalizations.of(context)!.contWithEmail,
+                            AppLocalizations.of(context)!.login_welcome_otp,
                             style: context.textStyles.calloutBold,
                           ),
                         ),
                         const SizedBox(height: 20),
                         Center(
                           child: Text(
-                            AppLocalizations.of(context)!.or,
+                            AppLocalizations.of(context)!.login_welcome_or,
                             style: context.textStyles.callout,
                           ),
                         ),
@@ -184,7 +185,8 @@ class AuthPage extends ConsumerWidget {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  AppLocalizations.of(context)!.contWithApple,
+                                  AppLocalizations.of(context)!
+                                      .login_welcome_apple,
                                   style: context.textStyles.calloutBold,
                                 ),
                               ],
@@ -205,7 +207,8 @@ class AuthPage extends ConsumerWidget {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                AppLocalizations.of(context)!.contWithGoogle,
+                                AppLocalizations.of(context)!
+                                    .login_welcome_google,
                                 style: context.textStyles.calloutBold,
                               ),
                             ],
@@ -221,12 +224,13 @@ class AuthPage extends ConsumerWidget {
                             textAlign: TextAlign.center,
                             text: TextSpan(
                               text: AppLocalizations.of(context)!
-                                  .privacyPolicyText1,
+                                  .login_welcome_privacy1,
                               style: context.textStyles.caption2,
                               children: <TextSpan>[
+                                const TextSpan(text: ' '),
                                 TextSpan(
                                   text: AppLocalizations.of(context)!
-                                      .privacyPolicyLink1,
+                                      .login_welcome_terms,
                                   style: context.textStyles.caption2!.copyWith(
                                     decoration: TextDecoration.underline,
                                   ),
@@ -234,14 +238,16 @@ class AuthPage extends ConsumerWidget {
                                     ..onTap = () => launchUrlString(
                                         "https://thedirection.org/posterstock_terms"),
                                 ),
+                                const TextSpan(text: ' '),
                                 TextSpan(
                                   text: AppLocalizations.of(context)!
-                                      .privacyPolicyText2,
+                                      .login_welcome_privacy2,
                                   style: context.textStyles.caption2,
                                 ),
+                                const TextSpan(text: ' '),
                                 TextSpan(
                                   text: AppLocalizations.of(context)!
-                                      .privacyPolicyLink2,
+                                      .login_welcome_policy,
                                   style: context.textStyles.caption2!.copyWith(
                                     decoration: TextDecoration.underline,
                                   ),
@@ -249,9 +255,10 @@ class AuthPage extends ConsumerWidget {
                                     ..onTap = () => launchUrlString(
                                         "https://thedirection.org/posterstock_privacy"),
                                 ),
+                                const TextSpan(text: ' '),
                                 TextSpan(
                                   text: AppLocalizations.of(context)!
-                                      .privacyPolicyText3,
+                                      .login_welcome_privacy3,
                                   style: context.textStyles.caption2,
                                 ),
                               ],

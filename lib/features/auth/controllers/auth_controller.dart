@@ -62,7 +62,7 @@ class AuthController {
   }
 
   void setError() {
-    errorState.updateState(localizations!.emailError);
+    errorState.updateState(localizations!.login_welcome_email_incorrect);
   }
 
   void removeError() {
@@ -110,7 +110,8 @@ class AuthController {
       debugPrint(e.toString());
     }
     try {
-      await repository.registerNotification((await FirebaseMessaging.instance.getToken())!, userToken);
+      await repository.registerNotification(
+          (await FirebaseMessaging.instance.getToken())!, userToken);
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -149,7 +150,8 @@ class AuthController {
     String? accessToken,
     String? idToken,
     String? code,
-    String? clientId,String? name,
+    String? clientId,
+    String? name,
     String? surname,
     String? email,
   }) async {

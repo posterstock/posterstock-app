@@ -55,7 +55,7 @@ class ChangeEmailCodePage extends ConsumerWidget {
                 titleSpacing: 0,
                 centerTitle: true,
                 title: Text(
-                  'We sent you a code',
+                  context.txt.settings_changeEmail_verify_codeSended,
                   style: context.textStyles.bodyBold,
                 ),
                 actions: [
@@ -63,10 +63,11 @@ class ChangeEmailCodePage extends ConsumerWidget {
                     onPressed: code.length < 4
                         ? null
                         : () {
-                            ref.watch(router)!
+                            ref
+                                .watch(router)!
                                 .popUntilRouteWithPath('settings');
                           },
-                    child: const Text('Verify'),
+                    child: Text(context.txt.settings_changeEmail_verify),
                   ),
                 ],
               ),
@@ -74,7 +75,7 @@ class ChangeEmailCodePage extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
-                  'Enter it below to verify your email.',
+                  context.txt.settings_changeEmail_verify_enterCodeBelow,
                   style: context.textStyles.footNote!
                       .copyWith(color: context.colors.textsSecondary),
                 ),

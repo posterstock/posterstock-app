@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class EmptyNotificationsWidget extends StatelessWidget {
@@ -20,7 +21,7 @@ class EmptyNotificationsWidget extends StatelessWidget {
           ),
           const SizedBox(height: 5),
           Text(
-            'At the moment,\nyou have no notifications',
+            AppLocalizations.of(context)!.notification_empty,
             style: context.textStyles.subheadlineBold!.copyWith(
               color: context.colors.textsDisabled,
             ),

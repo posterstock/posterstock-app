@@ -43,7 +43,7 @@ class LoginPage extends ConsumerWidget {
                     height: 30,
                   ),
                   Text(
-                    AppLocalizations.of(context)!.loginCode,
+                    AppLocalizations.of(context)!.login_signup_title,
                     style: context.textStyles.title2,
                   ),
                   const SizedBox(
@@ -61,7 +61,7 @@ class LoginPage extends ConsumerWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      AppLocalizations.of(context)!.codeSent,
+                      AppLocalizations.of(context)!.login_signup_sendText,
                       style: context.textStyles.callout!.copyWith(
                         color: context.colors.textsSecondary,
                       ),
@@ -71,7 +71,8 @@ class LoginPage extends ConsumerWidget {
                     height: 12,
                   ),
                   AppTextField(
-                    hint: AppLocalizations.of(context)!.pasteLoginCode,
+                    hint: AppLocalizations.of(context)!
+                        .login_signup_inputCode_hint,
                     removableWhenNotEmpty: true,
                     keyboardType: TextInputType.phone,
                     inputFormatters: [
@@ -103,7 +104,7 @@ class LoginPage extends ConsumerWidget {
                   AuthButton(
                     loading: loading,
                     loadingBorderColor: context.colors.fieldsActive!,
-                    text: AppLocalizations.of(context)!.contWithLoginCode,
+                    text: AppLocalizations.of(context)!.login_welcome_otp,
                     disabled: codeState.isEmpty,
                     fillColor: context.colors.buttonsDisabled,
                     borderColor: context.colors.fieldsActive!,
@@ -137,12 +138,14 @@ class LoginPage extends ConsumerWidget {
                     textDirection: TextDirection.ltr,
                     textAlign: TextAlign.center,
                     text: TextSpan(
-                      text: AppLocalizations.of(context)!.privacyPolicyText1,
+                      text:
+                          AppLocalizations.of(context)!.login_welcome_privacy1,
                       style: context.textStyles.caption2,
                       children: <TextSpan>[
+                        const TextSpan(text: ''),
                         TextSpan(
                           text:
-                              AppLocalizations.of(context)!.privacyPolicyLink1,
+                              AppLocalizations.of(context)!.login_welcome_terms,
                           style: context.textStyles.caption2!.copyWith(
                             decoration: TextDecoration.underline,
                           ),
@@ -151,14 +154,16 @@ class LoginPage extends ConsumerWidget {
                                   "https://thedirection.org/posterstock_terms",
                                 ),
                         ),
+                        const TextSpan(text: ''),
                         TextSpan(
-                          text:
-                              AppLocalizations.of(context)!.privacyPolicyText2,
+                          text: AppLocalizations.of(context)!
+                              .login_welcome_privacy2,
                           style: context.textStyles.caption2,
                         ),
+                        const TextSpan(text: ''),
                         TextSpan(
-                          text:
-                              AppLocalizations.of(context)!.privacyPolicyLink2,
+                          text: AppLocalizations.of(context)!
+                              .login_welcome_policy,
                           style: context.textStyles.caption2!.copyWith(
                             decoration: TextDecoration.underline,
                           ),
@@ -166,9 +171,10 @@ class LoginPage extends ConsumerWidget {
                             ..onTap = () => launchUrlString(
                                 "https://thedirection.org/posterstock_privacy"),
                         ),
+                        const TextSpan(text: ''),
                         TextSpan(
-                          text:
-                              AppLocalizations.of(context)!.privacyPolicyText3,
+                          text: AppLocalizations.of(context)!
+                              .login_welcome_privacy3,
                           style: context.textStyles.caption2,
                         ),
                       ],

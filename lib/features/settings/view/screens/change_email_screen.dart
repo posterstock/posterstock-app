@@ -57,7 +57,7 @@ class ChangeEmailPage extends ConsumerWidget {
                   ),
                 ),
                 title: Text(
-                  'Change Email',
+                  context.txt.settings_changeEmail,
                   style: context.textStyles.bodyBold,
                 ),
                 actions: [
@@ -68,11 +68,11 @@ class ChangeEmailPage extends ConsumerWidget {
                           .updateEmail(controller.text);
                       if (checkEmail(controller.text)) {
                         ref.watch(router)!.push(
-                          ChangeEmailCodeRoute(),
-                        );
+                              ChangeEmailCodeRoute(),
+                            );
                       }
                     },
-                    child: Text('Next'),
+                    child: Text(context.txt.next),
                   ),
                 ],
               ),
@@ -80,8 +80,8 @@ class ChangeEmailPage extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
-                  //TODO email
-                  'Your current email is test@test.com. What would you like to update it to? Your email is not  displayed in your public profile on Posterstock.',
+                  //TODO input user email
+                  context.txt.settings_changeEmail_text,
                   style: context.textStyles.footNote!
                       .copyWith(color: context.colors.textsSecondary),
                 ),

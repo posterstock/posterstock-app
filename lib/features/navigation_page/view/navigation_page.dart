@@ -58,7 +58,8 @@ class NavigationPage extends ConsumerWidget {
         rtr?.replaceNamed(
           '/auth',
         );
-        scaffoldMessengerKey.currentState?.showSnackBar(SnackBars.build(context, null, "Authentication error"));
+        scaffoldMessengerKey.currentState?.showSnackBar(
+            SnackBars.build(context, null, "Authentication error"));
       }
     });
     final pageTransitionController =
@@ -220,7 +221,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                 color: context.colors.fieldsHover!,
               ),
               picturePath: 'assets/icons/ic_lists.svg',
-              label: AppLocalizations.of(context)!.createList,
+              label: AppLocalizations.of(context)!.listCreate_create,
               animationValue: controller.value,
               onTap: () {
                 showModalBottomSheet(
@@ -245,7 +246,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                 color: context.colors.fieldsHover!,
               ),
               picturePath: 'assets/icons/ic_bookmarks.svg',
-              label: AppLocalizations.of(context)!.createBookmark,
+              label: AppLocalizations.of(context)!.watchlistAdd_bookmark,
               animationValue: controller.value,
               onTap: () {
                 showModalBottomSheet(
@@ -267,7 +268,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
               hightlightColor: context.colors.textsPrimary!.withOpacity(0.2),
               iconColor: context.colors.iconsBackground!,
               picturePath: 'assets/icons/ic_collection.svg',
-              label: AppLocalizations.of(context)!.addPoster,
+              label: AppLocalizations.of(context)!.home_add_poster,
               animationValue: controller.value,
               onTap: () {
                 showModalBottomSheet(

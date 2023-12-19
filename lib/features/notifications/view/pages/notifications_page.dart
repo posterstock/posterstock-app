@@ -103,7 +103,7 @@ class NotificationsPage extends ConsumerWidget {
                   title: Padding(
                     padding: const EdgeInsets.only(bottom: 16.0),
                     child: Text(
-                      AppLocalizations.of(context)!.notifications,
+                      AppLocalizations.of(context)!.notification_notifications,
                       style: context.textStyles.bodyBold,
                     ),
                   ),
@@ -219,8 +219,9 @@ class NotificationTile extends ConsumerWidget {
             children: [
               GestureDetector(
                 onTap: () {
-                  AutoRouter.of(context).pushNamed(notification.profileDeepLink);
-        },
+                  AutoRouter.of(context)
+                      .pushNamed(notification.profileDeepLink);
+                },
                 child: CircleAvatar(
                     radius: 24,
                     backgroundImage: notification.profileImage == null
@@ -229,8 +230,7 @@ class NotificationTile extends ConsumerWidget {
                     backgroundColor: avatar[Random().nextInt(3)],
                     child: notification.profileImage == null
                         ? Text(
-                            getAvatarName(notification.name)
-                                .toUpperCase(),
+                            getAvatarName(notification.name).toUpperCase(),
                             style: context.textStyles.calloutBold!.copyWith(
                               color: context.colors.textsBackground,
                             ),
@@ -248,10 +248,11 @@ class NotificationTile extends ConsumerWidget {
                       text: TextSpan(
                         text: notification.name,
                         style: context.textStyles.subheadlineBold,
-                        recognizer: TapGestureRecognizer()..onTap = () {
-                            AutoRouter.of(context).pushNamed(notification.profileDeepLink);
-
-                        },
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            AutoRouter.of(context)
+                                .pushNamed(notification.profileDeepLink);
+                          },
                         children: [
                           TextSpan(
                             text: notification.info,

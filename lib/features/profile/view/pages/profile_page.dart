@@ -450,8 +450,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                         ),
                                         const SizedBox(height: 3),
                                         Text(
-                                          AppLocalizations.of(context)!
-                                              .followers,
+                                          context.txt.profile_followers,
                                           style: context.textStyles.caption1!
                                               .copyWith(
                                             color:
@@ -491,8 +490,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                         ),
                                         const SizedBox(height: 3),
                                         Text(
-                                          AppLocalizations.of(context)!
-                                              .following,
+                                          context.txt.profile_following,
                                           style: context.textStyles.caption1!
                                               .copyWith(
                                             color:
@@ -617,13 +615,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                     }
                                   },
                                   text: (myself ?? false)
-                                      ? 'Edit'
+                                      ? context.txt.edit
                                       : ((profile.followed ?? true)
-                                          ? AppLocalizations.of(context)!
-                                              .following
+                                          ? context.txt.profile_following
                                               .capitalize()
-                                          : AppLocalizations.of(context)!
-                                              .follow),
+                                          : context.txt.follow),
                                   backgroundColor: ((myself ?? false) ||
                                           (profile.followed ?? true))
                                       ? context.colors.fieldsDefault
@@ -710,7 +706,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                     child: AppTextField(
                                       controller: searchController,
                                       searchField: true,
-                                      hint: 'Search',
+                                      hint: context.txt.search,
                                       removableWhenNotEmpty: true,
                                       crossPadding: const EdgeInsets.all(8.0),
                                       crossButton: SvgPicture.asset(
@@ -755,7 +751,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                   CupertinoButton(
                                     padding: EdgeInsets.zero,
                                     child: Text(
-                                      'Cancel',
+                                      context.txt.cancel,
                                       style: context.textStyles.bodyRegular!
                                           .copyWith(
                                         color: context.colors.textsAction,
@@ -818,18 +814,19 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
       MenuState(profile.name, [
         MenuItem(
           'assets/icons/ic_gear.svg',
-          "Settings",
+          context.txt.settings,
         ),
         MenuItem(
           'assets/icons/ic_share.svg',
-          "Share Profile",
+          context.txt.profile_menu_share,
         ),
         MenuItem(
           'assets/icons/search.svg',
-          "Search",
+          context.txt.search,
         ),
       ]),
     );
+    //TODO: pick by instance. Not by name
     final item = result as MenuItem;
     switch (item.title) {
       case "Settings":
@@ -850,19 +847,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
       MenuState(profile.name, [
         MenuItem(
           'assets/icons/ic_share.svg',
-          "Share",
+          context.txt.share,
         ),
         MenuItem(
           'assets/icons/search.svg',
-          "Search",
+          context.txt.search,
         ),
         MenuItem(
           'assets/icons/ic_hand.svg',
-          "Block",
+          context.txt.profile_menu_block,
           true,
         ),
       ]),
     );
+    //TODO: pick by instance. Not by name
     final item = result as MenuItem;
     switch (item.title) {
       case "Share":
@@ -1411,8 +1409,8 @@ class OtherProfileDialog extends ConsumerWidget {
                                   const SizedBox(width: 16),
                                   Text(
                                     (user?.followed ?? user1!.followed)
-                                        ? 'Unfollow ${user?.name ?? user1!.name}'
-                                        : 'Follow ${user?.name ?? user1!.name}',
+                                        ? '${context.txt.unfollow} ${user?.name ?? user1!.name}'
+                                        : '${context.txt.follow} ${user?.name ?? user1!.name}',
                                     style: context.textStyles.bodyRegular,
                                   ),
                                   const Spacer(),
@@ -1440,7 +1438,8 @@ class OtherProfileDialog extends ConsumerWidget {
                                 SnackBars.build(
                                   context,
                                   null,
-                                  'Not available yet',
+                                  //TODO: localize
+                                  "Not available yet",
                                 ),
                               );
                             },
@@ -1451,7 +1450,7 @@ class OtherProfileDialog extends ConsumerWidget {
                                 children: [
                                   const SizedBox(width: 16),
                                   Text(
-                                    'Report',
+                                    context.txt.report,
                                     style: context.textStyles.bodyRegular!
                                         .copyWith(
                                       color: context.colors.textsError,
@@ -1488,7 +1487,8 @@ class OtherProfileDialog extends ConsumerWidget {
                                   SnackBars.build(
                                     context,
                                     null,
-                                    'An error occured',
+                                    //TODO: localize
+                                    "An error occured",
                                   ),
                                 );
                                 return;
@@ -1522,7 +1522,9 @@ class OtherProfileDialog extends ConsumerWidget {
                                 children: [
                                   const SizedBox(width: 16),
                                   Text(
-                                    user?.blocked == true ? 'Unblock' : 'Block',
+                                    user?.blocked == true
+                                        ? context.txt.profile_menu_unblock
+                                        : context.txt.profile_menu_block,
                                     style: context.textStyles.bodyRegular!
                                         .copyWith(
                                       color: context.colors.textsError,
@@ -1570,7 +1572,8 @@ class OtherProfileDialog extends ConsumerWidget {
                                           SnackBars.build(
                                             context,
                                             null,
-                                            'Deleted successfully',
+                                            //TODO: localize
+                                            "Deleted successfully",
                                           ),
                                         );
                                         ref
@@ -1583,7 +1586,8 @@ class OtherProfileDialog extends ConsumerWidget {
                                           SnackBars.build(
                                             context,
                                             null,
-                                            'Could not delete poster',
+                                            //TODO: localize
+                                            "Could not delete poster",
                                           ),
                                         );
                                       }
@@ -1598,7 +1602,8 @@ class OtherProfileDialog extends ConsumerWidget {
                                           SnackBars.build(
                                             context,
                                             null,
-                                            'Could not delete list',
+                                            //TODO: localize
+                                            "Could not delete list",
                                           ),
                                         );
                                       }
@@ -1615,7 +1620,8 @@ class OtherProfileDialog extends ConsumerWidget {
                                           SnackBars.build(
                                             context,
                                             null,
-                                            'Deleted successfully',
+                                            //TODO: localize
+                                            "Deleted successfully",
                                           ),
                                         );
                                         Navigator.pop(context);
@@ -1625,7 +1631,8 @@ class OtherProfileDialog extends ConsumerWidget {
                                           SnackBars.build(
                                             context,
                                             null,
-                                            'Could not delete comment',
+                                            //TODO: localize
+                                            "Could not delete comment",
                                           ),
                                         );
                                       }
@@ -1642,7 +1649,8 @@ class OtherProfileDialog extends ConsumerWidget {
                                           SnackBars.build(
                                             context,
                                             null,
-                                            'Deleted successfully',
+                                            //TODO: localize
+                                            "Deleted successfully",
                                           ),
                                         );
                                         Navigator.pop(context);
@@ -1652,7 +1660,8 @@ class OtherProfileDialog extends ConsumerWidget {
                                           SnackBars.build(
                                             context,
                                             null,
-                                            'Could not delete comment',
+                                            //TODO: localize
+                                            "Could not delete comment",
                                           ),
                                         );
                                       }
@@ -1667,7 +1676,7 @@ class OtherProfileDialog extends ConsumerWidget {
                                 children: [
                                   const SizedBox(width: 16),
                                   Text(
-                                    'Delete',
+                                    context.txt.delete,
                                     style: context.textStyles.bodyRegular!
                                         .copyWith(
                                       color: context.colors.textsError,
@@ -1796,7 +1805,7 @@ class MyProfileDialog extends ConsumerWidget {
                           },
                           child: Center(
                             child: Text(
-                              'Cancel',
+                              context.txt.cancel,
                               style: context.textStyles.bodyRegular,
                             ),
                           ),
@@ -1838,7 +1847,7 @@ class ProfileTabBar extends AnimatedWidget {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 14.0),
           child: Text(
-            "Watched",
+            context.txt.profile_watched,
             style: animation.value >= 0 && animation.value <= 0.5
                 ? context.textStyles.subheadlineBold
                 : context.textStyles.subheadline,
@@ -1848,7 +1857,7 @@ class ProfileTabBar extends AnimatedWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 14.0),
             child: Text(
-              "Watchlist",
+              context.txt.profile_watchlist,
               style: animation.value > 0.5 && animation.value <= 1.5
                   ? context.textStyles.subheadlineBold
                   : context.textStyles.subheadline,
@@ -1857,7 +1866,7 @@ class ProfileTabBar extends AnimatedWidget {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 14.0),
           child: Text(
-            "Lists",
+            context.txt.lists,
             style: animation.value > 1.5 && animation.value <= 2
                 ? context.textStyles.subheadlineBold
                 : context.textStyles.subheadline,

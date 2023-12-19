@@ -80,7 +80,8 @@ class SignUpController {
   });
 
   void setWrongSymbolsErrorUsername() {
-    usernameErrorState.updateState(localizations!.invalidSymbols);
+    usernameErrorState
+        .updateState(localizations!.login_signup_username_wrongSymbol);
   }
 
   void removeUsernameError() {
@@ -88,15 +89,18 @@ class SignUpController {
   }
 
   void setTooLongErrorName() {
-    nameErrorState.updateState(localizations!.nameCantExceed32);
+    nameErrorState
+        .updateState(localizations!.login_signup_username_nameTooLong);
   }
 
   void setTooLongErrorUserName() {
-    usernameErrorState.updateState(localizations!.usernameCantExceed32);
+    usernameErrorState
+        .updateState(localizations!.login_signup_username_nameTooLong);
   }
 
   void setTooShortErrorUserName() {
-    usernameErrorState.updateState(localizations!.usernameMinLength5);
+    usernameErrorState
+        .updateState(localizations!.login_signup_username_nameTooShort);
   }
 
   void removeNameError() {

@@ -912,7 +912,8 @@ class _CommentTextFieldState extends ConsumerState<CommentTextField> {
                 cursorColor: context.colors.textsAction,
                 decoration: InputDecoration(
                   border: InputBorder.none,
-                  hintText: AppLocalizations.of(context)!.textReply,
+                  hintText:
+                      AppLocalizations.of(context)!.poster_reply_field_hint,
                   hintStyle: context.textStyles.callout!.copyWith(
                     color: context.colors.textsDisabled,
                   ),
@@ -945,12 +946,12 @@ class _CommentTextFieldState extends ConsumerState<CommentTextField> {
                     SizedBox(
                       height: 32,
                       width: TextInfoService.textSize(
-                                  AppLocalizations.of(context)!.reply,
+                                  AppLocalizations.of(context)!.poster_reply,
                                   context.textStyles.calloutBold!)
                               .width +
                           32,
                       child: AppTextButton(
-                        text: AppLocalizations.of(context)!.reply,
+                        text: AppLocalizations.of(context)!.poster_reply,
                         disabled: controller.text.isEmpty ||
                             controller.text.length > 140,
                         child: loading
@@ -1294,7 +1295,7 @@ class PosterActionsDialog extends ConsumerWidget {
                             height: 36,
                             child: Center(
                               child: Text(
-                                post.year.contains('-') ? 'TV Show' : 'Movie',
+                                post.year.contains('-') ? "TV Show" : "Movie",
                                 style: context.textStyles.footNote!.copyWith(
                                   color: context.colors.textsSecondary,
                                 ),
@@ -1321,7 +1322,8 @@ class PosterActionsDialog extends ConsumerWidget {
                                 child: Center(
                                   //TODO REMOVE THIS IF THIS MOVIE NOT IN COLLECTION
                                   child: Text(
-                                    'Add to list',
+                                    AppLocalizations.of(context)!
+                                        .poster_menu_listAdd,
                                     style: context.textStyles.bodyRegular!
                                         .copyWith(
                                       color: context.colors.textsPrimary,
@@ -1344,7 +1346,8 @@ class PosterActionsDialog extends ConsumerWidget {
                               },
                               child: Center(
                                 child: Text(
-                                  'Open on TMDB',
+                                  AppLocalizations.of(context)!
+                                      .poster_menu_openTMDB,
                                   style:
                                       context.textStyles.bodyRegular!.copyWith(
                                     color: context.colors.textsPrimary,
@@ -1365,13 +1368,14 @@ class PosterActionsDialog extends ConsumerWidget {
                                   SnackBars.build(
                                     context,
                                     null,
-                                    'Not available yet',
+                                    //TODO: localize
+                                    "Not available yet",
                                   ),
                                 );
                               },
                               child: Center(
                                 child: Text(
-                                  'Where to watch',
+                                  context.txt.watchlist_menu_whereToWatch,
                                   style:
                                       context.textStyles.bodyRegular!.copyWith(
                                     color: context.colors.textsPrimary,
@@ -1384,7 +1388,7 @@ class PosterActionsDialog extends ConsumerWidget {
                             height: 36,
                             child: Center(
                               child: Text(
-                                'Poster',
+                                context.txt.poster,
                                 style: context.textStyles.footNote!.copyWith(
                                   color: context.colors.textsSecondary,
                                 ),
@@ -1418,7 +1422,8 @@ class PosterActionsDialog extends ConsumerWidget {
                                 },
                                 child: Center(
                                   child: Text(
-                                    '${post.author.followed ? 'Unf' : 'F'}ollow ${post.author.name}',
+                                    //TODO: symplify
+                                    "${post.author.followed ? context.txt.unfollow : context.txt.follow} ${post.author.name}",
                                     style: context.textStyles.bodyRegular!
                                         .copyWith(
                                       color: context.colors.textsPrimary,
@@ -1440,7 +1445,7 @@ class PosterActionsDialog extends ConsumerWidget {
                               },
                               child: Center(
                                 child: Text(
-                                  'Share',
+                                  context.txt.share,
                                   style:
                                       context.textStyles.bodyRegular!.copyWith(
                                     color: context.colors.textsPrimary,
@@ -1463,7 +1468,8 @@ class PosterActionsDialog extends ConsumerWidget {
                                     SnackBars.build(
                                       context,
                                       null,
-                                      'Not available yet',
+                                      //TODO: loclize
+                                      "Not available yet",
                                     ),
                                   );
                                 } else {
@@ -1476,7 +1482,8 @@ class PosterActionsDialog extends ConsumerWidget {
                                       SnackBars.build(
                                         context,
                                         null,
-                                        'Deleted successfully',
+                                        //TODO: localize
+                                        "Deleted successfully",
                                       ),
                                     );
                                     Navigator.pop(context);
@@ -1489,6 +1496,7 @@ class PosterActionsDialog extends ConsumerWidget {
                                       SnackBars.build(
                                         context,
                                         null,
+                                        //TODO: localize
                                         'Could not delete post',
                                       ),
                                     );
@@ -1506,8 +1514,8 @@ class PosterActionsDialog extends ConsumerWidget {
                               child: Center(
                                 child: Text(
                                   (myPoster?.id != post.author.id)
-                                      ? 'Report'
-                                      : 'Delete',
+                                      ? context.txt.report
+                                      : context.txt.delete,
                                   style:
                                       context.textStyles.bodyRegular!.copyWith(
                                     color: context.colors.textsError,
@@ -1536,7 +1544,7 @@ class PosterActionsDialog extends ConsumerWidget {
                         },
                         child: Center(
                           child: Text(
-                            'Cancel',
+                            context.txt.cancel,
                             style: context.textStyles.bodyRegular,
                           ),
                         ),

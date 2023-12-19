@@ -109,7 +109,7 @@ class AddToListDialog extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 22),
                                 Text(
-                                  'Add to list',
+                                  context.txt.profile_addToList_title,
                                   style: context.textStyles.bodyBold,
                                 ),
                                 SizedBox(height: lists == null ? 100 : 10.5),
@@ -161,10 +161,7 @@ class AddToListDialog extends ConsumerWidget {
                                                 ),
                                                 const SizedBox(width: 16),
                                                 Text(
-                                                  lists![index]
-                                                          .postersCount
-                                                          .toString() +
-                                                      ' posters',
+                                                  '${lists![index].postersCount} ${context.txt.posters.toLowerCase()}',
                                                   style: context
                                                       .textStyles.footNote!
                                                       .copyWith(
@@ -184,6 +181,7 @@ class AddToListDialog extends ConsumerWidget {
                                           SnackBars.build(
                                             context,
                                             null,
+                                            //TODO: localize
                                             'Adding poster to list...',
                                             duration:
                                                 const Duration(minutes: 2),
@@ -209,6 +207,7 @@ class AddToListDialog extends ConsumerWidget {
                                               SnackBars.build(
                                                 context,
                                                 null,
+                                                //TODO: localize
                                                 'Could not update list',
                                               ),
                                             );

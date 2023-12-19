@@ -59,7 +59,7 @@ class EditProfileController {
 
   void setWrongSymbolsErrorUsername() {
     editProfileUsernameErrorStateHolder
-        .updateError(localizations!.invalidSymbols);
+        .updateError(localizations!.login_signup_username_wrongSymbol);
   }
 
   void removeUsernameError() {
@@ -68,7 +68,7 @@ class EditProfileController {
 
   void setTooLongErrorUsername() {
     editProfileUsernameErrorStateHolder
-        .updateError(localizations!.usernameCantExceed32);
+        .updateError(localizations!.login_signup_username_nameTooLong);
   }
 
   void setLoading(bool value) {
@@ -77,12 +77,12 @@ class EditProfileController {
 
   void setTooShortErrorUsername() {
     editProfileUsernameErrorStateHolder
-        .updateError(localizations!.usernameMinLength5);
+        .updateError(localizations!.login_signup_username_nameTooShort);
   }
 
   void setTooLongErrorName() {
     editProfileNameErrorStateHolder
-        .updateError(localizations!.nameCantExceed32);
+        .updateError(localizations!.login_signup_username_nameTooLong);
   }
 
   void setTooShortErrorName() {

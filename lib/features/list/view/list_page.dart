@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
@@ -636,7 +637,7 @@ class ListActionsDialog extends ConsumerWidget {
                                   "https://posterstock.com/list/${list.id}"),
                               child: Center(
                                 child: Text(
-                                  'Share',
+                                  AppLocalizations.of(context)!.share,
                                   style:
                                       context.textStyles.bodyRegular!.copyWith(
                                     color: context.colors.textsPrimary,
@@ -677,7 +678,7 @@ class ListActionsDialog extends ConsumerWidget {
                                       SnackBars.build(
                                         context,
                                         null,
-                                        'List deleted successfully',
+                                        "List deleted successfully",
                                       ),
                                     );
                                   } catch (_) {
@@ -687,7 +688,7 @@ class ListActionsDialog extends ConsumerWidget {
                                       SnackBars.build(
                                         context,
                                         null,
-                                        'Could not delete list',
+                                        "Could not delete list",
                                       ),
                                     );
                                   }
@@ -696,8 +697,8 @@ class ListActionsDialog extends ConsumerWidget {
                               child: Center(
                                 child: Text(
                                   list.author.id != myself?.id
-                                      ? 'Report'
-                                      : 'Delete',
+                                      ? AppLocalizations.of(context)!.report
+                                      : AppLocalizations.of(context)!.delete,
                                   style:
                                       context.textStyles.bodyRegular!.copyWith(
                                     color: context.colors.textsError,
@@ -722,7 +723,7 @@ class ListActionsDialog extends ConsumerWidget {
                         onTap: () => Navigator.pop(context),
                         child: Center(
                           child: Text(
-                            'Cancel',
+                            AppLocalizations.of(context)!.cancel,
                             style: context.textStyles.bodyRegular,
                           ),
                         ),

@@ -45,7 +45,7 @@ class SearchPage extends ConsumerWidget {
                     child: AppTextField(
                       controller: textController,
                       searchField: true,
-                      hint: 'Search',
+                      hint: context.txt.search,
                       removableWhenNotEmpty: true,
                       crossPadding: const EdgeInsets.all(8.0),
                       crossButton: SvgPicture.asset(
@@ -67,7 +67,7 @@ class SearchPage extends ConsumerWidget {
                   CupertinoButton(
                     padding: EdgeInsets.zero,
                     child: Text(
-                      'Cancel',
+                      context.txt.cancel,
                       style: context.textStyles.bodyRegular!.copyWith(
                         color: context.colors.textsAction,
                       ),
@@ -134,6 +134,7 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 14.0),
               child: Text(
+                //TODO: localize
                 "Users",
                 style: context.textStyles.subheadline,
               ),
@@ -141,14 +142,14 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 14.0),
               child: Text(
-                "Posters",
+                context.txt.posters,
                 style: context.textStyles.subheadline,
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 14.0),
               child: Text(
-                "Lists",
+                context.txt.lists,
                 style: context.textStyles.subheadline,
               ),
             ),
@@ -203,7 +204,8 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
                             top: (MediaQuery.of(context).size.height - 155) *
                                 0.4),
                         child: Text(
-                          'No users found',
+                          //TODO: localize
+                          "No users found",
                           style: context.textStyles.subheadlineBold!.copyWith(
                             color: context.colors.textsDisabled,
                           ),
@@ -268,7 +270,7 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
                             top: (MediaQuery.of(context).size.height - 155) *
                                 0.4),
                         child: Text(
-                          'No one has added this poster',
+                          context.txt.watchlist_empty,
                           style: context.textStyles.subheadlineBold!.copyWith(
                             color: context.colors.textsDisabled,
                           ),
@@ -336,7 +338,8 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
                                           155) *
                                       0.4),
                               child: Text(
-                                'No search results found',
+                                //TODO: localize
+                                "No search results found",
                                 style: context.textStyles.subheadlineBold!
                                     .copyWith(
                                   color: context.colors.textsDisabled,

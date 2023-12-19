@@ -70,7 +70,7 @@ class SettingsPage extends ConsumerWidget {
                 ),
               ),
               title: Text(
-                'Settings',
+                context.txt.settings,
                 style: context.textStyles.bodyBold,
               ),
             ),
@@ -93,7 +93,7 @@ class SettingsPage extends ConsumerWidget {
                         SizedBox(
                           width: 129,
                           child: Text(
-                            'Language',
+                            context.txt.settings_language,
                             style: context.textStyles.bodyRegular,
                           ),
                         ),
@@ -103,7 +103,7 @@ class SettingsPage extends ConsumerWidget {
                             ref
                                     .watch(chosenLanguageStateHolder)
                                     ?.languageName ??
-                                "English",
+                                context.txt.settings_english,
                             maxLines: 1,
                             textAlign: TextAlign.right,
                             overflow: TextOverflow.ellipsis,
@@ -134,7 +134,8 @@ class SettingsPage extends ConsumerWidget {
                           SnackBars.build(
                             context,
                             null,
-                            'Сhanging the email is currently not possible. Please contact support.',
+                            //TODO: localize
+                            "Сhanging the email is currently not possible. Please contact support.",
                           ),
                         );
                         /*ref.watch(router)!.push(
@@ -146,7 +147,7 @@ class SettingsPage extends ConsumerWidget {
                           SizedBox(
                             width: 129,
                             child: Text(
-                              'Email',
+                              context.txt.settings_email,
                               style: context.textStyles.bodyRegular,
                             ),
                           ),
@@ -201,12 +202,13 @@ class SettingsPage extends ConsumerWidget {
                       child1: Row(
                         children: [
                           Text(
-                            'Connected Google Account',
+                            context.txt.settings_googleConnect,
                             style: context.textStyles.bodyRegular,
                           ),
                           const Spacer(),
                           if (google)
                             Text(
+                              //TODO: localize
                               '􀆅',
                               style: context.textStyles.headline!.copyWith(
                                 color: context.colors.iconsActive,
@@ -217,12 +219,13 @@ class SettingsPage extends ConsumerWidget {
                       child2: Row(
                         children: [
                           Text(
-                            'Connected Apple Account',
+                            context.txt.settings_appleConnect,
                             style: context.textStyles.bodyRegular,
                           ),
                           const Spacer(),
                           if (apple)
                             Text(
+                              //TODO: localize
                               '􀆅',
                               style: context.textStyles.headline!.copyWith(
                                 color: context.colors.iconsActive,
@@ -239,7 +242,7 @@ class SettingsPage extends ConsumerWidget {
                     Padding(
                       padding: const EdgeInsets.only(left: 16.0),
                       child: Text(
-                        'Manage Google or Apple accounts to Posterstock\nto log in',
+                        context.txt.settings_manageAccounts,
                         style: context.textStyles.footNote!.copyWith(
                           color: context.colors.textsSecondary,
                         ),
@@ -264,13 +267,15 @@ class SettingsPage extends ConsumerWidget {
                       Row(
                         children: [
                           Text(
-                            'System theme',
+                            //TODO: localize
+                            "System theme",
                             style: context.textStyles.bodyRegular,
                           ),
                           const Spacer(),
                           if (theme == Themes.system)
                             Text(
-                              '􀆅',
+                              //TODO: localize
+                              "􀆅",
                               style: context.textStyles.headline!.copyWith(
                                 color: context.colors.iconsActive,
                               ),
@@ -280,13 +285,15 @@ class SettingsPage extends ConsumerWidget {
                       Row(
                         children: [
                           Text(
-                            'Light theme',
+                            //TODO: localize
+                            "Light theme",
                             style: context.textStyles.bodyRegular,
                           ),
                           const Spacer(),
                           if (theme == Themes.light)
                             Text(
-                              '􀆅',
+                              //TODO: localize
+                              "􀆅",
                               style: context.textStyles.headline!.copyWith(
                                 color: context.colors.iconsActive,
                               ),
@@ -296,13 +303,15 @@ class SettingsPage extends ConsumerWidget {
                       Row(
                         children: [
                           Text(
-                            'Dark theme',
+                            //TODO: localize
+                            "Dark theme",
                             style: context.textStyles.bodyRegular,
                           ),
                           const Spacer(),
                           if (theme == Themes.dark)
                             Text(
-                              '􀆅',
+                              //TODO: localize
+                              "􀆅",
                               style: context.textStyles.headline!.copyWith(
                                 color: context.colors.iconsActive,
                               ),
@@ -332,7 +341,7 @@ class SettingsPage extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              'Terms of Service',
+                              context.txt.settings_terms,
                               style: context.textStyles.bodyRegular,
                             ),
                           ),
@@ -348,7 +357,7 @@ class SettingsPage extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              'Privacy Policy',
+                              context.txt.settings_privacy,
                               style: context.textStyles.bodyRegular,
                             ),
                           ),
@@ -372,7 +381,8 @@ class SettingsPage extends ConsumerWidget {
                         builder: (context) => Container(
                           color: Colors.transparent,
                           child: AreYouSureDialog(
-                            actionText: 'Logout',
+                            actionText: context.txt.settings_logout,
+                            //TODO: localize
                             secondAction: 'Delete account with all data',
                             onTapSecond: () async {
                               bool delete = await treDelete(context);
@@ -446,7 +456,7 @@ class SettingsPage extends ConsumerWidget {
                     },
                     child: Center(
                       child: Text(
-                        'Logout',
+                        context.txt.settings_logout,
                         style: context.textStyles.bodyRegular!.copyWith(
                           color: context.colors.textsError,
                         ),
@@ -459,7 +469,7 @@ class SettingsPage extends ConsumerWidget {
                   Column(
                     children: [
                       Text(
-                        'This product uses the TMDB API but is not endorsed or certified by TMDB',
+                        context.txt.settings_TMDBapi,
                         textAlign: TextAlign.center,
                         style: context.textStyles.footNote!.copyWith(
                           color: context.colors.textsDisabled,
@@ -526,7 +536,8 @@ class SettingsPage extends ConsumerWidget {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text(
-                            'Are you sure you want to delete all your user data?',
+                            //TODO: localize
+                            "Are you sure you want to delete all your user data?",
                             style: context.textStyles.bodyBold,
                             textAlign: TextAlign.center,
                           ),
@@ -549,8 +560,9 @@ class SettingsPage extends ConsumerWidget {
                               },
                               child: Center(
                                 child: Text(
-                                  'Delete',
-                                  style: context.textStyles.bodyRegular!.copyWith(
+                                  context.txt.delete,
+                                  style:
+                                      context.textStyles.bodyRegular!.copyWith(
                                     color: context.colors.textsError,
                                   ),
                                 ),
@@ -564,7 +576,7 @@ class SettingsPage extends ConsumerWidget {
                               },
                               child: Center(
                                 child: Text(
-                                  'Cancel',
+                                  context.txt.cancel,
                                   style: context.textStyles.bodyRegular,
                                 ),
                               ),
@@ -813,7 +825,7 @@ class AreYouSureDialog extends ConsumerWidget {
                           height: 36,
                           child: Center(
                             child: Text(
-                              'Are you sure you want to do this?',
+                              context.txt.settings_disconnect_confirm,
                               style: context.textStyles.footNote!.copyWith(
                                 color: context.colors.textsSecondary,
                               ),
@@ -878,7 +890,7 @@ class AreYouSureDialog extends ConsumerWidget {
                       },
                       child: Center(
                         child: Text(
-                          'Cancel',
+                          context.txt.cancel,
                           style: context.textStyles.bodyRegular,
                         ),
                       ),

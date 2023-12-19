@@ -40,7 +40,6 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   final GlobalKey text3 = GlobalKey();
   final ScrollController controller = ScrollController();
 
-
   void animateScrollTo(double value, ScrollController controller) async {
     await waitWhile(() => controller.hasClients);
     controller.animateTo(
@@ -128,7 +127,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                       height: 30,
                     ),
                     Text(
-                      AppLocalizations.of(context)!.signUpCode,
+                      AppLocalizations.of(context)!.login_signup_title,
                       style: context.textStyles.title2,
                     ),
                     const SizedBox(
@@ -146,7 +145,8 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                     AppTextField(
                       key: text1,
                       autofocus: true,
-                      hint: AppLocalizations.of(context)!.name,
+                      hint:
+                          AppLocalizations.of(context)!.login_signup_name_hint,
                       onTap: () {
                         animateScrollTo(0, controller);
                       },
@@ -174,13 +174,14 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                     ),
                     AppTextField(
                       key: text2,
-                      hint: AppLocalizations.of(context)!.username,
+                      hint: AppLocalizations.of(context)!
+                          .login_signup_username_hint,
                       removableWhenNotEmpty: true,
                       tickOnSuccess: true,
                       hasError: usernameErrorState != null,
                       onTap: () {
                         if (screenHeight - 600 < 0) {
-                          animateScrollTo(600 -screenHeight , controller);
+                          animateScrollTo(600 - screenHeight, controller);
                         }
                       },
                       onChanged: (value) {
@@ -213,7 +214,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        AppLocalizations.of(context)!.codeSent,
+                        AppLocalizations.of(context)!.login_signup_sendText,
                         style: context.textStyles.callout!.copyWith(
                           color: context.colors.textsSecondary,
                         ),
@@ -224,7 +225,8 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                     ),
                     AppTextField(
                       key: text3,
-                      hint: AppLocalizations.of(context)!.pasteLoginCode,
+                      hint: AppLocalizations.of(context)!
+                          .login_signup_inputCode_hint,
                       removableWhenNotEmpty: true,
                       keyboardType: TextInputType.phone,
                       inputFormatters: [
@@ -238,7 +240,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                       },
                       onTap: () {
                         if (screenHeight - 650 < 0) {
-                          animateScrollTo(650 - screenHeight , controller);
+                          animateScrollTo(650 - screenHeight, controller);
                         }
                       },
                     ),
@@ -261,7 +263,8 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                     AuthButton(
                       loading: loading,
                       loadingBorderColor: context.colors.fieldsActive!,
-                      text: AppLocalizations.of(context)!.createAccount,
+                      text: AppLocalizations.of(context)!
+                          .login_signup_createAccount,
                       disabled: usernameErrorState != null ||
                           usernameState.length < 2 ||
                           nameState.isEmpty ||
@@ -303,12 +306,14 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                       textDirection: TextDirection.ltr,
                       textAlign: TextAlign.center,
                       text: TextSpan(
-                        text: AppLocalizations.of(context)!.privacyPolicyText1,
+                        text: AppLocalizations.of(context)!
+                            .login_welcome_privacy1,
                         style: context.textStyles.caption2,
                         children: <TextSpan>[
+                          const TextSpan(text: ''),
                           TextSpan(
                             text: AppLocalizations.of(context)!
-                                .privacyPolicyLink1,
+                                .login_welcome_terms,
                             style: context.textStyles.caption2!.copyWith(
                               decoration: TextDecoration.underline,
                             ),
@@ -316,14 +321,16 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                               ..onTap = () => launchUrlString(
                                   "https://thedirection.org/posterstock_terms"),
                           ),
+                          const TextSpan(text: ''),
                           TextSpan(
                             text: AppLocalizations.of(context)!
-                                .privacyPolicyText2,
+                                .login_welcome_privacy2,
                             style: context.textStyles.caption2,
                           ),
+                          const TextSpan(text: ''),
                           TextSpan(
                             text: AppLocalizations.of(context)!
-                                .privacyPolicyLink2,
+                                .login_welcome_policy,
                             style: context.textStyles.caption2!.copyWith(
                               decoration: TextDecoration.underline,
                             ),
@@ -332,9 +339,10 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                                     "https://thedirection.org/posterstock_privacy",
                                   ),
                           ),
+                          const TextSpan(text: ''),
                           TextSpan(
                             text: AppLocalizations.of(context)!
-                                .privacyPolicyText3,
+                                .login_welcome_privacy3,
                             style: context.textStyles.caption2,
                           ),
                         ],

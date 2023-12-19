@@ -25,9 +25,12 @@ class EmptyCollectionWidget extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          !bookmark ? (profileName != null
-              ? "$profileName has not added any posters to the collection yet. "
-              : "Press 􀁍 for add poster to your collection") : "Press 􀁍 to add\na bookmark",
+          !bookmark
+              ? (profileName != null
+                  ? "$profileName ${context.txt.profile_noWatched} "
+                  : context.txt.profile_lists_add_hint)
+              //TODO: localize
+              : "Press 􀁍 to add\na bookmark",
           style: context.textStyles.subheadlineBold!.copyWith(
             color: context.colors.textsDisabled,
           ),
