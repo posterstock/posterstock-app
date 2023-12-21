@@ -153,6 +153,7 @@
     "settings_language" : "Language",
     "settings_email" : "Email",
     "settings_english" : "English",
+    "settings_russian" : "Русский",
     "settings_german" : "German",
     "settings_googleConnect" : "Connect Google account",
     "settings_appleConnect" : "Connected Apple account",

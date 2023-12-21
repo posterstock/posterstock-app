@@ -65,22 +65,28 @@ class ChooseLanguagePage extends ConsumerWidget {
                     MultipleSettingsButton(
                       onTaps: [
                         () {
-                          print(Languages.english().languageName);
                           ref
                               .read(appLanguageControllerProvider)
                               .updateLanguage(
                                 Languages.english(),
                               );
                         },
+                        () {
+                          ref
+                              .read(appLanguageControllerProvider)
+                              .updateLanguage(
+                                Languages.russian(),
+                              );
+                        },
                       ],
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               context.txt.settings_english,
                               style: context.textStyles.bodyRegular,
                             ),
-                            const Spacer(),
                             if (ref
                                     .watch(chosenLanguageStateHolder)
                                     ?.locale
@@ -95,6 +101,27 @@ class ChooseLanguagePage extends ConsumerWidget {
                               ),
                           ],
                         ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              context.txt.settings_russian,
+                              style: context.textStyles.bodyRegular,
+                            ),
+                            if (ref
+                                    .watch(chosenLanguageStateHolder)
+                                    ?.locale
+                                    .languageCode ==
+                                'ru')
+                              Text(
+                                //TODO: localize
+                                '􀆅',
+                                style: context.textStyles.headline!.copyWith(
+                                  color: context.colors.iconsActive,
+                                ),
+                              ),
+                          ],
+                        )
                       ],
                     ),
                   ],

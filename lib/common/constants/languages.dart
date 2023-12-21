@@ -6,7 +6,12 @@ class Languages {
 
   Languages({required this.languageName, required this.locale});
 
-  factory Languages.english() {
-    return Languages(languageName: "English", locale:  Locale('en', 'US'),);
-  }
+  factory Languages.english() => Languages(
+        languageName: "English",
+        locale: const Locale('en', 'US'),
+      );
+  factory Languages.russian() => Languages(
+        languageName: "Русский",
+        locale: const Locale('ru', 'RU'),
+      );
 }
