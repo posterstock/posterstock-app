@@ -12,7 +12,7 @@
     "acounts" : "Аккаунты",
     "lists" : "Списки",
     "add" : "Добавить",
-    "discart" : "",
+    "discart" : "Сбросить",
     "yes" : "Да",
     "no" : "Нет",
     "minute" : "минута",
@@ -80,7 +80,7 @@
     "search_add_watched_title" : "Добавить Постер в Просмотренные",
     "search_add_watched_hint" : "Введите название Фильма или Сериала, который вы хотите добавить в Просмотренные",
 
-    "search_add_poster_title" : "",
+    "search_add_poster_title" : "Добавить постер",
     "search_add_poster_hint" : "Поделитесь впечатлением с вашей аудиторией",
     "search_add_poster_hidden" : "",
     "search_add_poster_discart" : "Вы хотите сбросить ваш Пост?",

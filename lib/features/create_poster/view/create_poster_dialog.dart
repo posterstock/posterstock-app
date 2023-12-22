@@ -82,7 +82,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                   Expanded(
                     child: Center(
                       child: Text(
-                        'Do you want to discard\nthe ${widget.bookmark ? 'bookmark' : 'post'}?',
+                        context.txt.search_add_poster_discart,
                         style: context.textStyles.bodyBold,
                         textAlign: TextAlign.center,
                       ),
@@ -112,7 +112,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                             },
                             child: Center(
                               child: Text(
-                                'Discard',
+                                context.txt.discart,
                                 style: context.textStyles.bodyRegular!.copyWith(
                                   color: context.colors.textsError,
                                 ),
@@ -127,7 +127,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                             },
                             child: Center(
                               child: Text(
-                                'Cancel',
+                                context.txt.cancel,
                                 style: context.textStyles.bodyRegular,
                               ),
                             ),
@@ -307,8 +307,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                           const SizedBox(height: 22),
                                           Text(
                                             widget.bookmark
-                                                ? 'Add to Watchlist'
-                                                : 'Add poster to Watched',
+                                                ? context.txt.home_add_watchlist
+                                                : context.txt.home_add_poster,
                                             style: context.textStyles.bodyBold,
                                           ),
                                           const SizedBox(height: 17),
@@ -320,7 +320,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                   controller: searchController,
                                                   searchField: true,
                                                   focus: focus,
-                                                  hint: 'Movie or TV Series',
+                                                  hint: context.txt.search_hint,
                                                   removableWhenNotEmpty: true,
                                                   crossPadding:
                                                       const EdgeInsets.all(8.0),
@@ -486,7 +486,8 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                             ),
                                             const SizedBox(height: 5),
                                             Text(
-                                              "Enter the title of the movie or series\nyou'd like to add to your ${widget.bookmark == true ? "Watchlist." : "Watched."}",
+                                              context
+                                                  .txt.search_add_watched_hint,
                                               style: context
                                                   .textStyles.subheadlineBold!
                                                   .copyWith(
@@ -702,10 +703,9 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                           color: context.colors.backgroundsPrimary,
                           child: DescriptionTextField(
                             focus: focusSec,
-                            hint:
-                                'Share your one-line review with your audience, it matters for them.',
+                            hint: context.txt.search_add_poster_hint,
                             showDivider: false,
-                            button: 'Add poster',
+                            button: context.txt.search_add_poster_title,
                             buttonAddCheck: chosenCover != null,
                             buttonLoading: ref
                                 .watch(createPosterLoadingStateHolderProvider),
@@ -762,7 +762,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                 children: [
                                   const Spacer(),
                                   AppTextButton(
-                                    text: "Add bookmark",
+                                    text: context.txt.watchlistAdd_bookmark,
                                     disabled: chosenMovie == null,
                                     onTap: () async {
                                       try {
