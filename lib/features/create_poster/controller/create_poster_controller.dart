@@ -67,7 +67,7 @@ class CreatePosterController {
       null,
     );
     createPosterSearchListStateHolder.updateValue(
-      await createPosterRepository.getSearchMedia(value),
+      await createPosterRepository.getSearchMedia(value, languages.state!),
     );
   }
 

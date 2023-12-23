@@ -15,8 +15,9 @@ class CreatePosterRepository {
     await service.createBookmark(mediaId, mediaType, image, lang);
   }
 
-  Future<List<MediaModel>> getSearchMedia(String searchValue) async {
-    return (await service.getSearchMedia(searchValue))
+  Future<List<MediaModel>> getSearchMedia(
+      String searchValue, Languages language) async {
+    return (await service.getSearchMedia(searchValue, language))
         .map((e) => MediaModel.fromJson(e))
         .toList();
   }

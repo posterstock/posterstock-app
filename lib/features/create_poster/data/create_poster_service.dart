@@ -72,7 +72,8 @@ class CreatePosterService {
     }
   }
 
-  Future<List<dynamic>> getSearchMedia(String searchValue) async {
+  Future<List<dynamic>> getSearchMedia(
+      String searchValue, Languages language) async {
     if (searchValue.isEmpty) return [];
     token = await SuperTokens.getAccessToken();
     try {
@@ -82,6 +83,7 @@ class CreatePosterService {
           ),
           queryParameters: {
             'query': searchValue,
+            'lang': language.locale.toLanguageTag(),
           });
       print(response.data);
       return response.data;
