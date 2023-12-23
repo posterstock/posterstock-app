@@ -708,42 +708,40 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                   .toDouble(),
                               child: Row(
                                 children: [
-                                  // GestureDetector(
-                                  //   onTap: () async {
-                                  //     if (post != null) {
-                                  //       await ref
-                                  //           .read(commentsControllerProvider)
-                                  //           .setBookmarked(
-                                  //             post.id,
-                                  //             !(post.hasBookmarked ?? true),
-                                  //           );
-                                  //       final myself = ref
-                                  //           .watch(
-                                  //               profileInfoStateHolderProvider)
-                                  //           ?.mySelf;
-                                  //       if (myself != false) {
-                                  //         ref
-                                  //             .read(
-                                  //                 profileControllerApiProvider)
-                                  //             .getUserInfo(null);
-                                  //       }
-                                  //     }
-                                  //   },
-                                  //   child: SizedBox(
-                                  //     width: 24,
-                                  //     height: 24,
-                                  //     child: Image.asset(
-                                  //       post?.hasBookmarked == true
-                                  //           ? 'assets/images/ic_bookmarks_filled.png'
-                                  //           : 'assets/images/ic_bookmarks.png',
-                                  //       color: context.colors.iconsDefault!,
-                                  //       colorBlendMode: BlendMode.srcIn,
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  // const SizedBox(
-                                  //   width: 20,
-                                  // ),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      if (post != null) {
+                                        await ref
+                                            .read(commentsControllerProvider)
+                                            .setBookmarked(
+                                              post.id,
+                                              !(post.hasBookmarked ?? true),
+                                            );
+                                        final myself = ref
+                                            .watch(
+                                                profileInfoStateHolderProvider)
+                                            ?.mySelf;
+                                        if (myself != false) {
+                                          ref
+                                              .read(
+                                                  profileControllerApiProvider)
+                                              .getUserInfo(null);
+                                        }
+                                      }
+                                    },
+                                    child: SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: Image.asset(
+                                        post?.hasBookmarked == true
+                                            ? 'assets/images/ic_bookmarks_filled.png'
+                                            : 'assets/images/ic_bookmarks.png',
+                                        color: context.colors.iconsDefault!,
+                                        colorBlendMode: BlendMode.srcIn,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 20),
                                   GestureDetector(
                                     onTap: () {
                                       ref
@@ -781,30 +779,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                         );
                                       }
                                     },
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        showModalBottomSheet(
-                                          context: context,
-                                          isScrollControlled: true,
-                                          backgroundColor: Colors.transparent,
-                                          builder: (context) =>
-                                              AddToListDialog(),
-                                        );
-                                      },
-                                      child: SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                          child: SvgPicture.asset(
-                                              'assets/icons/ic_collections_add.svg')
-                                          // child: Image.asset(
-                                          //   post?.hasInCollection == true
-                                          //       ? 'assets/images/ic_collection_filled.png'
-                                          //       : 'assets/images/ic_collection.png',
-                                          //   color: context.colors.iconsDefault!,
-                                          //   colorBlendMode: BlendMode.srcIn,
-                                          // ),
-                                          ),
-                                    ),
+                                    child: _PosterAction(),
                                   ),
                                 ],
                               ),
@@ -1567,6 +1542,52 @@ class PosterActionsDialog extends ConsumerWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _PosterAction extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final post = ref.watch(posterStateHolderProvider);
+    final profile = ref.watch(myProfileInfoStateHolderProvider)!;
+    return GestureDetector(
+        onTap: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => AddToListDialog(),
+          );
+        },
+        child: post?.author.name == profile.name
+            ? myPoster(context, ref)
+            : userPoster(context, ref));
+  }
+
+  Widget myPoster(BuildContext context, WidgetRef ref) {
+    final post = ref.watch(posterStateHolderProvider);
+    return post?.hasInCollection == true
+        ? const SizedBox.shrink()
+        : SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset('assets/icons/ic_collections_add.svg'),
+          );
+  }
+
+  Widget userPoster(BuildContext context, WidgetRef ref) {
+    final post = ref.watch(posterStateHolderProvider);
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: Image.asset(
+        post?.hasInCollection == true
+            ? 'assets/images/ic_collection_filled.png'
+            : 'assets/images/ic_collection.png',
+        color: context.colors.iconsDefault!,
+        colorBlendMode: BlendMode.srcIn,
       ),
     );
   }

@@ -14,6 +14,7 @@ import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/bookmarks/controller/bookmarks_controller.dart';
 import 'package:poster_stock/features/bookmarks/state_holders/bookmark_list_state_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
+import 'package:poster_stock/features/poster/controller/comments_controller.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -154,47 +155,49 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
     );
   }
 
-  void _showMenu(BuildContext context) async {
-    final result = await MenuDialog.showBottom(
+  void _showMenu(
+    BuildContext context,
+  ) async {
+    await MenuDialog.showBottom(
       context,
       MenuState(null, [
         MenuItem(
           'assets/icons/ic_arrow_out.svg',
-          "Open to TMDB",
+          context.txt.poster_menu_openTMDB,
+          () {
+            //launchUrlString(post.tmdbLink!);
+          },
         ),
         MenuItem(
           'assets/icons/ic_play_circle.svg',
-          "Where to watch",
+          context.txt.watchlist_menu_whereToWatch,
+          () {
+            scaffoldMessengerKey.currentState?.showSnackBar(
+              SnackBars.build(
+                context,
+                null,
+                //TODO: localize
+                "Not available yet",
+              ),
+            );
+          },
         ),
         MenuItem(
           'assets/icons/ic_collection_semibold.svg',
-          "Add to Watched",
+          context.txt.watchlist_menu_addToWathced,
+          () {
+            //TODO: implement
+          },
         ),
-        MenuItem(
+        MenuItem.danger(
           'assets/icons/ic_trash2.svg',
-          "Delete",
-          true,
+          context.txt.delete,
+          () {
+            //TODO: implement
+            // ref.read(commentsControllerProvider).setBookmarked(0, false);
+          },
         ),
       ]),
     );
-    final item = result as MenuItem;
-    switch (item.title) {
-      case "Open to TMDB":
-        break;
-      case "Where to watch":
-        scaffoldMessengerKey.currentState?.showSnackBar(
-          SnackBars.build(
-            context,
-            null,
-            //TODO: localize
-            "Not available yet",
-          ),
-        );
-        break;
-      case "Add to Watched":
-        break;
-      case "Delete":
-        break;
-    }
   }
 }

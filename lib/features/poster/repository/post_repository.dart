@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:poster_stock/features/home/models/list_base_model.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
@@ -33,15 +35,13 @@ class PostRepository {
     return await service.getInCollection(id);
   }
 
-
   Future<void> deletePost(int id) async {
     await service.deletePost(id);
   }
 
   Future<void> addPosterToList(MultiplePostModel listId, int posterId) async {
-    await service.addPosterToList(listId,posterId);
+    await service.addPosterToList(listId, posterId);
   }
-
 
   Future<void> setBookmarked(int id, bool bookmarked) async {
     await service.setBookmarked(id, bookmarked);

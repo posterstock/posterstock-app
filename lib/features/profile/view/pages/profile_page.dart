@@ -809,69 +809,56 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
   Future<void> newModalProfile(BuildContext context) async {
     final profile = ref.read(myProfileInfoStateHolderProvider)!;
-    final result = await MenuDialog.showBottom(
+    await MenuDialog.showBottom(
       context,
       MenuState(profile.name, [
-        MenuItem(
-          'assets/icons/ic_gear.svg',
-          context.txt.settings,
-        ),
+        MenuItem('assets/icons/ic_gear.svg', context.txt.settings, () {
+          ref.read(router)!.push(const SettingsRoute());
+        }),
         MenuItem(
           'assets/icons/ic_share.svg',
           context.txt.profile_menu_share,
+          () async {
+            await Share.share('https://posterstock.com/${profile.username}');
+          },
         ),
         MenuItem(
           'assets/icons/search.svg',
           context.txt.search,
+          () {
+            //TODO: implement
+          },
         ),
       ]),
     );
-    //TODO: pick by instance. Not by name
-    final item = result as MenuItem;
-    switch (item.title) {
-      case "Settings":
-        ref.read(router)!.push(const SettingsRoute());
-        break;
-      case "Share Profile":
-        await Share.share('https://posterstock.com/${profile.username}');
-        break;
-      case "Search":
-        break;
-    }
   }
 
   Future<void> newModalUser() async {
     final profile = ref.read(profileInfoStateHolderProvider)!;
-    final result = await MenuDialog.showBottom(
+    await MenuDialog.showBottom(
       context,
       MenuState(profile.name, [
         MenuItem(
           'assets/icons/ic_share.svg',
           context.txt.share,
+          () async {
+            await Share.share('https://posterstock.com/${profile.username}');
+          },
         ),
         MenuItem(
           'assets/icons/search.svg',
           context.txt.search,
+          () => ref.read(router)!.push(const SettingsRoute()),
         ),
-        MenuItem(
+        MenuItem.danger(
           'assets/icons/ic_hand.svg',
           context.txt.profile_menu_block,
-          true,
+          () {
+            //TODO: implement
+          },
         ),
       ]),
     );
-    //TODO: pick by instance. Not by name
-    final item = result as MenuItem;
-    switch (item.title) {
-      case "Share":
-        await Share.share('https://posterstock.com/${profile.username}');
-        break;
-      case "Search":
-        ref.read(router)!.push(const SettingsRoute());
-        break;
-      case "Block":
-        break;
-    }
   }
 }
 

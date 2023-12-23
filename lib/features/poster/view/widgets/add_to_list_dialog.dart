@@ -194,6 +194,14 @@ class AddToListDialog extends ConsumerWidget {
                                                 lists![index].id,
                                                 post!.id,
                                               );
+                                          await ref
+                                              .watch(posterStateHolderProvider
+                                                  .notifier)
+                                              .updateState(
+                                                post.copyWith(
+                                                  hasInCollection: true,
+                                                ),
+                                              );
                                         } catch (e) {
                                           snack?.close();
                                           ref
