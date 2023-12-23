@@ -54,7 +54,10 @@ class MenuDialog extends StatelessWidget {
             .map(
               (it) => InkWell(
                 splashColor: context.colors.iconsActive,
-                onTap: () => Navigator.of(context).pop(it),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  it.callback();
+                },
                 child: _MenuItemWidget(it),
               ),
             )
@@ -78,9 +81,9 @@ class _MenuItemWidget extends StatelessWidget {
     return SizedBox(
       height: 52,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Divider(thickness: 0.5, color: context.colors.fieldsDefault),
+          const Spacer(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
@@ -103,7 +106,8 @@ class _MenuItemWidget extends StatelessWidget {
                 )
               ],
             ),
-          )
+          ),
+          const Spacer(),
         ],
       ),
     );

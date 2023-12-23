@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 class MenuState {
   final String? title;
   final List<MenuItem> items;
@@ -9,6 +11,9 @@ class MenuItem {
   final String asset;
   final String title;
   final bool danger;
+  final VoidCallback callback;
 
-  MenuItem(this.asset, this.title, [this.danger = false]);
+  MenuItem(this.asset, this.title, this.callback) : danger = false;
+
+  MenuItem.danger(this.asset, this.title, this.callback) : danger = true;
 }
