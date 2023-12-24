@@ -827,7 +827,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
           'assets/icons/search.svg',
           context.txt.search,
           () {
-            //TODO: implement
+            animationController.animateTo(1);
+            scrollController.animateTo(
+              245,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.linear,
+            );
+            focusNode.requestFocus();
           },
         ),
       ]),

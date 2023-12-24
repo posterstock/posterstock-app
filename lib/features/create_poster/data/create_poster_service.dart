@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:poster_stock/common/constants/languages.dart';
 import 'package:supertokens_flutter/dio.dart';
 import 'package:supertokens_flutter/supertokens.dart';
@@ -12,7 +13,11 @@ class CreatePosterService {
       connectTimeout: 10000,
       receiveTimeout: 10000,
     ),
-  );
+  )..interceptors.add(PrettyDioLogger(
+      requestBody: true,
+      responseBody: true,
+      compact: true,
+    ));
   String? token;
 
   CreatePosterService() {
