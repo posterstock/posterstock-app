@@ -30,16 +30,20 @@ import 'package:share_plus/share_plus.dart';
 
 @RoutePage()
 class ListPage extends ConsumerStatefulWidget {
+  final int id;
+  final ListType? type;
+
   const ListPage({
     @PathParam('id') required this.id,
+    @PathParam('type') this.type,
     Key? key,
   }) : super(key: key);
-
-  final int id;
 
   @override
   ConsumerState<ListPage> createState() => _ListPageState();
 }
+
+enum ListType { favorited, recomends }
 
 class _ListPageState extends ConsumerState<ListPage>
     with SingleTickerProviderStateMixin {
@@ -63,7 +67,11 @@ class _ListPageState extends ConsumerState<ListPage>
     );
     Future(() async {
       ref.read(listsControllerProvider).clear();
-      ref.read(listsControllerProvider).getPost(widget.id);
+      if (widget.type != null) {
+        ref.read(listsControllerProvider).getSpecialList(widget.type!);
+      } else {
+        ref.read(listsControllerProvider).getPost(widget.id);
+      }
       animationController
           .animateTo(MediaQuery.of(context).size.width / 540 * 300);
     });

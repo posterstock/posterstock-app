@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:poster_stock/common/data/dio_keeper.dart';
+import 'package:poster_stock/features/list/view/list_page.dart';
 
 class ListService {
   final Dio _dio = DioKeeper.getDio();
@@ -59,6 +60,29 @@ class ListService {
       print(e.response);
       rethrow;
     }
+  }
+
+  Future<Map<String, dynamic>> getSpecialList(int userId, ListType type) async {
+    final String endpoint;
+    switch (type) {
+      case ListType.favorited:
+        endpoint = 'api/users/$userId/lists/favourites';
+        break;
+      case ListType.recomends:
+        endpoint = 'api/users/$userId/lists/recommends';
+        break;
+    }
+    final response = await _dio.get(
+      endpoint,
+      options: Options(
+        contentType: 'application/json',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      ),
+    );
+    return response.data;
   }
 
   Future<Map<String, dynamic>> getPost(int id) async {

@@ -31,6 +31,7 @@ import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/list/controller/list_controller.dart';
 import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
+import 'package:poster_stock/features/list/view/list_page.dart';
 import 'package:poster_stock/features/peek_pop/peek_and_pop_dialog.dart';
 import 'package:poster_stock/features/poster/controller/comments_controller.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
@@ -976,7 +977,15 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
             ),
             itemCount: lists?.length ?? 30,
             itemBuilder: (context, index) {
-              return ListGridWidget(post: lists?[index]);
+              final ListType? type = index == 0
+                  ? ListType.favorited
+                  : index == 1
+                      ? ListType.recomends
+                      : null;
+              return ListGridWidget(
+                post: lists?[index],
+                type: type,
+              );
             },
           ),
         ],

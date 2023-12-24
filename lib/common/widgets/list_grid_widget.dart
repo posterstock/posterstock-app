@@ -5,13 +5,16 @@ import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/shimmer_widget.dart';
 import 'package:poster_stock/features/home/models/list_base_model.dart';
+import 'package:poster_stock/features/list/view/list_page.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class ListGridWidget extends ConsumerWidget {
   final ListBaseModel? post;
+  final ListType? type;
   const ListGridWidget({
     required this.post,
+    this.type,
     Key? key,
   }) : super(key: key);
 
