@@ -136,7 +136,7 @@
     "watchlist_following" : "Your following",
     "watchlist_empty" : "Никто не добавил этот Постер себе в Профиль",
     "watchlist_menu_openOnTMDB" : "Открыть на TMDB",
-    "watchlist_menu_addToWathced" : "Добавить в Просмотренные",
+    "watchlist_menu_addToWatched" : "Добавить в Просмотренные",
     "watchlist_menu_whereToWatch" : "Где Смотреть",
 
     "settings_profileEdit_title" : "Редактировать Профиль",
