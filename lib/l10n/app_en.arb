@@ -95,7 +95,7 @@
     "profile_followers" : "followers",
     "profile_following" : "following",
     "profile_watched" : "Watched",
-    "profile_watchlist" : "Wathclist",
+    "profile_watchlist" : "Watchlist",
     "profile_removeFromCollection" : "Removed from Collection",
     "profile_menu_share" : "Share Profile",
     "profile_menu_report" : "Report",
@@ -136,7 +136,7 @@
     "watchlist_following" : "Your following",
     "watchlist_empty" : "No one has added this poster",
     "watchlist_menu_openOnTMDB" : "Open on TMDB",
-    "watchlist_menu_addToWathced" : "Add to Watched",
+    "watchlist_menu_addToWatched" : "Add to Watched",
     "watchlist_menu_whereToWatch" : "Where to watch",
 
     "settings_profileEdit_title" : "EditProfile",
