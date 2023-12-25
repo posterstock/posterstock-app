@@ -79,6 +79,7 @@ class PostBase extends ConsumerWidget {
             ref.watch(router)!.push(
                   ListRoute(
                     id: multPost.id,
+                    type: 0,
                   ),
                 );
           }

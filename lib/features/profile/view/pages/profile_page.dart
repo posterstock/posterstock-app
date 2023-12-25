@@ -958,13 +958,17 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
               shimmer: widget.shimmer,
               bookmark: true,
               customOnItemTap: (post, index) {
+                final bookmark = bookmarks![index];
                 int id;
-                var list = bookmarks![index].tmdbLink!.split('/');
+                var list = bookmark.tmdbLink!.split('/');
                 list.removeLast();
                 print(list);
                 id = int.parse(list.last);
                 ref.watch(router)!.push(
-                      BookmarksRoute(id: id),
+                      BookmarksRoute(
+                        id: id,
+                        tmdbLink: bookmark.tmdbLink!,
+                      ),
                     );
               },
               customOnLongTap: () {},
@@ -983,14 +987,9 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
             ),
             itemCount: lists?.length ?? 30,
             itemBuilder: (context, index) {
-              final ListType? type = index == 0
-                  ? ListType.favorited
-                  : index == 1
-                      ? ListType.recomends
-                      : null;
               return ListGridWidget(
                 post: lists?[index],
-                type: type,
+                index: index,
               );
             },
           ),

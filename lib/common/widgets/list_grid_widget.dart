@@ -5,16 +5,15 @@ import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/shimmer_widget.dart';
 import 'package:poster_stock/features/home/models/list_base_model.dart';
-import 'package:poster_stock/features/list/view/list_page.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class ListGridWidget extends ConsumerWidget {
   final ListBaseModel? post;
-  final ListType? type;
+  final int index;
   const ListGridWidget({
     required this.post,
-    this.type,
+    this.index = -1,
     Key? key,
   }) : super(key: key);
 
@@ -23,7 +22,12 @@ class ListGridWidget extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         if (post?.id == null) return;
-        ref.watch(router)!.push(ListRoute(id: post!.id));
+        ref.watch(router)!.push(
+              ListRoute(
+                id: post!.id,
+                type: index,
+              ),
+            );
       },
       child: GroupListItemWidget(post),
     );

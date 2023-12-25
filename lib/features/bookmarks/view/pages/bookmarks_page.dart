@@ -17,14 +17,18 @@ import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/poster/controller/comments_controller.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 @RoutePage()
 class BookmarksPage extends ConsumerStatefulWidget {
+  final int id;
+  final String tmdbLink;
+
   const BookmarksPage({
     Key? key,
-    this.id = 0,
+    required this.id,
+    required this.tmdbLink,
   }) : super(key: key);
-  final int id;
 
   @override
   ConsumerState<BookmarksPage> createState() => _BookmarksPageState();
@@ -165,7 +169,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
           'assets/icons/ic_arrow_out.svg',
           context.txt.poster_menu_openTMDB,
           () {
-            //launchUrlString(post.tmdbLink!);
+            launchUrlString(widget.tmdbLink);
           },
         ),
         MenuItem(

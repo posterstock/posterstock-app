@@ -33,11 +33,12 @@ class ListPage extends ConsumerStatefulWidget {
   final int id;
   final ListType? type;
 
-  const ListPage({
+  ListPage({
     @PathParam('id') required this.id,
-    @PathParam('type') this.type,
+    @PathParam('type') int type = -1,
     Key? key,
-  }) : super(key: key);
+  })  : type = ListType.values[type],
+        super(key: key);
 
   @override
   ConsumerState<ListPage> createState() => _ListPageState();

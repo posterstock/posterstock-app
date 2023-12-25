@@ -10,7 +10,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i19;
 import 'package:flutter/cupertino.dart' as _i21;
-import 'package:flutter/material.dart' as _i20;
+import 'package:flutter/foundation.dart' as _i20;
+import 'package:flutter/material.dart' as _i22;
 import 'package:poster_stock/features/auth/view/pages/auth_page.dart' as _i1;
 import 'package:poster_stock/features/auth/view/pages/login_page.dart' as _i9;
 import 'package:poster_stock/features/auth/view/pages/sign_up_page.dart'
@@ -58,13 +59,13 @@ abstract class $AppRouter extends _i19.RootStackRouter {
       );
     },
     BookmarksRoute.name: (routeData) {
-      final args = routeData.argsAs<BookmarksRouteArgs>(
-          orElse: () => const BookmarksRouteArgs());
+      final args = routeData.argsAs<BookmarksRouteArgs>();
       return _i19.AutoRoutePage<dynamic>(
         routeData: routeData,
         child: _i2.BookmarksPage(
           key: args.key,
           id: args.id,
+          tmdbLink: args.tmdbLink,
         ),
       );
     },
@@ -107,11 +108,18 @@ abstract class $AppRouter extends _i19.RootStackRouter {
     ListRoute.name: (routeData) {
       final pathParams = routeData.inheritedPathParams;
       final args = routeData.argsAs<ListRouteArgs>(
-          orElse: () => ListRouteArgs(id: pathParams.getInt('id')));
+          orElse: () => ListRouteArgs(
+                id: pathParams.getInt('id'),
+                type: pathParams.getInt(
+                  'type',
+                  -1,
+                ),
+              ));
       return _i19.AutoRoutePage<dynamic>(
         routeData: routeData,
         child: _i8.ListPage(
           id: args.id,
+          type: args.type,
           key: args.key,
         ),
       );
@@ -261,13 +269,15 @@ class AuthRouteArgs {
 class BookmarksRoute extends _i19.PageRouteInfo<BookmarksRouteArgs> {
   BookmarksRoute({
     _i21.Key? key,
-    int id = 0,
+    required int id,
+    required String tmdbLink,
     List<_i19.PageRouteInfo>? children,
   }) : super(
           BookmarksRoute.name,
           args: BookmarksRouteArgs(
             key: key,
             id: id,
+            tmdbLink: tmdbLink,
           ),
           initialChildren: children,
         );
@@ -281,16 +291,19 @@ class BookmarksRoute extends _i19.PageRouteInfo<BookmarksRouteArgs> {
 class BookmarksRouteArgs {
   const BookmarksRouteArgs({
     this.key,
-    this.id = 0,
+    required this.id,
+    required this.tmdbLink,
   });
 
   final _i21.Key? key;
 
   final int id;
 
+  final String tmdbLink;
+
   @override
   String toString() {
-    return 'BookmarksRouteArgs{key: $key, id: $id}';
+    return 'BookmarksRouteArgs{key: $key, id: $id, tmdbLink: $tmdbLink}';
   }
 }
 
@@ -415,15 +428,20 @@ class HomeRoute extends _i19.PageRouteInfo<void> {
 class ListRoute extends _i19.PageRouteInfo<ListRouteArgs> {
   ListRoute({
     required int id,
-    _i20.Key? key,
+    int type = -1,
+    _i22.Key? key,
     List<_i19.PageRouteInfo>? children,
   }) : super(
           ListRoute.name,
           args: ListRouteArgs(
             id: id,
+            type: type,
             key: key,
           ),
-          rawPathParams: {'id': id},
+          rawPathParams: {
+            'id': id,
+            'type': type,
+          },
           initialChildren: children,
         );
 
@@ -436,16 +454,19 @@ class ListRoute extends _i19.PageRouteInfo<ListRouteArgs> {
 class ListRouteArgs {
   const ListRouteArgs({
     required this.id,
+    this.type = -1,
     this.key,
   });
 
   final int id;
 
-  final _i20.Key? key;
+  final int type;
+
+  final _i22.Key? key;
 
   @override
   String toString() {
-    return 'ListRouteArgs{id: $id, key: $key}';
+    return 'ListRouteArgs{id: $id, type: $type, key: $key}';
   }
 }
 
@@ -467,7 +488,7 @@ class LoginRoute extends _i19.PageRouteInfo<void> {
 /// [_i10.NavigationPage]
 class NavigationRoute extends _i19.PageRouteInfo<NavigationRouteArgs> {
   NavigationRoute({
-    _i20.Key? key,
+    _i22.Key? key,
     List<_i19.PageRouteInfo>? children,
   }) : super(
           NavigationRoute.name,
@@ -484,7 +505,7 @@ class NavigationRoute extends _i19.PageRouteInfo<NavigationRouteArgs> {
 class NavigationRouteArgs {
   const NavigationRouteArgs({this.key});
 
-  final _i20.Key? key;
+  final _i22.Key? key;
 
   @override
   String toString() {
@@ -612,7 +633,7 @@ class ProfileRouteArgs {
 class ProfileRouteId extends _i19.PageRouteInfo<ProfileRouteIdArgs> {
   ProfileRouteId({
     int id = 0,
-    _i20.Key? key,
+    _i22.Key? key,
     List<_i19.PageRouteInfo>? children,
   }) : super(
           ProfileRouteId.name,
@@ -638,7 +659,7 @@ class ProfileRouteIdArgs {
 
   final int id;
 
-  final _i20.Key? key;
+  final _i22.Key? key;
 
   @override
   String toString() {
