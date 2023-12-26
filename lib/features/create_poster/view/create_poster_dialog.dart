@@ -728,7 +728,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                       .read(posterStateHolderProvider.notifier)
                                       .updateState(
                                         currPost!
-                                            .copyWith(hasInCollection: false),
+                                            .copyWith(hasInCollection: true),
                                       );
                                 }
                                 await ref
