@@ -855,7 +855,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
         MenuItem(
           'assets/icons/search.svg',
           context.txt.search,
-          () => ref.read(router)!.push(const SettingsRoute()),
+          () {
+            animationController.animateTo(1);
+            scrollController.animateTo(
+              245,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.linear,
+            );
+            focusNode.requestFocus();
+          },
         ),
         MenuItem.danger(
           'assets/icons/ic_hand.svg',
