@@ -188,7 +188,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
         ),
         MenuItem(
           'assets/icons/ic_collection_semibold.svg',
-          context.txt.watchlist_menu_addToWathced,
+          context.txt.watchlist_menu_addToWatched,
           () {
             //TODO: implement
           },
