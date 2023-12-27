@@ -45,6 +45,7 @@ String? initTheme;
 bool google = false;
 bool apple = false;
 String? email;
+String? storedLocale;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -83,6 +84,7 @@ void main() async {
     google = prefs.getBool('google') ?? false;
     apple = prefs.getBool('apple') ?? false;
     email = prefs.getString('email');
+    storedLocale = prefs.getString('locale');
   } catch (e) {
     debugPrint(e.toString());
   }
@@ -141,28 +143,47 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
     final theme = ref.watch(themeStateHolderProvider);
     final appLocale = ref.watch(chosenLanguageStateHolder);
     final rtr = ref.watch(router);
-    final Locale systemLocale = WidgetsBinding.instance.window.locale;
+    // final Locale systemLocale = WidgetsBinding.instance.window.locale;
+    // final storedLocale = prefs.getString('locale');
+/*     switch (storedLocale) {
+      case 'English':
+        ref
+            .read(chosenLanguageStateHolder.notifier)
+            .setLocale(Languages.english());
+        break;
+      case 'Русский':
+        ref
+            .read(chosenLanguageStateHolder.notifier)
+            .setLocale(Languages.russian());
+        break;
+      default:
+        ref
+            .read(chosenLanguageStateHolder.notifier)
+            .setLocale(Languages.english());
+    }
+ */ // ref.read(chosenLanguageStateHolder.notifier).setLocale(initLocale);
     List<Languages> langs = [
       Languages.english(),
       Languages.russian(),
     ];
-    List<Locale> locales = langs.map((e) => e.locale).toList();
+    List<Locale> locales = langs.map((it) => it.locale).toList();
+    // if (appLocale == null) {
+    //   Future(() {
+    //     if (locales.contains(systemLocale)) {
+    //       for (int i = 0; i < locales.length; i++) {
+    //         if (locales[i] == systemLocale) {
+    //           ref.read(appLanguageControllerProvider).updateLanguage(langs[i]);
+    //         }
+    //       }
+    //     } else {
+    //       ref.read(appLanguageControllerProvider).updateLanguage(langs[0]);
+    //     }
+    //   });
+    // }
+    // final Locale savedLocale =
     if (rtr == null) {
       Future(() {
         ref.read(router.notifier).setRouter(App._appRouter);
-      });
-    }
-    if (appLocale == null) {
-      Future(() {
-        if (locales.contains(systemLocale)) {
-          for (int i = 0; i < locales.length; i++) {
-            if (locales[i] == systemLocale) {
-              ref.read(appLanguageControllerProvider).updateLanguage(langs[i]);
-            }
-          }
-        } else {
-          ref.read(appLanguageControllerProvider).updateLanguage(langs[0]);
-        }
       });
     }
     Future(() {
@@ -194,7 +215,7 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: locales,
-      locale: appLocale?.locale ?? locales[0],
+      locale: appLocale?.locale,
       builder: (context, child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),

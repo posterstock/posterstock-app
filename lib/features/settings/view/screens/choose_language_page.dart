@@ -9,14 +9,13 @@ import 'package:poster_stock/features/settings/state_holders/chosen_language_sta
 import 'package:poster_stock/features/settings/view/screens/settings_page.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
-import '../../controllers/app_language_controller.dart';
-
 @RoutePage()
 class ChooseLanguagePage extends ConsumerWidget {
   const ChooseLanguagePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final language = ref.watch(chosenLanguageStateHolder);
     return CustomScaffold(
       backgroundColor: context.colors.backgroundsSecondary,
       child: SizedBox(
@@ -66,17 +65,13 @@ class ChooseLanguagePage extends ConsumerWidget {
                       onTaps: [
                         () {
                           ref
-                              .read(appLanguageControllerProvider)
-                              .updateLanguage(
-                                Languages.english(),
-                              );
+                              .read(chosenLanguageStateHolder.notifier)
+                              .setLocale(Languages.english());
                         },
                         () {
                           ref
-                              .read(appLanguageControllerProvider)
-                              .updateLanguage(
-                                Languages.russian(),
-                              );
+                              .read(chosenLanguageStateHolder.notifier)
+                              .setLocale(Languages.russian());
                         },
                       ],
                       children: [
@@ -87,13 +82,8 @@ class ChooseLanguagePage extends ConsumerWidget {
                               context.txt.settings_english,
                               style: context.textStyles.bodyRegular,
                             ),
-                            if (ref
-                                    .watch(chosenLanguageStateHolder)
-                                    ?.locale
-                                    .languageCode ==
-                                'en')
+                            if (language?.locale.languageCode == 'en')
                               Text(
-                                //TODO: localize
                                 '􀆅',
                                 style: context.textStyles.headline!.copyWith(
                                   color: context.colors.iconsActive,
@@ -108,11 +98,7 @@ class ChooseLanguagePage extends ConsumerWidget {
                               context.txt.settings_russian,
                               style: context.textStyles.bodyRegular,
                             ),
-                            if (ref
-                                    .watch(chosenLanguageStateHolder)
-                                    ?.locale
-                                    .languageCode ==
-                                'ru')
+                            if (language?.locale.languageCode == 'ru')
                               Text(
                                 //TODO: localize
                                 '􀆅',
