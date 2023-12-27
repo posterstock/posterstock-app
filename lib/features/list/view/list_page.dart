@@ -216,7 +216,7 @@ class _ListPageState extends ConsumerState<ListPage>
                               },
                               child: Container(
                                 color: Colors.transparent,
-                                child: const ListActionsDialog(),
+                                child: ListActionsDialog(widget.type),
                               ),
                             ),
                           );
@@ -573,7 +573,8 @@ class CollectionInfoWidget extends ConsumerWidget {
 }
 
 class ListActionsDialog extends ConsumerWidget {
-  const ListActionsDialog({super.key});
+  final ListType? type;
+  const ListActionsDialog(this.type, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -653,8 +654,24 @@ class ListActionsDialog extends ConsumerWidget {
                           ),
                           Expanded(
                             child: InkWell(
-                              onTap: () => Share.share(
-                                  "https://posterstock.com/list/${list.id}"),
+                              onTap: () {
+                                final profile = myself!.username;
+                                String link;
+                                switch (type) {
+                                  case ListType.favorited:
+                                    link =
+                                        'https://posterstock.com/$profile/favorites';
+                                    break;
+                                  case ListType.recomends:
+                                    link =
+                                        'https://posterstock.com/$profile/recommends';
+                                    break;
+                                  default:
+                                    link =
+                                        'https://posterstock.com/list/${list.id}';
+                                }
+                                Share.share(link);
+                              },
                               child: Center(
                                 child: Text(
                                   AppLocalizations.of(context)!.share,
