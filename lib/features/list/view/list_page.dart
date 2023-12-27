@@ -37,14 +37,25 @@ class ListPage extends ConsumerStatefulWidget {
     @PathParam('id') required this.id,
     @PathParam('type') int type = -1,
     Key? key,
-  })  : type = ListType.values[type],
+  })  : type = ListType.findByIndex(type),
         super(key: key);
 
   @override
   ConsumerState<ListPage> createState() => _ListPageState();
 }
 
-enum ListType { favorited, recomends }
+enum ListType {
+  favorited,
+  recomends;
+
+  static ListType? findByIndex(int index) {
+    try {
+      return ListType.values[index];
+    } on RangeError catch (ex) {
+      return null;
+    }
+  }
+}
 
 class _ListPageState extends ConsumerState<ListPage>
     with SingleTickerProviderStateMixin {
