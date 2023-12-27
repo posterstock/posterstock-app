@@ -5,6 +5,8 @@ import 'package:poster_stock/common/data/dio_keeper.dart';
 import 'package:poster_stock/features/home/models/list_base_model.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supertokens_flutter/supertokens.dart';
 
 class PostService {
   final Dio _dio = DioKeeper.getDio();
@@ -68,14 +70,15 @@ class PostService {
 
   Future<bool> getInCollection(int id) async {
     try {
-      final response = await _dio.get('api/posters/collection/$id/',
-          options: Options(
-            contentType: 'application/json',
-            headers: {
-              'accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-          ),
+      final response = await _dio.get(
+        'api/posters/collection/$id/',
+        options: Options(
+          contentType: 'application/json',
+          headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+        ),
       );
       print(response.data);
       return response.data['has_in_collection'];
@@ -107,35 +110,48 @@ class PostService {
 
   Future<void> setBookmarked(int id, bool bookmarked) async {
     try {
-      Response response;
-      if (bookmarked) {
-        response = await _dio.post(
-          '/api/posters/$id/bookmark',
-          options: Options(
-            contentType: 'application/json',
-            headers: {
-              'accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-          ),
-        );
-      } else {
-        response = await _dio.post(
-          '/api/posters/$id/unbookmark',
-          options: Options(
-            contentType: 'application/json',
-            headers: {
-              'accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-          ),
-        );
-      }
-      print(response.headers);
-      print(response);
+      // final token = await SuperTokens.getAccessToken();
+      // print('token: $token');
+      // print('setBookmarked: $id $bookmarked');
+      final path = bookmarked
+          ? '/api/posters/$id/bookmark'
+          : '/api/posters/$id/unbookmark';
+      Response response = await _dio.post(
+        path,
+        options: Options(
+          contentType: 'application/json',
+          headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+        ),
+      );
+      // if (bookmarked) {
+      //   response = await _dio.post(
+      //     '/api/posters/$id/bookmark',
+      //     options: Options(
+      //       contentType: 'application/json',
+      //       headers: {
+      //         'accept': 'application/json',
+      //         'Content-Type': 'application/json'
+      //       },
+      //     ),
+      //   );
+      // } else {
+      //   response = await _dio.post(
+      //     '/api/posters/$id/unbookmark',
+      //     options: Options(
+      //       contentType: 'application/json',
+      //       headers: {
+      //         'accept': 'application/json',
+      //         'Content-Type': 'application/json'
+      //       },
+      //     ),
+      //   );
+      // }
+      print('request success');
     } on DioError catch (e) {
-      print(e.response?.headers);
-      print(e.response);
+      print(e);
       rethrow;
     }
   }
@@ -198,9 +214,9 @@ class PostService {
           },
         ),
         data: jsonEncode({
-          'title' : listId.name,
-          'posters' : idPosters,
-          'description' : listId.description,
+          'title': listId.name,
+          'posters': idPosters,
+          'description': listId.description,
         }),
       );
       print(response.data);

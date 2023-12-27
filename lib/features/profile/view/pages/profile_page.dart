@@ -975,6 +975,7 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
                 ref.watch(router)!.push(
                       BookmarksRoute(
                         id: id,
+                        mediaId: bookmark.mediaId!,
                         tmdbLink: bookmark.tmdbLink!,
                       ),
                     );

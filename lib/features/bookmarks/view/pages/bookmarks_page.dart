@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -15,6 +13,7 @@ import 'package:poster_stock/features/bookmarks/controller/bookmarks_controller.
 import 'package:poster_stock/features/bookmarks/state_holders/bookmark_list_state_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/poster/controller/comments_controller.dart';
+import 'package:poster_stock/features/profile/state_holders/profile_bookmarks_state_holder.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -22,11 +21,13 @@ import 'package:url_launcher/url_launcher_string.dart';
 @RoutePage()
 class BookmarksPage extends ConsumerStatefulWidget {
   final int id;
+  final int mediaId;
   final String tmdbLink;
 
   const BookmarksPage({
     Key? key,
     required this.id,
+    required this.mediaId,
     required this.tmdbLink,
   }) : super(key: key);
 
@@ -196,9 +197,14 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
         MenuItem.danger(
           'assets/icons/ic_trash2.svg',
           context.txt.delete,
-          () {
-            //TODO: implement
-            // ref.read(commentsControllerProvider).setBookmarked(0, false);
+          () async {
+            await ref
+                .read(commentsControllerProvider)
+                .setBookmarked(widget.mediaId, false);
+            await ref
+                .read(profileBookmarksStateHolderProvider.notifier)
+                .remove(widget.mediaId);
+            await ref.read(router)!.pop();
           },
         ),
       ]),

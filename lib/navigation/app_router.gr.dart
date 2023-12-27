@@ -65,6 +65,7 @@ abstract class $AppRouter extends _i19.RootStackRouter {
         child: _i2.BookmarksPage(
           key: args.key,
           id: args.id,
+          mediaId: args.mediaId,
           tmdbLink: args.tmdbLink,
         ),
       );
@@ -270,6 +271,7 @@ class BookmarksRoute extends _i19.PageRouteInfo<BookmarksRouteArgs> {
   BookmarksRoute({
     _i21.Key? key,
     required int id,
+    required int mediaId,
     required String tmdbLink,
     List<_i19.PageRouteInfo>? children,
   }) : super(
@@ -277,6 +279,7 @@ class BookmarksRoute extends _i19.PageRouteInfo<BookmarksRouteArgs> {
           args: BookmarksRouteArgs(
             key: key,
             id: id,
+            mediaId: mediaId,
             tmdbLink: tmdbLink,
           ),
           initialChildren: children,
@@ -292,6 +295,7 @@ class BookmarksRouteArgs {
   const BookmarksRouteArgs({
     this.key,
     required this.id,
+    required this.mediaId,
     required this.tmdbLink,
   });
 
@@ -299,11 +303,13 @@ class BookmarksRouteArgs {
 
   final int id;
 
+  final int mediaId;
+
   final String tmdbLink;
 
   @override
   String toString() {
-    return 'BookmarksRouteArgs{key: $key, id: $id, tmdbLink: $tmdbLink}';
+    return 'BookmarksRouteArgs{key: $key, id: $id, mediaId: $mediaId, tmdbLink: $tmdbLink}';
   }
 }
 

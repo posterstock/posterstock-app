@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 
 final profileBookmarksStateHolderProvider =
-StateNotifierProvider<ProfileBookmarksStateHolder, List<PostMovieModel>?>(
-      (ref) => ProfileBookmarksStateHolder(null),
+    StateNotifierProvider<ProfileBookmarksStateHolder, List<PostMovieModel>?>(
+  (ref) => ProfileBookmarksStateHolder(null),
 );
 
 class ProfileBookmarksStateHolder extends StateNotifier<List<PostMovieModel>?> {
@@ -27,5 +27,11 @@ class ProfileBookmarksStateHolder extends StateNotifier<List<PostMovieModel>?> {
 
   Future<void> clearState() async {
     state = null;
+  }
+
+  Future<void> remove(int mediaId) async {
+    final tList = [...state!];
+    tList.removeWhere((it) => it.mediaId == mediaId);
+    state = tList;
   }
 }
