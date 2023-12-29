@@ -10,7 +10,11 @@ import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/bookmarks/controller/bookmarks_controller.dart';
+import 'package:poster_stock/features/bookmarks/state_holders/bookmark_details_state_holder.dart';
 import 'package:poster_stock/features/bookmarks/state_holders/bookmark_list_state_holder.dart';
+import 'package:poster_stock/features/create_poster/controller/create_poster_controller.dart';
+import 'package:poster_stock/features/create_poster/model/media_model.dart';
+import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/poster/controller/comments_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_bookmarks_state_holder.dart';
@@ -47,6 +51,9 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bookmark = ref.watch(
+      bookmarkDetailsStateHolderProvider(widget.mediaId),
+    );
     final bookmarks = ref.watch(bookmarksListStateHolderProvider);
     if (bookmarks == null) {
       Future(() {
@@ -191,7 +198,35 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
           'assets/icons/ic_collection_semibold.svg',
           context.txt.watchlist_menu_addToWatched,
           () {
-            //TODO: implement
+            final bookmark = ref.read(
+              bookmarkDetailsStateHolderProvider(widget.mediaId),
+            );
+
+            ref.read(createPosterControllerProvider).chooseMovie(
+                  MediaModel(
+                    id: bookmark!.mediaId!,
+                    title: bookmark.name,
+                    type: bookmark.mediaType == 'movie'
+                        ? MediaType.movie
+                        : MediaType.tv,
+                    startYear: int.parse(bookmark.year.split(" - ")[0]),
+                    endYear: bookmark.year.split(" - ").length == 1 ||
+                            bookmark.year.split(" - ")[1].isEmpty
+                        ? null
+                        : int.parse(
+                            bookmark.year.split(" - ")[1],
+                          ),
+                  ),
+                );
+            if (bookmark.hasInCollection == false) {
+              showModalBottomSheet(
+                context: context,
+                backgroundColor: Colors.transparent,
+                isScrollControlled: true,
+                useSafeArea: true,
+                builder: (context) => const CreatePosterDialog(),
+              );
+            }
           },
         ),
         MenuItem.danger(
