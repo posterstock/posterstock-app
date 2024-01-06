@@ -118,7 +118,7 @@
     "posterEdit_publish" : "Publish",
 
     "watchlistAdd_add" : "Add to Watchlist",
-    "watchlistAdd_bookmark" : "Add bookmark",
+    "watchlistAdd_bookmark" : "Add to Watchlist",
     
     "listCreate_create" : "Create a List",
     "listCreate_postersCounter" : "0 of 30 posters",

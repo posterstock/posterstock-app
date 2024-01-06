@@ -9,6 +9,6 @@ extension ThemePicker on BuildContext {
 
   AppTextStyles get textStyles => Theme.of(this).extension<AppTextStyles>()!;
 
-  //TODO: replace by whole app code
+  //TODO: replace by whole app code AppLocalizations.of(context)!
   AppLocalizations get txt => AppLocalizations.of(this)!;
 }
