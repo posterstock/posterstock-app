@@ -25,7 +25,8 @@ class AppRouter extends $AppRouter {
             AutoRoute(page: HomeRoute.page, path: 'home'),
             AutoRoute(page: SearchRoute.page, path: 'search'),
             AutoRoute(page: NotificationsRoute.page, path: 'notifications'),
-            AutoRoute(page: ProfileRoute.page, path: 'profile'),
+            // AutoRoute(page: ProfileRoute.page, path: 'profile'),
+            AutoRoute(page: AccountRoute.page, path: 'account'),
           ],
         ),
         AutoRoute(page: SettingsRoute.page, path: '/settings'),
@@ -39,6 +40,8 @@ class AppRouter extends $AppRouter {
         AutoRoute(page: ListRoute.page, path: '/lists/:id'),
         RedirectRoute(path: '/list/:id', redirectTo: '/lists/:id'),
         AutoRoute(page: ProfileRouteId.page, path: '/users/:id'),
+        // AutoRoute(page: UserRoute.page, path: '/users/:id'),
+        AutoRoute(page: UserRoute.page),
         CustomRoute(
           page: PosterRoute.page,
           path: '/:username/:id',
@@ -48,7 +51,8 @@ class AppRouter extends $AppRouter {
             return PageRouteBuilder(
               opaque: false,
               fullscreenDialog: page.fullscreenDialog,
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
                 return Stack(
                   children: <Widget>[
                     SlideTransition(

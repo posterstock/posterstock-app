@@ -16,6 +16,7 @@ import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/helpers/custom_scroll_behavior.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/page_transition_controller_state_holder.dart';
+import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:poster_stock/features/settings/controllers/app_language_controller.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
@@ -29,6 +30,8 @@ import 'common/services/notifications_service.dart';
 import 'firebase_options.dart';
 import 'navigation/app_router.dart';
 import 'navigation/app_router.gr.dart';
+
+// dart run build_runner build --delete-conflicting-outputs
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 

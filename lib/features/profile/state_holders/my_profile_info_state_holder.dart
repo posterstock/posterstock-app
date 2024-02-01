@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 
 final myProfileInfoStateHolderProvider =
-StateNotifierProvider<MyProfileInfoStateHolder, UserDetailsModel?>(
-      (ref) => MyProfileInfoStateHolder(null),
+    StateNotifierProvider<MyProfileInfoStateHolder, UserDetailsModel?>(
+  (ref) => MyProfileInfoStateHolder(null),
 );
 
 class MyProfileInfoStateHolder extends StateNotifier<UserDetailsModel?> {
