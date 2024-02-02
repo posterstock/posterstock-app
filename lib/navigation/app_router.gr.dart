@@ -43,7 +43,7 @@ import 'package:poster_stock/features/settings/view/screens/choose_language_page
     as _i6;
 import 'package:poster_stock/features/settings/view/screens/settings_page.dart'
     as _i17;
-import 'package:poster_stock/features/user/view/user_page.dart' as _i19;
+import 'package:poster_stock/features/user/user_page.dart' as _i19;
 import 'package:poster_stock/features/users_list/view/users_list_page.dart'
     as _i20;
 

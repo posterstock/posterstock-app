@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,18 +11,24 @@ import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
+import 'package:poster_stock/common/widgets/list_grid_widget.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
 import 'package:poster_stock/features/create_list/state_holders/lists_search_value_state_holder.dart';
+import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
-import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/features/profile/view/widgets/count_indicator.dart';
+import 'package:poster_stock/features/profile/view/widgets/poster_tile.dart';
 import 'package:poster_stock/features/profile/view/widgets/profile_appbar.dart';
 import 'package:poster_stock/features/profile/view/widgets/profile_avatar.dart';
+import 'package:poster_stock/features/profile/view/widgets/simple_empty_collection.dart';
 import 'package:poster_stock/features/profile/view/widgets/wait_screen.dart';
-import 'package:poster_stock/features/user/state_holder/user_holder.dart';
+import 'package:poster_stock/features/user/notifiers/user_lists_notifier.dart';
+import 'package:poster_stock/features/user/notifiers/user_notifier.dart';
+import 'package:poster_stock/features/user/notifiers/user_posters_notifier.dart';
+import 'package:poster_stock/features/user/user_controller.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:share_plus/share_plus.dart';
@@ -42,8 +46,9 @@ class UserPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.read(userControllerProvider(args.id));
     final user = ref.watch(userNotifier(args.id));
-    return user == null ? WaitProfile(args.name) : UserPage2(args: args);
+    return user == null ? WaitProfile(args.username) : UserPage2(args: args);
   }
 }
 
@@ -118,9 +123,10 @@ class _State extends ConsumerState<UserPage2> with TickerProviderStateMixin {
                 children: [
                   const SizedBox(height: 12.0),
                   ProfileAppbar(
-                    user.name,
+                    user.username,
                     onBack: context.back,
                     onMenuClick: openContextMenu,
+                    bg: Colors.amber,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -364,6 +370,27 @@ class _State extends ConsumerState<UserPage2> with TickerProviderStateMixin {
           shimmer: shimmer,
           controller: tabController,
           name: user!.name,
+          id: user!.id,
+          callback: (poster, index) =>
+              ref.read(router)!.push(PosterRoute(postId: poster.id)),
+          /*
+                        /*
+          ref.watch(router)!.push(
+                  PosterRoute(
+                    postId: post!.id,
+                  ),
+                );
+          */
+              */
+          /*
+                  if (post?.id == null) return;
+        ref.watch(router)!.push(
+              ListRoute(
+                id: post!.id,
+                type: index,
+              ),
+            );
+          */
         ),
       ),
     ));
@@ -417,9 +444,9 @@ class _State extends ConsumerState<UserPage2> with TickerProviderStateMixin {
 
 class UserArgs {
   final int id;
-  final String name;
+  final String username;
 
-  UserArgs(this.id, this.name);
+  UserArgs(this.id, this.username);
 }
 
 class UserHeader extends ConsumerWidget {
@@ -796,6 +823,204 @@ class AppSvg extends StatelessWidget {
     );
   }
 }
+
+class ProfileTabs extends ConsumerStatefulWidget {
+  const ProfileTabs({
+    Key? key,
+    required this.controller,
+    this.name,
+    required this.shimmer,
+    required this.id,
+    required this.animationController,
+    required this.searchTextController,
+    this.callback,
+  }) : super(key: key);
+  final int id;
+  final TabController controller;
+  final String? name;
+  final Widget shimmer;
+  final AnimationController animationController;
+  final TextEditingController searchTextController;
+  final void Function(PostMovieModel, int index)? callback;
+
+  @override
+  ConsumerState<ProfileTabs> createState() => _ProfileTabsState();
+}
+
+class _ProfileTabsState extends ConsumerState<ProfileTabs> {
+  @override
+  Widget build(BuildContext context) {
+    final id = widget.id;
+    final lists = ref.watch(userListsStateNotifier(id));
+    final searchValue = ref.watch(listSearchValueStateHolderProvider);
+    final posters = ref.watch(userPostersNotifier(id));
+    // final postersSearch = ref.watch(listSearchPostsStateHolderProvider);
+    // final bookmarks = ref.watch(accountBookmarksStateNotifier);
+    final profile = ref.watch(userNotifier(id));
+    return AnimatedBuilder(
+      animation: widget.animationController,
+      builder: (context, child) {
+        if (widget.animationController.value <= 0.5 &&
+            widget.searchTextController.text.isNotEmpty) {
+          Future(() {
+            ref.read(listSearchValueStateHolderProvider.notifier).clearState();
+            // ref.read(listSearchPostsStateHolderProvider.notifier).clearState();
+            widget.searchTextController.clear();
+          });
+        }
+        return child!;
+      },
+      child: TabBarView(
+        controller: widget.controller,
+        children: [
+          NotificationListener<ScrollUpdateNotification>(
+            onNotification: (info) {
+              if (info.metrics.pixels >=
+                      info.metrics.maxScrollExtent -
+                          MediaQuery.of(context).size.height &&
+                  searchValue.isNotEmpty) {
+                ref.read(pickCoverControllerProvider).updateSearch(searchValue);
+              }
+              if (widget.controller.index == 0 &&
+                  info.metrics.pixels >
+                      info.metrics.maxScrollExtent -
+                          MediaQuery.of(context).size.height) {
+                // ref.read(profileControllerApiProvider).updatePosts(profile!.id);
+              }
+              if (widget.controller.index == 1 &&
+                  widget.controller.length == 3 &&
+                  info.metrics.pixels >
+                      info.metrics.maxScrollExtent -
+                          MediaQuery.of(context).size.height) {
+                // ref.read(profileControllerApiProvider).updateBookmarks();
+              }
+              return true;
+            },
+            child: PostsCollectionView(
+              posters,
+              name: widget.name,
+              callback: widget.callback,
+            ),
+          ),
+          // PostsCollectionView(bookmarks),
+          GridView.builder(
+            padding: const EdgeInsets.all(16.0),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 13.0,
+              mainAxisSpacing: 16.0,
+              mainAxisExtent:
+                  ((MediaQuery.of(context).size.width - 16.0 * 3) / 2) /
+                          540 *
+                          300 +
+                      23,
+            ),
+            itemCount: lists?.length ?? 30,
+            itemBuilder: (context, index) {
+              return ListGridWidget(
+                post: lists?[index],
+                index: index,
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PostsCollectionView extends ConsumerWidget {
+  final List<PostMovieModel?> movies;
+  final String? name;
+  final void Function(PostMovieModel, int)? callback;
+
+  const PostsCollectionView(
+    this.movies, {
+    this.name,
+    this.callback,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (movies.isEmpty == true) {
+      return Column(
+        children: [
+          SizedBox(height: (MediaQuery.of(context).size.height - 480 - 56) / 2),
+          SizedBox(
+            width: name == null ? 170 : 250,
+            child: SimpleEmptyCollectionWidget(
+              name != null
+                  ? "$name ${context.txt.profile_noWatched} "
+                  : context.txt.profile_lists_add_hint,
+            ),
+          ),
+        ],
+      );
+    }
+    return GridView.builder(
+        physics: const NeverScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 12.5,
+          mainAxisSpacing: 15,
+          mainAxisExtent:
+              ((MediaQuery.of(context).size.width - 15 * 2 - 16 * 2) / 3) /
+                      2 *
+                      3 +
+                  41,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        itemCount: movies.length,
+        itemBuilder: (_, index) => GestureDetector(
+              onTap: () => callback?.call(movies[index]!, index),
+              child: PostGridItemWidget(movies[index]),
+            ));
+  }
+}
+
+// class ProfileTabBar extends AnimatedWidget {
+//   final TabController tabController;
+//   final Animation<double> animation;
+
+//   const ProfileTabBar(
+//     this.tabController,
+//     this.animation, {
+//     super.key,
+//   }) : super(listenable: animation);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final animation = listenable as Animation<double>;
+//     return TabBar(
+//       dividerColor: Colors.transparent,
+//       controller: tabController,
+//       indicatorColor: context.colors.iconsActive,
+//       tabs: [
+//         Padding(
+//           padding: const EdgeInsets.symmetric(vertical: 14),
+//           child: Text(
+//             context.txt.profile_watched,
+//             style: animation.value >= 0 && animation.value <= 0.5
+//                 ? context.textStyles.subheadlineBold
+//                 : context.textStyles.subheadline,
+//           ),
+//         ),
+//         Padding(
+//           padding: const EdgeInsets.symmetric(vertical: 14),
+//           child: Text(
+//             context.txt.lists,
+//             style: animation.value > 1.5 && animation.value <= 2
+//                 ? context.textStyles.subheadlineBold
+//                 : context.textStyles.subheadline,
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
 
 extension NullSafeExt<T> on T {
   R let<R>(R Function(T it) block) => block(this);

@@ -117,8 +117,9 @@ class _AccountState extends ConsumerState<_AccountScreen>
                   children: [
                     const SizedBox(height: 12),
                     ProfileAppbar(
-                      account.name,
+                      account.username,
                       onMenuClick: () => openContextMenu(context),
+                      bg: Colors.blue,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -416,6 +417,8 @@ class _AccountState extends ConsumerState<_AccountScreen>
             shimmer: shimmer,
             controller: tabController,
             name: null,
+            callback: (poster, index) =>
+                ref.read(router)!.push(PosterRoute(postId: poster.id)),
           ),
         ),
       ),
@@ -474,12 +477,14 @@ class ProfileTabs extends ConsumerStatefulWidget {
     required this.shimmer,
     required this.animationController,
     required this.searchTextController,
+    this.callback,
   }) : super(key: key);
   final TabController controller;
   final String? name;
   final Widget shimmer;
   final AnimationController animationController;
   final TextEditingController searchTextController;
+  final void Function(PostMovieModel, int index)? callback;
 
   @override
   ConsumerState<ProfileTabs> createState() => _ProfileTabsState();
@@ -536,9 +541,29 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
             child: PostsCollectionView(
               posters,
               name: widget.name,
+              callback: widget.callback,
             ),
           ),
-          PostsCollectionView(bookmarks),
+          PostsCollectionView(
+            bookmarks,
+            callback: (bookmark, index) {
+// customOnItemTap: (post, index) {
+              // final bookmark = bookmarks![index]!;
+              int id;
+              var list = bookmark.tmdbLink!.split('/');
+              list.removeLast();
+              print(list);
+              id = int.parse(list.last);
+              ref.watch(router)!.push(
+                    BookmarksRoute(
+                      id: id,
+                      mediaId: bookmark.mediaId!,
+                      tmdbLink: bookmark.tmdbLink!,
+                    ),
+                  );
+              // },
+            },
+          ),
           GridView.builder(
             padding: const EdgeInsets.all(16.0),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -568,10 +593,12 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
 class PostsCollectionView extends ConsumerWidget {
   final List<PostMovieModel?> movies;
   final String? name;
+  final void Function(PostMovieModel, int index)? callback;
 
   const PostsCollectionView(
     this.movies, {
     this.name,
+    this.callback,
     Key? key,
   }) : super(key: key);
 
@@ -608,7 +635,10 @@ class PostsCollectionView extends ConsumerWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       itemCount: movies.length,
-      itemBuilder: (_, index) => PostGridItemWidget(movies[index]),
+      itemBuilder: (_, index) => GestureDetector(
+        onTap: () => callback?.call(movies[index]!, index),
+        child: PostGridItemWidget(movies[index]),
+      ),
     );
   }
 }

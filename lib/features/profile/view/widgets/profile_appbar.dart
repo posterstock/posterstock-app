@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class ProfileAppbar extends StatelessWidget {
@@ -8,11 +7,14 @@ class ProfileAppbar extends StatelessWidget {
   final String title;
   final VoidCallback? onMenuClick;
   final VoidCallback? onBack;
+  //TODO: remove after migration
+  final Color? bg;
 
   const ProfileAppbar(
     this.title, {
     this.onMenuClick,
     this.onBack,
+    this.bg = Colors.transparent,
     super.key,
   });
 
@@ -29,7 +31,8 @@ class ProfileAppbar extends StatelessWidget {
                   child: GestureDetector(
                     onTap: onBack?.call,
                     child: Container(
-                      color: Colors.transparent,
+                      // color: Colors.transparent,
+                      color: bg,
                       padding: const EdgeInsets.only(
                         left: 7,
                         right: 31,

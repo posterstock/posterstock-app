@@ -21,7 +21,7 @@ import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
-import 'package:poster_stock/features/user/view/user_page.dart';
+import 'package:poster_stock/features/user/user_page.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -188,7 +188,8 @@ class UserInfoTile extends ConsumerWidget {
         onTap: () {
           if (user == null) return;
           // ref.watch(router)!.pushNamed('/${user!.username}');
-          context.pushRoute(UserRoute(args: UserArgs(user!.id, user!.name)));
+          context
+              .pushRoute(UserRoute(args: UserArgs(user!.id, user!.username)));
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,

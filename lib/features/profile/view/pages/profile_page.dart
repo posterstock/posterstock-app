@@ -1017,6 +1017,7 @@ class PostsCollectionView extends ConsumerWidget {
     this.name,
     this.bookmark = false,
     required this.shimmer,
+    this.callback,
   }) : super(key: key);
   final List<PostMovieModel>? movies;
   final void Function(PostMovieModel, int)? customOnItemTap;
@@ -1024,6 +1025,7 @@ class PostsCollectionView extends ConsumerWidget {
   final String? name;
   final bool bookmark;
   final Widget shimmer;
+  final void Function(PostMovieModel)? callback;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1060,12 +1062,15 @@ class PostsCollectionView extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       itemCount: movies == null ? 30 : movies!.length,
       itemBuilder: (context, index) {
-        return PostsCollectionTile(
-          post: movies?[index],
-          shimmer: shimmer,
-          customOnItemTap: customOnItemTap,
-          customOnLongTap: customOnLongTap,
-          index: index,
+        return GestureDetector(
+          onTap: () => callback?.call(movies![index]),
+          child: PostsCollectionTile(
+            post: movies?[index],
+            shimmer: shimmer,
+            customOnItemTap: customOnItemTap,
+            customOnLongTap: customOnLongTap,
+            index: index,
+          ),
         );
       },
     );
