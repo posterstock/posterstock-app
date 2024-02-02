@@ -23,10 +23,6 @@ class _PosterTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final shimmer = ShimmerLoader(
-      loaded: false,
-      child: Container(color: Colors.grey),
-    );
     return Column(
       children: [
         ClipRRect(
@@ -44,8 +40,8 @@ class _PosterTile extends StatelessWidget {
               placeholderFadeInDuration: Durations.cachedDuration,
               fadeInDuration: Durations.cachedDuration,
               fadeOutDuration: Durations.cachedDuration,
-              placeholder: (_, __) => shimmer,
-              errorWidget: (_, __, ___) => shimmer,
+              placeholder: (_, __) => _shimmer,
+              errorWidget: (_, __, ___) => _shimmer,
             ),
           ),
         ),
@@ -78,10 +74,6 @@ class _PosterPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final shimmer = ShimmerLoader(
-      loaded: false,
-      child: Container(color: Colors.grey),
-    );
     return Column(
       children: [
         ClipRRect(
@@ -93,37 +85,19 @@ class _PosterPlaceholder extends StatelessWidget {
                 ((MediaQuery.of(context).size.width - 15 * 2 - 16 * 2) / 3) /
                     2 *
                     3,
-            child: CachedNetworkImage(
-              imageUrl: '',
-              fit: BoxFit.cover,
-              placeholderFadeInDuration: Durations.cachedDuration,
-              fadeInDuration: Durations.cachedDuration,
-              fadeOutDuration: Durations.cachedDuration,
-              placeholder: (_, __) => shimmer,
-              errorWidget: (_, __, ___) => shimmer,
-            ),
+            child: _shimmer,
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          '',
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: context.textStyles.caption2!.copyWith(
-            color: context.colors.textsPrimary,
-          ),
-        ),
+        Text('', style: context.textStyles.caption2),
         const SizedBox(height: 4),
-        Text(
-          '',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: context.textStyles.caption1!.copyWith(
-            color: context.colors.textsDisabled,
-          ),
-        ),
+        Text('', style: context.textStyles.caption1),
       ],
     );
   }
 }
+
+final _shimmer = ShimmerLoader(
+  loaded: false,
+  child: Container(color: Colors.grey),
+);

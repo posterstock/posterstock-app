@@ -8,6 +8,7 @@ import 'package:poster_stock/common/menu/menu_dialog.dart';
 import 'package:poster_stock/common/menu/menu_state.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
+import 'package:poster_stock/common/widgets/app_tab_bar.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
@@ -29,7 +30,7 @@ import 'package:poster_stock/features/profile/controllers/profile_controller.dar
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/view/widgets/count_indicator.dart';
-import 'package:poster_stock/features/profile/view/widgets/poster_tile.dart';
+import 'package:poster_stock/features/poster/view/widgets/poster_tile.dart';
 import 'package:poster_stock/features/profile/view/widgets/profile_appbar.dart';
 import 'package:poster_stock/features/profile/view/widgets/profile_avatar.dart';
 import 'package:poster_stock/features/profile/view/widgets/simple_empty_collection.dart';
@@ -312,10 +313,11 @@ class _AccountState extends ConsumerState<_AccountScreen>
                 toolbarHeight: 48,
                 pinned: true,
                 leading: const SizedBox(),
-                flexibleSpace: ProfileTabBar(
-                  tabController,
-                  tabController.animation!,
-                ),
+                flexibleSpace: AppTabBar(tabController, [
+                  context.txt.profile_watched,
+                  context.txt.profile_watchlist,
+                  context.txt.lists,
+                ]),
               ),
               SliverToBoxAdapter(
                 child: AnimatedBuilder(
@@ -639,56 +641,6 @@ class PostsCollectionView extends ConsumerWidget {
         onTap: () => callback?.call(movies[index]!, index),
         child: PostGridItemWidget(movies[index]),
       ),
-    );
-  }
-}
-
-class ProfileTabBar extends AnimatedWidget {
-  final TabController tabController;
-  final Animation<double> animation;
-
-  const ProfileTabBar(
-    this.tabController,
-    this.animation, {
-    super.key,
-  }) : super(listenable: animation);
-
-  @override
-  Widget build(BuildContext context) {
-    final animation = listenable as Animation<double>;
-    return TabBar(
-      dividerColor: Colors.transparent,
-      controller: tabController,
-      indicatorColor: context.colors.iconsActive,
-      tabs: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          child: Text(
-            context.txt.profile_watched,
-            style: animation.value >= 0 && animation.value <= 0.5
-                ? context.textStyles.subheadlineBold
-                : context.textStyles.subheadline,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          child: Text(
-            context.txt.profile_watchlist,
-            style: animation.value > 0.5 && animation.value <= 1.5
-                ? context.textStyles.subheadlineBold
-                : context.textStyles.subheadline,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          child: Text(
-            context.txt.lists,
-            style: animation.value > 1.5 && animation.value <= 2
-                ? context.textStyles.subheadlineBold
-                : context.textStyles.subheadline,
-          ),
-        ),
-      ],
     );
   }
 }

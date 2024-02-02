@@ -8,6 +8,7 @@ import 'package:poster_stock/common/menu/menu_dialog.dart';
 import 'package:poster_stock/common/menu/menu_state.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
+import 'package:poster_stock/common/widgets/app_tab_bar.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
@@ -20,7 +21,7 @@ import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/features/profile/view/widgets/count_indicator.dart';
-import 'package:poster_stock/features/profile/view/widgets/poster_tile.dart';
+import 'package:poster_stock/features/poster/view/widgets/poster_tile.dart';
 import 'package:poster_stock/features/profile/view/widgets/profile_appbar.dart';
 import 'package:poster_stock/features/profile/view/widgets/profile_avatar.dart';
 import 'package:poster_stock/features/profile/view/widgets/simple_empty_collection.dart';
@@ -295,19 +296,17 @@ class _State extends ConsumerState<UserPage2> with TickerProviderStateMixin {
               ),
             ),
             SliverAppBar(
-              backgroundColor: context.colors.backgroundsPrimary,
-              elevation: 0,
-              expandedHeight: 48,
-              collapsedHeight: 48,
-              toolbarHeight: 48,
-              pinned: true,
-              leading: const SizedBox(),
-              flexibleSpace: ProfileTabBar(
-                animation: tabController.animation!,
-                tabController: tabController,
-                profile: user,
-              ),
-            ),
+                backgroundColor: context.colors.backgroundsPrimary,
+                elevation: 0,
+                expandedHeight: 48,
+                collapsedHeight: 48,
+                toolbarHeight: 48,
+                pinned: true,
+                leading: const SizedBox(),
+                flexibleSpace: AppTabBar(tabController, [
+                  context.txt.profile_watched,
+                  context.txt.lists,
+                ])),
             SliverToBoxAdapter(
               child: AnimatedBuilder(
                 animation: animationController,
@@ -694,60 +693,6 @@ class UserHeader extends ConsumerWidget {
   }
 }
 
-class ProfileTabBar extends AnimatedWidget {
-  const ProfileTabBar({
-    super.key,
-    required Animation<double> animation,
-    this.tabController,
-    this.profile,
-    // required this.myself,
-  }) : super(listenable: animation);
-
-  final TabController? tabController;
-  final UserDetailsModel? profile;
-  // final bool myself;
-
-  @override
-  Widget build(BuildContext context) {
-    final animation = listenable as Animation<double>;
-    return TabBar(
-      dividerColor: Colors.transparent,
-      controller: tabController,
-      indicatorColor: context.colors.iconsActive,
-      tabs: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14.0),
-          child: Text(
-            context.txt.profile_watched,
-            style: animation.value >= 0 && animation.value <= 0.5
-                ? context.textStyles.subheadlineBold
-                : context.textStyles.subheadline,
-          ),
-        ),
-        // if (myself ?? false)
-        //   Padding(
-        //     padding: const EdgeInsets.symmetric(vertical: 14.0),
-        //     child: Text(
-        //       context.txt.profile_watchlist,
-        //       style: animation.value > 0.5 && animation.value <= 1.5
-        //           ? context.textStyles.subheadlineBold
-        //           : context.textStyles.subheadline,
-        //     ),
-        //   ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14.0),
-          child: Text(
-            context.txt.lists,
-            style: animation.value > 1.5 && animation.value <= 2
-                ? context.textStyles.subheadlineBold
-                : context.textStyles.subheadline,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class SearchField extends ConsumerWidget {
   final TextEditingController searchController;
   final AnimationController animationController;
@@ -980,47 +925,6 @@ class PostsCollectionView extends ConsumerWidget {
             ));
   }
 }
-
-// class ProfileTabBar extends AnimatedWidget {
-//   final TabController tabController;
-//   final Animation<double> animation;
-
-//   const ProfileTabBar(
-//     this.tabController,
-//     this.animation, {
-//     super.key,
-//   }) : super(listenable: animation);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final animation = listenable as Animation<double>;
-//     return TabBar(
-//       dividerColor: Colors.transparent,
-//       controller: tabController,
-//       indicatorColor: context.colors.iconsActive,
-//       tabs: [
-//         Padding(
-//           padding: const EdgeInsets.symmetric(vertical: 14),
-//           child: Text(
-//             context.txt.profile_watched,
-//             style: animation.value >= 0 && animation.value <= 0.5
-//                 ? context.textStyles.subheadlineBold
-//                 : context.textStyles.subheadline,
-//           ),
-//         ),
-//         Padding(
-//           padding: const EdgeInsets.symmetric(vertical: 14),
-//           child: Text(
-//             context.txt.lists,
-//             style: animation.value > 1.5 && animation.value <= 2
-//                 ? context.textStyles.subheadlineBold
-//                 : context.textStyles.subheadline,
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
 
 extension NullSafeExt<T> on T {
   R let<R>(R Function(T it) block) => block(this);
