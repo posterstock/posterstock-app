@@ -460,38 +460,8 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
           NotificationListener<ScrollUpdateNotification>(
             onNotification: (info) {
               if (info.metrics.pixels >=
-                      info.metrics.maxScrollExtent -
-                          MediaQuery.of(context).size.height &&
-                  searchValue.isNotEmpty) {
-                ref.read(accountControllerProvider).loadMorePosters();
-              }
-              if (widget.controller.index == 0 &&
-                  info.metrics.pixels >
-                      info.metrics.maxScrollExtent -
-                          MediaQuery.of(context).size.height) {
-                //TODO: add pagination to watchlist
-              }
-              if (widget.controller.index == 1 &&
-                  widget.controller.length == 3 &&
-                  info.metrics.pixels >
-                      info.metrics.maxScrollExtent -
-                          MediaQuery.of(context).size.height) {
-                //TODO: add pagination to lists
-              }
-              return true;
-            },
-            child: PostersCollectionView(
-              posters,
-              name: widget.name,
-              callback: widget.callback,
-            ),
-          ),
-          NotificationListener<ScrollUpdateNotification>(
-            onNotification: (info) {
-              if (info.metrics.pixels >=
-                      info.metrics.maxScrollExtent -
-                          MediaQuery.of(context).size.height &&
-                  searchValue.isNotEmpty) {
+                  info.metrics.maxScrollExtent -
+                      MediaQuery.of(context).size.height) {
                 ref.read(accountControllerProvider).loadMorePosters();
               }
               return true;
