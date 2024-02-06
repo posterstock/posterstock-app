@@ -32,4 +32,12 @@ class AccountController {
     bookmarks.load();
     lists.load(account.account!.id);
   }
+
+  void loadMorePosters() {
+    posters.loadMore(account.account!.id);
+  }
+
+  void loadMoreBookmarks() {
+    bookmarks.loadMore();
+  }
 }

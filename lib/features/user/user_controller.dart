@@ -24,4 +24,8 @@ class UserController {
     this.userPostersNotifier,
     this.userListsNotifier,
   );
+
+  void loadMorePosters() {
+    userPostersNotifier.loadMore();
+  }
 }

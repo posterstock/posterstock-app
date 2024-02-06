@@ -19,12 +19,10 @@ import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
-import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/features/profile/view/widgets/count_indicator.dart';
-import 'package:poster_stock/features/poster/view/widgets/poster_tile.dart';
+import 'package:poster_stock/features/profile/view/widgets/posters_collections_view.dart';
 import 'package:poster_stock/features/profile/view/widgets/profile_appbar.dart';
 import 'package:poster_stock/features/profile/view/widgets/profile_avatar.dart';
-import 'package:poster_stock/features/profile/view/widgets/simple_empty_collection.dart';
 import 'package:poster_stock/features/profile/view/widgets/wait_screen.dart';
 import 'package:poster_stock/features/user/notifiers/user_lists_notifier.dart';
 import 'package:poster_stock/features/user/notifiers/user_notifier.dart';
@@ -35,6 +33,13 @@ import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:share_plus/share_plus.dart';
 
 //TODO: replace all read(router)/watch(router) by context.router
+
+class UserArgs {
+  final int id;
+  final String username;
+
+  UserArgs(this.id, this.username);
+}
 
 @RoutePage()
 class UserPage extends ConsumerWidget {
@@ -49,14 +54,14 @@ class UserPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.read(userControllerProvider(args.id));
     final user = ref.watch(userNotifier(args.id));
-    return user == null ? WaitProfile(args.username) : UserPage2(args: args);
+    return user == null ? WaitProfile(args.username) : _UserPage(args: args);
   }
 }
 
-class UserPage2 extends ConsumerStatefulWidget {
+class _UserPage extends ConsumerStatefulWidget {
   final UserArgs args;
 
-  const UserPage2({
+  const _UserPage({
     required this.args,
     super.key,
   });
@@ -65,7 +70,7 @@ class UserPage2 extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _State();
 }
 
-class _State extends ConsumerState<UserPage2> with TickerProviderStateMixin {
+class _State extends ConsumerState<_UserPage> with TickerProviderStateMixin {
   final focusNode = FocusNode();
   final scrollController = ScrollController();
   final searchController = TextEditingController();
@@ -87,7 +92,7 @@ class _State extends ConsumerState<UserPage2> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final controller = ref.read(userNotifier(widget.args.id).notifier);
-    final user = ref.watch(userNotifier(widget.args.id));
+    final user = ref.watch(userNotifier(widget.args.id))!;
     return CustomScaffold(
         child: NotificationListener<ScrollUpdateNotification>(
       onNotification: (details) {
@@ -125,9 +130,8 @@ class _State extends ConsumerState<UserPage2> with TickerProviderStateMixin {
                   const SizedBox(height: 12.0),
                   ProfileAppbar(
                     user.username,
-                    onBack: context.back,
+                    onBack: ref.watch(router)!.pop,
                     onMenuClick: openContextMenu,
-                    bg: Colors.amber,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -181,71 +185,25 @@ class _State extends ConsumerState<UserPage2> with TickerProviderStateMixin {
                                 Row(
                                   children: [
                                     GestureDetector(
-                                      onTap: () {
-                                        tabController.animateTo(0);
-                                      },
-                                      child: Container(
-                                        color: Colors.transparent,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 8.0),
-                                          child: Row(
-                                            children: [
-                                              SvgPicture.asset(
-                                                'assets/icons/ic_collection.svg',
-                                                colorFilter: ColorFilter.mode(
-                                                  context.colors.iconsDefault!,
-                                                  BlendMode.srcIn,
-                                                ),
-                                                width: 16,
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                user.posters.toString(),
-                                                style: context
-                                                    .textStyles.caption1!
-                                                    .copyWith(
-                                                        color: context.colors
-                                                            .textsPrimary),
-                                              ),
-                                            ],
-                                          ),
+                                      onTap: () => tabController.animateTo(0),
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: IconCountIndicator(
+                                          'assets/icons/ic_collection.svg',
+                                          user.posters,
                                         ),
                                       ),
                                     ),
+                                    const SizedBox(width: 12),
                                     GestureDetector(
-                                      onTap: () {
-                                        tabController.animateTo(
-                                            tabController.length - 1);
-                                      },
-                                      child: Container(
-                                        color: Colors.transparent,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 8.0),
-                                          child: Row(
-                                            children: [
-                                              const SizedBox(width: 12),
-                                              SvgPicture.asset(
-                                                'assets/icons/lists.svg',
-                                                colorFilter: ColorFilter.mode(
-                                                  context.colors.iconsDefault!,
-                                                  BlendMode.srcIn,
-                                                ),
-                                                width: 16,
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                user.lists.toString(),
-                                                style: context
-                                                    .textStyles.caption1!
-                                                    .copyWith(
-                                                        color: context.colors
-                                                            .textsPrimary),
-                                              ),
-                                              const SizedBox(width: 8.0),
-                                            ],
-                                          ),
+                                      onTap: () => tabController.animateTo(1),
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: IconCountIndicator(
+                                          'assets/icons/lists.svg',
+                                          user.lists,
                                         ),
                                       ),
                                     ),
@@ -255,9 +213,7 @@ class _State extends ConsumerState<UserPage2> with TickerProviderStateMixin {
                             ),
                             const Spacer(),
                             AppTextButton(
-                              onTap: () {
-                                controller.toggleFollow();
-                              },
+                              onTap: controller.toggleFollow,
                               text: user.followed
                                   ? context.txt.profile_following.capitalize()
                                   : context.txt.follow,
@@ -268,14 +224,6 @@ class _State extends ConsumerState<UserPage2> with TickerProviderStateMixin {
                                   ? context.colors.textsPrimary
                                   : null,
                             ),
-                            // AppTextButton(
-                            //   onTap: () {
-                            //     ref.watch(router)!.push(EditProfileRoute());
-                            //   },
-                            //   text: context.txt.edit.capitalize(),
-                            //   backgroundColor: context.colors.fieldsDefault,
-                            //   textColor: context.colors.textsPrimary,
-                            // ),
                           ],
                         ),
                         if (user.description != null)
@@ -366,30 +314,11 @@ class _State extends ConsumerState<UserPage2> with TickerProviderStateMixin {
         body: ProfileTabs(
           animationController: animationController,
           searchTextController: searchController,
-          shimmer: shimmer,
           controller: tabController,
-          name: user!.name,
-          id: user!.id,
-          callback: (poster, index) =>
+          name: user.name,
+          id: user.id,
+          callback: (poster, _) =>
               ref.read(router)!.push(PosterRoute(postId: poster.id)),
-          /*
-                        /*
-          ref.watch(router)!.push(
-                  PosterRoute(
-                    postId: post!.id,
-                  ),
-                );
-          */
-              */
-          /*
-                  if (post?.id == null) return;
-        ref.watch(router)!.push(
-              ListRoute(
-                id: post!.id,
-                type: index,
-              ),
-            );
-          */
         ),
       ),
     ));
@@ -441,258 +370,6 @@ class _State extends ConsumerState<UserPage2> with TickerProviderStateMixin {
   }
 }
 
-class UserArgs {
-  final int id;
-  final String username;
-
-  UserArgs(this.id, this.username);
-}
-
-class UserHeader extends ConsumerWidget {
-  final int id;
-  final TabController? tabController;
-
-  const UserHeader(this.id, this.tabController, {super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final shimmer = ShimmerLoader(
-      loaded: false,
-      child: Container(color: Colors.grey),
-    );
-    final controller = ref.read(userNotifier(id).notifier);
-    final user = controller.user;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 18),
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 40,
-                backgroundImage: user.imagePath != null
-                    ? Image.network(
-                        user.imagePath!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, obj, trace) {
-                          return shimmer;
-                        },
-                        loadingBuilder: (context, child, event) {
-                          if (event?.cumulativeBytesLoaded !=
-                              event?.expectedTotalBytes) {
-                            return shimmer;
-                          }
-                          return child;
-                        },
-                      ).image
-                    : null,
-                backgroundColor: user.color,
-                child: user.imagePath == null
-                    ? Text(
-                        getAvatarName(user.name).toUpperCase().isEmpty
-                            ? getAvatarName(user.username).toUpperCase()
-                            : getAvatarName(user.name).toUpperCase(),
-                        style: context.textStyles.title3!.copyWith(
-                          color: context.colors.textsBackground,
-                        ),
-                      )
-                    : const SizedBox(),
-              ),
-              const SizedBox(width: 38),
-              GestureDetector(
-                onTap: () {
-                  ref.read(router)!.push(UsersListRoute(id: id));
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextOrContainer(
-                        text: user.followers.toString(),
-                        style: context.textStyles.headline,
-                        emptyWidth: 35,
-                        emptyHeight: 20,
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        context.txt.profile_followers,
-                        style: context.textStyles.caption1!.copyWith(
-                          color: context.colors.textsSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 36),
-              GestureDetector(
-                onTap: () {
-                  // if (profile != null) {
-                  //   ref.watch(router)!.push(
-                  //         UsersListRoute(
-                  //           following: true,
-                  //           id: profile.id,
-                  //         ),
-                  //       );
-                  // }
-                  ref
-                      .read(router)!
-                      .push(UsersListRoute(id: id, following: true));
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ShimmerLoader(
-                        loaded: user != null,
-                        child: TextOrContainer(
-                          text: user.following.toString(),
-                          style: context.textStyles.headline,
-                          emptyWidth: 35,
-                          emptyHeight: 20,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        context.txt.profile_following,
-                        style: context.textStyles.caption1!.copyWith(
-                          color: context.colors.textsSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const Spacer(),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextOrContainer(
-                    text: user.name,
-                    style: context.textStyles.headline,
-                    emptyWidth: 150,
-                    emptyHeight: 20,
-                  ),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          tabController?.animateTo(0);
-                        },
-                        child: Container(
-                          color: Colors.transparent,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Row(
-                              children: [
-                                SvgPicture.asset(
-                                  'assets/icons/ic_collection.svg',
-                                  colorFilter: ColorFilter.mode(
-                                    context.colors.iconsDefault!,
-                                    BlendMode.srcIn,
-                                  ),
-                                  width: 16,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  user.posters.toString(),
-                                  style: context.textStyles.caption1!.copyWith(
-                                      color: context.colors.textsPrimary),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          tabController?.animateTo(tabController!.length - 1);
-                        },
-                        child: Container(
-                          color: Colors.transparent,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Row(
-                              children: [
-                                const SizedBox(width: 12),
-                                // SvgPicture.asset(
-                                //   'assets/icons/lists.svg',
-                                //   colorFilter: ColorFilter.mode(
-                                //     context.colors.iconsDefault!,
-                                //     BlendMode.srcIn,
-                                //   ),
-                                //   width: 16,
-                                // ),
-                                AppSvg.icon(
-                                  'lists.svg',
-                                  color: context.colors.iconsDefault!,
-                                  width: 16,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  user.lists.toString(),
-                                  style: context.textStyles.caption1!.copyWith(
-                                      color: context.colors.textsPrimary),
-                                ),
-                                const SizedBox(width: 8.0),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const Spacer(),
-              AppTextButton(
-                onTap: () {
-                  controller.toggleFollow();
-                },
-                text: user.followed
-                    ? context.txt.profile_following.capitalize()
-                    : context.txt.follow,
-                backgroundColor:
-                    user.followed ? context.colors.fieldsDefault : null,
-                textColor: user.followed ? context.colors.textsPrimary : null,
-              ),
-            ],
-          ),
-          if (user.description != null) const SizedBox(height: 12),
-          if (user.description != null)
-            Text(
-              user.description!,
-              style: context.textStyles.footNote,
-            ),
-          if (user.description != null) const SizedBox(height: 16),
-        ],
-      ),
-    );
-  }
-
-  String getAvatarName(String name) {
-    if (name.isEmpty) return name;
-    String result = name[0];
-    for (int i = 0; i < name.length; i++) {
-      if (name[i] == ' ' && i != name.length - 1) {
-        result += name[i + 1];
-        break;
-      }
-    }
-    return result;
-  }
-}
-
 class SearchField extends ConsumerWidget {
   final TextEditingController searchController;
   final AnimationController animationController;
@@ -739,42 +416,11 @@ class SearchField extends ConsumerWidget {
   }
 }
 
-class AppSvg extends StatelessWidget {
-  final String path;
-  final String name;
-  final Color? color;
-  final double? width;
-
-  const AppSvg(
-    this.name, {
-    this.color,
-    this.width,
-    super.key,
-  }) : path = 'assets/';
-
-  const AppSvg.icon(
-    this.name, {
-    this.color,
-    this.width,
-    super.key,
-  }) : path = 'assets/icons/';
-
-  @override
-  Widget build(BuildContext context) {
-    return SvgPicture.asset(
-      '$path$name',
-      colorFilter: color?.let((it) => ColorFilter.mode(it, BlendMode.srcIn)),
-      width: width,
-    );
-  }
-}
-
 class ProfileTabs extends ConsumerStatefulWidget {
   const ProfileTabs({
     Key? key,
     required this.controller,
     this.name,
-    required this.shimmer,
     required this.id,
     required this.animationController,
     required this.searchTextController,
@@ -783,7 +429,6 @@ class ProfileTabs extends ConsumerStatefulWidget {
   final int id;
   final TabController controller;
   final String? name;
-  final Widget shimmer;
   final AnimationController animationController;
   final TextEditingController searchTextController;
   final void Function(PostMovieModel, int index)? callback;
@@ -796,12 +441,10 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
   @override
   Widget build(BuildContext context) {
     final id = widget.id;
-    final lists = ref.watch(userListsStateNotifier(id));
-    final searchValue = ref.watch(listSearchValueStateHolderProvider);
     final posters = ref.watch(userPostersNotifier(id));
-    // final postersSearch = ref.watch(listSearchPostsStateHolderProvider);
-    // final bookmarks = ref.watch(accountBookmarksStateNotifier);
-    final profile = ref.watch(userNotifier(id));
+    final searchValue = ref.watch(listSearchValueStateHolderProvider);
+    final lists = ref.watch(userListsStateNotifier(id));
+    final controller = ref.read(userControllerProvider(id));
     return AnimatedBuilder(
       animation: widget.animationController,
       builder: (context, child) {
@@ -809,7 +452,6 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
             widget.searchTextController.text.isNotEmpty) {
           Future(() {
             ref.read(listSearchValueStateHolderProvider.notifier).clearState();
-            // ref.read(listSearchPostsStateHolderProvider.notifier).clearState();
             widget.searchTextController.clear();
           });
         }
@@ -821,111 +463,51 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
           NotificationListener<ScrollUpdateNotification>(
             onNotification: (info) {
               if (info.metrics.pixels >=
-                      info.metrics.maxScrollExtent -
-                          MediaQuery.of(context).size.height &&
-                  searchValue.isNotEmpty) {
-                ref.read(pickCoverControllerProvider).updateSearch(searchValue);
-              }
-              if (widget.controller.index == 0 &&
-                  info.metrics.pixels >
-                      info.metrics.maxScrollExtent -
-                          MediaQuery.of(context).size.height) {
-                // ref.read(profileControllerApiProvider).updatePosts(profile!.id);
-              }
-              if (widget.controller.index == 1 &&
-                  widget.controller.length == 3 &&
-                  info.metrics.pixels >
-                      info.metrics.maxScrollExtent -
-                          MediaQuery.of(context).size.height) {
-                // ref.read(profileControllerApiProvider).updateBookmarks();
+                  info.metrics.maxScrollExtent -
+                      MediaQuery.of(context).size.height) {
+                controller.loadMorePosters();
               }
               return true;
             },
-            child: PostsCollectionView(
+            child: PostersCollectionView(
               posters,
               name: widget.name,
               callback: widget.callback,
             ),
           ),
-          // PostsCollectionView(bookmarks),
-          GridView.builder(
-            padding: const EdgeInsets.all(16.0),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 13.0,
-              mainAxisSpacing: 16.0,
-              mainAxisExtent:
-                  ((MediaQuery.of(context).size.width - 16.0 * 3) / 2) /
-                          540 *
-                          300 +
-                      23,
-            ),
-            itemCount: lists?.length ?? 30,
-            itemBuilder: (context, index) {
-              return ListGridWidget(
-                post: lists?[index],
-                index: index,
-              );
+          NotificationListener<ScrollUpdateNotification>(
+            onNotification: (info) {
+              if (info.metrics.pixels >=
+                      info.metrics.maxScrollExtent -
+                          MediaQuery.of(context).size.height &&
+                  searchValue.isNotEmpty) {
+                ref.read(pickCoverControllerProvider).updateSearch(searchValue);
+              }
+              return true;
             },
+            child: GridView.builder(
+              padding: const EdgeInsets.all(16.0),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 13.0,
+                mainAxisSpacing: 16.0,
+                mainAxisExtent:
+                    ((MediaQuery.of(context).size.width - 16.0 * 3) / 2) /
+                            540 *
+                            300 +
+                        23,
+              ),
+              itemCount: lists.length,
+              itemBuilder: (_, index) {
+                return ListGridWidget(
+                  post: lists[index],
+                  index: index,
+                );
+              },
+            ),
           ),
         ],
       ),
     );
   }
-}
-
-class PostsCollectionView extends ConsumerWidget {
-  final List<PostMovieModel?> movies;
-  final String? name;
-  final void Function(PostMovieModel, int)? callback;
-
-  const PostsCollectionView(
-    this.movies, {
-    this.name,
-    this.callback,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    if (movies.isEmpty == true) {
-      return Column(
-        children: [
-          SizedBox(height: (MediaQuery.of(context).size.height - 480 - 56) / 2),
-          SizedBox(
-            width: name == null ? 170 : 250,
-            child: SimpleEmptyCollectionWidget(
-              name != null
-                  ? "$name ${context.txt.profile_noWatched} "
-                  : context.txt.profile_lists_add_hint,
-            ),
-          ),
-        ],
-      );
-    }
-    return GridView.builder(
-        physics: const NeverScrollableScrollPhysics(
-          parent: BouncingScrollPhysics(),
-        ),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 12.5,
-          mainAxisSpacing: 15,
-          mainAxisExtent:
-              ((MediaQuery.of(context).size.width - 15 * 2 - 16 * 2) / 3) /
-                      2 *
-                      3 +
-                  41,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-        itemCount: movies.length,
-        itemBuilder: (_, index) => GestureDetector(
-              onTap: () => callback?.call(movies[index]!, index),
-              child: PostGridItemWidget(movies[index]),
-            ));
-  }
-}
-
-extension NullSafeExt<T> on T {
-  R let<R>(R Function(T it) block) => block(this);
 }

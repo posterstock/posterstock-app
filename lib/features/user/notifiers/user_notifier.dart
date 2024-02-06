@@ -4,7 +4,7 @@ import 'package:poster_stock/features/profile/models/user_details_model.dart';
 
 final userNotifier = StateNotifierProvider.family
     .autoDispose<UserNotifier, UserDetailsModel?, int>(
-  (ref, id) => UserNotifier(id).._load(),
+  (ref, id) => UserNotifier(id)..load(),
 );
 
 class UserNotifier extends StateNotifier<UserDetailsModel?> {
@@ -15,7 +15,7 @@ class UserNotifier extends StateNotifier<UserDetailsModel?> {
 
   UserDetailsModel get user => state!;
 
-  void _load() async {
+  Future<void> load() async {
     final json = await network.getProfileInfo(id);
     state = UserDetailsModel.fromJson(json);
   }

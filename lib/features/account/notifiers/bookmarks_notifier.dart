@@ -11,11 +11,22 @@ class BookmarksNotifier extends StateNotifier<List<PostMovieModel?>> {
   BookmarksNotifier() : super(List.generate(12, (_) => null));
   final AccountNetwork network = AccountNetwork();
   bool _hasMore = true;
+  bool _loading = false;
 
   void load() async {
     if (!_hasMore) return;
     final result = await network.getBookmarks();
     state = result.$1 ?? [];
+    _hasMore = result.$2;
+  }
+
+  Future<void> loadMore() async {
+    if (!_hasMore) return;
+    if (_loading) return;
+    _loading = true;
+    final result = await network.getBookmarks();
+    _loading = false;
+    state = state + result.$1!;
     _hasMore = result.$2;
   }
 }

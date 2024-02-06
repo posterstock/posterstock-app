@@ -21,7 +21,6 @@ import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
 import 'package:poster_stock/features/create_list/state_holders/list_search_posters_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/lists_search_value_state_holder.dart';
-import 'package:poster_stock/features/edit_profile/controller/edit_profile_controller.dart';
 import 'package:poster_stock/features/edit_profile/view/pages/edit_profile_page.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
@@ -30,10 +29,9 @@ import 'package:poster_stock/features/profile/controllers/profile_controller.dar
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/view/widgets/count_indicator.dart';
-import 'package:poster_stock/features/poster/view/widgets/poster_tile.dart';
+import 'package:poster_stock/features/profile/view/widgets/posters_collections_view.dart';
 import 'package:poster_stock/features/profile/view/widgets/profile_appbar.dart';
 import 'package:poster_stock/features/profile/view/widgets/profile_avatar.dart';
-import 'package:poster_stock/features/profile/view/widgets/simple_empty_collection.dart';
 import 'package:poster_stock/features/profile/view/widgets/wait_screen.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -119,8 +117,7 @@ class _AccountState extends ConsumerState<_AccountScreen>
                     const SizedBox(height: 12),
                     ProfileAppbar(
                       account.username,
-                      onMenuClick: () => openContextMenu(context),
-                      bg: Colors.blue,
+                      onMenuClick: _openContextMenu,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -131,33 +128,7 @@ class _AccountState extends ConsumerState<_AccountScreen>
                           Row(
                             children: [
                               GestureDetector(
-                                onTap: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    backgroundColor: Colors.transparent,
-                                    isScrollControlled: true,
-                                    useSafeArea: true,
-                                    builder: (context) => GestureDetector(
-                                      onTap: context.back,
-                                      child: Container(
-                                        height: double.infinity,
-                                        color: Colors.transparent,
-                                        child: const ProfilePhotoDialog(),
-                                      ),
-                                    ),
-                                  ).then((value) async {
-                                    await ref
-                                        .read(editProfileControllerProvider)
-                                        .save(
-                                          name: account.name,
-                                          username: account.username,
-                                          description: account.description,
-                                        );
-                                    await ref
-                                        .read(profileControllerApiProvider)
-                                        .getUserInfo(null);
-                                  });
-                                },
+                                onTap: () => _editAvatar(account),
                                 child: ProfileAvatar(account),
                               ),
                               const SizedBox(width: 38),
@@ -203,73 +174,25 @@ class _AccountState extends ConsumerState<_AccountScreen>
                                   Row(
                                     children: [
                                       GestureDetector(
-                                        onTap: () {
-                                          tabController.animateTo(0);
-                                        },
-                                        child: Container(
-                                          color: Colors.transparent,
-                                          child: Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 8.0),
-                                            child: Row(
-                                              children: [
-                                                SvgPicture.asset(
-                                                  'assets/icons/ic_collection.svg',
-                                                  colorFilter: ColorFilter.mode(
-                                                    context
-                                                        .colors.iconsDefault!,
-                                                    BlendMode.srcIn,
-                                                  ),
-                                                  width: 16,
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  account.posters.toString(),
-                                                  style: context
-                                                      .textStyles.caption1!
-                                                      .copyWith(
-                                                          color: context.colors
-                                                              .textsPrimary),
-                                                ),
-                                              ],
-                                            ),
+                                        onTap: () => tabController.animateTo(0),
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 8.0),
+                                          child: IconCountIndicator(
+                                            'assets/icons/ic_collection.svg',
+                                            account.posters,
                                           ),
                                         ),
                                       ),
+                                      const SizedBox(width: 12),
                                       GestureDetector(
-                                        onTap: () {
-                                          tabController.animateTo(
-                                              tabController.length - 1);
-                                        },
-                                        child: Container(
-                                          color: Colors.transparent,
-                                          child: Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 8.0),
-                                            child: Row(
-                                              children: [
-                                                const SizedBox(width: 12),
-                                                SvgPicture.asset(
-                                                  'assets/icons/lists.svg',
-                                                  colorFilter: ColorFilter.mode(
-                                                    context
-                                                        .colors.iconsDefault!,
-                                                    BlendMode.srcIn,
-                                                  ),
-                                                  width: 16,
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  account.lists.toString(),
-                                                  style: context
-                                                      .textStyles.caption1!
-                                                      .copyWith(
-                                                          color: context.colors
-                                                              .textsPrimary),
-                                                ),
-                                                const SizedBox(width: 8.0),
-                                              ],
-                                            ),
+                                        onTap: () => tabController.animateTo(2),
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 8.0),
+                                          child: IconCountIndicator(
+                                            'assets/icons/lists.svg',
+                                            account.lists,
                                           ),
                                         ),
                                       ),
@@ -438,7 +361,7 @@ class _AccountState extends ConsumerState<_AccountScreen>
             : 0);
   }
 
-  Future<void> openContextMenu(BuildContext context) async {
+  Future<void> _openContextMenu() async {
     final account = ref.watch(accountNotifier)!;
     await MenuDialog.showBottom(
       context,
@@ -467,6 +390,23 @@ class _AccountState extends ConsumerState<_AccountScreen>
           },
         ),
       ]),
+    );
+  }
+
+  void _editAvatar(UserDetailsModel account) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => GestureDetector(
+        onTap: context.back,
+        child: Container(
+          height: double.infinity,
+          color: Colors.transparent,
+          child: const ProfilePhotoDialog(),
+        ),
+      ),
     );
   }
 }
@@ -500,7 +440,7 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
     final posters = ref.watch(accountPostersStateNotifier);
     final postersSearch = ref.watch(listSearchPostsStateHolderProvider);
     final bookmarks = ref.watch(accountBookmarksStateNotifier);
-    final profile = ref.watch(profileInfoStateHolderProvider);
+    // final profile = ref.watch(profileInfoStateHolderProvider);
     return AnimatedBuilder(
       animation: widget.animationController,
       builder: (context, child) {
@@ -523,48 +463,70 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
                       info.metrics.maxScrollExtent -
                           MediaQuery.of(context).size.height &&
                   searchValue.isNotEmpty) {
-                ref.read(pickCoverControllerProvider).updateSearch(searchValue);
+                ref.read(accountControllerProvider).loadMorePosters();
               }
               if (widget.controller.index == 0 &&
                   info.metrics.pixels >
                       info.metrics.maxScrollExtent -
                           MediaQuery.of(context).size.height) {
-                ref.read(profileControllerApiProvider).updatePosts(profile!.id);
+                //TODO: add pagination to watchlist
               }
               if (widget.controller.index == 1 &&
                   widget.controller.length == 3 &&
                   info.metrics.pixels >
                       info.metrics.maxScrollExtent -
                           MediaQuery.of(context).size.height) {
-                ref.read(profileControllerApiProvider).updateBookmarks();
+                //TODO: add pagination to lists
               }
               return true;
             },
-            child: PostsCollectionView(
+            child: PostersCollectionView(
               posters,
               name: widget.name,
               callback: widget.callback,
             ),
           ),
-          PostsCollectionView(
-            bookmarks,
-            callback: (bookmark, index) {
-// customOnItemTap: (post, index) {
-              // final bookmark = bookmarks![index]!;
-              int id;
-              var list = bookmark.tmdbLink!.split('/');
-              list.removeLast();
-              print(list);
-              id = int.parse(list.last);
-              ref.watch(router)!.push(
-                    BookmarksRoute(
-                      id: id,
-                      mediaId: bookmark.mediaId!,
-                      tmdbLink: bookmark.tmdbLink!,
-                    ),
-                  );
-              // },
+          NotificationListener<ScrollUpdateNotification>(
+            onNotification: (info) {
+              if (info.metrics.pixels >=
+                      info.metrics.maxScrollExtent -
+                          MediaQuery.of(context).size.height &&
+                  searchValue.isNotEmpty) {
+                ref.read(accountControllerProvider).loadMorePosters();
+              }
+              return true;
             },
+            child: PostersCollectionView(
+              posters,
+              name: widget.name,
+              callback: widget.callback,
+            ),
+          ),
+          NotificationListener<ScrollUpdateNotification>(
+            onNotification: (info) {
+              if (info.metrics.pixels >=
+                  info.metrics.maxScrollExtent -
+                      MediaQuery.of(context).size.height) {
+                ref.read(accountControllerProvider).loadMoreBookmarks();
+              }
+              return true;
+            },
+            child: PostersCollectionView(
+              bookmarks,
+              callback: (bookmark, index) {
+                int id;
+                var list = bookmark.tmdbLink!.split('/');
+                list.removeLast();
+                id = int.parse(list.last);
+                ref.watch(router)!.push(
+                      BookmarksRoute(
+                        id: id,
+                        mediaId: bookmark.mediaId!,
+                        tmdbLink: bookmark.tmdbLink!,
+                      ),
+                    );
+              },
+            ),
           ),
           GridView.builder(
             padding: const EdgeInsets.all(16.0),
@@ -578,68 +540,15 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
                           300 +
                       23,
             ),
-            itemCount: lists?.length ?? 30,
+            itemCount: lists.length,
             itemBuilder: (context, index) {
               return ListGridWidget(
-                post: lists?[index],
+                post: lists[index],
                 index: index,
               );
             },
           ),
         ],
-      ),
-    );
-  }
-}
-
-class PostsCollectionView extends ConsumerWidget {
-  final List<PostMovieModel?> movies;
-  final String? name;
-  final void Function(PostMovieModel, int index)? callback;
-
-  const PostsCollectionView(
-    this.movies, {
-    this.name,
-    this.callback,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    if (movies.isEmpty == true) {
-      return Column(
-        children: [
-          SizedBox(height: (MediaQuery.of(context).size.height - 480 - 56) / 2),
-          SizedBox(
-            width: name == null ? 170 : 250,
-            child: SimpleEmptyCollectionWidget(
-              name != null
-                  ? "$name ${context.txt.profile_noWatched} "
-                  : context.txt.profile_lists_add_hint,
-            ),
-          ),
-        ],
-      );
-    }
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(
-        parent: BouncingScrollPhysics(),
-      ),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 12.5,
-        mainAxisSpacing: 15,
-        mainAxisExtent:
-            ((MediaQuery.of(context).size.width - 15 * 2 - 16 * 2) / 3) /
-                    2 *
-                    3 +
-                41,
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      itemCount: movies.length,
-      itemBuilder: (_, index) => GestureDetector(
-        onTap: () => callback?.call(movies[index]!, index),
-        child: PostGridItemWidget(movies[index]),
       ),
     );
   }
