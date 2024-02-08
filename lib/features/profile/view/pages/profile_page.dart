@@ -996,10 +996,10 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs>
             ),
             itemCount: lists?.length ?? 30,
             itemBuilder: (context, index) {
-              return ListGridWidget(
-                post: lists?[index],
-                index: index,
-              );
+              // return ListGridWidget(
+              //   post: lists?[index],
+              //   index: index,
+              // );
             },
           ),
         ],

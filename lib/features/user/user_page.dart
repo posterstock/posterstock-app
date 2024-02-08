@@ -500,10 +500,19 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
               itemCount: lists.length,
               itemBuilder: (_, index) {
                 return ListGridWidget(
+                  (post) => ref.watch(router)!.push(ListRoute(id: post!.id)),
                   post: lists[index],
-                  index: index,
+                  // index: index,
                 );
               },
+              /*
+                      ref.watch(router)!.push(
+              ListRoute(
+                id: post!.id,
+                // type: index,
+              ),
+            );
+               */
             ),
           ),
         ],

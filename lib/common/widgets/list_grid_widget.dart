@@ -10,10 +10,12 @@ import 'package:poster_stock/themes/build_context_extension.dart';
 
 class ListGridWidget extends ConsumerWidget {
   final ListBaseModel? post;
-  final int index;
-  const ListGridWidget({
+  // final int index;
+  final void Function(ListBaseModel?) callback;
+  const ListGridWidget(
+    this.callback, {
     required this.post,
-    this.index = -1,
+    // this.index = -1,
     Key? key,
   }) : super(key: key);
 
@@ -22,12 +24,13 @@ class ListGridWidget extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         if (post?.id == null) return;
-        ref.watch(router)!.push(
-              ListRoute(
-                id: post!.id,
-                type: index,
-              ),
-            );
+        callback(post);
+        // ref.watch(router)!.push(
+        //       ListRoute(
+        //         id: post!.id,
+        //         // type: index,
+        //       ),
+        //     );
       },
       child: GroupListItemWidget(post),
     );

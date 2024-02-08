@@ -51,7 +51,7 @@ enum ListType {
   static ListType? findByIndex(int index) {
     try {
       return ListType.values[index];
-    } on RangeError catch (ex) {
+    } catch (_) {
       return null;
     }
   }
