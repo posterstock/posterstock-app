@@ -3,16 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
+import 'package:poster_stock/features/peek_pop/peek_and_pop_dialog.dart';
+import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class PostGridItemWidget extends StatelessWidget {
   final PostMovieModel? poster;
+  final VoidCallback? callback;
 
-  const PostGridItemWidget(this.poster, {super.key});
+  const PostGridItemWidget(this.poster, this.callback, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    return poster == null ? const _PosterPlaceholder() : _PosterTile(poster!);
+    return poster == null
+        ? const _PosterPlaceholder()
+        : PeekAndPopDialog(
+            onTap: () => callback?.call(),
+            dialog: Material(
+              color: Colors.transparent,
+              child: PosterImageDialog(
+                imagePath: poster!.imagePath,
+                name: poster!.name,
+                year: poster!.year.toString(),
+                description: poster!.description,
+              ),
+            ),
+            child: _PosterTile(poster!),
+          );
   }
 }
 

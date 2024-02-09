@@ -50,9 +50,9 @@ class PostersCollectionView extends ConsumerWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       itemCount: movies.length,
-      itemBuilder: (_, index) => GestureDetector(
-        onTap: () => callback?.call(movies[index]!, index),
-        child: PostGridItemWidget(movies[index]),
+      itemBuilder: (_, index) => PostGridItemWidget(
+        movies[index],
+        () => callback?.call(movies[index]!, index),
       ),
     );
   }

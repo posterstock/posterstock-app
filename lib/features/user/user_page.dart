@@ -520,3 +520,10 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
     );
   }
 }
+
+final shimmer = ShimmerLoader(
+  loaded: false,
+  child: Container(
+    color: Colors.grey,
+  ),
+);
