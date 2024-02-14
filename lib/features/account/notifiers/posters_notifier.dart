@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/account/account_network.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
@@ -14,8 +16,14 @@ class PostersNotifier extends StateNotifier<List<PostMovieModel?>> {
   bool _hasMore = true;
   bool _loading = false;
 
-  void load(int id) async {
+  Future<void> load(int id) async {
     if (!_hasMore) return;
+    final result = await network.getPosters(id);
+    state = result.$1 ?? [];
+    _hasMore = result.$2;
+  }
+
+  Future<void> reload(int id) async {
     final result = await network.getPosters(id);
     state = result.$1 ?? [];
     _hasMore = result.$2;
