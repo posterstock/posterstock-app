@@ -11,6 +11,7 @@ import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
+import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
 import 'package:poster_stock/features/create_list/state_holders/chosen_cover_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/create_list_chosen_poster_state_holder.dart';
@@ -173,11 +174,13 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
   Widget build(BuildContext context) {
     final image = ref.watch(chosenCoverStateHolderProvider);
     final searchValue = ref.watch(listSearchValueStateHolderProvider);
-    final posts = ref.watch(profilePostsStateHolderProvider);
+    final posts = ref
+        .watch(accountPostersStateNotifier)
+        .whereType<PostMovieModel>()
+        .toList();
     final postersSearch = ref.watch(listSearchPostsStateHolderProvider);
     final me = ref.watch(myProfileInfoStateHolderProvider);
     if (posts == null) {
-      print("NUUKLL");
       ref.read(profileControllerApiProvider).getUserInfo(null);
     }
     List<PostMovieModel>? posters;
