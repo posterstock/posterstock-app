@@ -51,9 +51,6 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bookmark = ref.watch(
-      bookmarkDetailsStateHolderProvider(widget.mediaId),
-    );
     final bookmarks = ref.watch(bookmarksListStateHolderProvider);
     if (bookmarks == null) {
       Future(() {
