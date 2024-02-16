@@ -105,7 +105,7 @@ class CreatePosterController {
     try {
       await createPosterRepository.createPoster(mediaState!.id,
           mediaState.type.name, image!.$2, description, languages.state!);
-      posterNotifier.reload(accountNotifier.state!.id);
+      posterNotifier.reload();
       profileControllerApi.getUserInfo(null); //TODO: redundant
     } catch (e) {
       print(e);

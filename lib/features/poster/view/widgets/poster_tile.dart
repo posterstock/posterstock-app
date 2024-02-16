@@ -16,7 +16,7 @@ class PostGridItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return poster == null
-        ? const _PosterPlaceholder()
+        ? const PosterPlaceholder()
         : PeekAndPopDialog(
             onTap: () => callback?.call(),
             dialog: Material(
@@ -86,8 +86,8 @@ class _PosterTile extends StatelessWidget {
   }
 }
 
-class _PosterPlaceholder extends StatelessWidget {
-  const _PosterPlaceholder({super.key});
+class PosterPlaceholder extends StatelessWidget {
+  const PosterPlaceholder({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +103,32 @@ class _PosterPlaceholder extends StatelessWidget {
                     2 *
                     3,
             child: _shimmer,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text('', style: context.textStyles.caption2),
+        const SizedBox(height: 4),
+        Text('', style: context.textStyles.caption1),
+      ],
+    );
+  }
+}
+
+class AdaptivePosterPlaceholder extends StatelessWidget {
+  const AdaptivePosterPlaceholder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: ShimmerLoader(
+              child: Container(
+                color: Colors.white,
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 8),

@@ -13,7 +13,6 @@ import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/common/widgets/list_grid_widget.dart';
-import 'package:poster_stock/features/account/account_controller.dart';
 import 'package:poster_stock/features/account/notifiers/account_notifier.dart';
 import 'package:poster_stock/features/account/notifiers/bookmarks_notifier.dart';
 import 'package:poster_stock/features/account/notifiers/lists_notifier.dart';
@@ -25,9 +24,7 @@ import 'package:poster_stock/features/edit_profile/view/pages/edit_profile_page.
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
-import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
-import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/view/widgets/count_indicator.dart';
 import 'package:poster_stock/features/profile/view/widgets/posters_collections_view.dart';
 import 'package:poster_stock/features/profile/view/widgets/profile_appbar.dart';
@@ -43,7 +40,7 @@ class AccountPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.read(accountControllerProvider);
+    // ref.read(accountControllerProvider);
     final account = ref.watch(accountNotifier);
     return account == null ? const WaitProfile.empty() : _AccountScreen();
   }
@@ -435,12 +432,20 @@ class ProfileTabs extends ConsumerStatefulWidget {
 class _ProfileTabsState extends ConsumerState<ProfileTabs> {
   @override
   Widget build(BuildContext context) {
+    // final accountController = ref.read(accountControllerProvider);
     final lists = ref.watch(accountListsStateNotifier);
     final searchValue = ref.watch(listSearchValueStateHolderProvider);
     final posters = ref.watch(accountPostersStateNotifier);
+    // final posters = accountController.posters;
     final postersSearch = ref.watch(listSearchPostsStateHolderProvider);
     final bookmarks = ref.watch(accountBookmarksStateNotifier);
     // final profile = ref.watch(profileInfoStateHolderProvider);
+    if (posters.top) {
+      widget.animationController.value = 0;
+    }
+    if (bookmarks.top) {
+      widget.animationController.value = 0;
+    }
     return AnimatedBuilder(
       animation: widget.animationController,
       builder: (context, child) {
@@ -462,12 +467,12 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
               if (info.metrics.pixels >=
                   info.metrics.maxScrollExtent -
                       MediaQuery.of(context).size.height) {
-                ref.read(accountControllerProvider).loadMorePosters();
+                ref.read(accountPostersStateNotifier.notifier).loadMore();
               }
               return true;
             },
             child: PostersCollectionView(
-              posters,
+              posters.posters,
               name: widget.name,
               callback: widget.callback,
             ),
@@ -477,12 +482,12 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
               if (info.metrics.pixels >=
                   info.metrics.maxScrollExtent -
                       MediaQuery.of(context).size.height) {
-                ref.read(accountControllerProvider).loadMoreBookmarks();
+                ref.read(accountBookmarksStateNotifier.notifier).loadMore();
               }
               return true;
             },
             child: PostersCollectionView(
-              bookmarks,
+              bookmarks.bookmarks,
               callback: (bookmark, index) {
                 int id;
                 var list = bookmark.tmdbLink!.split('/');
