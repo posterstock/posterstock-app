@@ -4,7 +4,7 @@ import 'package:poster_stock/features/profile/models/user_details_model.dart';
 
 final accountNotifier =
     StateNotifierProvider<AccountNotifier, UserDetailsModel?>(
-  (ref) => AccountNotifier().._init(),
+  (ref) => AccountNotifier()..load(),
 );
 
 class AccountNotifier extends StateNotifier<UserDetailsModel?> {
@@ -14,7 +14,7 @@ class AccountNotifier extends StateNotifier<UserDetailsModel?> {
 
   UserDetailsModel? get account => state;
 
-  Future<void> _init() async {
+  Future<void> load() async {
     state = await network.getProfileInfo();
   }
 }

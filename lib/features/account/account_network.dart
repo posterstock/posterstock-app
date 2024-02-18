@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:poster_stock/common/data/dio_keeper.dart';
 import 'package:poster_stock/features/account/profile_mapper.dart';
@@ -56,6 +58,7 @@ class AccountNetwork {
     for (var a in response.data['entries'] ?? []) {
       result.add(a);
     }
+    log('reslut ${result.length}');
     return (
       result.map(_fromJson).toList(),
       response.data['has_more'] as bool,

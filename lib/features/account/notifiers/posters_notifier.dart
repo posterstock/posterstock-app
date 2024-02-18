@@ -2,25 +2,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/account/account_network.dart';
 import 'package:poster_stock/features/account/notifiers/account_notifier.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
-import 'package:poster_stock/features/profile/models/user_details_model.dart';
 
 final accountPostersStateNotifier =
     StateNotifierProvider<PostersNotifier, PostersState>(
-  (ref) => PostersNotifier(ref.watch(accountNotifier)).._init(),
+  (ref) => PostersNotifier(ref.watch(accountNotifier.notifier)).._init(),
 );
 
 class PostersNotifier extends StateNotifier<PostersState> {
-  PostersNotifier(this.account) : super(const PostersState.holder());
+  PostersNotifier(this.accountNotifier) : super(const PostersState.holder());
 
-  final UserDetailsModel? account;
+  final AccountNotifier accountNotifier;
   final AccountNetwork network = AccountNetwork();
   bool _hasMore = true;
   bool _loading = false;
 
-  int get _id => account!.id;
+  int get _id => accountNotifier.account!.id;
 
   Future<void> _init() async {
-    if (account == null) return;
+    if (accountNotifier.account == null) return;
     load();
   }
 
@@ -36,9 +35,10 @@ class PostersNotifier extends StateNotifier<PostersState> {
   }
 
   Future<void> reload() async {
-    final (list, more) = await network.getPosters(_id);
+    final (list, more) = await network.getPosters(_id, restart: true);
     state = PostersState.top(list!);
     _hasMore = more;
+    await accountNotifier.load();
   }
 
   Future<void> loadMore() async {

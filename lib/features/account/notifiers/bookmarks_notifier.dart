@@ -44,7 +44,7 @@ class BookmarksNotifier extends StateNotifier<BookmarksState> {
   }
 
   Future<void> reload() async {
-    final (list, more) = await network.getBookmarks();
+    final (list, more) = await network.getBookmarks(restart: true);
     state = BookmarksState.top(list!);
     _hasMore = more;
   }

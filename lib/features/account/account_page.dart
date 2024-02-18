@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -334,6 +336,7 @@ class _AccountState extends ConsumerState<_AccountScreen>
             ];
           },
           body: ProfileTabs(
+            scrollController: scrollController,
             animationController: animationController,
             searchTextController: searchController,
             shimmer: shimmer,
@@ -413,11 +416,13 @@ class ProfileTabs extends ConsumerStatefulWidget {
     Key? key,
     required this.controller,
     this.name,
+    required this.scrollController,
     required this.shimmer,
     required this.animationController,
     required this.searchTextController,
     this.callback,
   }) : super(key: key);
+  final ScrollController scrollController;
   final TabController controller;
   final String? name;
   final Widget shimmer;
@@ -440,12 +445,18 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
     final postersSearch = ref.watch(listSearchPostsStateHolderProvider);
     final bookmarks = ref.watch(accountBookmarksStateNotifier);
     // final profile = ref.watch(profileInfoStateHolderProvider);
-    if (posters.top) {
-      widget.animationController.value = 0;
+    log('poster: ${posters.posters.length}');
+    log('bookmarks: ${bookmarks.bookmarks.length}');
+    if (posters.top || bookmarks.top) {
+      widget.scrollController.animateTo(0,
+          duration: const Duration(milliseconds: 300), curve: Curves.linear);
+      // widget.animationController.animateTo(0);
     }
-    if (bookmarks.top) {
-      widget.animationController.value = 0;
-    }
+    // if (bookmarks.top) {
+    //   widget.scrollController.animateTo(0,
+    //       duration: const Duration(milliseconds: 300), curve: Curves.linear);
+    //   // widget.animationController.value = 0;
+    // }
     return AnimatedBuilder(
       animation: widget.animationController,
       builder: (context, child) {
