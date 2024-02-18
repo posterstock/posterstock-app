@@ -41,6 +41,14 @@ class PostersNotifier extends StateNotifier<PostersState> {
     await accountNotifier.load();
   }
 
+  Future<void> deletePost(int posterId) async {
+    await network.deletePost(posterId);
+    final (list, more) = await network.getPosters(_id, restart: true);
+    state = PostersState.top(list!);
+    _hasMore = more;
+    await accountNotifier.load();
+  }
+
   Future<void> loadMore() async {
     if (!_hasMore) return;
     if (_loading) return;

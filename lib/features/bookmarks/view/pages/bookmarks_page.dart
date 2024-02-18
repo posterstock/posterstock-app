@@ -9,6 +9,7 @@ import 'package:poster_stock/common/menu/menu_state.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
+import 'package:poster_stock/features/account/notifiers/bookmarks_notifier.dart';
 import 'package:poster_stock/features/bookmarks/controller/bookmarks_controller.dart';
 import 'package:poster_stock/features/bookmarks/state_holders/bookmark_details_state_holder.dart';
 import 'package:poster_stock/features/bookmarks/state_holders/bookmark_list_state_holder.dart';
@@ -230,12 +231,15 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
           'assets/icons/ic_trash2.svg',
           context.txt.delete,
           () async {
+            // await ref
+            //     .read(commentsControllerProvider)
+            //     .setBookmarked(widget.mediaId, false);
+            // await ref
+            //     .read(profileBookmarksStateHolderProvider.notifier)
+            //     .remove(widget.mediaId);
             await ref
-                .read(commentsControllerProvider)
-                .setBookmarked(widget.mediaId, false);
-            await ref
-                .read(profileBookmarksStateHolderProvider.notifier)
-                .remove(widget.mediaId);
+                .read(accountBookmarksStateNotifier.notifier)
+                .deleteBookmark(widget.mediaId);
             await ref.read(router)!.pop();
           },
         ),

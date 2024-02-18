@@ -8,21 +8,22 @@ import 'package:poster_stock/features/profile/models/user_details_model.dart';
 
 final accountBookmarksStateNotifier =
     StateNotifierProvider<BookmarksNotifier, BookmarksState>(
-  (ref) => BookmarksNotifier(ref.watch(accountNotifier)).._init(),
+  (ref) => BookmarksNotifier(ref.watch(accountNotifier.notifier)).._init(),
 );
 
 class BookmarksNotifier extends StateNotifier<BookmarksState> {
-  BookmarksNotifier(this.account) : super(const BookmarksState.holder());
-  final UserDetailsModel? account;
+  BookmarksNotifier(this.accountNotifier)
+      : super(const BookmarksState.holder());
+  final AccountNotifier accountNotifier;
   final AccountNetwork network = AccountNetwork();
   bool _hasMore = true;
   bool _loading = false;
 
-  int get _id => account!.id;
+  int get _id => accountNotifier.account!.id;
 
   Future<void> _init() async {
-    log('account: $account, state: $state');
-    if (account == null) return;
+    log('account: ${accountNotifier.account}, state: $state');
+    if (accountNotifier.account == null) return;
     load();
   }
 
@@ -41,6 +42,14 @@ class BookmarksNotifier extends StateNotifier<BookmarksState> {
       state = BookmarksState.list(list!);
     }
     _hasMore = more;
+  }
+
+  Future<void> deleteBookmark(int bookmarkId) async {
+    await network.removeBookmark(bookmarkId);
+    final (list, more) = await network.getBookmarks(restart: true);
+    state = BookmarksState.top(list!);
+    _hasMore = more;
+    await accountNotifier.load();
   }
 
   Future<void> reload() async {

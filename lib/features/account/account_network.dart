@@ -43,6 +43,29 @@ class AccountNetwork {
     return (result.map(_fromJson).toList(), response.data['has_more'] as bool);
   }
 
+  Future<void> deletePost(int id) async {
+    try {
+      final response = await _dio.delete(
+        'api/posters/$id',
+        options: Options(
+          contentType: 'application/json',
+          headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+        ),
+      );
+      print('$id ${response.data}');
+      return response.data;
+    } on DioError catch (e) {
+      print(18);
+      print(e.response);
+      print(e.response?.data);
+      print(e.response?.headers);
+      rethrow;
+    }
+  }
+
   PostMovieModel _fromJson(Map<String, dynamic> json) =>
       PostMovieModel.fromJson(json, previewPrimary: true);
 
@@ -63,6 +86,26 @@ class AccountNetwork {
       result.map(_fromJson).toList(),
       response.data['has_more'] as bool,
     );
+  }
+
+  Future<void> removeBookmark(int id) async {
+    try {
+      final path = '/api/posters/$id/unbookmark';
+      Response response = await _dio.post(
+        path,
+        options: Options(
+          contentType: 'application/json',
+          headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+        ),
+      );
+      print('request success');
+    } on DioError catch (e) {
+      print(e);
+      rethrow;
+    }
   }
 
   Future<List<ListBaseModel>?> getLists(int id) async {

@@ -14,6 +14,7 @@ import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
+import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
 import 'package:poster_stock/features/create_poster/controller/create_poster_controller.dart';
 import 'package:poster_stock/features/create_poster/model/media_model.dart';
@@ -1384,8 +1385,12 @@ class PosterActionsDialog extends ConsumerWidget {
                                   );
                                 } else {
                                   try {
+                                    // await ref
+                                    //     .read(commentsControllerProvider)
+                                    //     .deletePost(post.id);
                                     await ref
-                                        .read(commentsControllerProvider)
+                                        .read(accountPostersStateNotifier
+                                            .notifier)
                                         .deletePost(post.id);
                                     scaffoldMessengerKey.currentState
                                         ?.showSnackBar(
