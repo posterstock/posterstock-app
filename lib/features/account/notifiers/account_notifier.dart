@@ -3,7 +3,7 @@ import 'package:poster_stock/features/account/account_network.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 
 final accountNotifier =
-    StateNotifierProvider<AccountNotifier, UserDetailsModel?>(
+    StateNotifierProvider.autoDispose<AccountNotifier, UserDetailsModel?>(
   (ref) => AccountNotifier()..load(),
 );
 

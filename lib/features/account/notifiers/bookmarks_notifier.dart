@@ -1,13 +1,11 @@
-import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/account/account_network.dart';
 import 'package:poster_stock/features/account/notifiers/account_notifier.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
-import 'package:poster_stock/features/profile/models/user_details_model.dart';
 
 final accountBookmarksStateNotifier =
-    StateNotifierProvider<BookmarksNotifier, BookmarksState>(
+    StateNotifierProvider.autoDispose<BookmarksNotifier, BookmarksState>(
   (ref) => BookmarksNotifier(ref.watch(accountNotifier.notifier)).._init(),
 );
 
@@ -22,7 +20,6 @@ class BookmarksNotifier extends StateNotifier<BookmarksState> {
   int get _id => accountNotifier.account!.id;
 
   Future<void> _init() async {
-    log('account: ${accountNotifier.account}, state: $state');
     if (accountNotifier.account == null) return;
     load();
   }

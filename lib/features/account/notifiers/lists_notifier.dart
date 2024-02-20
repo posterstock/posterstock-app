@@ -5,18 +5,20 @@ import 'package:poster_stock/features/home/models/list_base_model.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 
 final accountListsStateNotifier =
-    StateNotifierProvider<ListsNotifier, List<ListBaseModel?>>(
-  (ref) => ListsNotifier(ref.watch(accountNotifier)).._init(),
+    StateNotifierProvider.autoDispose<ListsNotifier, List<ListBaseModel?>>(
+  (ref) => ListsNotifier(ref.watch(accountNotifier.notifier)).._init(),
 );
 
 class ListsNotifier extends StateNotifier<List<ListBaseModel?>> {
-  ListsNotifier(this.account) : super(List.generate(8, (_) => null));
+  ListsNotifier(this.accountNotifier) : super(List.generate(8, (_) => null));
 
-  final UserDetailsModel? account;
+  final AccountNotifier accountNotifier;
   final AccountNetwork network = AccountNetwork();
 
+  UserDetailsModel? get account => accountNotifier.account;
+
   Future<void> _init() async {
-    if (account == null) return;
+    if (accountNotifier.account == null) return;
     load();
   }
 

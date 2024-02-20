@@ -1,8 +1,6 @@
-import 'dart:math';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:poster_stock/features/poster/view/pages/poster_page/poster_page.dart';
+
 import 'app_router.gr.dart';
 
 @AutoRouterConfig(replaceInRouteName: 'Page,Route')
@@ -36,11 +34,8 @@ class AppRouter extends $AppRouter {
         AutoRoute(page: EditProfileRoute.page, path: '/edit_profile'),
         AutoRoute(page: BookmarksRoute.page, path: '/bookmarks'),
         AutoRoute(page: UsersListRoute.page, path: '/users_list'),
-        AutoRoute(page: ProfileRoute.page, path: '/:username'),
         AutoRoute(page: ListRoute.page, path: '/lists/:id'),
         RedirectRoute(path: '/list/:id', redirectTo: '/lists/:id'),
-        AutoRoute(page: ProfileRouteId.page, path: '/users/:id'),
-        // AutoRoute(page: UserRoute.page, path: '/users/:id'),
         AutoRoute(page: UserRoute.page),
         CustomRoute(
           page: PosterRoute.page,
@@ -72,41 +67,3 @@ class AppRouter extends $AppRouter {
         ),
       ];
 }
-/*
-@AutoRouterConfig(
-  replaceInRouteName: 'Route.page,Route',
-  routes: <AutoRoute>[
-    AutoRoute(
-      page: AuthRoute.page,
-      initial: true,
-      path: 'auth',
-    ),
-    AutoRoute(page: SignUpRoute.page, path: 'sign_up'),
-    AutoRoute(page: LoginRoute.page, path: 'login'),
-    AutoRoute(
-      page: NavigationRoute.page,
-      path: 'navigation',
-      children: [
-        AutoRoute(page: HomeRoute.page, path: 'home'),
-        AutoRoute(page: SearchRoute.page, path: 'search'),
-        AutoRoute(page: NotificationsRoute.page, path: 'notifications'),
-        AutoRoute(page: ProfileRoute.page, path: ':username'),
-      ],
-    ),
-    AutoRoute(
-      page: PosterRoute.page,
-      path: ':username/:id',
-    ),
-    AutoRoute(page: ListRoute.page, path: 'list/:id'),
-    AutoRoute(page: ProfileRoute.page, path: ':username'),
-    AutoRoute(page: SettingsRoute.page, path: 'settings'),
-    AutoRoute(page: ChooseLanguageRoute.page, path: 'language'),
-    AutoRoute(page: ChangeEmailScreen, path: 'change_email'),
-    AutoRoute(page: ChangeEmailCodeScreen, path: 'change_email_code'),
-    AutoRoute(page: EditProfileRoute.page, path: 'edit_profile'),
-    AutoRoute(page: BookmarksRoute.page, path: 'bookmarks'),
-    AutoRoute(page: UsersListRoute.page, path: 'users_list'),
-  ],
-)
-class $AppRouter {}
-*/

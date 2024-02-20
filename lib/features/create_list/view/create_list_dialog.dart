@@ -11,6 +11,7 @@ import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
+import 'package:poster_stock/features/account/notifiers/account_notifier.dart';
 import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
 import 'package:poster_stock/features/create_list/state_holders/chosen_cover_state_holder.dart';
@@ -171,6 +172,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final account = ref.watch(accountNotifier);
     final image = ref.watch(chosenCoverStateHolderProvider);
     final searchValue = ref.watch(listSearchValueStateHolderProvider);
     final posts = ref.watch(accountPostersStateNotifier);
@@ -284,13 +286,8 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                   info.metrics.maxScrollExtent -
                                       MediaQuery.of(context).size.height) {
                                 ref
-                                    .read(pickCoverControllerProvider)
-                                    .updateSearch(searchValue)
-                                    .then((value) {
-                                  ref
-                                      .read(profileControllerApiProvider)
-                                      .updatePosts(me!.id);
-                                });
+                                    .read(accountPostersStateNotifier.notifier)
+                                    .loadMore();
                               }
                               return true;
                             },

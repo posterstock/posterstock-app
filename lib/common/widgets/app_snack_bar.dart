@@ -10,7 +10,9 @@ class SnackBars {
       {Duration? duration}) {
     final shimmer = ShimmerLoader(
       child: Container(
-        color: !context.mounted ? Colors.black : context.colors.backgroundsSecondary,
+        color: !context.mounted
+            ? Colors.black
+            : context.colors.backgroundsSecondary,
       ),
     );
     return SnackBar(
@@ -48,9 +50,83 @@ class SnackBars {
           Expanded(
             child: Text(
               text,
-              style: !context.mounted ? TextStyle(color: Colors.white) : context.textStyles.bodyRegular!.copyWith(
-                color: Colors.white,
-              ),
+              style: !context.mounted
+                  ? TextStyle(color: Colors.white)
+                  : context.textStyles.bodyRegular!.copyWith(
+                      color: Colors.white,
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SnackFactory {
+  static SnackBar image(
+    BuildContext context,
+    String url,
+    String text, {
+    Duration? duration,
+  }) {
+    final shimmer = ShimmerLoader(
+      child: Container(
+        color: !context.mounted
+            ? Colors.black
+            : context.colors.backgroundsSecondary,
+      ),
+    );
+    final image = CachedNetworkImage(
+      width: 36,
+      height: 36,
+      imageUrl: url,
+      fit: BoxFit.cover,
+      fadeInDuration: Durations.cachedDuration,
+      fadeOutDuration: Durations.cachedDuration,
+      placeholderFadeInDuration: Durations.cachedDuration,
+      placeholder: (_, child) => shimmer,
+      errorWidget: (_, obj, trace) => shimmer,
+    );
+    return _snack(context, image, text, duration);
+  }
+
+  static SnackBar text(
+    BuildContext context,
+    String text, {
+    Duration? duration,
+  }) {
+    final icon = SvgPicture.asset('assets/images/dark_logo.svg', width: 36);
+    return _snack(context, icon, text, duration);
+  }
+
+  static SnackBar _snack(
+    BuildContext context,
+    Widget image,
+    String text, [
+    Duration? duration,
+  ]) {
+    final snackDuration = duration ?? const Duration(seconds: 4);
+    return SnackBar(
+      backgroundColor: Colors.black.withOpacity(0.8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      behavior: SnackBarBehavior.floating,
+      duration: snackDuration,
+      margin: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      content: Row(
+        children: [
+          image,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              text,
+              //TODO: refactor
+              style: !context.mounted
+                  ? const TextStyle(color: Colors.white)
+                  : context.textStyles.bodyRegular!.copyWith(
+                      color: Colors.white,
+                    ),
             ),
           ),
         ],

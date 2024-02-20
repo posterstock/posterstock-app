@@ -2,15 +2,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/account/account_network.dart';
 import 'package:poster_stock/features/account/notifiers/account_notifier.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
+import 'package:poster_stock/features/profile/models/user_details_model.dart';
 
 final accountPostersStateNotifier =
-    StateNotifierProvider<PostersNotifier, PostersState>(
-  (ref) => PostersNotifier(ref.watch(accountNotifier.notifier)).._init(),
+    StateNotifierProvider.autoDispose<PostersNotifier, PostersState>(
+  (ref) {
+    final UserDetailsModel? account = ref.watch(accountNotifier);
+    return PostersNotifier(account, ref.read(accountNotifier.notifier)).._init();
+  },
 );
 
 class PostersNotifier extends StateNotifier<PostersState> {
-  PostersNotifier(this.accountNotifier) : super(const PostersState.holder());
+  PostersNotifier(this.account, this.accountNotifier) : super(const PostersState.holder());
 
+
+  final UserDetailsModel? account;
   final AccountNotifier accountNotifier;
   final AccountNetwork network = AccountNetwork();
   bool _hasMore = true;
