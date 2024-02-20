@@ -84,7 +84,8 @@ class NavigationPage extends ConsumerWidget {
           const PageRouteInfo(HomeRoute.name),
           const PageRouteInfo(SearchRoute.name),
           const NotificationsRoute(),
-          ProfileRoute()
+          const AccountRoute(),
+          // ProfileRoute()
         ],
         builder: (context, child, _) {
           return WillPopScope(

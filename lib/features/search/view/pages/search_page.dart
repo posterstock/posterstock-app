@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/common/widgets/list_grid_widget.dart';
@@ -15,6 +16,7 @@ import 'package:poster_stock/features/search/state_holders/search_posts_state_ho
 import 'package:poster_stock/features/search/state_holders/search_users_state_holder.dart';
 import 'package:poster_stock/features/search/state_holders/search_value_state_holder.dart';
 import 'package:poster_stock/features/search/view/widgets/search_user_tile.dart';
+import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 @RoutePage()
@@ -365,7 +367,11 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
                         ),
                         itemCount: lists.length,
                         itemBuilder: (context, index) {
-                          return ListGridWidget(post: lists![index]);
+                          return ListGridWidget(
+                              (post) => ref.watch(router)!.push(ListRoute(
+                                    id: post!.id,
+                                  )),
+                              post: lists[index]);
                         },
                       ),
               ),

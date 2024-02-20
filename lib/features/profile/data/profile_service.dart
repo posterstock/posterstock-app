@@ -8,18 +8,17 @@ class ProfileService {
   String? postsCursor;
   int? id;
 
-  Future<(List<Map<String, dynamic>>?, bool)> getUserPosts(int? id, {bool restart = false}) async {
+  Future<(List<Map<String, dynamic>>?, bool)> getUserPosts(int? id,
+      {bool restart = false}) async {
     print(id != this.id);
     if (id != this.id) postsCursor = null;
     if (restart) postsCursor = null;
     this.id = id;
-    final response = await _dio.get(
-      'api/posters/users/$id',
-      options: Options(headers: {}),
+    final response = await _dio.get('api/posters/users/$id',
+        options: Options(headers: {}),
         queryParameters: {
-          'cursor' : postsCursor,
-        }
-    );
+          'cursor': postsCursor,
+        });
     final List<Map<String, dynamic>> result = [];
     print(response);
     postsCursor = response.data['next_cursor'];
@@ -51,30 +50,21 @@ class ProfileService {
     if (restart) {
       bookmarksCursor = null;
     }
-    final response = await _dio.get(
-      'api/bookmarks/my',
-      queryParameters: {
-        'cursor' : bookmarksCursor,
-      }
-    );
+    final response = await _dio.get('api/bookmarks/my', queryParameters: {
+      'cursor': bookmarksCursor,
+    });
     bookmarksCursor = response.data['next_cursor'];
-    return (response.data['entries'] as List<dynamic>?, !response.data['has_more']);
+    return (
+      response.data['entries'] as List<dynamic>?,
+      !response.data['has_more']
+    );
   }
 
-  @override
   Future<Map<String, dynamic>> getProfileInfo(dynamic id) async {
-    print(id);
-    print('fewf');
-    print("SHIIT");
     try {
       if (id == null) {
-        print("NULL");
         try {
-          final response = await _dio.get(
-            'api/profiles/',
-            options: Options(
-            ),
-          );
+          final response = await _dio.get('api/profiles/');
           return response.data;
         } on DioError catch (e) {
           print(e.response);
@@ -86,7 +76,6 @@ class ProfileService {
       }
       Response response;
       if (id is String) {
-        print("STRING");
         response = await _dio.get(
           'api/users/u/$id/',
           options: Options(headers: {}),
@@ -98,10 +87,23 @@ class ProfileService {
           options: Options(headers: {}),
         );
       }
-      print(response);
       return response.data;
     } on DioError catch (e) {
       print(e.response);
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getMyProfile() async {
+    try {
+      final response = await _dio.get('api/profiles/');
+      return response.data;
+    } on DioError catch (e) {
+      print(e.response);
+      print(e.response?.headers);
+      rethrow;
+    } catch (e) {
+      print(e);
       rethrow;
     }
   }

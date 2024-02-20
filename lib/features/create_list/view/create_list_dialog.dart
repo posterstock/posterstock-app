@@ -11,16 +11,17 @@ import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
+import 'package:poster_stock/features/account/notifiers/account_notifier.dart';
+import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
 import 'package:poster_stock/features/create_list/state_holders/chosen_cover_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/create_list_chosen_poster_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/list_search_posters_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/lists_search_value_state_holder.dart';
-import 'package:poster_stock/features/create_list/view/pick_cover_dialog.dart';
 import 'package:poster_stock/features/create_list/view/widgets/%D1%81hoose_poster_tile.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
-import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
+import 'package:poster_stock/features/poster/view/widgets/poster_tile.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_posts_state_holder.dart';
@@ -171,20 +172,20 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final account = ref.watch(accountNotifier);
     final image = ref.watch(chosenCoverStateHolderProvider);
     final searchValue = ref.watch(listSearchValueStateHolderProvider);
-    final posts = ref.watch(profilePostsStateHolderProvider);
+    final posts = ref.watch(accountPostersStateNotifier);
     final postersSearch = ref.watch(listSearchPostsStateHolderProvider);
     final me = ref.watch(myProfileInfoStateHolderProvider);
     if (posts == null) {
-      print("NUUKLL");
       ref.read(profileControllerApiProvider).getUserInfo(null);
     }
-    List<PostMovieModel>? posters;
+    List<PostMovieModel?> posters;
     if (searchValue.isEmpty) {
-      posters = posts;
+      posters = posts.posters;
     } else {
-      posters = postersSearch;
+      posters = postersSearch ?? List.generate(12, (_) => null);
     }
     dragController.addListener(() async {
       print(dragController.size);
@@ -285,13 +286,8 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                   info.metrics.maxScrollExtent -
                                       MediaQuery.of(context).size.height) {
                                 ref
-                                    .read(pickCoverControllerProvider)
-                                    .updateSearch(searchValue)
-                                    .then((value) {
-                                  ref
-                                      .read(profileControllerApiProvider)
-                                      .updatePosts(me!.id);
-                                });
+                                    .read(accountPostersStateNotifier.notifier)
+                                    .loadMore();
                               }
                               return true;
                             },
@@ -407,16 +403,18 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                         16, 0, 16, 24),
                                     sliver: SliverGrid(
                                       delegate: SliverChildBuilderDelegate(
-                                        childCount: posters?.length,
+                                        childCount: posters.length,
                                         (context, index) {
-                                          return ChoosePosterTile(
-                                            imagePath:
-                                                posters?[index].imagePath,
-                                            name: posters?[index].name,
-                                            year: posters?[index].year,
-                                            id: posters?[index].id,
-                                            index: index,
-                                          );
+                                          final poster = posters[index];
+                                          return poster == null
+                                              ? const AdaptivePosterPlaceholder()
+                                              : ChoosePosterTile(
+                                                  imagePath: poster.imagePath,
+                                                  name: poster.name,
+                                                  year: poster.year,
+                                                  id: poster.id,
+                                                  index: index,
+                                                );
                                         },
                                       ),
                                       gridDelegate:

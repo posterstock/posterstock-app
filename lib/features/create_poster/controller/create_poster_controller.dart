@@ -1,4 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/features/account/account_network.dart';
+import 'package:poster_stock/features/account/notifiers/account_notifier.dart';
+import 'package:poster_stock/features/account/notifiers/bookmarks_notifier.dart';
+import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
 import 'package:poster_stock/features/create_poster/model/media_model.dart';
 import 'package:poster_stock/features/create_poster/repository/create_poster_repository.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_chosen_movie_state_holder.dart';
@@ -30,6 +34,9 @@ final createPosterControllerProvider =
       createPosterSearchListStateHolderProvider.notifier,
     ),
     profileControllerApi: ref.read(profileControllerApiProvider),
+    accountNotifier: ref.read(accountNotifier.notifier),
+    posterNotifier: ref.read(accountPostersStateNotifier.notifier),
+    bookmarkNotifier: ref.read(accountBookmarksStateNotifier.notifier),
     profileInfoStateHolder: ref.watch(profileInfoStateHolderProvider),
     languages: ref.watch(chosenLanguageStateHolder.notifier),
   ),
@@ -42,6 +49,9 @@ class CreatePosterController {
   final CreatePosterChosenPosterStateHolder createPosterChosenPosterStateHolder;
   final CreatePosterSearchListStateHolder createPosterSearchListStateHolder;
   final ProfileControllerApi profileControllerApi;
+  final AccountNotifier accountNotifier;
+  final PostersNotifier posterNotifier;
+  final BookmarksNotifier bookmarkNotifier;
   final UserDetailsModel? profileInfoStateHolder;
   final CreatePosterRepository createPosterRepository =
       CreatePosterRepository();
@@ -54,6 +64,9 @@ class CreatePosterController {
     required this.createPosterChosenPosterStateHolder,
     required this.createPosterSearchListStateHolder,
     required this.profileControllerApi,
+    required this.accountNotifier,
+    required this.posterNotifier,
+    required this.bookmarkNotifier,
     required this.profileInfoStateHolder,
     required this.languages,
   });
@@ -92,16 +105,15 @@ class CreatePosterController {
     try {
       await createPosterRepository.createPoster(mediaState!.id,
           mediaState.type.name, image!.$2, description, languages.state!);
-      profileControllerApi.getUserInfo(null);
+      posterNotifier.reload();
+      profileControllerApi.getUserInfo(null); //TODO: redundant
     } catch (e) {
       print(e);
     }
     createPosterChoseMovieStateHolder.updateValue(null);
     createPosterChosenPosterStateHolder.updateValue(null);
     createPosterSearchStateHolder.updateValue('');
-    createPosterSearchListStateHolder.setValue(
-      null,
-    );
+    createPosterSearchListStateHolder.setValue(null);
     createPosterImagesStateHolder.setValue([]);
   }
 
@@ -115,16 +127,15 @@ class CreatePosterController {
         image!.$2,
         languages.state!,
       );
-      profileControllerApi.getUserInfo(null);
+      bookmarkNotifier.reload();
+      profileControllerApi.getUserInfo(null); //TODO: redundant
     } catch (e) {
       print(e);
     }
     createPosterChoseMovieStateHolder.updateValue(null);
     createPosterChosenPosterStateHolder.updateValue(null);
     createPosterSearchStateHolder.updateValue('');
-    createPosterSearchListStateHolder.setValue(
-      null,
-    );
+    createPosterSearchListStateHolder.setValue(null);
     createPosterImagesStateHolder.setValue([]);
   }
 }
