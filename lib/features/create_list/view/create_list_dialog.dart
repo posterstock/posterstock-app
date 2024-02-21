@@ -172,7 +172,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final account = ref.watch(accountNotifier);
+    // final account = ref.watch(accountNotifier);
     final image = ref.watch(chosenCoverStateHolderProvider);
     final searchValue = ref.watch(listSearchValueStateHolderProvider);
     final posts = ref.watch(accountPostersStateNotifier);
