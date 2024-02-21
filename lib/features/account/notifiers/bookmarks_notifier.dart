@@ -31,7 +31,7 @@ class BookmarksNotifier extends StateNotifier<BookmarksState> {
 
   //TODO: redundant, replace by tryLoad() and load()
   Future<void> load() async {
-    if (!_hasMore) return;
+    if (!_hasMore || _loading) return;
     final (list, more) = await network.getBookmarks();
     if (list?.isEmpty ?? true) {
       state = const BookmarksState.empty();

@@ -8,13 +8,14 @@ final accountPostersStateNotifier =
     StateNotifierProvider.autoDispose<PostersNotifier, PostersState>(
   (ref) {
     final UserDetailsModel? account = ref.watch(accountNotifier);
-    return PostersNotifier(account, ref.read(accountNotifier.notifier)).._init();
+    return PostersNotifier(account, ref.read(accountNotifier.notifier))
+      .._init();
   },
 );
 
 class PostersNotifier extends StateNotifier<PostersState> {
-  PostersNotifier(this.account, this.accountNotifier) : super(const PostersState.holder());
-
+  PostersNotifier(this.account, this.accountNotifier)
+      : super(const PostersState.holder());
 
   final UserDetailsModel? account;
   final AccountNotifier accountNotifier;
@@ -30,8 +31,10 @@ class PostersNotifier extends StateNotifier<PostersState> {
   }
 
   Future<void> load() async {
-    if (!_hasMore) return;
+    if (!_hasMore || _loading) return;
+    _loading = true;
     final (list, more) = await network.getPosters(_id);
+    _loading = false;
     if (list?.isEmpty ?? true) {
       state = const PostersState.empty();
     } else {
@@ -41,10 +44,13 @@ class PostersNotifier extends StateNotifier<PostersState> {
   }
 
   Future<void> reload() async {
+    if (!_hasMore || _loading) return;
+    _loading = true;
     final (list, more) = await network.getPosters(_id, restart: true);
     state = PostersState.top(list!);
     _hasMore = more;
     await accountNotifier.load();
+    _loading = false;
   }
 
   Future<void> deletePost(int posterId) async {
@@ -56,8 +62,7 @@ class PostersNotifier extends StateNotifier<PostersState> {
   }
 
   Future<void> loadMore() async {
-    if (!_hasMore) return;
-    if (_loading) return;
+    if (!_hasMore || _loading) return;
     _loading = true;
     final result = await network.getPosters(_id);
     _loading = false;
