@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
+import 'package:poster_stock/features/user/user_page.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -27,11 +28,9 @@ class SearchUserTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     print(user.id);
     return InkWell(
-      onTap: () {
-        ref.watch(router)!.pushNamed(
-          '/${user.username}/'
-        );
-      },
+      onTap: () => context.pushRoute(
+        UserRoute(args: UserArgs(user.id, user.username)),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: SizedBox(
