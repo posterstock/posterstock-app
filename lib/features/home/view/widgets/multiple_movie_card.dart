@@ -39,9 +39,9 @@ class MultipleMovieCard extends ConsumerWidget {
               child: CachedNetworkImage(
                 imageUrl: post.image ?? '',
                 fit: BoxFit.cover,
-                placeholderFadeInDuration: Durations.cachedDuration,
-                fadeInDuration: Durations.cachedDuration,
-                fadeOutDuration: Durations.cachedDuration,
+                placeholderFadeInDuration: CustomDurations.cachedDuration,
+                fadeInDuration: CustomDurations.cachedDuration,
+                fadeOutDuration: CustomDurations.cachedDuration,
                 placeholder: (context, child) {
                   return shimmer;
                 },

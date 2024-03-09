@@ -467,11 +467,11 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                                       imageUrl: post.imagePath,
                                                       fit: BoxFit.cover,
                                                       placeholderFadeInDuration:
-                                                          Durations
+                                                          CustomDurations
                                                               .cachedDuration,
-                                                      fadeInDuration: Durations
+                                                      fadeInDuration: CustomDurations
                                                           .cachedDuration,
-                                                      fadeOutDuration: Durations
+                                                      fadeOutDuration: CustomDurations
                                                           .cachedDuration,
                                                       placeholder:
                                                           (context, child) {
@@ -506,11 +506,11 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                                       imageUrl: post!.imagePath,
                                                       fit: BoxFit.cover,
                                                       placeholderFadeInDuration:
-                                                          Durations
+                                                          CustomDurations
                                                               .cachedDuration,
-                                                      fadeInDuration: Durations
+                                                      fadeInDuration: CustomDurations
                                                           .cachedDuration,
-                                                      fadeOutDuration: Durations
+                                                      fadeOutDuration: CustomDurations
                                                           .cachedDuration,
                                                       placeholder:
                                                           (context, child) {

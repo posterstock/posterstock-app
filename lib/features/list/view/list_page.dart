@@ -363,9 +363,9 @@ class _ListPageState extends ConsumerState<ListPage>
                               imageUrl: posts!.image!,
                               fit: BoxFit.cover,
                               placeholderFadeInDuration:
-                                  Durations.cachedDuration,
-                              fadeInDuration: Durations.cachedDuration,
-                              fadeOutDuration: Durations.cachedDuration,
+                                  CustomDurations.cachedDuration,
+                              fadeInDuration: CustomDurations.cachedDuration,
+                              fadeOutDuration: CustomDurations.cachedDuration,
                               placeholder: (context, child) {
                                 return shimmer;
                               },

@@ -54,9 +54,9 @@ class _PosterTile extends StatelessWidget {
             child: CachedNetworkImage(
               imageUrl: poster.imagePath,
               fit: BoxFit.cover,
-              placeholderFadeInDuration: Durations.cachedDuration,
-              fadeInDuration: Durations.cachedDuration,
-              fadeOutDuration: Durations.cachedDuration,
+              placeholderFadeInDuration: CustomDurations.cachedDuration,
+              fadeInDuration: CustomDurations.cachedDuration,
+              fadeOutDuration: CustomDurations.cachedDuration,
               placeholder: (_, __) => _shimmer,
               errorWidget: (_, __, ___) => _shimmer,
             ),

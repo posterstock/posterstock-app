@@ -87,9 +87,9 @@ class PostsCollectionTile extends ConsumerWidget {
               child: CachedNetworkImage(
                 imageUrl: (post == null ? imagePath : post?.imagePath) ?? '',
                 fit: BoxFit.cover,
-                placeholderFadeInDuration: Durations.cachedDuration,
-                fadeInDuration: Durations.cachedDuration,
-                fadeOutDuration: Durations.cachedDuration,
+                placeholderFadeInDuration: CustomDurations.cachedDuration,
+                fadeInDuration: CustomDurations.cachedDuration,
+                fadeOutDuration: CustomDurations.cachedDuration,
                 placeholder: (context, child) {
                   return shimmer;
                 },
@@ -194,9 +194,9 @@ class _PosterImageDialogState extends State<PosterImageDialog>
                     child: CachedNetworkImage(
                       imageUrl: widget.imagePath,
                       fit: BoxFit.cover,
-                      placeholderFadeInDuration: Durations.cachedDuration,
-                      fadeInDuration: Durations.cachedDuration,
-                      fadeOutDuration: Durations.cachedDuration,
+                      placeholderFadeInDuration: CustomDurations.cachedDuration,
+                      fadeInDuration: CustomDurations.cachedDuration,
+                      fadeOutDuration: CustomDurations.cachedDuration,
                       placeholder: (context, child) {
                         return shimmer;
                       },

@@ -15,7 +15,7 @@ class AppTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return TabBar(
       controller: tabController,
-      labelColor: Colors.black,
+      labelColor: context.colors.textsPrimary,
       indicatorColor: context.colors.iconsActive,
       labelPadding: const EdgeInsets.symmetric(vertical: 14),
       labelStyle: context.textStyles.subheadlineBold,
