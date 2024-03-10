@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:poster_stock/common/constants/languages.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:supertokens_flutter/dio.dart';
 import 'package:supertokens_flutter/supertokens.dart';
 
@@ -66,6 +66,29 @@ class CreatePosterService {
             "media_type": mediaType,
             "poster_image": '/${image.split('/').last}',
             "lang": lang.locale.toLanguageTag(),
+          },
+        ),
+      );
+      print(response.data);
+      return response.data;
+    } on DioError catch (e) {
+      print(e.response?.headers);
+      rethrow;
+    }
+  }
+
+  Future<void> editPoster(int id, String image, String description) async {
+    token = await SuperTokens.getAccessToken();
+    try {
+      var response = await _dio.post(
+        '/api/posters/$id',
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
+        data: jsonEncode(
+          {
+            "description": description,
+            "poster_image": '/${image.split('/').last}',
           },
         ),
       );

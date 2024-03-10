@@ -1,23 +1,15 @@
-import 'dart:io';
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
-import 'package:poster_stock/features/bookmarks/view/pages/bookmarks_page.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
-import 'package:poster_stock/features/home/state_holders/home_page_likes_state_holder.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/search/state_holders/search_posts_state_holder.dart';
-import 'package:poster_stock/themes/app_colors.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../../models/post_movie_model.dart';
 import '../helpers/custom_bounce_physic.dart';

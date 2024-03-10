@@ -32,9 +32,8 @@ class MultipleMovieCard extends ConsumerWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
             child: SizedBox(
-              height: (MediaQuery.of(context).size.width - 16.0 - 68.0) /
-    540 *
-    300,
+              height:
+                  (MediaQuery.of(context).size.width - 16.0 - 68.0) / 540 * 300,
               width: double.infinity,
               child: CachedNetworkImage(
                 imageUrl: post.image ?? '',

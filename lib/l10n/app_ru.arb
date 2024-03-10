@@ -40,7 +40,7 @@
     "login_signup_title" : "Ввод кода",
     "login_signup_sendText" : "Временный код был отправлен. Пожалуйста проверьте вашу почту и введите код.",
     "login_signup_name_hint" : "Имя",
-    "login_signup_username_hint" : "@имя_пользователя",
+    "login_signup_username_hint" : "имя_пользователя",
     "login_signup_inputCode_hint" : "Введите код",
     "login_signup_createAccount" : "Создать аккаунт",
     "login_signup_username_exist" : "Такое имя_пользователя уже существует",

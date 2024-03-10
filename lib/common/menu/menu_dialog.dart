@@ -52,14 +52,18 @@ class MenuDialog extends StatelessWidget {
           ),
         ...state.items
             .map(
-              (it) => InkWell(
-                splashColor: context.colors.iconsActive,
-                onTap: () {
-                  Navigator.of(context).pop();
-                  it.callback();
-                },
-                child: _MenuItemWidget(it),
-              ),
+              (it) => it is MenuItem
+                  ? InkWell(
+                      splashColor: context.colors.iconsActive,
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        it.callback();
+                      },
+                      child: _MenuItemWidget(it),
+                    )
+                  : it is MenuTitle
+                      ? _MenuTitleWidget(it)
+                      : const SizedBox(),
             )
             .toList(),
         //FIXME: crunch: dialog show behind navigationBar
@@ -72,7 +76,7 @@ class MenuDialog extends StatelessWidget {
 class _MenuItemWidget extends StatelessWidget {
   final MenuItem item;
 
-  const _MenuItemWidget(this.item, {super.key});
+  const _MenuItemWidget(this.item);
 
   @override
   Widget build(BuildContext context) {
@@ -109,6 +113,26 @@ class _MenuItemWidget extends StatelessWidget {
           ),
           const Spacer(),
         ],
+      ),
+    );
+  }
+}
+
+class _MenuTitleWidget extends StatelessWidget {
+  final MenuTitle item;
+
+  const _MenuTitleWidget(this.item);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+      child: Text(
+        item.title,
+        style: context.textStyles.footNote!.copyWith(
+          color: context.colors.textsSecondary,
+        ),
       ),
     );
   }

@@ -4,18 +4,12 @@ import 'dart:io';
 import 'package:auto_route/auto_route.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:poster_stock/common/state_holders/router_state_holder.dart';
-import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
 import 'package:poster_stock/features/notifications/state_holders/notifications_count_state_holder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../../main.dart';
 
 /// Defines a iOS/MacOS notification category for plain actions.
 const String darwinNotificationCategoryPlain = 'plainCategory';
@@ -89,10 +83,6 @@ Future<void> initPushes(StackRouter? routerLocal, WidgetRef ref) async {
     showPush(message, ref: ref);
   });
 
-  FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
-    showPush(message, ref: ref);
-  });
-
   FirebaseMessaging.instance.getInitialMessage().then((value) {
     flutterLocalNotificationsPlugin
         .getNotificationAppLaunchDetails()
@@ -149,9 +139,11 @@ void showPush(RemoteMessage message, {WidgetRef? ref}) async {
   }
   DarwinNotificationDetails iosNotificationDetails = DarwinNotificationDetails(
       categoryIdentifier: darwinNotificationCategoryPlain,
-      attachments: filePath.isEmpty ? [] : [
-        DarwinNotificationAttachment(filePath),
-      ]);
+      attachments: filePath.isEmpty
+          ? []
+          : [
+              DarwinNotificationAttachment(filePath),
+            ]);
   flutterLocalNotificationsPlugin.show(
     message.hashCode,
     message.data['text'],

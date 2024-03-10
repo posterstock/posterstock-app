@@ -10,6 +10,10 @@ class CreatePosterRepository {
     await service.createPoster(mediaId, mediaType, image, description, lang);
   }
 
+  Future<void> editPoster(int id, String image, String description) async {
+    await service.editPoster(id, image, description);
+  }
+
   Future<void> createBookmark(
       int mediaId, String mediaType, String image, Languages lang) async {
     await service.createBookmark(mediaId, mediaType, image, lang);

@@ -40,7 +40,7 @@
     "login_signup_title" : "Sign up code",
     "login_signup_sendText" : "We just sent you a temporary up code. Please check your inbox and paste the sign up code below.",
     "login_signup_name_hint" : "Name",
-    "login_signup_username_hint" : "@Username",
+    "login_signup_username_hint" : "Username",
     "login_signup_inputCode_hint" : "Paste login code",
     "login_signup_createAccount" : "Create new account",
     "login_signup_username_exist" : "This username already exists",

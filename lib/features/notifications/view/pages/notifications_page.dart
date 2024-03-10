@@ -1,7 +1,7 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -10,14 +10,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
-import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/notifications/controllers/notifications_controller.dart';
 import 'package:poster_stock/features/notifications/models/notification_model.dart';
 import 'package:poster_stock/features/notifications/state_holders/notifications_state_holder.dart';
 import 'package:poster_stock/features/notifications/view/empty_notifications_widget.dart';
-import 'package:poster_stock/features/profile/models/user_details_model.dart';
-import 'package:poster_stock/features/profile/view/empty_collection_widget.dart';
-import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../../../common/state_holders/router_state_holder.dart';
@@ -157,7 +153,9 @@ class NotificationsPage extends ConsumerWidget {
                             color: context.colors.backgroundsPrimary,
                           );
                         }
-                        if (notifications.length <= index) return SizedBox();
+                        if (notifications.length <= index) {
+                          return const SizedBox();
+                        }
                         return Column(
                           children: [
                             if (index != 0)
@@ -226,7 +224,8 @@ class NotificationTile extends ConsumerWidget {
                     radius: 24,
                     backgroundImage: notification.profileImage == null
                         ? null
-                        : NetworkImage(notification.profileImage!),
+                        : CachedNetworkImageProvider(
+                            notification.profileImage!),
                     backgroundColor: avatar[Random().nextInt(3)],
                     child: notification.profileImage == null
                         ? Text(

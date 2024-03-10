@@ -25,20 +25,19 @@ class NotificationsController {
     if (loading) return;
     loading = true;
     try {
-      if (getNewPosts && !loadedAll) {
-        final result = await repo.getNotifications(getNewPosts: true);
-        if (result.isEmpty) {
-          loadedAll = true;
-        }
-        notificationsState
-            .updateStateStart(result);
-      } else {
-        var nots = await repo.getNotifications();
-        if (nots.isEmpty) {
-          loadedAll = true;
-        }
-        notificationsState.updateState(nots);
+      // if (getNewPosts && !loadedAll) {
+      final result = await repo.getNotifications(getNewPosts: true);
+      if (result.isEmpty) {
+        loadedAll = true;
       }
+      notificationsState.updateStateStart(result);
+      // } else {
+      //   var nots = await repo.getNotifications();
+      //   if (nots.isEmpty) {
+      //     loadedAll = true;
+      //   }
+      //   notificationsState.updateState(nots);
+      // }
     } catch (e) {
       print(e);
     }

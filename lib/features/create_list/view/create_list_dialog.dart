@@ -11,7 +11,6 @@ import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
-import 'package:poster_stock/features/account/notifiers/account_notifier.dart';
 import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
 import 'package:poster_stock/features/create_list/state_holders/chosen_cover_state_holder.dart';
@@ -798,9 +797,8 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
                     ).width +
                     32,
                 child: AppTextButton(
-                  disabled: (descriptionController!.text.isEmpty ||
-                          descriptionController!.text.length >
-                              widget.maxSymbols) ||
+                  disabled: (descriptionController!.text.length >
+                          widget.maxSymbols) ||
                       !widget.buttonAddCheck,
                   onTap: widget.onTap,
                   child: widget.buttonLoading
