@@ -2,18 +2,31 @@ import 'dart:ui';
 
 class MenuState {
   final String? title;
-  final List<MenuItem> items;
+  final List<MenuElement> items;
 
   MenuState(this.title, this.items);
 }
 
-class MenuItem {
-  final String asset;
+abstract class MenuElement {
   final String title;
+
+  MenuElement(this.title);
+}
+
+class MenuItem extends MenuElement {
+  final String asset;
   final bool danger;
   final VoidCallback callback;
 
-  MenuItem(this.asset, this.title, this.callback) : danger = false;
+  MenuItem(this.asset, String title, this.callback)
+      : danger = false,
+        super(title);
 
-  MenuItem.danger(this.asset, this.title, this.callback) : danger = true;
+  MenuItem.danger(this.asset, String title, this.callback)
+      : danger = true,
+        super(title);
+}
+
+class MenuTitle extends MenuElement {
+  MenuTitle(String title) : super(title);
 }

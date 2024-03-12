@@ -35,9 +35,9 @@ class SnackBars {
               child: CachedNetworkImage(
                 imageUrl: image,
                 fit: BoxFit.cover,
-                placeholderFadeInDuration: Durations.cachedDuration,
-                fadeInDuration: Durations.cachedDuration,
-                fadeOutDuration: Durations.cachedDuration,
+                placeholderFadeInDuration: CustomDurations.cachedDuration,
+                fadeInDuration: CustomDurations.cachedDuration,
+                fadeOutDuration: CustomDurations.cachedDuration,
                 placeholder: (context, child) {
                   return shimmer;
                 },
@@ -82,9 +82,9 @@ class SnackFactory {
       height: 36,
       imageUrl: url,
       fit: BoxFit.cover,
-      fadeInDuration: Durations.cachedDuration,
-      fadeOutDuration: Durations.cachedDuration,
-      placeholderFadeInDuration: Durations.cachedDuration,
+      fadeInDuration: CustomDurations.cachedDuration,
+      fadeOutDuration: CustomDurations.cachedDuration,
+      placeholderFadeInDuration: CustomDurations.cachedDuration,
       placeholder: (_, child) => shimmer,
       errorWidget: (_, obj, trace) => shimmer,
     );

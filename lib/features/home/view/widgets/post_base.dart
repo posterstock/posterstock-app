@@ -1,11 +1,10 @@
-import 'dart:math';
-
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
@@ -19,7 +18,6 @@ import 'package:poster_stock/features/home/view/helpers/page_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
-import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/features/user/user_page.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
@@ -193,22 +191,32 @@ class UserInfoTile extends ConsumerWidget {
               ignoring: true,
               child: Padding(
                 padding: const EdgeInsets.only(top: 4.0),
-                child: CircleAvatar(
-                  radius: 20,
-                  backgroundImage: user?.imagePath != null
-                      ? NetworkImage(user!.imagePath!)
-                      : null,
-                  backgroundColor: user?.color,
-                  child: user?.imagePath == null && !loading
-                      ? Text(
-                          getAvatarName(
-                                  user?.name ?? 'AA', user?.username ?? '')
-                              .toUpperCase(),
-                          style: context.textStyles.subheadlineBold!.copyWith(
-                            color: context.colors.textsBackground,
+                child: SizedBox(
+                  width: 40.0,
+                  child: user?.imagePath == null
+                      ? CircleAvatar(
+                          radius: 20.0,
+                          backgroundColor: user?.color,
+                          child: Text(
+                            getAvatarName(
+                                    user?.name ?? 'AA', user?.username ?? '')
+                                .toUpperCase(),
+                            style: context.textStyles.subheadlineBold!.copyWith(
+                              color: context.colors.textsBackground,
+                            ),
+                          ))
+                      : ClipOval(
+                          child: CachedNetworkImage(
+                            width: 40.0,
+                            height: 40.0,
+                            imageUrl: user!.imagePath!,
+                            errorWidget: (c, o, t) => shimmer,
+                            placeholderFadeInDuration:
+                                CustomDurations.cachedDuration,
+                            fadeInDuration: CustomDurations.cachedDuration,
+                            fadeOutDuration: CustomDurations.cachedDuration,
                           ),
-                        )
-                      : const SizedBox(),
+                        ),
                 ),
               ),
             ),

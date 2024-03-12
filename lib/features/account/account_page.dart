@@ -41,8 +41,11 @@ class AccountPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // ref.read(accountControllerProvider);
+    final posters = ref.watch(accountPostersStateNotifier);
     final account = ref.watch(accountNotifier);
-    return account == null ? const WaitProfile.empty() : _AccountScreen();
+    return account == null || posters.posters.firstOrNull == null
+        ? const WaitProfile.empty()
+        : _AccountScreen();
   }
 }
 

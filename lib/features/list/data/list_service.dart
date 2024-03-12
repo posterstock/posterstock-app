@@ -128,4 +128,23 @@ class ListService {
       rethrow;
     }
   }
+
+  Future<void> changeDefaultLang(String lang) async {
+    try {
+      final response = await _dio.post('api/lists/default',
+          options: Options(
+            contentType: 'application/json',
+            headers: {
+              'accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+          ),
+          queryParameters: {'lang': lang});
+      print('$lang ${response.data}');
+      return response.data;
+    } on DioError catch (e) {
+      print(e.response);
+      rethrow;
+    }
+  }
 }

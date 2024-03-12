@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:poster_stock/features/account/account_network.dart';
 import 'package:poster_stock/features/account/notifiers/account_notifier.dart';
 import 'package:poster_stock/features/account/notifiers/bookmarks_notifier.dart';
 import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
@@ -112,6 +111,25 @@ class CreatePosterController {
     }
     createPosterChoseMovieStateHolder.updateValue(null);
     createPosterChosenPosterStateHolder.updateValue(null);
+    createPosterSearchStateHolder.updateValue('');
+    createPosterSearchListStateHolder.setValue(null);
+    createPosterImagesStateHolder.setValue([]);
+  }
+
+  Future<void> editPoster(int id, String image, String description) async {
+    var selectedImage = createPosterChosenPosterStateHolder.state;
+    if (selectedImage != null) {
+      image = selectedImage.$2;
+    }
+    try {
+      await createPosterRepository.editPoster(id, image, description);
+      posterNotifier.reload();
+      profileControllerApi.getUserInfo(null); //TODO: redundant
+    } catch (e) {
+      print(e);
+    }
+    createPosterChoseMovieStateHolder.updateValue(null);
+    // createPosterChosenPosterStateHolder.updateValue(null);
     createPosterSearchStateHolder.updateValue('');
     createPosterSearchListStateHolder.setValue(null);
     createPosterImagesStateHolder.setValue([]);

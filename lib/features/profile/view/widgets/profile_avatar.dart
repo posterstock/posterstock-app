@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -14,32 +16,30 @@ class ProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: 40,
-      backgroundColor: profile.color,
-      backgroundImage: profile.imagePath != null
-          ? Image.network(
-              profile.imagePath!,
-              fit: BoxFit.cover,
-              errorBuilder: (c, o, t) => shimmer,
-              loadingBuilder: (_, child, event) {
-                return event?.cumulativeBytesLoaded != event?.expectedTotalBytes
-                    ? shimmer
-                    : child;
-              },
-            ).image
-          : null,
-      child: profile.imagePath == null
-          ? Text(
+    return profile.imagePath == null
+        ? CircleAvatar(
+            radius: 40,
+            backgroundColor: profile.color,
+            child: Text(
               getAvatarName(profile.name).toUpperCase().isEmpty
                   ? getAvatarName(profile.username).toUpperCase()
                   : getAvatarName(profile.name).toUpperCase(),
               style: context.textStyles.title3!.copyWith(
                 color: context.colors.textsBackground,
               ),
-            )
-          : const SizedBox(),
-    );
+            ))
+        : ClipOval(
+            child: CachedNetworkImage(
+              width: 80.0,
+              height: 80.0,
+              imageUrl: profile.imagePath!,
+              fit: BoxFit.cover,
+              errorWidget: (c, o, t) => shimmer,
+              placeholderFadeInDuration: CustomDurations.cachedDuration,
+              fadeInDuration: CustomDurations.cachedDuration,
+              fadeOutDuration: CustomDurations.cachedDuration,
+            ),
+          );
   }
 
   String getAvatarName(String name) {

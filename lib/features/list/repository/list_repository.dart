@@ -1,8 +1,6 @@
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
-import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/list/data/list_service.dart';
 import 'package:poster_stock/features/list/view/list_page.dart';
-import 'package:poster_stock/features/poster/data/comments_service.dart';
 import 'package:poster_stock/features/poster/model/comment.dart';
 
 class ListRepository {
@@ -34,5 +32,9 @@ class ListRepository {
 
   Future<void> deleteList(int id) async {
     await service.deleteList(id);
+  }
+
+  Future<void> changeDefaultLang(String lang) async {
+    await service.changeDefaultLang(lang);
   }
 }

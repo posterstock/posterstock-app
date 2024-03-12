@@ -10,6 +10,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/helpers/hero_dialog_route.dart';
+import 'package:poster_stock/common/menu/menu_dialog.dart';
+import 'package:poster_stock/common/menu/menu_state.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
@@ -467,12 +469,14 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                                       imageUrl: post.imagePath,
                                                       fit: BoxFit.cover,
                                                       placeholderFadeInDuration:
-                                                          Durations
+                                                          CustomDurations
                                                               .cachedDuration,
-                                                      fadeInDuration: Durations
-                                                          .cachedDuration,
-                                                      fadeOutDuration: Durations
-                                                          .cachedDuration,
+                                                      fadeInDuration:
+                                                          CustomDurations
+                                                              .cachedDuration,
+                                                      fadeOutDuration:
+                                                          CustomDurations
+                                                              .cachedDuration,
                                                       placeholder:
                                                           (context, child) {
                                                         return SizedBox(
@@ -506,12 +510,14 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                                       imageUrl: post!.imagePath,
                                                       fit: BoxFit.cover,
                                                       placeholderFadeInDuration:
-                                                          Durations
+                                                          CustomDurations
                                                               .cachedDuration,
-                                                      fadeInDuration: Durations
-                                                          .cachedDuration,
-                                                      fadeOutDuration: Durations
-                                                          .cachedDuration,
+                                                      fadeInDuration:
+                                                          CustomDurations
+                                                              .cachedDuration,
+                                                      fadeOutDuration:
+                                                          CustomDurations
+                                                              .cachedDuration,
                                                       placeholder:
                                                           (context, child) {
                                                         return shimmer;
@@ -650,18 +656,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                 GestureDetector(
                                   onTap: () {
                                     if (post == null) return;
-                                    showModalBottomSheet(
-                                      context: context,
-                                      builder: (context) => GestureDetector(
-                                        onTap: () => Navigator.pop(context),
-                                        child: Container(
-                                          color: Colors.transparent,
-                                          child: const PosterActionsDialog(),
-                                        ),
-                                      ),
-                                      backgroundColor: Colors.transparent,
-                                      isScrollControlled: true,
-                                    );
+                                    _showMenu(context);
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -767,6 +762,153 @@ class _PosterPageState extends ConsumerState<PosterPage>
     return MediaQuery.of(context).size.height - result < 0
         ? 0
         : MediaQuery.of(context).size.height - result;
+  }
+
+  void _showMenu(
+    BuildContext context,
+  ) {
+    final myPoster = ref.watch(myProfileInfoStateHolderProvider);
+    final post = ref.watch(posterStateHolderProvider)!;
+
+    MenuDialog.showBottom(
+      context,
+      MenuState(null, [
+        MenuTitle(post.year.contains('-') ? "TV Show" : "Movie"),
+        if (post.hasInCollection == true)
+          MenuItem(
+            'assets/icons/ic_collections_add.svg',
+            context.txt.poster_menu_listAdd,
+            () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => AddToListDialog(),
+              );
+            },
+          ),
+        MenuItem(
+          'assets/icons/ic_arrow_out.svg',
+          context.txt.poster_menu_openTMDB,
+          () {
+            if (post.tmdbLink != null) {
+              launchUrlString(post.tmdbLink!);
+            }
+          },
+        ),
+        MenuItem(
+          'assets/icons/ic_play_circle.svg',
+          context.txt.watchlist_menu_whereToWatch,
+          () {
+            scaffoldMessengerKey.currentState?.showSnackBar(
+              SnackBars.build(
+                context,
+                null,
+                //TODO: localize
+                "Not available yet",
+              ),
+            );
+          },
+        ),
+        MenuTitle(context.txt.poster),
+        if (myPoster?.id != post.author.id)
+          MenuItem(
+            'assets/icons/ic_follow.svg',
+            context.txt.follow,
+            () {
+              ref
+                  .read(homePagePostsControllerProvider)
+                  .setFollowId(post.id, !post.author.followed);
+              ref.read(posterStateHolderProvider.notifier).updateState(
+                  post.copyWith(
+                      author: post.author
+                          .copyWith(followed: !post.author.followed)));
+              ref.read(profileControllerApiProvider).follow(
+                    post!.author.id,
+                    post!.author.followed,
+                  );
+            },
+          ),
+        MenuItem(
+          (myPoster?.id != post.author.id)
+              ? 'assets/icons/ic_share.svg'
+              : 'assets/icons/ic_edit.svg',
+          (myPoster?.id != post.author.id)
+              ? context.txt.share
+              : context.txt.posterEdit_editPoster,
+          () {
+            if (myPoster?.id != post.author.id) {
+              Share.share(
+                  "https://posterstock.com/${post.author.username}/${post.id}");
+            } else {
+              showModalBottomSheet(
+                context: context,
+                backgroundColor: Colors.transparent,
+                isScrollControlled: true,
+                useSafeArea: true,
+                builder: (context) => CreatePosterDialog(
+                  postMovieModel: post,
+                ),
+              );
+            }
+          },
+        ),
+        MenuItem.danger(
+          (myPoster?.id != post.author.id)
+              ? 'assets/icons/ic_danger.svg'
+              : 'assets/icons/ic_trash2.svg',
+          (myPoster?.id != post.author.id)
+              ? context.txt.report
+              : context.txt.delete,
+          () async {
+            if (myPoster?.id != post.author.id) {
+              scaffoldMessengerKey.currentState?.showSnackBar(
+                SnackBars.build(
+                  context,
+                  null,
+                  //TODO: loclize
+                  "Not available yet",
+                ),
+              );
+            } else {
+              try {
+                // await ref
+                //     .read(commentsControllerProvider)
+                //     .deletePost(post.id);
+                await ref
+                    .read(accountPostersStateNotifier.notifier)
+                    .deletePost(post.id);
+                scaffoldMessengerKey.currentState?.showSnackBar(
+                  SnackBars.build(
+                    context,
+                    null,
+                    //TODO: localize
+                    "Deleted successfully",
+                  ),
+                );
+                Navigator.pop(context);
+                AutoRouter.of(context).pop();
+              } catch (e) {
+                print("FEF");
+                print(e);
+                scaffoldMessengerKey.currentState?.showSnackBar(
+                  SnackBars.build(
+                    context,
+                    null,
+                    //TODO: localize
+                    'Could not delete post',
+                  ),
+                );
+              }
+              final myself = ref.watch(profileInfoStateHolderProvider)?.mySelf;
+              if (myself != false) {
+                ref.read(profileControllerApiProvider).getUserInfo(null);
+              }
+            }
+          },
+        )
+      ]),
+    );
   }
 }
 
@@ -1171,310 +1313,310 @@ class PosterInfo extends ConsumerWidget {
   }
 }
 
-class PosterActionsDialog extends ConsumerWidget {
-  const PosterActionsDialog({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final myPoster = ref.watch(myProfileInfoStateHolderProvider);
-    final post = ref.watch(posterStateHolderProvider)!;
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: SizedBox(
-        height: 490 -
-            ((myPoster?.id != post.author.id) ? 0 : 40) -
-            ((post.hasInCollection == true) ? 0 : 40),
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16.0),
-                  child: SizedBox(
-                    height: 384 -
-                        ((myPoster?.id != post.author.id) ? 0 : 40) -
-                        ((post.hasInCollection == true) ? 0 : 40),
-                    child: Material(
-                      color: context.colors.backgroundsPrimary,
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 36,
-                            child: Center(
-                              child: Text(
-                                post.year.contains('-') ? "TV Show" : "Movie",
-                                style: context.textStyles.footNote!.copyWith(
-                                  color: context.colors.textsSecondary,
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (post.hasInCollection == true)
-                            Divider(
-                              height: 0.5,
-                              thickness: 0.5,
-                              color: context.colors.fieldsDefault,
-                            ),
-                          if (post.hasInCollection == true)
-                            Expanded(
-                              child: InkWell(
-                                onTap: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    backgroundColor: Colors.transparent,
-                                    builder: (context) => AddToListDialog(),
-                                  );
-                                },
-                                child: Center(
-                                  //TODO REMOVE THIS IF THIS MOVIE NOT IN COLLECTION
-                                  child: Text(
-                                    AppLocalizations.of(context)!
-                                        .poster_menu_listAdd,
-                                    style: context.textStyles.bodyRegular!
-                                        .copyWith(
-                                      color: context.colors.textsPrimary,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          Divider(
-                            height: 0.5,
-                            thickness: 0.5,
-                            color: context.colors.fieldsDefault,
-                          ),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () {
-                                if (post.tmdbLink != null) {
-                                  launchUrlString(post.tmdbLink!);
-                                }
-                              },
-                              child: Center(
-                                child: Text(
-                                  AppLocalizations.of(context)!
-                                      .poster_menu_openTMDB,
-                                  style:
-                                      context.textStyles.bodyRegular!.copyWith(
-                                    color: context.colors.textsPrimary,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Divider(
-                            height: 0.5,
-                            thickness: 0.5,
-                            color: context.colors.fieldsDefault,
-                          ),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () {
-                                scaffoldMessengerKey.currentState?.showSnackBar(
-                                  SnackBars.build(
-                                    context,
-                                    null,
-                                    //TODO: localize
-                                    "Not available yet",
-                                  ),
-                                );
-                              },
-                              child: Center(
-                                child: Text(
-                                  context.txt.watchlist_menu_whereToWatch,
-                                  style:
-                                      context.textStyles.bodyRegular!.copyWith(
-                                    color: context.colors.textsPrimary,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 36,
-                            child: Center(
-                              child: Text(
-                                context.txt.poster,
-                                style: context.textStyles.footNote!.copyWith(
-                                  color: context.colors.textsSecondary,
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (myPoster?.id != post.author.id)
-                            Divider(
-                              height: 0.5,
-                              thickness: 0.5,
-                              color: context.colors.fieldsDefault,
-                            ),
-                          if (myPoster?.id != post.author.id)
-                            Expanded(
-                              child: InkWell(
-                                onTap: () {
-                                  ref
-                                      .read(homePagePostsControllerProvider)
-                                      .setFollowId(
-                                          post.id, !post.author.followed);
-                                  ref
-                                      .read(posterStateHolderProvider.notifier)
-                                      .updateState(post.copyWith(
-                                          author: post.author.copyWith(
-                                              followed:
-                                                  !post.author.followed)));
-                                  ref.read(profileControllerApiProvider).follow(
-                                        post!.author.id,
-                                        post!.author.followed,
-                                      );
-                                },
-                                child: Center(
-                                  child: Text(
-                                    //TODO: symplify
-                                    "${post.author.followed ? context.txt.unfollow : context.txt.follow} ${post.author.name}",
-                                    style: context.textStyles.bodyRegular!
-                                        .copyWith(
-                                      color: context.colors.textsPrimary,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          Divider(
-                            height: 0.5,
-                            thickness: 0.5,
-                            color: context.colors.fieldsDefault,
-                          ),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () {
-                                Share.share(
-                                    "https://posterstock.com/${post.author.username}/${post.id}");
-                              },
-                              child: Center(
-                                child: Text(
-                                  context.txt.share,
-                                  style:
-                                      context.textStyles.bodyRegular!.copyWith(
-                                    color: context.colors.textsPrimary,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Divider(
-                            height: 0.5,
-                            thickness: 0.5,
-                            color: context.colors.fieldsDefault,
-                          ),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () async {
-                                if (myPoster?.id != post.author.id) {
-                                  scaffoldMessengerKey.currentState
-                                      ?.showSnackBar(
-                                    SnackBars.build(
-                                      context,
-                                      null,
-                                      //TODO: loclize
-                                      "Not available yet",
-                                    ),
-                                  );
-                                } else {
-                                  try {
-                                    // await ref
-                                    //     .read(commentsControllerProvider)
-                                    //     .deletePost(post.id);
-                                    await ref
-                                        .read(accountPostersStateNotifier
-                                            .notifier)
-                                        .deletePost(post.id);
-                                    scaffoldMessengerKey.currentState
-                                        ?.showSnackBar(
-                                      SnackBars.build(
-                                        context,
-                                        null,
-                                        //TODO: localize
-                                        "Deleted successfully",
-                                      ),
-                                    );
-                                    Navigator.pop(context);
-                                    AutoRouter.of(context).pop();
-                                  } catch (e) {
-                                    print("FEF");
-                                    print(e);
-                                    scaffoldMessengerKey.currentState
-                                        ?.showSnackBar(
-                                      SnackBars.build(
-                                        context,
-                                        null,
-                                        //TODO: localize
-                                        'Could not delete post',
-                                      ),
-                                    );
-                                  }
-                                  final myself = ref
-                                      .watch(profileInfoStateHolderProvider)
-                                      ?.mySelf;
-                                  if (myself != false) {
-                                    ref
-                                        .read(profileControllerApiProvider)
-                                        .getUserInfo(null);
-                                  }
-                                }
-                              },
-                              child: Center(
-                                child: Text(
-                                  (myPoster?.id != post.author.id)
-                                      ? context.txt.report
-                                      : context.txt.delete,
-                                  style:
-                                      context.textStyles.bodyRegular!.copyWith(
-                                    color: context.colors.textsError,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 12,
-                ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16.0),
-                  child: SizedBox(
-                    height: 52,
-                    child: Material(
-                      color: context.colors.backgroundsPrimary,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Center(
-                          child: Text(
-                            context.txt.cancel,
-                            style: context.textStyles.bodyRegular,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+// class PosterActionsDialog extends ConsumerWidget {
+//   const PosterActionsDialog({
+//     Key? key,
+//   }) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final myPoster = ref.watch(myProfileInfoStateHolderProvider);
+//     final post = ref.watch(posterStateHolderProvider)!;
+//     return Align(
+//       alignment: Alignment.bottomCenter,
+//       child: SizedBox(
+//         height: 490 -
+//             ((myPoster?.id != post.author.id) ? 0 : 40) -
+//             ((post.hasInCollection == true) ? 0 : 40),
+//         child: Scaffold(
+//           backgroundColor: Colors.transparent,
+//           body: Padding(
+//             padding: const EdgeInsets.symmetric(horizontal: 16.0),
+//             child: Column(
+//               children: [
+//                 ClipRRect(
+//                   borderRadius: BorderRadius.circular(16.0),
+//                   child: SizedBox(
+//                     height: 384 -
+//                         ((myPoster?.id != post.author.id) ? 0 : 40) -
+//                         ((post.hasInCollection == true) ? 0 : 40),
+//                     child: Material(
+//                       color: context.colors.backgroundsPrimary,
+//                       child: Column(
+//                         children: [
+//                           SizedBox(
+//                             height: 36,
+//                             child: Center(
+//                               child: Text(
+//                                 post.year.contains('-') ? "TV Show" : "Movie",
+//                                 style: context.textStyles.footNote!.copyWith(
+//                                   color: context.colors.textsSecondary,
+//                                 ),
+//                               ),
+//                             ),
+//                           ),
+//                           if (post.hasInCollection == true)
+//                             Divider(
+//                               height: 0.5,
+//                               thickness: 0.5,
+//                               color: context.colors.fieldsDefault,
+//                             ),
+//                           if (post.hasInCollection == true)
+//                             Expanded(
+//                               child: InkWell(
+//                                 onTap: () {
+//                                   showModalBottomSheet(
+//                                     context: context,
+//                                     isScrollControlled: true,
+//                                     backgroundColor: Colors.transparent,
+//                                     builder: (context) => AddToListDialog(),
+//                                   );
+//                                 },
+//                                 child: Center(
+//                                   //TODO REMOVE THIS IF THIS MOVIE NOT IN COLLECTION
+//                                   child: Text(
+//                                     AppLocalizations.of(context)!
+//                                         .poster_menu_listAdd,
+//                                     style: context.textStyles.bodyRegular!
+//                                         .copyWith(
+//                                       color: context.colors.textsPrimary,
+//                                     ),
+//                                   ),
+//                                 ),
+//                               ),
+//                             ),
+//                           Divider(
+//                             height: 0.5,
+//                             thickness: 0.5,
+//                             color: context.colors.fieldsDefault,
+//                           ),
+//                           Expanded(
+//                             child: InkWell(
+//                               onTap: () {
+//                                 if (post.tmdbLink != null) {
+//                                   launchUrlString(post.tmdbLink!);
+//                                 }
+//                               },
+//                               child: Center(
+//                                 child: Text(
+//                                   AppLocalizations.of(context)!
+//                                       .poster_menu_openTMDB,
+//                                   style:
+//                                       context.textStyles.bodyRegular!.copyWith(
+//                                     color: context.colors.textsPrimary,
+//                                   ),
+//                                 ),
+//                               ),
+//                             ),
+//                           ),
+//                           Divider(
+//                             height: 0.5,
+//                             thickness: 0.5,
+//                             color: context.colors.fieldsDefault,
+//                           ),
+//                           Expanded(
+//                             child: InkWell(
+//                               onTap: () {
+//                                 scaffoldMessengerKey.currentState?.showSnackBar(
+//                                   SnackBars.build(
+//                                     context,
+//                                     null,
+//                                     //TODO: localize
+//                                     "Not available yet",
+//                                   ),
+//                                 );
+//                               },
+//                               child: Center(
+//                                 child: Text(
+//                                   context.txt.watchlist_menu_whereToWatch,
+//                                   style:
+//                                       context.textStyles.bodyRegular!.copyWith(
+//                                     color: context.colors.textsPrimary,
+//                                   ),
+//                                 ),
+//                               ),
+//                             ),
+//                           ),
+//                           SizedBox(
+//                             height: 36,
+//                             child: Center(
+//                               child: Text(
+//                                 context.txt.poster,
+//                                 style: context.textStyles.footNote!.copyWith(
+//                                   color: context.colors.textsSecondary,
+//                                 ),
+//                               ),
+//                             ),
+//                           ),
+//                           if (myPoster?.id != post.author.id)
+//                             Divider(
+//                               height: 0.5,
+//                               thickness: 0.5,
+//                               color: context.colors.fieldsDefault,
+//                             ),
+//                           if (myPoster?.id != post.author.id)
+//                             Expanded(
+//                               child: InkWell(
+//                                 onTap: () {
+//                                   ref
+//                                       .read(homePagePostsControllerProvider)
+//                                       .setFollowId(
+//                                           post.id, !post.author.followed);
+//                                   ref
+//                                       .read(posterStateHolderProvider.notifier)
+//                                       .updateState(post.copyWith(
+//                                           author: post.author.copyWith(
+//                                               followed:
+//                                                   !post.author.followed)));
+//                                   ref.read(profileControllerApiProvider).follow(
+//                                         post!.author.id,
+//                                         post!.author.followed,
+//                                       );
+//                                 },
+//                                 child: Center(
+//                                   child: Text(
+//                                     //TODO: symplify
+//                                     "${post.author.followed ? context.txt.unfollow : context.txt.follow} ${post.author.name}",
+//                                     style: context.textStyles.bodyRegular!
+//                                         .copyWith(
+//                                       color: context.colors.textsPrimary,
+//                                     ),
+//                                   ),
+//                                 ),
+//                               ),
+//                             ),
+//                           Divider(
+//                             height: 0.5,
+//                             thickness: 0.5,
+//                             color: context.colors.fieldsDefault,
+//                           ),
+//                           Expanded(
+//                             child: InkWell(
+//                               onTap: () {
+//                                 Share.share(
+//                                     "https://posterstock.com/${post.author.username}/${post.id}");
+//                               },
+//                               child: Center(
+//                                 child: Text(
+//                                   context.txt.share,
+//                                   style:
+//                                       context.textStyles.bodyRegular!.copyWith(
+//                                     color: context.colors.textsPrimary,
+//                                   ),
+//                                 ),
+//                               ),
+//                             ),
+//                           ),
+//                           Divider(
+//                             height: 0.5,
+//                             thickness: 0.5,
+//                             color: context.colors.fieldsDefault,
+//                           ),
+//                           Expanded(
+//                             child: InkWell(
+//                               onTap: () async {
+//                                 if (myPoster?.id != post.author.id) {
+//                                   scaffoldMessengerKey.currentState
+//                                       ?.showSnackBar(
+//                                     SnackBars.build(
+//                                       context,
+//                                       null,
+//                                       //TODO: loclize
+//                                       "Not available yet",
+//                                     ),
+//                                   );
+//                                 } else {
+//                                   try {
+//                                     // await ref
+//                                     //     .read(commentsControllerProvider)
+//                                     //     .deletePost(post.id);
+//                                     await ref
+//                                         .read(accountPostersStateNotifier
+//                                             .notifier)
+//                                         .deletePost(post.id);
+//                                     scaffoldMessengerKey.currentState
+//                                         ?.showSnackBar(
+//                                       SnackBars.build(
+//                                         context,
+//                                         null,
+//                                         //TODO: localize
+//                                         "Deleted successfully",
+//                                       ),
+//                                     );
+//                                     Navigator.pop(context);
+//                                     AutoRouter.of(context).pop();
+//                                   } catch (e) {
+//                                     print("FEF");
+//                                     print(e);
+//                                     scaffoldMessengerKey.currentState
+//                                         ?.showSnackBar(
+//                                       SnackBars.build(
+//                                         context,
+//                                         null,
+//                                         //TODO: localize
+//                                         'Could not delete post',
+//                                       ),
+//                                     );
+//                                   }
+//                                   final myself = ref
+//                                       .watch(profileInfoStateHolderProvider)
+//                                       ?.mySelf;
+//                                   if (myself != false) {
+//                                     ref
+//                                         .read(profileControllerApiProvider)
+//                                         .getUserInfo(null);
+//                                   }
+//                                 }
+//                               },
+//                               child: Center(
+//                                 child: Text(
+//                                   (myPoster?.id != post.author.id)
+//                                       ? context.txt.report
+//                                       : context.txt.delete,
+//                                   style:
+//                                       context.textStyles.bodyRegular!.copyWith(
+//                                     color: context.colors.textsError,
+//                                   ),
+//                                 ),
+//                               ),
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//                 const SizedBox(
+//                   height: 12,
+//                 ),
+//                 ClipRRect(
+//                   borderRadius: BorderRadius.circular(16.0),
+//                   child: SizedBox(
+//                     height: 52,
+//                     child: Material(
+//                       color: context.colors.backgroundsPrimary,
+//                       child: InkWell(
+//                         onTap: () {
+//                           Navigator.pop(context);
+//                         },
+//                         child: Center(
+//                           child: Text(
+//                             context.txt.cancel,
+//                             style: context.textStyles.bodyRegular,
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class _PosterActions extends ConsumerWidget {
   @override

@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
@@ -363,9 +363,9 @@ class _ListPageState extends ConsumerState<ListPage>
                               imageUrl: posts!.image!,
                               fit: BoxFit.cover,
                               placeholderFadeInDuration:
-                                  Durations.cachedDuration,
-                              fadeInDuration: Durations.cachedDuration,
-                              fadeOutDuration: Durations.cachedDuration,
+                                  CustomDurations.cachedDuration,
+                              fadeInDuration: CustomDurations.cachedDuration,
+                              fadeOutDuration: CustomDurations.cachedDuration,
                               placeholder: (context, child) {
                                 return shimmer;
                               },

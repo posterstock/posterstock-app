@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/constants/languages.dart';
+import 'package:poster_stock/features/list/repository/list_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final chosenLanguageStateHolder =
@@ -15,32 +17,22 @@ class ChosenLanguageStateHolder extends StateNotifier<Languages?> {
 
   //TODO: initialize in "main()" method
   Future<void> init() async {
-// ref.read(chosenLanguageStateHolder.notifier).setLocale(initLocale);
-/*
-    Languages initLocale;
-    switch (storedLocale) {
-      case 'English':
-        initLocale = Languages.english();
-        break;
-      case 'Русский':
-        initLocale = Languages.russian();
-        break;
-      default:
-        initLocale = Languages.byLocale(WidgetsBinding.instance.window.locale);
-    }
-*/
     prefs = await SharedPreferences.getInstance();
-    final locale = prefs.getString(_key);
-    if (locale != null) {
-      switch (locale) {
-        case 'English':
-          state = Languages.english();
-          break;
-        case 'Русский':
-          state = Languages.russian();
-          break;
-      }
+    String? locale = prefs.getString(_key);
+    locale ??= Platform.localeName;
+
+    switch (locale) {
+      case 'English' || 'en_US':
+        state = Languages.english();
+        break;
+      case 'Русский' || 'ru_RU':
+        state = Languages.russian();
+        break;
     }
+
+    final ListRepository listRepository = ListRepository();
+    String lang = state!.locale.toLanguageTag();
+    listRepository.changeDefaultLang(lang);
   }
 
   Future<void> setLocale(Languages language) async {

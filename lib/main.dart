@@ -5,9 +5,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -16,8 +16,6 @@ import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/helpers/custom_scroll_behavior.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/page_transition_controller_state_holder.dart';
-import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
-import 'package:poster_stock/features/settings/controllers/app_language_controller.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
@@ -30,8 +28,6 @@ import 'common/services/notifications_service.dart';
 import 'firebase_options.dart';
 import 'navigation/app_router.dart';
 import 'navigation/app_router.gr.dart';
-
-// dart run build_runner build --delete-conflicting-outputs
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
@@ -71,6 +67,7 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    print('Token: ' + (await FirebaseMessaging.instance.getToken()).toString());
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     PlatformDispatcher.instance.onError = (error, stack) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
@@ -146,44 +143,11 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
     final theme = ref.watch(themeStateHolderProvider);
     final appLocale = ref.watch(chosenLanguageStateHolder);
     final rtr = ref.watch(router);
-    // final Locale systemLocale = WidgetsBinding.instance.window.locale;
-    // final storedLocale = prefs.getString('locale');
-/*     switch (storedLocale) {
-      case 'English':
-        ref
-            .read(chosenLanguageStateHolder.notifier)
-            .setLocale(Languages.english());
-        break;
-      case 'Русский':
-        ref
-            .read(chosenLanguageStateHolder.notifier)
-            .setLocale(Languages.russian());
-        break;
-      default:
-        ref
-            .read(chosenLanguageStateHolder.notifier)
-            .setLocale(Languages.english());
-    }
- */ // ref.read(chosenLanguageStateHolder.notifier).setLocale(initLocale);
     List<Languages> langs = [
       Languages.english(),
       Languages.russian(),
     ];
     List<Locale> locales = langs.map((it) => it.locale).toList();
-    // if (appLocale == null) {
-    //   Future(() {
-    //     if (locales.contains(systemLocale)) {
-    //       for (int i = 0; i < locales.length; i++) {
-    //         if (locales[i] == systemLocale) {
-    //           ref.read(appLanguageControllerProvider).updateLanguage(langs[i]);
-    //         }
-    //       }
-    //     } else {
-    //       ref.read(appLanguageControllerProvider).updateLanguage(langs[0]);
-    //     }
-    //   });
-    // }
-    // final Locale savedLocale =
     if (rtr == null) {
       Future(() {
         ref.read(router.notifier).setRouter(App._appRouter);

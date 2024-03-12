@@ -16,17 +16,18 @@ import 'package:poster_stock/features/create_poster/state_holder/create_poster_i
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_loading_state_holder.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_search_list.dart';
 import 'package:poster_stock/features/create_poster/state_holder/create_poster_search_state_holder.dart';
+import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class CreatePosterDialog extends ConsumerStatefulWidget {
-  const CreatePosterDialog({
-    Key? key,
-    this.bookmark = false,
-  }) : super(key: key);
+  const CreatePosterDialog(
+      {Key? key, this.bookmark = false, this.postMovieModel})
+      : super(key: key);
   final bool bookmark;
+  final PostMovieModel? postMovieModel;
 
   @override
   ConsumerState<CreatePosterDialog> createState() => _CreatePosterDialogState();
@@ -45,6 +46,20 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
     super.initState();
     Future(() {
       focus.requestFocus();
+      if (widget.postMovieModel != null) {
+        final years = widget.postMovieModel!.year.split('-');
+        int? startYear = int.parse(years.first);
+        int? endYear = years.length >= 2 ? int.tryParse(years.last) : null;
+
+        ref.read(createPosterControllerProvider).chooseMovie(MediaModel(
+            id: widget.postMovieModel!.mediaId!,
+            title: widget.postMovieModel!.name,
+            type: widget.postMovieModel!.mediaType == 'movie'
+                ? MediaType.movie
+                : MediaType.tv,
+            startYear: startYear,
+            endYear: endYear));
+      }
     });
   }
 
@@ -55,7 +70,9 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
   }
 
   Future<bool> tryExit() async {
-    if (searchController.text.isEmpty) return true;
+    if (searchController.text.isEmpty ||
+        (widget.postMovieModel != null && descController.text.isEmpty))
+      return true;
     bool? exit = await showDialog(
       context: context,
       builder: (context) => Padding(
@@ -161,6 +178,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
         ref.watch(createPosterSearchListStateHolderProvider);
     final MediaModel? chosenMovie =
         ref.watch(createPosterChoseMovieStateHolderProvider);
+
     final List<String> images =
         ref.watch(createPosterImagesStateHolderProvider);
     final chosenCover = ref.watch(createPosterChosenPosterStateHolderProvider);
@@ -290,6 +308,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                       ? 125
                                       : 150,
                                   content: Stack(
+                                    alignment: Alignment.center,
                                     children: [
                                       Column(
                                         children: [
@@ -306,92 +325,101 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                           ),
                                           const SizedBox(height: 22),
                                           Text(
-                                            widget.bookmark
-                                                ? context.txt.home_add_watchlist
-                                                : context.txt.home_add_poster,
+                                            widget.postMovieModel != null
+                                                ? context
+                                                    .txt.posterEdit_editPoster
+                                                : widget.bookmark
+                                                    ? context
+                                                        .txt.home_add_watchlist
+                                                    : context
+                                                        .txt.home_add_poster,
                                             style: context.textStyles.bodyBold,
                                           ),
                                           const SizedBox(height: 17),
-                                          SizedBox(
-                                            height: 36,
-                                            child: Stack(
-                                              children: [
-                                                AppTextField(
-                                                  controller: searchController,
-                                                  searchField: true,
-                                                  focus: focus,
-                                                  hint: context.txt.search_hint,
-                                                  removableWhenNotEmpty: true,
-                                                  crossPadding:
-                                                      const EdgeInsets.all(8.0),
-                                                  crossButton: SvgPicture.asset(
-                                                    'assets/icons/search_cross.svg',
-                                                  ),
-                                                  onRemoved: () {
-                                                    searchController.clear();
-                                                    ref
-                                                        .read(
-                                                            createPosterControllerProvider)
-                                                        .updateSearch('');
-                                                  },
-                                                  onChanged: (value) {
-                                                    if (chosenMovie != null) {
+                                          if (widget.postMovieModel != null)
+                                            Text(
+                                              widget.postMovieModel!.name,
+                                              style: context.textStyles.title3,
+                                            ),
+                                          if (widget.postMovieModel != null)
+                                            const SizedBox(height: 6.0),
+                                          if (widget.postMovieModel != null)
+                                            Text(
+                                              widget.postMovieModel!.year,
+                                              style: context
+                                                  .textStyles.bodyMedium
+                                                  ?.copyWith(
+                                                      color: context.colors
+                                                          .textsSecondary),
+                                            ),
+                                          if (widget.postMovieModel == null)
+                                            SizedBox(
+                                              height: 36,
+                                              child: Stack(
+                                                children: [
+                                                  AppTextField(
+                                                    controller:
+                                                        searchController,
+                                                    searchField: true,
+                                                    focus: focus,
+                                                    hint:
+                                                        context.txt.search_hint,
+                                                    removableWhenNotEmpty: true,
+                                                    crossPadding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    crossButton:
+                                                        SvgPicture.asset(
+                                                      'assets/icons/search_cross.svg',
+                                                    ),
+                                                    onRemoved: () {
+                                                      searchController.clear();
                                                       ref
                                                           .read(
                                                               createPosterControllerProvider)
-                                                          .chooseMovie(null);
-                                                    }
-                                                    ref
-                                                        .read(
-                                                            createPosterControllerProvider)
-                                                        .updateSearch(value);
-                                                  },
-                                                ),
-                                                if (chosenMovie?.startYear !=
-                                                    null)
-                                                  Positioned(
-                                                    left: 50,
-                                                    top: 0,
-                                                    bottom: 0,
-                                                    child: IgnorePointer(
-                                                      ignoring: true,
-                                                      child: Align(
-                                                        alignment: Alignment
-                                                            .centerLeft,
-                                                        child: Row(
-                                                          children: [
-                                                            Text(
-                                                              chosenMovie!
-                                                                  .title,
-                                                              style: context
-                                                                  .textStyles
-                                                                  .bodyRegular!
-                                                                  .copyWith(
-                                                                color: Colors
-                                                                    .transparent,
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              chosenMovie
-                                                                  .startYear
-                                                                  .toString(),
-                                                              style: context
-                                                                  .textStyles
-                                                                  .caption1!
-                                                                  .copyWith(
-                                                                color: context
-                                                                    .colors
-                                                                    .textsSecondary,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                              ),
-                                                            ),
-                                                            if (chosenMovie
-                                                                    .endYear !=
-                                                                null)
+                                                          .updateSearch('');
+                                                    },
+                                                    onChanged: (value) {
+                                                      if (chosenMovie != null) {
+                                                        ref
+                                                            .read(
+                                                                createPosterControllerProvider)
+                                                            .chooseMovie(null);
+                                                      }
+                                                      ref
+                                                          .read(
+                                                              createPosterControllerProvider)
+                                                          .updateSearch(value);
+                                                    },
+                                                  ),
+                                                  if (chosenMovie?.startYear !=
+                                                      null)
+                                                    Positioned(
+                                                      left: 50,
+                                                      top: 0,
+                                                      bottom: 0,
+                                                      child: IgnorePointer(
+                                                        ignoring: true,
+                                                        child: Align(
+                                                          alignment: Alignment
+                                                              .centerLeft,
+                                                          child: Row(
+                                                            children: [
                                                               Text(
-                                                                ' - ${chosenMovie.endYear}',
+                                                                chosenMovie!
+                                                                    .title,
+                                                                style: context
+                                                                    .textStyles
+                                                                    .bodyRegular!
+                                                                    .copyWith(
+                                                                  color: Colors
+                                                                      .transparent,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                chosenMovie
+                                                                    .startYear
+                                                                    .toString(),
                                                                 style: context
                                                                     .textStyles
                                                                     .caption1!
@@ -404,14 +432,31 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                                                           .ellipsis,
                                                                 ),
                                                               ),
-                                                          ],
+                                                              if (chosenMovie
+                                                                      .endYear !=
+                                                                  null)
+                                                                Text(
+                                                                  ' - ${chosenMovie.endYear}',
+                                                                  style: context
+                                                                      .textStyles
+                                                                      .caption1!
+                                                                      .copyWith(
+                                                                    color: context
+                                                                        .colors
+                                                                        .textsSecondary,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ),
+                                                                ),
+                                                            ],
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
-                                                  ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
-                                          ),
                                           if (searchText.isEmpty ||
                                               chosenMovie != null)
                                             const SizedBox(height: 16),
@@ -666,7 +711,9 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
               ),
             ),
             if (!focus.hasFocus && searchController.text.isEmpty ||
-                chosenMovie != null && dragController.isAttached)
+                chosenMovie != null &&
+                    (dragController.isAttached ||
+                        widget.postMovieModel != null))
               AnimatedPositioned(
                 duration: Duration.zero,
                 bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -705,8 +752,11 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                             focus: focusSec,
                             hint: context.txt.search_add_poster_hint,
                             showDivider: false,
-                            button: context.txt.search_add_poster_title,
-                            buttonAddCheck: chosenCover != null,
+                            button: widget.postMovieModel != null
+                                ? context.txt.save
+                                : context.txt.search_add_poster_title,
+                            buttonAddCheck: widget.postMovieModel != null ||
+                                chosenCover != null,
                             buttonLoading: ref
                                 .watch(createPosterLoadingStateHolderProvider),
                             maxSymbols: 280,
@@ -717,6 +767,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                     .read(createPosterLoadingStateHolderProvider
                                         .notifier)
                                     .updateValue(true);
+                                // if (widget.mediaModel == null) {
                                 final currPost =
                                     ref.read(posterStateHolderProvider);
                                 final createId = ref.read(
@@ -731,9 +782,18 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                             .copyWith(hasInCollection: true),
                                       );
                                 }
-                                await ref
-                                    .read(createPosterControllerProvider)
-                                    .createPoster(descController.text);
+                                if (widget.postMovieModel == null) {
+                                  await ref
+                                      .read(createPosterControllerProvider)
+                                      .createPoster(descController.text);
+                                } else {
+                                  await ref
+                                      .read(createPosterControllerProvider)
+                                      .editPoster(
+                                          widget.postMovieModel!.id,
+                                          widget.postMovieModel!.imagePath,
+                                          descController.text);
+                                }
                               } catch (_) {
                                 print(_);
                               }
@@ -743,7 +803,28 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                   .updateValue(false);
                               if (context.mounted) {
                                 Navigator.pop(context);
-                                ref.read(menuControllerProvider).switchMenu();
+
+                                final selectedImage = ref
+                                    .read(createPosterControllerProvider)
+                                    .createPosterChosenPosterStateHolder
+                                    .state;
+                                PostMovieModel? updatedState = ref
+                                    .read(posterStateHolderProvider.notifier)
+                                    .state
+                                    ?.copyWith(
+                                        description: descController.text);
+                                if (selectedImage != null) {
+                                  updatedState = updatedState?.copyWith(
+                                      imagePath: selectedImage.$2);
+                                }
+                                ref
+                                    .read(createPosterControllerProvider)
+                                    .createPosterChosenPosterStateHolder
+                                    .updateValue(null);
+
+                                ref
+                                    .read(posterStateHolderProvider.notifier)
+                                    .updateState(updatedState);
                               }
                             },
                           ),
@@ -763,7 +844,7 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
                                   const Spacer(),
                                   AppTextButton(
                                     text: context.txt.watchlistAdd_bookmark,
-                                    disabled: chosenMovie == null,
+                                    disabled: chosenCover == null,
                                     onTap: () async {
                                       try {
                                         ref

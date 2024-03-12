@@ -1,16 +1,12 @@
-import 'dart:math';
-
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/user/user_page.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
-
-import '../../../../common/state_holders/router_state_holder.dart';
 
 class SearchUserTile extends ConsumerWidget {
   const SearchUserTile({
@@ -41,7 +37,7 @@ class SearchUserTile extends ConsumerWidget {
               CircleAvatar(
                 radius: 24,
                 backgroundImage: user.imagePath != null
-                    ? NetworkImage(user.imagePath!)
+                    ? CachedNetworkImageProvider(user.imagePath!)
                     : null,
                 backgroundColor: user.color,
                 child: user.imagePath == null

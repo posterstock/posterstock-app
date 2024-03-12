@@ -57,9 +57,9 @@ class GroupListItemWidget extends StatelessWidget {
             child: CachedNetworkImage(
               imageUrl: post?.image ?? '',
               fit: BoxFit.cover,
-              placeholderFadeInDuration: Durations.cachedDuration,
-              fadeInDuration: Durations.cachedDuration,
-              fadeOutDuration: Durations.cachedDuration,
+              placeholderFadeInDuration: CustomDurations.cachedDuration,
+              fadeInDuration: CustomDurations.cachedDuration,
+              fadeOutDuration: CustomDurations.cachedDuration,
               placeholder: (_, c) => const ShimmerWidget(),
               errorWidget: (_, o, s) => const ShimmerWidget(),
             ),

@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "405674784124-feinalps3vlsof8gt0rhfss7jujj7pfb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.thedirection.posterstock",
+            "certificate_hash": "9bbf1876c10ddefcfb34f58477f65770efd59b31"
+          }
+        },
+        {
           "client_id": "405674784124-srh0usjhjk28idl1mhqj1oo3ipktujlb.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -30,12 +38,8 @@
           }
         },
         {
-          "client_id": "405674784124-feinalps3vlsof8gt0rhfss7jujj7pfb.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.thedirection.posterstock",
-            "certificate_hash": "9bbf1876c10ddefcfb34f58477f65770efd59b31"
-          }
+          "client_id": "405674784124-o5mimp1gieo999o67s4ourrna4s0e1u5.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
@@ -46,6 +50,10 @@
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
+            {
+              "client_id": "405674784124-o5mimp1gieo999o67s4ourrna4s0e1u5.apps.googleusercontent.com",
+              "client_type": 3
+            },
             {
               "client_id": "405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com",
               "client_type": 2,
