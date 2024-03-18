@@ -3,12 +3,12 @@ import 'package:poster_stock/features/profile/data/profile_service.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 
 final userNotifier = StateNotifierProvider.family
-    .autoDispose<UserNotifier, UserDetailsModel?, int>(
+    .autoDispose<UserNotifier, UserDetailsModel?, dynamic>(
   (ref, id) => UserNotifier(id)..load(),
 );
 
 class UserNotifier extends StateNotifier<UserDetailsModel?> {
-  final int id;
+  final dynamic id;
   final network = ProfileService();
 
   UserNotifier(this.id) : super(null);

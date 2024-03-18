@@ -34,11 +34,30 @@ import 'package:share_plus/share_plus.dart';
 
 //TODO: replace all read(router)/watch(router) by context.router
 
+@RoutePage()
+class UserPageRoute extends ConsumerWidget {
+  final String username;
+
+  const UserPageRoute({
+    @PathParam('username') required this.username,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userNotifier(username));
+    return user == null
+        ? WaitProfile(username)
+        : _UserPage(args: UserArgs(user.id, username, uid: false));
+  }
+}
+
 class UserArgs {
   final int id;
   final String username;
+  final bool uid;
 
-  UserArgs(this.id, this.username);
+  UserArgs(this.id, this.username, {this.uid = true});
 }
 
 @RoutePage()
@@ -53,8 +72,11 @@ class UserPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.read(userControllerProvider(args.id));
+    final posters = ref.watch(userPostersNotifier(args.id));
     final user = ref.watch(userNotifier(args.id));
-    return user == null ? WaitProfile(args.username) : _UserPage(args: args);
+    return user == null || (posters.firstOrNull == null && posters.isNotEmpty)
+        ? WaitProfile(args.username)
+        : _UserPage(args: args);
   }
 }
 
@@ -92,7 +114,8 @@ class _State extends ConsumerState<_UserPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final controller = ref.read(userNotifier(widget.args.id).notifier);
-    final user = ref.watch(userNotifier(widget.args.id))!;
+    final user = ref.watch(
+        userNotifier(widget.args.uid ? widget.args.id : widget.args.username))!;
     return CustomScaffold(
         child: NotificationListener<ScrollUpdateNotification>(
       onNotification: (details) {

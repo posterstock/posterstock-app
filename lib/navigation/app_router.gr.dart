@@ -204,6 +204,19 @@ abstract class $AppRouter extends _i19.RootStackRouter {
         ),
       );
     },
+    UserRouteRoute.name: (routeData) {
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<UserRouteRouteArgs>(
+          orElse: () =>
+              UserRouteRouteArgs(username: pathParams.getString('username')));
+      return _i19.AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: _i17.UserPageRoute(
+          username: args.username,
+          key: args.key,
+        ),
+      );
+    },
     UsersListRoute.name: (routeData) {
       final args = routeData.argsAs<UsersListRouteArgs>();
       return _i19.AutoRoutePage<dynamic>(
@@ -683,6 +696,45 @@ class UserRouteArgs {
   @override
   String toString() {
     return 'UserRouteArgs{args: $args, key: $key}';
+  }
+}
+
+/// generated route for
+/// [_i17.UserPageRoute]
+class UserRouteRoute extends _i19.PageRouteInfo<UserRouteRouteArgs> {
+  UserRouteRoute({
+    required String username,
+    _i21.Key? key,
+    List<_i19.PageRouteInfo>? children,
+  }) : super(
+          UserRouteRoute.name,
+          args: UserRouteRouteArgs(
+            username: username,
+            key: key,
+          ),
+          rawPathParams: {'username': username},
+          initialChildren: children,
+        );
+
+  static const String name = 'UserRouteRoute';
+
+  static const _i19.PageInfo<UserRouteRouteArgs> page =
+      _i19.PageInfo<UserRouteRouteArgs>(name);
+}
+
+class UserRouteRouteArgs {
+  const UserRouteRouteArgs({
+    required this.username,
+    this.key,
+  });
+
+  final String username;
+
+  final _i21.Key? key;
+
+  @override
+  String toString() {
+    return 'UserRouteRouteArgs{username: $username, key: $key}';
   }
 }
 

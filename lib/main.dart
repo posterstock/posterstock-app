@@ -1,8 +1,5 @@
-import 'dart:ui';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -67,12 +64,12 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    print('Token: ' + (await FirebaseMessaging.instance.getToken()).toString());
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-    PlatformDispatcher.instance.onError = (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      return true;
-    };
+    // print('Token: ' + (await FirebaseMessaging.instance.getToken()).toString());
+    // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    // PlatformDispatcher.instance.onError = (error, stack) {
+    //   FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    //   return true;
+    // };
   } catch (e) {
     debugPrint(e.toString());
   }
@@ -192,7 +189,7 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
           ),
         );
       },
-      theme: theme,
+      theme: theme.copyWith(useMaterial3: false),
     );
   }
 }

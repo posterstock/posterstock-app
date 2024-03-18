@@ -37,6 +37,7 @@ class AppRouter extends $AppRouter {
         AutoRoute(page: ListRoute.page, path: '/lists/:id'),
         RedirectRoute(path: '/list/:id', redirectTo: '/lists/:id'),
         AutoRoute(page: UserRoute.page),
+        AutoRoute(path: '/:username', page: UserRouteRoute.page),
         CustomRoute(
           page: PosterRoute.page,
           path: '/:username/:id',

@@ -43,7 +43,8 @@ class AccountPage extends ConsumerWidget {
     // ref.read(accountControllerProvider);
     final posters = ref.watch(accountPostersStateNotifier);
     final account = ref.watch(accountNotifier);
-    return account == null || posters.posters.firstOrNull == null
+    return account == null ||
+            (posters.posters.firstOrNull == null && posters.posters.isNotEmpty)
         ? const WaitProfile.empty()
         : _AccountScreen();
   }
