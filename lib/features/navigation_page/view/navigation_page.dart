@@ -1,18 +1,15 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
-import 'package:poster_stock/common/state_holders/auth_id_state_holder.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
-import 'package:poster_stock/features/create_list/view/create_list_dialog.dart';
+import 'package:poster_stock/features/create_poster/controller/create_poster_controller.dart';
 import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
-import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/menu_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/previous_page_state_holder.dart';
@@ -82,8 +79,8 @@ class NavigationPage extends ConsumerWidget {
         physics: const NeverScrollableScrollPhysics(),
         routes: [
           const PageRouteInfo(HomeRoute.name),
-          const PageRouteInfo(SearchRoute.name),
-          const NotificationsRoute(),
+          // const PageRouteInfo(SearchRoute.name),
+          // const NotificationsRoute(),
           const AccountRoute(),
           // ProfileRoute()
         ],
@@ -185,21 +182,21 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                 ),
               ),
             ),
+            // LayerCircle(
+            //   width: width,
+            //   bottomPaddingMul: 1.56,
+            //   radiusMul: 1.8,
+            //   scale: controller.value,
+            // ),
             LayerCircle(
               width: width,
-              bottomPaddingMul: 1.56,
-              radiusMul: 1.8,
-              scale: controller.value,
-            ),
-            LayerCircle(
-              width: width,
-              bottomPaddingMul: 1.91,
+              bottomPaddingMul: 2.1,
               radiusMul: 2.4,
               scale: controller.value,
             ),
             LayerCircle(
               width: width,
-              bottomPaddingMul: 2.35,
+              bottomPaddingMul: 2.5,
               radiusMul: 3.1,
               scale: controller.value,
             ),
@@ -212,34 +209,34 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                 color: Colors.transparent,
               ),
             ),
+            // MenuButton(
+            //   width: width,
+            //   bottomPaddingMul: 0.24,
+            //   color: context.colors.backgroundsPrimary!,
+            //   hightlightColor: context.colors.textsPrimary!.withOpacity(0.2),
+            //   iconColor: context.colors.iconsActive!,
+            //   border: Border.all(
+            //     color: context.colors.fieldsHover!,
+            //   ),
+            //   picturePath: 'assets/icons/ic_lists.svg',
+            //   label: AppLocalizations.of(context)!.listCreate_create,
+            //   animationValue: controller.value,
+            //   onTap: () {
+            //     showModalBottomSheet(
+            //       context: context,
+            //       backgroundColor: Colors.transparent,
+            //       useRootNavigator: true,
+            //       isScrollControlled: true,
+            //       enableDrag: false,
+            //       isDismissible: false,
+            //       useSafeArea: true,
+            //       builder: (context) => const CreateListDialog(),
+            //     );
+            //   },
+            // ),
             MenuButton(
               width: width,
-              bottomPaddingMul: 0.24,
-              color: context.colors.backgroundsPrimary!,
-              hightlightColor: context.colors.textsPrimary!.withOpacity(0.2),
-              iconColor: context.colors.iconsActive!,
-              border: Border.all(
-                color: context.colors.fieldsHover!,
-              ),
-              picturePath: 'assets/icons/ic_lists.svg',
-              label: AppLocalizations.of(context)!.listCreate_create,
-              animationValue: controller.value,
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  backgroundColor: Colors.transparent,
-                  useRootNavigator: true,
-                  isScrollControlled: true,
-                  enableDrag: false,
-                  isDismissible: false,
-                  useSafeArea: true,
-                  builder: (context) => const CreateListDialog(),
-                );
-              },
-            ),
-            MenuButton(
-              width: width,
-              bottomPaddingMul: 0.49,
+              bottomPaddingMul: 0.29,
               color: context.colors.backgroundsPrimary!,
               hightlightColor: context.colors.textsPrimary!.withOpacity(0.2),
               iconColor: context.colors.iconsActive!,
@@ -254,20 +251,27 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                   context: context,
                   backgroundColor: Colors.transparent,
                   isScrollControlled: true,
-                  enableDrag: false,
+                  enableDrag: true,
                   useSafeArea: true,
                   builder: (context) => const CreatePosterDialog(
                     bookmark: true,
                   ),
-                );
+                ).whenComplete(() {
+                  ref.read(createPosterControllerProvider).choosePoster(null);
+                  ref.read(createPosterControllerProvider).chooseMovie(null);
+                  ref.read(createPosterControllerProvider).updateSearch('');
+                });
               },
             ),
             MenuButton(
               width: width,
-              bottomPaddingMul: 0.745,
-              color: context.colors.backgroundsDropAction!,
+              bottomPaddingMul: 0.595,
+              color: context.colors.backgroundsPrimary!,
               hightlightColor: context.colors.textsPrimary!.withOpacity(0.2),
-              iconColor: context.colors.iconsBackground!,
+              iconColor: context.colors.iconsActive!,
+              border: Border.all(
+                color: context.colors.fieldsHover!,
+              ),
               picturePath: 'assets/icons/ic_collection.svg',
               label: AppLocalizations.of(context)!.home_add_poster,
               animationValue: controller.value,
@@ -277,9 +281,13 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                   backgroundColor: Colors.transparent,
                   isScrollControlled: true,
                   useSafeArea: true,
-                  enableDrag: false,
+                  enableDrag: true,
                   builder: (context) => const CreatePosterDialog(),
-                );
+                ).whenComplete(() {
+                  ref.read(createPosterControllerProvider).choosePoster(null);
+                  ref.read(createPosterControllerProvider).chooseMovie(null);
+                  ref.read(createPosterControllerProvider).updateSearch('');
+                });
               },
             ),
           ],
@@ -348,7 +356,7 @@ class MenuButton extends StatelessWidget {
                               iconColor,
                               BlendMode.srcIn,
                             ),
-                            width: 24,
+                            width: 28.0,
                           ),
                         ),
                       ),

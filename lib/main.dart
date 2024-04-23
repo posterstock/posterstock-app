@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:poster_stock/common/constants/languages.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
@@ -63,6 +65,7 @@ void main() async {
       name: "Posterstock",
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     // print('Token: ' + (await FirebaseMessaging.instance.getToken()).toString());
     // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
@@ -85,6 +88,7 @@ void main() async {
   } catch (e) {
     debugPrint(e.toString());
   }
+  await Hive.initFlutter();
 
   runApp(const ProviderScope(child: App()));
 }
@@ -143,6 +147,9 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
     List<Languages> langs = [
       Languages.english(),
       Languages.russian(),
+      Languages.german(),
+      Languages.french(),
+      Languages.turkish(),
     ];
     List<Locale> locales = langs.map((it) => it.locale).toList();
     if (rtr == null) {
@@ -164,10 +171,14 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
             if (route is NavigationRoute) return DeepLink([route]);
             return DeepLink([AuthRoute(), route, ...?route.initialChildren]);
           }
-          return DeepLink([AuthRoute()]);
+          return TokenKeeper.token != null
+              ? DeepLink([NavigationRoute()])
+              : DeepLink([AuthRoute()]);
         }
         if (deepLink.path == '/' || deepLink.path == '') {
-          return DeepLink([AuthRoute()]);
+          return TokenKeeper.token != null
+              ? DeepLink([NavigationRoute()])
+              : DeepLink([AuthRoute()]);
         }
         return deepLink;
       }),

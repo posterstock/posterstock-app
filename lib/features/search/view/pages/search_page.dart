@@ -9,7 +9,6 @@ import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/common/widgets/list_grid_widget.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
-import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/search/controller/search_controller.dart';
 import 'package:poster_stock/features/search/state_holders/search_lists_state_holder.dart';
 import 'package:poster_stock/features/search/state_holders/search_posts_state_holder.dart';
@@ -77,7 +76,7 @@ class SearchPage extends ConsumerWidget {
                     onPressed: () {
                       ref.read(searchControllerProvider).startSearchUsers('');
                       textController.text = '';
-                      ref.read(menuControllerProvider).backToPage(context, ref);
+                      Navigator.of(context).pop();
                     },
                   ),
                 ],
@@ -128,35 +127,35 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
     final lists = ref.watch(searchListsStateHolderProvider);
     return Column(
       children: [
-        TabBar(
-          dividerColor: Colors.transparent,
-          controller: controller,
-          indicatorColor: context.colors.iconsActive,
-          tabs: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14.0),
-              child: Text(
-                //TODO: localize
-                "Users",
-                style: context.textStyles.subheadline,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14.0),
-              child: Text(
-                context.txt.posters,
-                style: context.textStyles.subheadline,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14.0),
-              child: Text(
-                context.txt.lists,
-                style: context.textStyles.subheadline,
-              ),
-            ),
-          ],
-        ),
+        // TabBar(
+        //   dividerColor: Colors.transparent,
+        //   controller: controller,
+        //   indicatorColor: context.colors.iconsActive,
+        //   tabs: [
+        //     Padding(
+        //       padding: const EdgeInsets.symmetric(vertical: 14.0),
+        //       child: Text(
+        //         //TODO: localize
+        //         "Users",
+        //         style: context.textStyles.subheadline,
+        //       ),
+        //     ),
+        //     Padding(
+        //       padding: const EdgeInsets.symmetric(vertical: 14.0),
+        //       child: Text(
+        //         context.txt.posters,
+        //         style: context.textStyles.subheadline,
+        //       ),
+        //     ),
+        //     Padding(
+        //       padding: const EdgeInsets.symmetric(vertical: 14.0),
+        //       child: Text(
+        //         context.txt.lists,
+        //         style: context.textStyles.subheadline,
+        //       ),
+        //     ),
+        //   ],
+        // ),
         Expanded(
           child: TabBarView(
             controller: controller,

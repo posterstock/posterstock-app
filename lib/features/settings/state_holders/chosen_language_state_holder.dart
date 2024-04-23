@@ -28,6 +28,15 @@ class ChosenLanguageStateHolder extends StateNotifier<Languages?> {
       case 'Русский' || 'ru_RU':
         state = Languages.russian();
         break;
+      case 'Deutsch' || 'de_DE':
+        state = Languages.russian();
+        break;
+      case 'Français' || 'fr_FR':
+        state = Languages.russian();
+        break;
+      case 'Türkçe' || 'tr_TR':
+        state = Languages.russian();
+        break;
     }
 
     final ListRepository listRepository = ListRepository();

@@ -74,7 +74,7 @@ class _PlusButtonState extends ConsumerState<PlusButton> {
                   context.colors.iconsFAB!,
                   BlendMode.srcIn,
                 ),
-                width: 26,
+                width: 30.0,
               ),
             ),
           ),

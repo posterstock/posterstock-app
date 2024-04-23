@@ -1,7 +1,4 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:poster_stock/features/home/models/comment_model.dart';
 import 'package:poster_stock/features/home/models/post_base_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 
@@ -43,7 +40,8 @@ class PostMovieModel extends PostBaseModel {
           liked: liked,
         );
 
-  factory PostMovieModel.fromJson(Map<String, Object?> json, {bool previewPrimary = false}) {
+  factory PostMovieModel.fromJson(Map<String, Object?> json,
+      {bool previewPrimary = false}) {
     const List<Color> avatar = [
       Color(0xfff09a90),
       Color(0xfff3d376),
@@ -57,16 +55,23 @@ class PostMovieModel extends PostBaseModel {
       year: (json['end_year'] as int?) == null
           ? (json['start_year'] as int).toString()
           : '${(json['start_year'] as int).toString()} - ${(json['end_year'] as int?).toString()}',
-      imagePath: (previewPrimary ?
-      (json['preview_image'] as String? ?? json['image'] as String?) : (json['image'] as String? ?? json['preview_image'] as String?)) ?? '',
+      imagePath: (previewPrimary
+              ? (json['preview_image'] as String? ?? json['image'] as String?)
+              : (json['image'] as String? ??
+                  json['preview_image'] as String?)) ??
+          '',
       name: json['title'] as String,
       author: json['user'] == null
           ? UserModel(
               id: json['user_id'] as int? ?? 0,
               name: json['name'] as String? ?? '',
               username: json['username'] as String? ?? '',
-              imagePath:(json['profile_image'] as String?) == "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp" ? null : json['profile_image'] as String?,
-              followed: !(json['is_suggested'] as bool? ?? !(json['is_following'] as bool? ?? false)),
+              imagePath: (json['profile_image'] as String?) ==
+                      "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp"
+                  ? null
+                  : json['profile_image'] as String?,
+              followed: !(json['is_suggested'] as bool? ??
+                  !(json['is_following'] as bool? ?? false)),
               color: avatar[(json['user_id'] as int? ?? 0) % 3],
             )
           : UserModel.fromJson(json['user'] as Map<String, dynamic>),
@@ -88,6 +93,21 @@ class PostMovieModel extends PostBaseModel {
       mediaType: json['media_type'] as String?,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'has_liked': liked,
+        'has_bookmarked': hasBookmarked,
+        'start_year': int.parse(year.split('-').first),
+        'image': imagePath,
+        'title': name,
+        'description': description,
+        'tmdbLink': tmdbLink,
+        'mediaId': mediaId,
+        'media_type': mediaType,
+        'likes_count': likes,
+        // 'created_at': timeDate
+      };
 
   @override
   PostMovieModel copyWith({

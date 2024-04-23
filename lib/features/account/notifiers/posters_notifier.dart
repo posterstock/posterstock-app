@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/features/account/account_cache.dart';
 import 'package:poster_stock/features/account/account_network.dart';
 import 'package:poster_stock/features/account/notifiers/account_notifier.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
@@ -20,6 +21,8 @@ class PostersNotifier extends StateNotifier<PostersState> {
   final UserDetailsModel? account;
   final AccountNotifier accountNotifier;
   final AccountNetwork network = AccountNetwork();
+  final AccountCache cache = AccountCache();
+
   bool _hasMore = true;
   bool _loading = false;
 
@@ -33,13 +36,20 @@ class PostersNotifier extends StateNotifier<PostersState> {
   Future<void> load() async {
     if (!_hasMore || _loading) return;
     _loading = true;
+    var cachedList = await cache.getPosters(_id);
+    if (cachedList != null) {
+      state = PostersState.list(cachedList);
+      _loading = false;
+    }
+
     final (list, more) = await network.getPosters(_id);
-    _loading = false;
+    cache.cachePosters(_id, list);
     if (list?.isEmpty ?? true) {
       state = const PostersState.empty();
     } else {
       state = PostersState.list(list!);
     }
+    _loading = false;
     _hasMore = more;
   }
 

@@ -886,7 +886,6 @@ class _PosterPageState extends ConsumerState<PosterPage>
                     "Deleted successfully",
                   ),
                 );
-                Navigator.pop(context);
                 AutoRouter.of(context).pop();
               } catch (e) {
                 print("FEF");

@@ -17,14 +17,13 @@ import 'package:poster_stock/features/auth/controllers/auth_controller.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_error_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/auth_loading_state_holder.dart';
+import 'package:poster_stock/features/auth/state_holders/code_error_state_holder.dart';
 import 'package:poster_stock/features/auth/view/pages/sign_up_page.dart';
 import 'package:poster_stock/features/auth/view/widgets/auth_button.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_state_holder.dart';
 import 'package:poster_stock/main.dart';
-import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:supertokens_flutter/supertokens.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../../common/state_holders/intl_state_holder.dart';
@@ -153,6 +152,9 @@ class AuthPage extends ConsumerWidget {
                               .watch(authLoadingStateHolderProvider)
                               .loadingEmail,
                           onTap: () {
+                            ref
+                                .read(codeErrorStateHolderProvider.notifier)
+                                .setValue(null);
                             checkEmail(
                                 ref, textEditingController.text, context);
                           },
@@ -320,7 +322,7 @@ class AuthPage extends ConsumerWidget {
       final googleSignIn = GoogleSignIn(
         clientId: Platform.isIOS
             ? '405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com'
-            : (kDebugMode
+            : (kDebugMode && false
                 ? '405674784124-buqlusrif3nur8sqk7li6u1ruq6votji.apps.googleusercontent.com'
                 : '405674784124-srh0usjhjk28idl1mhqj1oo3ipktujlb.apps.googleusercontent.com'),
         serverClientId:

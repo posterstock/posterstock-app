@@ -382,13 +382,14 @@ class _AccountState extends ConsumerState<_AccountScreen>
           'assets/icons/search.svg',
           context.txt.search,
           () {
-            animationController.animateTo(1);
-            scrollController.animateTo(
-              245,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.linear,
-            );
-            focusNode.requestFocus();
+            context.router.push(const PageRouteInfo(SearchRoute.name));
+            // animationController.animateTo(1);
+            // scrollController.animateTo(
+            //   245,
+            //   duration: const Duration(milliseconds: 300),
+            //   curve: Curves.linear,
+            // );
+            // focusNode.requestFocus();
           },
         ),
       ]),
@@ -526,19 +527,23 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
                           300 +
                       23,
             ),
-            itemCount: lists.length,
+            itemCount: lists.length + 1,
             itemBuilder: (context, index) {
-              return ListGridWidget(
-                (post) => ref.watch(router)!.push(
-                      ListRoute(
-                        id: post!.id,
-                        // type: index,
+              if (index == lists.length) {
+                return const CreateListGridWidget();
+              } else {
+                return ListGridWidget(
+                  (post) => ref.watch(router)!.push(
+                        ListRoute(
+                          id: post!.id,
+                          // type: index,
+                        ),
                       ),
-                    ),
-                post: lists[index],
-              );
-              //   index: index,
-              // );
+                  post: lists[index],
+                );
+                //   index: index,
+                // );
+              }
             },
           ),
         ],

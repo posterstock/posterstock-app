@@ -9,7 +9,10 @@ class AppTabBar extends StatelessWidget {
     this.tabController,
     List<String> tabs, {
     super.key,
-  }) : tabs = tabs.map((it) => Tab(child: Text(it))).toList();
+  }) : tabs = tabs
+            .map((it) =>
+                Tab(child: FittedBox(fit: BoxFit.fitWidth, child: Text(it))))
+            .toList();
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +22,7 @@ class AppTabBar extends StatelessWidget {
       indicatorColor: context.colors.iconsActive,
       labelPadding: const EdgeInsets.symmetric(vertical: 14),
       labelStyle: context.textStyles.subheadlineBold,
-      unselectedLabelStyle: context.textStyles.subheadline,
+      // unselectedLabelStyle: context.textStyles.subheadline,
       tabs: tabs,
     );
   }

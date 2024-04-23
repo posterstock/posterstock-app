@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 class UserDetailsModel {
@@ -43,7 +41,10 @@ class UserDetailsModel {
       id: json['id'] as int,
       name: json['name'] as String,
       username: json['username'] as String,
-      imagePath: (json['image'] as String?) == "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp" ? null : json['image'] as String?,
+      imagePath: (json['image'] as String?) ==
+              "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp"
+          ? null
+          : json['image'] as String?,
       followed: (json['is_following'] as bool?) ?? false,
       description: json['description'] as String?,
       following: json['following'] as int? ?? 0,
@@ -54,6 +55,20 @@ class UserDetailsModel {
       color: avatar[(json['id'] as int) % 3],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'username': username,
+        'image': imagePath,
+        'is_following': followed,
+        'description': description,
+        'following': following,
+        'followers': followers,
+        'myself': mySelf,
+        'posters': posters,
+        'lists': lists,
+      };
 
   UserDetailsModel copyWith({
     int? id,

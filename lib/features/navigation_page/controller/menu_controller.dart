@@ -5,9 +5,6 @@ import 'package:poster_stock/features/navigation_page/state_holder/menu_state_ho
 import 'package:poster_stock/features/navigation_page/state_holder/navigation_page_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/navigation_route_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/previous_page_state_holder.dart';
-import 'package:poster_stock/features/navigation_page/view/navigation_page.dart';
-import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
-import 'package:poster_stock/navigation/app_router.gr.dart';
 
 import '../../../common/state_holders/router_state_holder.dart';
 
@@ -43,6 +40,10 @@ class MenuController {
     menuState.updateState(!menuValue);
   }
 
+  void hideMenu() {
+    menuState.updateState(false);
+  }
+
   void jumpToPage(int page, BuildContext context, WidgetRef ref) {
     FocusScope.of(context).unfocus();
     if (previousPageState.state.isNotEmpty) {
@@ -59,7 +60,7 @@ class MenuController {
   void backToPage(BuildContext context, WidgetRef ref) {
     FocusScope.of(context).unfocus();
     ref.watch(router)!.popUntilRouteWithPath('/');
-    if (menuValue ==true) {
+    if (menuValue == true) {
       menuState.updateState(!menuValue);
     }
     final page = previousPageState.state.last;

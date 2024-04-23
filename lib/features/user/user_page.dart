@@ -374,14 +374,20 @@ class _State extends ConsumerState<_UserPage> with TickerProviderStateMixin {
           'assets/icons/search.svg',
           context.txt.search,
           () {
-            animationController.animateTo(1);
-            scrollController.animateTo(
-              245,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.linear,
-            );
-            focusNode.requestFocus();
+            context.router.push(const PageRouteInfo(SearchRoute.name));
+            // animationController.animateTo(1);
+            // scrollController.animateTo(
+            //   245,
+            //   duration: const Duration(milliseconds: 300),
+            //   curve: Curves.linear,
+            // );
+            // focusNode.requestFocus();
           },
+        ),
+        MenuItem.danger(
+          'assets/icons/ic_danger.svg',
+          context.txt.report,
+          () {} /* TODO: implement */,
         ),
         MenuItem.danger(
           'assets/icons/ic_hand.svg',

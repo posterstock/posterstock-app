@@ -66,12 +66,27 @@ class ChooseLanguagePage extends ConsumerWidget {
                         () {
                           ref
                               .read(chosenLanguageStateHolder.notifier)
+                              .setLocale(Languages.german());
+                        },
+                        () {
+                          ref
+                              .read(chosenLanguageStateHolder.notifier)
                               .setLocale(Languages.english());
                         },
                         () {
                           ref
                               .read(chosenLanguageStateHolder.notifier)
+                              .setLocale(Languages.french());
+                        },
+                        () {
+                          ref
+                              .read(chosenLanguageStateHolder.notifier)
                               .setLocale(Languages.russian());
+                        },
+                        () {
+                          ref
+                              .read(chosenLanguageStateHolder.notifier)
+                              .setLocale(Languages.turkish());
                         },
                       ],
                       children: [
@@ -79,7 +94,24 @@ class ChooseLanguagePage extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              context.txt.settings_english,
+                              'Deutsch',
+                              style: context.textStyles.bodyRegular,
+                            ),
+                            if (language?.locale.languageCode == 'de')
+                              Text(
+                                //TODO: localize
+                                '􀆅',
+                                style: context.textStyles.headline!.copyWith(
+                                  color: context.colors.iconsActive,
+                                ),
+                              ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'English',
                               style: context.textStyles.bodyRegular,
                             ),
                             if (language?.locale.languageCode == 'en')
@@ -95,10 +127,44 @@ class ChooseLanguagePage extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              context.txt.settings_russian,
+                              'Français',
+                              style: context.textStyles.bodyRegular,
+                            ),
+                            if (language?.locale.languageCode == 'fr')
+                              Text(
+                                //TODO: localize
+                                '􀆅',
+                                style: context.textStyles.headline!.copyWith(
+                                  color: context.colors.iconsActive,
+                                ),
+                              ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Русский',
                               style: context.textStyles.bodyRegular,
                             ),
                             if (language?.locale.languageCode == 'ru')
+                              Text(
+                                //TODO: localize
+                                '􀆅',
+                                style: context.textStyles.headline!.copyWith(
+                                  color: context.colors.iconsActive,
+                                ),
+                              ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Türkçe',
+                              style: context.textStyles.bodyRegular,
+                            ),
+                            if (language?.locale.languageCode == 'tr')
                               Text(
                                 //TODO: localize
                                 '􀆅',

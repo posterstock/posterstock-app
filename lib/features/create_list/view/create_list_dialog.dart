@@ -70,7 +70,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
     print(list);
     if (list.isEmpty) {
       exiting = false;
-      ref.read(menuControllerProvider).switchMenu();
+      ref.read(menuControllerProvider).hideMenu();
       return true;
     }
     bool? exit = await showDialog(
@@ -707,18 +707,18 @@ class AppDialogHeaderDelegate extends SliverPersistentHeaderDelegate {
 }
 
 class DescriptionTextField extends StatefulWidget {
-  const DescriptionTextField({
-    super.key,
-    this.hint,
-    this.showDivider = true,
-    this.button,
-    this.maxSymbols = 140,
-    this.buttonAddCheck = true,
-    this.controller,
-    this.buttonLoading = false,
-    this.onTap,
-    this.focus,
-  });
+  const DescriptionTextField(
+      {super.key,
+      this.hint,
+      this.showDivider = true,
+      this.button,
+      this.maxSymbols = 140,
+      this.buttonAddCheck = true,
+      this.controller,
+      this.buttonLoading = false,
+      this.onTap,
+      this.focus,
+      this.disableWithoutText = false});
 
   final String? hint;
   final bool showDivider;
@@ -729,6 +729,7 @@ class DescriptionTextField extends StatefulWidget {
   final FocusNode? focus;
   final TextEditingController? controller;
   final void Function()? onTap;
+  final bool disableWithoutText;
 
   @override
   State<DescriptionTextField> createState() => _DescriptionTextFieldState();
@@ -736,6 +737,7 @@ class DescriptionTextField extends StatefulWidget {
 
 class _DescriptionTextFieldState extends State<DescriptionTextField> {
   TextEditingController? descriptionController;
+  bool disable = false;
 
   @override
   Widget build(BuildContext context) {
@@ -753,7 +755,8 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
           child: TextField(
             textCapitalization: TextCapitalization.sentences,
             focusNode: widget.focus,
-            maxLines: null,
+            minLines: 2,
+            maxLines: 5,
             controller: descriptionController,
             cursorWidth: 1,
             cursorColor: context.colors.textsAction,
@@ -769,7 +772,13 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
               overflow: TextOverflow.visible,
               color: context.colors.textsPrimary,
             ),
-            onChanged: (_) => setState(() {}),
+            onChanged: (String text) => setState(() {
+              if (text.isEmpty && widget.disableWithoutText) {
+                disable = true;
+              } else {
+                disable = false;
+              }
+            }),
           ),
         ),
         Container(
@@ -790,7 +799,7 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
               SizedBox(
                 height: 32,
                 width: TextInfoService.textSize(
-                      widget.button ?? "Create list",
+                      widget.button ?? context.txt.listCreate_create,
                       context.textStyles.calloutBold!.copyWith(
                         color: context.colors.textsBackground,
                       ),
@@ -799,7 +808,8 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
                 child: AppTextButton(
                   disabled: (descriptionController!.text.length >
                           widget.maxSymbols) ||
-                      !widget.buttonAddCheck,
+                      !widget.buttonAddCheck ||
+                      disable,
                   onTap: widget.onTap,
                   child: widget.buttonLoading
                       ? Center(
@@ -818,7 +828,7 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
                                 ),
                         )
                       : Text(
-                          widget.button ?? "Create list",
+                          widget.button ?? context.txt.listCreate_create,
                           style: context.textStyles.calloutBold!.copyWith(
                             color: context.colors.textsBackground,
                           ),

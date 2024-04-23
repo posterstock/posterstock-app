@@ -8,9 +8,7 @@ import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/auth/state_holders/code_error_state_holder.dart';
 import 'package:poster_stock/features/auth/state_holders/sign_up_loading_state_holder.dart';
-import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../../common/widgets/app_text_field.dart';
@@ -43,7 +41,7 @@ class LoginPage extends ConsumerWidget {
                     height: 30,
                   ),
                   Text(
-                    AppLocalizations.of(context)!.login_signup_title,
+                    AppLocalizations.of(context)!.login_auth_title,
                     style: context.textStyles.title2,
                   ),
                   const SizedBox(
@@ -61,7 +59,7 @@ class LoginPage extends ConsumerWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      AppLocalizations.of(context)!.login_signup_sendText,
+                      AppLocalizations.of(context)!.login_auth_sendText,
                       style: context.textStyles.callout!.copyWith(
                         color: context.colors.textsSecondary,
                       ),
@@ -117,6 +115,9 @@ class LoginPage extends ConsumerWidget {
                       color: context.colors.textsAction!,
                     ),
                     onTap: () async {
+                      ref
+                          .read(codeErrorStateHolderProvider.notifier)
+                          .setValue(null);
                       print("SIGNING");
                       bool success = await ref
                           .read(signUpControllerProvider)

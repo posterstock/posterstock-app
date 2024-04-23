@@ -21,12 +21,12 @@ class AppRouter extends $AppRouter {
           path: '/',
           children: [
             AutoRoute(page: HomeRoute.page, path: 'home'),
-            AutoRoute(page: SearchRoute.page, path: 'search'),
-            AutoRoute(page: NotificationsRoute.page, path: 'notifications'),
+            // AutoRoute(page: NotificationsRoute.page, path: 'notifications'),
             // AutoRoute(page: ProfileRoute.page, path: 'profile'),
             AutoRoute(page: AccountRoute.page, path: 'account'),
           ],
         ),
+        AutoRoute(page: SearchRoute.page, path: '/search'),
         AutoRoute(page: SettingsRoute.page, path: '/settings'),
         AutoRoute(page: ChooseLanguageRoute.page, path: '/language'),
         AutoRoute(page: ChangeEmailRoute.page, path: '/change_email'),
@@ -38,6 +38,7 @@ class AppRouter extends $AppRouter {
         RedirectRoute(path: '/list/:id', redirectTo: '/lists/:id'),
         AutoRoute(page: UserRoute.page),
         AutoRoute(path: '/:username', page: UserRouteRoute.page),
+        AutoRoute(page: NotificationsRoute.page, path: '/notifications'),
         CustomRoute(
           page: PosterRoute.page,
           path: '/:username/:id',
