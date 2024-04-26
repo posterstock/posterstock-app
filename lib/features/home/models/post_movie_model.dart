@@ -11,7 +11,6 @@ class PostMovieModel extends PostBaseModel {
   final int? mediaId;
   final int startYear;
   final int? endYear;
-  final int? createdAt;
 
   PostMovieModel({
     required this.imagePath,
@@ -22,14 +21,12 @@ class PostMovieModel extends PostBaseModel {
     this.mediaType,
     required this.startYear,
     this.endYear,
-    this.createdAt,
+    int? creationTime,
     required int id,
     required String name,
     required UserModel author,
-    required String time,
     required bool liked,
-    required DateTime timeDate,
-    required String type,
+    required String? type,
     int likes = 0,
     int comments = 0,
     String? description,
@@ -38,8 +35,7 @@ class PostMovieModel extends PostBaseModel {
           id: id,
           name: name,
           author: author,
-          time: time,
-          timeDate: timeDate,
+          creationTime: creationTime,
           likes: likes,
           comments: comments,
           description: description,
@@ -49,18 +45,6 @@ class PostMovieModel extends PostBaseModel {
   get year => endYear == null
       ? startYear.toString()
       : '${startYear.toString()} - ${endYear.toString()}';
-
-  @override
-  get time => createdAt == null
-      ? ''
-      : _getTimeString(
-          DateTime.fromMillisecondsSinceEpoch(createdAt! * 1000),
-        );
-
-  @override
-  get timeDate => createdAt == null
-      ? DateTime.now()
-      : DateTime.fromMillisecondsSinceEpoch(createdAt! * 1000);
 
   factory PostMovieModel.fromJson(Map<String, dynamic> json,
       {bool previewPrimary = false}) {
@@ -97,16 +81,7 @@ class PostMovieModel extends PostBaseModel {
               color: avatar[(json['user_id'] as int? ?? 0) % 3],
             )
           : UserModel.fromJson(json['user'] as Map<String, dynamic>),
-      timeDate: json['created_at'] == null
-          ? DateTime.now()
-          : DateTime.fromMillisecondsSinceEpoch(
-              (json['created_at'] as int) * 1000),
-      time: json['created_at'] == null
-          ? ''
-          : _getTimeString(
-              DateTime.fromMillisecondsSinceEpoch(
-                  (json['created_at'] as int) * 1000),
-            ),
+      creationTime: json['created_at'],
       likes: json['likes_count'] as int? ?? 0,
       comments: json['comments_count'] as int? ?? 0,
       description: json['description'] as String?,
@@ -130,7 +105,7 @@ class PostMovieModel extends PostBaseModel {
         'media_id': mediaId,
         'media_type': mediaType,
         'likes_count': likes,
-        'created_at': createdAt,
+        'created_at': creationTime,
         'comments_count': comments,
         'user': author.toJson()
       };
@@ -144,8 +119,7 @@ class PostMovieModel extends PostBaseModel {
     String? type,
     String? name,
     UserModel? author,
-    String? time,
-    DateTime? timeDate,
+    int? creationTime,
     bool? liked,
     int? likes,
     int? comments,
@@ -163,8 +137,7 @@ class PostMovieModel extends PostBaseModel {
       id: id ?? this.id,
       name: name ?? this.name,
       author: author ?? this.author,
-      time: time ?? this.time,
-      timeDate: timeDate ?? this.timeDate,
+      creationTime: creationTime ?? this.creationTime,
       liked: liked ?? this.liked,
       likes: likes ?? this.likes,
       comments: comments ?? this.comments,
@@ -173,20 +146,5 @@ class PostMovieModel extends PostBaseModel {
       mediaType: mediaType,
       tmdbLink: tmdbLink,
     );
-  }
-
-  static String _getTimeString(DateTime date) {
-    DateTime now = DateTime.now();
-    Duration diff = now.difference(date).abs();
-    if (diff.inDays > 30) {
-      return "${diff.inDays ~/ 30} month${diff.inDays ~/ 30 > 1 ? "s" : ''} ago";
-    } else if (diff.inDays > 0) {
-      return "${diff.inDays} day${diff.inDays > 1 ? "s" : ''} ago";
-    } else if (diff.inHours > 0) {
-      return "${diff.inHours} hour${diff.inHours > 1 ? "s" : ''} ago";
-    } else if (diff.inMinutes > 0) {
-      return "${diff.inMinutes} minute${diff.inMinutes > 1 ? "s" : ''} ago";
-    }
-    return "Less than a minute ago";
   }
 }

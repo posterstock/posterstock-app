@@ -18,6 +18,7 @@ class HomePagePostsController {
 
   bool gettingPosts = false;
   bool gotAll = false;
+  bool gotFirst = false;
 
   HomePagePostsController({
     required this.homePagePostsState,
@@ -28,16 +29,21 @@ class HomePagePostsController {
     if (gettingPosts) return;
     if (!getNewPosts && gotAll) return;
     gettingPosts = true;
-    // final cachedResult = await cachedHomeRepository.getPosts();
-    // if (cachedResult != null) {
-    //   homePagePostsState.updateStateEnd(cachedResult);
-    //   // gettingPosts = false;
-    // }
+    if (!gotFirst) {
+      final cachedResult = await cachedHomeRepository.getPosts();
+      if (cachedResult != null) {
+        homePagePostsState.updateStateEnd(cachedResult);
+      }
+    }
 
     final result = await repository.getPosts(getNesPosts: getNewPosts);
-    // if (!getNewPosts && result?.$1 != null && result!.$1!.isNotEmpty) {
-    //   cachedHomeRepository.cachePosts(result.$1!);
-    // }
+    if (!gotFirst &&
+        !getNewPosts &&
+        result?.$1 != null &&
+        result!.$1!.isNotEmpty) {
+      cachedHomeRepository.cachePosts(List.from(result.$1!));
+      gotFirst = true;
+    }
     gotAll = result?.$2 ?? false;
     try {
       if (getNewPosts) {

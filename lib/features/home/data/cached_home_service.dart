@@ -15,16 +15,14 @@ class CachedHomeService {
 
   Future<void> cachePosts(List<PostBaseModel> posts) async {
     var box = await Hive.openBox('postsBox');
-    box.put(
-        'feed',
-        jsonEncode(posts.map((element) {
-          if (element is PostMovieModel) {
-            return element.toJson();
-          } else if (element is MultiplePostModel) {
-            return element.toJson();
-          } else {}
-        }).toList())
-            .toString());
-    // box.put('feed', jsonEncode(posts.map((i) => i.toJson()).toList()).toString());
+    String encoded = jsonEncode(posts.map((element) {
+      if (element is PostMovieModel) {
+        return element.toJson();
+      } else if (element is MultiplePostModel) {
+        return element.toJson();
+      } else {}
+    }).toList())
+        .toString();
+    box.put('feed', encoded);
   }
 }

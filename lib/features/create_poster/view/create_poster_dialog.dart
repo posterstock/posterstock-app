@@ -241,9 +241,11 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
         extentOffset: searchController.text.length,
       );
     }
-    double constValue = 480.0;
+    double constValue = 490.0;
     if (widget.bookmark) constValue = 430.0;
-    if (widget.postMovieModel != null) constValue = 490.0;
+    if (widget.postMovieModel != null) constValue = 510.0;
+    double constValue2 = 11.0;
+    if (widget.postMovieModel != null) constValue2 = 14.0;
     return WillPopScope(
       onWillPop: () async {
         bool exit = await tryExit();
@@ -253,671 +255,699 @@ class _CreatePosterDialogState extends ConsumerState<CreatePosterDialog> {
         ref.read(createPosterControllerProvider).updateSearch('');
         return exit;
       },
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        resizeToAvoidBottomInset: false,
-        body: Stack(
-          children: [
-            Positioned(
-              top: 0,
-              left: 0,
-              bottom: 0,
-              right: 0,
-              child: GestureDetector(
-                onTap: () async {
-                  bool exit = await tryExit();
-                  if (!exit) return;
-                  ref.read(createPosterControllerProvider).choosePoster(null);
-                  ref.read(createPosterControllerProvider).chooseMovie(null);
-                  ref.read(createPosterControllerProvider).updateSearch('');
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  color: Colors.transparent,
+      child: Padding(
+        padding: focusSec.hasFocus
+            ? EdgeInsets.only(
+                    top: (MediaQuery.of(context).size.height -
+                        MediaQuery.of(context).padding.bottom)) /
+                constValue2
+            : EdgeInsets.zero,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          resizeToAvoidBottomInset: false,
+          body: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0,
+                child: GestureDetector(
+                  onTap: () async {
+                    bool exit = await tryExit();
+                    if (!exit) return;
+                    ref.read(createPosterControllerProvider).choosePoster(null);
+                    ref.read(createPosterControllerProvider).chooseMovie(null);
+                    ref.read(createPosterControllerProvider).updateSearch('');
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    color: Colors.transparent,
+                  ),
                 ),
               ),
-            ),
-            GestureDetector(
-              onTap: () {
-                if (chosenMovie != null) FocusScope.of(context).unfocus();
-              },
-              child: DraggableScrollableSheet(
-                controller: dragController,
-                minChildSize: 0,
-                initialChildSize: constValue /
-                    (MediaQuery.of(context).size.height -
-                        MediaQuery.of(context).padding.bottom),
-                maxChildSize:
-                    focus.hasFocus || focusSec.hasFocus || chosenMovie == null
-                        ? 1
-                        : constValue /
-                            (MediaQuery.of(context).size.height -
-                                MediaQuery.of(context).padding.bottom),
-                snap: true,
-                snapSizes: [
-                  constValue /
+              GestureDetector(
+                onTap: () {
+                  if (chosenMovie != null) FocusScope.of(context).unfocus();
+                },
+                child: DraggableScrollableSheet(
+                  controller: dragController,
+                  minChildSize: 0,
+                  initialChildSize: constValue /
                       (MediaQuery.of(context).size.height -
-                          MediaQuery.of(context).padding.bottom)
-                ],
-                builder: (context, controller) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(
-                        topRight: Radius.circular(16.0),
-                        topLeft: Radius.circular(16.0),
+                          MediaQuery.of(context).padding.bottom),
+                  maxChildSize:
+                      focus.hasFocus || focusSec.hasFocus || chosenMovie == null
+                          ? 1
+                          : constValue /
+                              (MediaQuery.of(context).size.height -
+                                  MediaQuery.of(context).padding.bottom),
+                  snap: true,
+                  snapSizes: [
+                    constValue /
+                        (MediaQuery.of(context).size.height -
+                            MediaQuery.of(context).padding.bottom)
+                  ],
+                  builder: (context, controller) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(16.0),
+                          topLeft: Radius.circular(16.0),
+                        ),
+                        color: context.colors.backgroundsPrimary,
                       ),
-                      color: context.colors.backgroundsPrimary,
-                    ),
-                    child: CustomScrollView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      controller: controller,
-                      slivers: [
-                        SliverPersistentHeader(
-                          delegate: AppDialogHeaderDelegate(
-                            extent: widget.postMovieModel != null
-                                ? 160.0
-                                : searchText.isNotEmpty && chosenMovie == null
-                                    ? 125.0
-                                    : 144.0,
-                            content: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Column(
-                                  children: [
-                                    const SizedBox(height: 14.0),
-                                    Container(
-                                      height: 4,
-                                      width: 36,
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(2.0),
-                                        color: context.colors.fieldsDefault,
+                      child: CustomScrollView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        controller: controller,
+                        slivers: [
+                          SliverPersistentHeader(
+                            delegate: AppDialogHeaderDelegate(
+                              extent: widget.postMovieModel != null
+                                  ? 160.0
+                                  : searchText.isNotEmpty && chosenMovie == null
+                                      ? 125.0
+                                      : 144.0,
+                              content: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Column(
+                                    children: [
+                                      const SizedBox(height: 14.0),
+                                      Container(
+                                        height: 4,
+                                        width: 36,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(2.0),
+                                          color: context.colors.fieldsDefault,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 22),
-                                    Text(
-                                      widget.postMovieModel != null
-                                          ? context.txt.posterEdit_editPoster
-                                          : widget.bookmark
-                                              ? context.txt.home_add_watchlist
-                                              : context.txt.home_add_poster,
-                                      style: context.textStyles.bodyBold
-                                          ?.copyWith(fontSize: 19.0),
-                                    ),
-                                    const SizedBox(height: 20.0),
-                                    if (widget.postMovieModel != null)
+                                      const SizedBox(height: 22),
                                       Text(
-                                        widget.postMovieModel!.name,
-                                        style: context.textStyles.title3,
+                                        widget.postMovieModel != null
+                                            ? context.txt.posterEdit_editPoster
+                                            : widget.bookmark
+                                                ? context.txt.home_add_watchlist
+                                                : context.txt.home_add_poster,
+                                        style: context.textStyles.bodyBold
+                                            ?.copyWith(fontSize: 19.0),
                                       ),
-                                    if (widget.postMovieModel != null)
-                                      const SizedBox(height: 6.0),
-                                    if (widget.postMovieModel != null)
-                                      Text(
-                                        widget.postMovieModel!.year,
-                                        style: context.textStyles.bodyMedium
-                                            ?.copyWith(
-                                                color: context
-                                                    .colors.textsSecondary),
-                                      ),
-                                    if (widget.postMovieModel == null)
-                                      SizedBox(
-                                        height: 36,
-                                        child: AppTextField(
-                                          controller: searchController,
-                                          searchField: true,
-                                          disableOutline: true,
-                                          focus: focus,
-                                          hint: context.txt.search_hint,
-                                          removableWhenNotEmpty: true,
-                                          crossPadding:
-                                              const EdgeInsets.all(8.0),
-                                          crossButton: SvgPicture.asset(
-                                            'assets/icons/search_cross.svg',
-                                          ),
-                                          alternativeCancel: true,
-                                          onRemoved: () {
-                                            searchController.clear();
-                                            ref
-                                                .read(
-                                                    createPosterControllerProvider)
-                                                .updateSearch('');
-                                            ref
-                                                .read(
-                                                    createPosterControllerProvider)
-                                                .choosePoster(null);
-                                            ref
-                                                .read(
-                                                    createPosterControllerProvider)
-                                                .chooseMovie(null);
-                                            ref
-                                                .read(
-                                                    createPosterControllerProvider)
-                                                .createPosterChosenPosterStateHolder
-                                                .updateValue(null);
-                                            dragController
-                                                .animateTo(
-                                              1,
-                                              duration: const Duration(
-                                                  milliseconds: 100),
-                                              curve: Curves.linear,
-                                            )
-                                                .then((value) {
-                                              if (dragController.size != 1) {
-                                                dragController.animateTo(
-                                                  1,
-                                                  duration: const Duration(
-                                                      milliseconds: 100),
-                                                  curve: Curves.linear,
-                                                );
-                                              }
-                                            });
-                                          },
-                                          onChanged: (value) {
-                                            if (chosenMovie != null) {
+                                      const SizedBox(height: 20.0),
+                                      if (widget.postMovieModel != null)
+                                        Text(
+                                          widget.postMovieModel!.name,
+                                          style: context.textStyles.title3,
+                                        ),
+                                      if (widget.postMovieModel != null)
+                                        const SizedBox(height: 6.0),
+                                      if (widget.postMovieModel != null)
+                                        Text(
+                                          widget.postMovieModel!.year,
+                                          style: context.textStyles.bodyMedium
+                                              ?.copyWith(
+                                                  color: context
+                                                      .colors.textsSecondary),
+                                        ),
+                                      if (widget.postMovieModel == null)
+                                        SizedBox(
+                                          height: 36,
+                                          child: AppTextField(
+                                            controller: searchController,
+                                            searchField: true,
+                                            disableOutline: true,
+                                            focus: focus,
+                                            hint: context.txt.search_hint,
+                                            removableWhenNotEmpty: true,
+                                            crossPadding:
+                                                const EdgeInsets.all(8.0),
+                                            crossButton: SvgPicture.asset(
+                                              'assets/icons/search_cross.svg',
+                                            ),
+                                            alternativeCancel: true,
+                                            onRemoved: () {
+                                              searchController.clear();
+                                              ref
+                                                  .read(
+                                                      createPosterControllerProvider)
+                                                  .updateSearch('');
+                                              ref
+                                                  .read(
+                                                      createPosterControllerProvider)
+                                                  .choosePoster(null);
                                               ref
                                                   .read(
                                                       createPosterControllerProvider)
                                                   .chooseMovie(null);
-                                            }
-                                            ref
-                                                .read(
-                                                    createPosterControllerProvider)
-                                                .updateSearch(value);
-                                          },
+                                              ref
+                                                  .read(
+                                                      createPosterControllerProvider)
+                                                  .createPosterChosenPosterStateHolder
+                                                  .updateValue(null);
+                                              dragController
+                                                  .animateTo(
+                                                1,
+                                                duration: const Duration(
+                                                    milliseconds: 100),
+                                                curve: Curves.linear,
+                                              )
+                                                  .then((value) {
+                                                if (dragController.size != 1) {
+                                                  dragController.animateTo(
+                                                    1,
+                                                    duration: const Duration(
+                                                        milliseconds: 100),
+                                                    curve: Curves.linear,
+                                                  );
+                                                }
+                                              });
+                                            },
+                                            onChanged: (value) {
+                                              if (chosenMovie != null) {
+                                                ref
+                                                    .read(
+                                                        createPosterControllerProvider)
+                                                    .chooseMovie(null);
+                                              }
+                                              ref
+                                                  .read(
+                                                      createPosterControllerProvider)
+                                                  .updateSearch(value);
+                                            },
+                                          ),
+                                        ),
+                                      if (searchText.isEmpty ||
+                                          chosenMovie != null)
+                                        const SizedBox(height: 16),
+                                    ],
+                                  ),
+                                  // Positioned(
+                                  //   right: 0,
+                                  //   top: 70,
+                                  //   bottom:
+                                  //       searchController.text.isEmpty ? 30 : 0,
+                                  //   child: GestureDetector(
+                                  //     behavior: HitTestBehavior.opaque,
+                                  //     onTap: () {
+                                  //       searchController.clear();
+                                  //       ref
+                                  //           .read(createPosterControllerProvider)
+                                  //           .updateSearch('');
+                                  //     },
+                                  //     child: Container(
+                                  //       color: Colors.transparent,
+                                  //       width: 60,
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                ],
+                              ),
+                            ),
+                            pinned: true,
+                          ),
+                          if (searchText.isEmpty && chosenMovie == null)
+                            SliverToBoxAdapter(
+                              child: IgnorePointer(
+                                child: AnimatedBuilder(
+                                  animation: dragController,
+                                  builder: (context, child) {
+                                    return Transform.translate(
+                                      offset: Offset(
+                                        0,
+                                        !dragController.isAttached
+                                            ? 0
+                                            : (MediaQuery.of(context)
+                                                        .size
+                                                        .height -
+                                                    370 -
+                                                    MediaQuery.of(context)
+                                                        .padding
+                                                        .top -
+                                                    MediaQuery.of(context)
+                                                        .viewInsets
+                                                        .bottom) /
+                                                2,
+                                      ),
+                                      child: child,
+                                    );
+                                  },
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SvgPicture.asset(
+                                          widget.bookmark
+                                              ? 'assets/icons/ic_bookmark_second.svg'
+                                              : 'assets/icons/ic_collection_second.svg',
+                                          width: 48,
+                                          colorFilter: ColorFilter.mode(
+                                            context.colors.textsDisabled!,
+                                            BlendMode.srcIn,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Text(
+                                          context.txt.search_add_watched_hint,
+                                          style: context
+                                              .textStyles.subheadlineBold!
+                                              .copyWith(
+                                            color:
+                                                context.colors.textsDisabled!,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (chosenMovie != null)
+                            SliverToBoxAdapter(
+                              child: SizedBox(
+                                height: 160,
+                                child: ListView.separated(
+                                  itemCount:
+                                      chosenMovie == null ? 20 : images.length,
+                                  itemBuilder: (context, index) => Padding(
+                                    padding: EdgeInsets.only(
+                                        left: index == 0 ? 16.0 : 0.0,
+                                        right: index ==
+                                                ((chosenMovie == null
+                                                        ? 20
+                                                        : images.length) -
+                                                    1)
+                                            ? 16.0
+                                            : 0.0),
+                                    child: PosterRadio(
+                                      chosenMovie: chosenMovie,
+                                      images: images,
+                                      index: index,
+                                    ),
+                                  ),
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(
+                                    width: 8,
+                                  ),
+                                  scrollDirection: Axis.horizontal,
+                                ),
+                              ),
+                            ),
+                          if (searchText.isNotEmpty && results == null)
+                            SliverFillRemaining(
+                              child: Center(
+                                child: defaultTargetPlatform !=
+                                        TargetPlatform.android
+                                    ? const CupertinoActivityIndicator(
+                                        radius: 10,
+                                      )
+                                    : SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          color: context.colors.iconsDisabled!,
+                                          strokeWidth: 2,
                                         ),
                                       ),
-                                    if (searchText.isEmpty ||
-                                        chosenMovie != null)
-                                      const SizedBox(height: 16),
-                                  ],
-                                ),
-                                // Positioned(
-                                //   right: 0,
-                                //   top: 70,
-                                //   bottom:
-                                //       searchController.text.isEmpty ? 30 : 0,
-                                //   child: GestureDetector(
-                                //     behavior: HitTestBehavior.opaque,
-                                //     onTap: () {
-                                //       searchController.clear();
-                                //       ref
-                                //           .read(createPosterControllerProvider)
-                                //           .updateSearch('');
-                                //     },
-                                //     child: Container(
-                                //       color: Colors.transparent,
-                                //       width: 60,
-                                //     ),
-                                //   ),
-                                // ),
-                              ],
+                              ),
                             ),
-                          ),
-                          pinned: true,
-                        ),
-                        if (searchText.isEmpty && chosenMovie == null)
-                          SliverToBoxAdapter(
-                            child: IgnorePointer(
+                          if (searchText.isNotEmpty &&
+                              results != null &&
+                              chosenMovie == null)
+                            SliverList.builder(
+                              itemCount: results.length,
+                              itemBuilder: (context, index) => Material(
+                                color: context.colors.backgroundsPrimary,
+                                child: InkWell(
+                                  onTap: () {
+                                    ref
+                                        .read(createPosterControllerProvider)
+                                        .chooseMovie(
+                                          (results[index]),
+                                        );
+                                    focus.unfocus();
+                                    setState(() {});
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                      16.0,
+                                      12.0,
+                                      16.0,
+                                      12.0,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: TextInfoService.textSize(
+                                                    results[index].title,
+                                                    context.textStyles
+                                                        .bodyRegular!,
+                                                  ).width >
+                                                  (MediaQuery.of(context)
+                                                          .size
+                                                          .width -
+                                                      54 -
+                                                      TextInfoService.textSize(
+                                                              results[index]
+                                                                          .endYear ==
+                                                                      null
+                                                                  ? results[index]
+                                                                      .startYear
+                                                                      .toString()
+                                                                  : '${results[index].startYear} - ${results[index].endYear}',
+                                                              context.textStyles
+                                                                  .caption1!)
+                                                          .width)
+                                              ? (MediaQuery.of(context)
+                                                      .size
+                                                      .width -
+                                                  54 -
+                                                  TextInfoService.textSize(
+                                                          results[index]
+                                                                      .endYear ==
+                                                                  null
+                                                              ? results[index]
+                                                                  .startYear
+                                                                  .toString()
+                                                              : '${results[index].startYear} - ${results[index].endYear}',
+                                                          context.textStyles
+                                                              .caption1!)
+                                                      .width)
+                                              : TextInfoService.textSize(
+                                                  results[index].title,
+                                                  context
+                                                      .textStyles.bodyRegular!,
+                                                ).width,
+                                          child: Text(
+                                            results[index].title,
+                                            style:
+                                                context.textStyles.bodyRegular,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 8,
+                                        ),
+                                        Text(
+                                          results[index].endYear == null
+                                              ? results[index]
+                                                  .startYear
+                                                  .toString()
+                                              : '${results[index].startYear} - ${results[index].endYear}',
+                                          style: context.textStyles.caption1!
+                                              .copyWith(
+                                            color:
+                                                context.colors.textsSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (!focus.hasFocus &&
+                                  searchController.text.isEmpty ||
+                              chosenMovie != null &&
+                                  (dragController.isAttached ||
+                                      widget.postMovieModel != null))
+                            SliverToBoxAdapter(
                               child: AnimatedBuilder(
                                 animation: dragController,
                                 builder: (context, child) {
                                   return Transform.translate(
                                     offset: Offset(
-                                      0,
-                                      !dragController.isAttached
-                                          ? 0
-                                          : (MediaQuery.of(context)
-                                                      .size
-                                                      .height -
-                                                  370 -
-                                                  MediaQuery.of(context)
-                                                      .padding
-                                                      .top -
-                                                  MediaQuery.of(context)
-                                                      .viewInsets
-                                                      .bottom) /
-                                              2,
-                                    ),
-                                    child: child,
+                                        0,
+                                        !dragController.isAttached
+                                            ? 0
+                                            : dragController.size >= 0.2
+                                                ? 0
+                                                : (0.2 - dragController.size) *
+                                                    MediaQuery.of(context)
+                                                        .size
+                                                        .height),
+                                    child: child!,
                                   );
                                 },
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SvgPicture.asset(
-                                        widget.bookmark
-                                            ? 'assets/icons/ic_bookmark_second.svg'
-                                            : 'assets/icons/ic_collection_second.svg',
-                                        width: 48,
-                                        colorFilter: ColorFilter.mode(
-                                          context.colors.textsDisabled!,
-                                          BlendMode.srcIn,
-                                        ),
+                                child: Column(
+                                  children: <Widget>[
+                                    // Divider(
+                                    //   height: 1,
+                                    //   thickness: 1,
+                                    //   color: context.colors.fieldsDefault,
+                                    // ),
+                                    if (!widget.bookmark)
+                                      Container(
+                                        height: 16.0,
+                                        color:
+                                            context.colors.backgroundsPrimary,
                                       ),
-                                      const SizedBox(height: 5),
-                                      Text(
-                                        context.txt.search_add_watched_hint,
-                                        style: context
-                                            .textStyles.subheadlineBold!
-                                            .copyWith(
-                                          color: context.colors.textsDisabled!,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        if (chosenMovie != null)
-                          SliverToBoxAdapter(
-                            child: SizedBox(
-                              height: 160,
-                              child: ListView.separated(
-                                itemCount:
-                                    chosenMovie == null ? 20 : images.length,
-                                itemBuilder: (context, index) => Padding(
-                                  padding: EdgeInsets.only(
-                                      left: index == 0 ? 16.0 : 0.0,
-                                      right: index ==
-                                              ((chosenMovie == null
-                                                      ? 20
-                                                      : images.length) -
-                                                  1)
-                                          ? 16.0
-                                          : 0.0),
-                                  child: PosterRadio(
-                                    chosenMovie: chosenMovie,
-                                    images: images,
-                                    index: index,
-                                  ),
-                                ),
-                                separatorBuilder: (context, index) =>
-                                    const SizedBox(
-                                  width: 8,
-                                ),
-                                scrollDirection: Axis.horizontal,
-                              ),
-                            ),
-                          ),
-                        if (searchText.isNotEmpty && results == null)
-                          SliverFillRemaining(
-                            child: Center(
-                              child: defaultTargetPlatform !=
-                                      TargetPlatform.android
-                                  ? const CupertinoActivityIndicator(
-                                      radius: 10,
-                                    )
-                                  : SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        color: context.colors.iconsDisabled!,
-                                        strokeWidth: 2,
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        if (searchText.isNotEmpty &&
-                            results != null &&
-                            chosenMovie == null)
-                          SliverList.builder(
-                            itemCount: results.length,
-                            itemBuilder: (context, index) => Material(
-                              color: context.colors.backgroundsPrimary,
-                              child: InkWell(
-                                onTap: () {
-                                  ref
-                                      .read(createPosterControllerProvider)
-                                      .chooseMovie(
-                                        (results[index]),
-                                      );
-                                  focus.unfocus();
-                                  setState(() {});
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    16.0,
-                                    12.0,
-                                    16.0,
-                                    12.0,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        width: TextInfoService.textSize(
-                                                  results[index].title,
-                                                  context
-                                                      .textStyles.bodyRegular!,
-                                                ).width >
-                                                (MediaQuery.of(context)
-                                                        .size
-                                                        .width -
-                                                    54 -
-                                                    TextInfoService.textSize(
-                                                            results[index]
-                                                                        .endYear ==
-                                                                    null
-                                                                ? results[index]
-                                                                    .startYear
-                                                                    .toString()
-                                                                : '${results[index].startYear} - ${results[index].endYear}',
-                                                            context.textStyles
-                                                                .caption1!)
-                                                        .width)
-                                            ? (MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                54 -
-                                                TextInfoService.textSize(
-                                                        results[index]
-                                                                    .endYear ==
-                                                                null
-                                                            ? results[index]
-                                                                .startYear
-                                                                .toString()
-                                                            : '${results[index].startYear} - ${results[index].endYear}',
-                                                        context.textStyles
-                                                            .caption1!)
-                                                    .width)
-                                            : TextInfoService.textSize(
-                                                results[index].title,
-                                                context.textStyles.bodyRegular!,
-                                              ).width,
-                                        child: Text(
-                                          results[index].title,
-                                          style: context.textStyles.bodyRegular,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 8,
-                                      ),
-                                      Text(
-                                        results[index].endYear == null
-                                            ? results[index]
-                                                .startYear
-                                                .toString()
-                                            : '${results[index].startYear} - ${results[index].endYear}',
-                                        style: context.textStyles.caption1!
-                                            .copyWith(
-                                          color: context.colors.textsSecondary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        if (!focus.hasFocus && searchController.text.isEmpty ||
-                            chosenMovie != null &&
-                                (dragController.isAttached ||
-                                    widget.postMovieModel != null))
-                          SliverToBoxAdapter(
-                            child: AnimatedBuilder(
-                              animation: dragController,
-                              builder: (context, child) {
-                                return Transform.translate(
-                                  offset: Offset(
-                                      0,
-                                      !dragController.isAttached
-                                          ? 0
-                                          : dragController.size >= 0.2
-                                              ? 0
-                                              : (0.2 - dragController.size) *
-                                                  MediaQuery.of(context)
-                                                      .size
-                                                      .height),
-                                  child: child!,
-                                );
-                              },
-                              child: Column(
-                                children: <Widget>[
-                                  // Divider(
-                                  //   height: 1,
-                                  //   thickness: 1,
-                                  //   color: context.colors.fieldsDefault,
-                                  // ),
-                                  if (!widget.bookmark)
-                                    Container(
-                                      height: 16.0,
-                                      color: context.colors.backgroundsPrimary,
-                                    ),
-                                  if (!widget.bookmark && chosenMovie != null)
-                                    Container(
-                                      color: context.colors.backgroundsPrimary,
-                                      child: DescriptionTextField(
-                                        focus: focusSec,
-                                        hint:
-                                            context.txt.search_add_poster_hint,
-                                        showDivider: true,
-                                        button: widget.postMovieModel != null
-                                            ? context.txt.save
-                                            : context.txt.add,
-                                        buttonAddCheck: !(chosenCover == null),
-                                        disableWithoutText:
-                                            widget.postMovieModel != null
-                                                ? false
-                                                : true,
-                                        buttonLoading: ref.watch(
-                                            createPosterLoadingStateHolderProvider),
-                                        maxSymbols: 280,
-                                        controller: descController,
-                                        onTap: () async {
-                                          try {
+                                    if (!widget.bookmark && chosenMovie != null)
+                                      Container(
+                                        color:
+                                            context.colors.backgroundsPrimary,
+                                        child: DescriptionTextField(
+                                          focus: focusSec,
+                                          hint: context
+                                              .txt.search_add_poster_hint,
+                                          showDivider: true,
+                                          button: widget.postMovieModel != null
+                                              ? context.txt.save
+                                              : context.txt.add,
+                                          buttonAddCheck:
+                                              !(chosenCover == null),
+                                          disableWithoutText:
+                                              widget.postMovieModel != null
+                                                  ? false
+                                                  : true,
+                                          buttonLoading: ref.watch(
+                                              createPosterLoadingStateHolderProvider),
+                                          maxSymbols: 280,
+                                          controller: descController,
+                                          onTap: () async {
+                                            try {
+                                              ref
+                                                  .read(
+                                                      createPosterLoadingStateHolderProvider
+                                                          .notifier)
+                                                  .updateValue(true);
+                                              // if (widget.mediaModel == null) {
+                                              final currPost = ref.read(
+                                                  posterStateHolderProvider);
+                                              final createId = ref.read(
+                                                  createPosterChoseMovieStateHolderProvider);
+                                              if (currPost?.name ==
+                                                      createId?.title &&
+                                                  currPost?.year ==
+                                                      '${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}') {
+                                                ref
+                                                    .read(
+                                                        posterStateHolderProvider
+                                                            .notifier)
+                                                    .updateState(
+                                                      currPost!.copyWith(
+                                                          hasInCollection:
+                                                              true),
+                                                    );
+                                              }
+                                              if (widget.postMovieModel ==
+                                                  null) {
+                                                await ref
+                                                    .read(
+                                                        createPosterControllerProvider)
+                                                    .createPoster(
+                                                        descController.text);
+                                              } else {
+                                                await ref
+                                                    .read(
+                                                        createPosterControllerProvider)
+                                                    .editPoster(
+                                                        widget
+                                                            .postMovieModel!.id,
+                                                        widget.postMovieModel!
+                                                            .imagePath,
+                                                        descController.text);
+                                              }
+                                            } catch (_) {
+                                              print(_);
+                                            }
                                             ref
                                                 .read(
                                                     createPosterLoadingStateHolderProvider
                                                         .notifier)
-                                                .updateValue(true);
-                                            // if (widget.mediaModel == null) {
-                                            final currPost = ref.read(
-                                                posterStateHolderProvider);
-                                            final createId = ref.read(
-                                                createPosterChoseMovieStateHolderProvider);
-                                            if (currPost?.name ==
-                                                    createId?.title &&
-                                                currPost?.year ==
-                                                    '${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}') {
+                                                .updateValue(false);
+                                            ref
+                                                .read(menuControllerProvider)
+                                                .hideMenu();
+                                            if (context.mounted) {
+                                              Navigator.pop(context);
+
+                                              final selectedImage = ref
+                                                  .read(
+                                                      createPosterControllerProvider)
+                                                  .createPosterChosenPosterStateHolder
+                                                  .state;
+                                              PostMovieModel? updatedState = ref
+                                                  .read(
+                                                      posterStateHolderProvider
+                                                          .notifier)
+                                                  .state
+                                                  ?.copyWith(
+                                                      description:
+                                                          descController.text);
+                                              if (selectedImage != null) {
+                                                updatedState =
+                                                    updatedState?.copyWith(
+                                                        imagePath:
+                                                            selectedImage.$2);
+                                              }
+                                              ref
+                                                  .read(
+                                                      createPosterControllerProvider)
+                                                  .createPosterChosenPosterStateHolder
+                                                  .updateValue(null);
+
                                               ref
                                                   .read(
                                                       posterStateHolderProvider
                                                           .notifier)
-                                                  .updateState(
-                                                    currPost!.copyWith(
-                                                        hasInCollection: true),
-                                                  );
+                                                  .updateState(updatedState);
                                             }
-                                            if (widget.postMovieModel == null) {
-                                              await ref
-                                                  .read(
-                                                      createPosterControllerProvider)
-                                                  .createPoster(
-                                                      descController.text);
-                                            } else {
-                                              await ref
-                                                  .read(
-                                                      createPosterControllerProvider)
-                                                  .editPoster(
-                                                      widget.postMovieModel!.id,
-                                                      widget.postMovieModel!
-                                                          .imagePath,
-                                                      descController.text);
-                                            }
-                                          } catch (_) {
-                                            print(_);
-                                          }
-                                          ref
-                                              .read(
-                                                  createPosterLoadingStateHolderProvider
-                                                      .notifier)
-                                              .updateValue(false);
-                                          ref
-                                              .read(menuControllerProvider)
-                                              .hideMenu();
-                                          if (context.mounted) {
-                                            Navigator.pop(context);
-
-                                            final selectedImage = ref
-                                                .read(
-                                                    createPosterControllerProvider)
-                                                .createPosterChosenPosterStateHolder
-                                                .state;
-                                            PostMovieModel? updatedState = ref
-                                                .read(posterStateHolderProvider
-                                                    .notifier)
-                                                .state
-                                                ?.copyWith(
-                                                    description:
-                                                        descController.text);
-                                            if (selectedImage != null) {
-                                              updatedState =
-                                                  updatedState?.copyWith(
-                                                      imagePath:
-                                                          selectedImage.$2);
-                                            }
-                                            ref
-                                                .read(
-                                                    createPosterControllerProvider)
-                                                .createPosterChosenPosterStateHolder
-                                                .updateValue(null);
-
-                                            ref
-                                                .read(posterStateHolderProvider
-                                                    .notifier)
-                                                .updateState(updatedState);
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  if (widget.bookmark)
-                                    const SizedBox(
-                                      height: 28.0,
-                                    ),
-                                  if (widget.bookmark && chosenMovie != null)
-                                    Container(
-                                      color: context.colors.backgroundsPrimary,
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                          bottom: MediaQuery.of(context)
-                                              .padding
-                                              .bottom,
+                                          },
                                         ),
-                                        child: Container(
-                                          height: 36,
-                                          color:
-                                              context.colors.backgroundsPrimary,
-                                          child: Row(
-                                            children: [
-                                              const Spacer(),
-                                              SizedBox(
-                                                width: TextInfoService.textSize(
-                                                      context.txt
-                                                          .watchlistAdd_bookmark,
-                                                      context.textStyles
-                                                          .calloutBold!
-                                                          .copyWith(
-                                                        color: context.colors
-                                                            .textsBackground,
-                                                      ),
-                                                    ).width +
-                                                    32,
-                                                child: AppTextButton(
-                                                  disabled: chosenCover == null,
-                                                  child: ref.watch(
-                                                          createPosterLoadingStateHolderProvider)
-                                                      ? Center(
-                                                          child: defaultTargetPlatform !=
-                                                                  TargetPlatform
-                                                                      .android
-                                                              ? CupertinoActivityIndicator(
-                                                                  radius: 10.0,
-                                                                  color: context
-                                                                      .colors
-                                                                      .textsBackground!,
-                                                                )
-                                                              : SizedBox(
-                                                                  width: 16,
-                                                                  height: 16,
-                                                                  child:
-                                                                      CircularProgressIndicator(
+                                      ),
+                                    if (widget.bookmark)
+                                      const SizedBox(
+                                        height: 28.0,
+                                      ),
+                                    if (widget.bookmark && chosenMovie != null)
+                                      Container(
+                                        color:
+                                            context.colors.backgroundsPrimary,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            bottom: MediaQuery.of(context)
+                                                .padding
+                                                .bottom,
+                                          ),
+                                          child: Container(
+                                            height: 36,
+                                            color: context
+                                                .colors.backgroundsPrimary,
+                                            child: Row(
+                                              children: [
+                                                const Spacer(),
+                                                SizedBox(
+                                                  width:
+                                                      TextInfoService.textSize(
+                                                            context.txt
+                                                                .watchlistAdd_bookmark,
+                                                            context.textStyles
+                                                                .calloutBold!
+                                                                .copyWith(
+                                                              color: context
+                                                                  .colors
+                                                                  .textsBackground,
+                                                            ),
+                                                          ).width +
+                                                          32,
+                                                  child: AppTextButton(
+                                                    disabled:
+                                                        chosenCover == null,
+                                                    child: ref.watch(
+                                                            createPosterLoadingStateHolderProvider)
+                                                        ? Center(
+                                                            child: defaultTargetPlatform !=
+                                                                    TargetPlatform
+                                                                        .android
+                                                                ? CupertinoActivityIndicator(
+                                                                    radius:
+                                                                        10.0,
                                                                     color: context
                                                                         .colors
                                                                         .textsBackground!,
-                                                                    strokeWidth:
-                                                                        2,
+                                                                  )
+                                                                : SizedBox(
+                                                                    width: 16,
+                                                                    height: 16,
+                                                                    child:
+                                                                        CircularProgressIndicator(
+                                                                      color: context
+                                                                          .colors
+                                                                          .textsBackground!,
+                                                                      strokeWidth:
+                                                                          2,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                        )
-                                                      : Text(
-                                                          context.txt
-                                                              .watchlistAdd_bookmark,
-                                                          style: context
-                                                              .textStyles
-                                                              .calloutBold!
-                                                              .copyWith(
-                                                            color: context
-                                                                .colors
-                                                                .textsBackground,
+                                                          )
+                                                        : Text(
+                                                            context.txt
+                                                                .watchlistAdd_bookmark,
+                                                            style: context
+                                                                .textStyles
+                                                                .calloutBold!
+                                                                .copyWith(
+                                                              color: context
+                                                                  .colors
+                                                                  .textsBackground,
+                                                            ),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
                                                           ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                  onTap: () async {
-                                                    try {
+                                                    onTap: () async {
+                                                      try {
+                                                        ref
+                                                            .read(
+                                                                createPosterLoadingStateHolderProvider
+                                                                    .notifier)
+                                                            .updateValue(true);
+                                                        await ref
+                                                            .read(
+                                                                createPosterControllerProvider)
+                                                            .createBookmark();
+                                                      } catch (_) {
+                                                        print(_);
+                                                      }
                                                       ref
                                                           .read(
                                                               createPosterLoadingStateHolderProvider
                                                                   .notifier)
-                                                          .updateValue(true);
-                                                      await ref
-                                                          .read(
-                                                              createPosterControllerProvider)
-                                                          .createBookmark();
-                                                    } catch (_) {
-                                                      print(_);
-                                                    }
-                                                    ref
-                                                        .read(
-                                                            createPosterLoadingStateHolderProvider
-                                                                .notifier)
-                                                        .updateValue(false);
-                                                    if (context.mounted) {
-                                                      Navigator.pop(context);
-                                                      ref
-                                                          .read(
-                                                              menuControllerProvider)
-                                                          .hideMenu();
-                                                    }
-                                                  },
+                                                          .updateValue(false);
+                                                      if (context.mounted) {
+                                                        Navigator.pop(context);
+                                                        ref
+                                                            .read(
+                                                                menuControllerProvider)
+                                                            .hideMenu();
+                                                      }
+                                                    },
+                                                  ),
                                                 ),
-                                              ),
-                                              const SizedBox(width: 16),
-                                            ],
+                                                const SizedBox(width: 16),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
+                                    Container(
+                                      height:
+                                          MediaQuery.of(context).padding.bottom,
+                                      color: context.colors.backgroundsPrimary,
                                     ),
-                                  Container(
-                                    height:
-                                        MediaQuery.of(context).padding.bottom,
-                                    color: context.colors.backgroundsPrimary,
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                      ],
-                    ),
-                  );
-                },
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

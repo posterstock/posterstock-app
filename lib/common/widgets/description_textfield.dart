@@ -55,7 +55,7 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
             textCapitalization: TextCapitalization.sentences,
             focusNode: widget.focus,
             minLines: 2,
-            maxLines: 5,
+            maxLines: 2,
             controller: descriptionController,
             cursorWidth: 1,
             cursorColor: context.colors.textsAction,

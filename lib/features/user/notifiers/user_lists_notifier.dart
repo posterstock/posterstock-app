@@ -21,6 +21,7 @@ class UserListsNotifier extends StateNotifier<List<ListBaseModel?>> {
 
     final result = await network.getLists(id);
     cache.cacheLists(id, result);
+    if (!mounted) return;
     state = result ?? [];
   }
 }

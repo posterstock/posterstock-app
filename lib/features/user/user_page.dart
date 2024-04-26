@@ -45,10 +45,11 @@ class UserPageId extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.read(userControllerProvider(id));
-    final posters = ref.watch(userPostersNotifier(id));
+    // ref.read(userControllerProvider(id));
+    // final posters = ref.watch(userPostersNotifier(id));
     final user = ref.watch(userNotifier(id));
-    return user == null || (posters.firstOrNull == null && posters.isNotEmpty)
+    return user == null
+        // || (posters.firstOrNull == null && posters.isNotEmpty)
         ? const WaitProfile('')
         : _UserPage(args: UserArgs(user.id, user.username, uid: true));
   }

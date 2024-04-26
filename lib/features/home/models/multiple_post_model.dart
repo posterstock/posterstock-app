@@ -49,11 +49,10 @@ class MultiplePostModel extends PostBaseModel {
     this.image,
     required String name,
     required UserModel author,
-    required String time,
+    required int? creationTime,
     required int id,
     required bool liked,
-    required DateTime timeDate,
-    required String type,
+    required String? type,
     int likes = 0,
     int comments = 0,
     String? description,
@@ -62,15 +61,14 @@ class MultiplePostModel extends PostBaseModel {
           id: id,
           name: name,
           author: author,
-          time: time,
-          timeDate: timeDate,
+          creationTime: creationTime,
           likes: likes,
           liked: liked,
           comments: comments,
           description: description,
         );
 
-  factory MultiplePostModel.fromJson(Map<String, Object?> json,
+  factory MultiplePostModel.fromJson(Map<String, dynamic> json,
       {bool previewPrimary = false}) {
     const List<Color> avatar = [
       Color(0xfff09a90),
@@ -90,7 +88,7 @@ class MultiplePostModel extends PostBaseModel {
     print(json['description'] as String?);
     print((json['description'] as String?)?.replaceAll('\n', "F"));
     return MultiplePostModel(
-      type: json['type'] as String,
+      type: json['type'],
       id: json['id'] as int,
       name: json['title'] as String,
       liked: json['has_liked'] as bool,
@@ -107,14 +105,7 @@ class MultiplePostModel extends PostBaseModel {
               color: avatar[(json['user_id'] as int? ?? 0) % 3],
             )
           : UserModel.fromJson(json['user'] as Map<String, dynamic>),
-      time: _getTimeString(DateTime.fromMillisecondsSinceEpoch(
-          (json['created_at'] as int? ??
-                  DateTime.now().millisecondsSinceEpoch) *
-              1000)),
-      timeDate: DateTime.fromMillisecondsSinceEpoch(
-          (json['created_at'] as int? ??
-                  DateTime.now().millisecondsSinceEpoch) *
-              1000),
+      creationTime: json['created_at'],
       likes: json['likes_count'] as int,
       comments: json['comments_count'] as int,
       description: json['description'] as String?,
@@ -138,23 +129,9 @@ class MultiplePostModel extends PostBaseModel {
         'comments_count': comments,
         'user': author.toJson(),
         'image': image,
-        // 'posters': posters.map((i) => i.toJson()),
+        'created_at': creationTime,
+        'posters': posters.map((i) => i.toJson()).toList(),
       };
-
-  static String _getTimeString(DateTime date) {
-    DateTime now = DateTime.now();
-    Duration diff = now.difference(date);
-    if (diff.inDays > 30) {
-      return "${diff.inDays ~/ 30} month${diff.inDays ~/ 30 > 1 ? "s" : ''} ago";
-    } else if (diff.inDays > 0) {
-      return "${diff.inDays} day${diff.inDays > 1 ? "s" : ''} ago";
-    } else if (diff.inHours > 0) {
-      return "${diff.inHours} hour${diff.inHours > 1 ? "s" : ''} ago";
-    } else if (diff.inMinutes > 0) {
-      return "${diff.inMinutes} minute${diff.inMinutes > 1 ? "s" : ''} ago";
-    }
-    return "Less than a minute ago";
-  }
 
   @override
   MultiplePostModel copyWith({
@@ -162,8 +139,7 @@ class MultiplePostModel extends PostBaseModel {
     String? type,
     String? name,
     UserModel? author,
-    String? time,
-    DateTime? timeDate,
+    int? creationTime,
     String? description,
     int? likes,
     int? comments,
@@ -176,8 +152,7 @@ class MultiplePostModel extends PostBaseModel {
       type: type ?? this.type,
       name: name ?? this.name,
       author: author ?? this.author,
-      time: time ?? this.time,
-      timeDate: timeDate ?? this.timeDate,
+      creationTime: creationTime ?? this.creationTime,
       description: description ?? this.description,
       likes: likes ?? this.likes,
       comments: comments ?? this.comments,

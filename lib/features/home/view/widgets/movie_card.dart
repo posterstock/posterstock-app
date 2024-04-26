@@ -36,7 +36,7 @@ class MovieCard extends ConsumerStatefulWidget {
 class MovieCardState extends ConsumerState<MovieCard>
     with TickerProviderStateMixin {
   late AnimationController controller;
-  late AnimationController likeCommentController;
+  late AnimationController multiplePosterController;
   PageController? pageController;
   int currentPage = 0;
   double? textHeight;
@@ -80,7 +80,7 @@ class MovieCardState extends ConsumerState<MovieCard>
 
     getInitData();
     widget.pageHolder.page = (pageController?.page ?? 0).round();
-    return Container(
+    return SizedBox(
       height: (textHeight ?? 0) +
           58 +
           31 +
@@ -105,7 +105,7 @@ class MovieCardState extends ConsumerState<MovieCard>
               }
               Future(() {
                 try {
-                  likeCommentController.animateTo(
+                  multiplePosterController.animateTo(
                       (pageController?.page?.toInt() ?? 0) +
                           (((pageController!.page ?? 0) * 100).toInt() % 100) /
                               100);
@@ -131,7 +131,7 @@ class MovieCardState extends ConsumerState<MovieCard>
                         left: controller.value < 0 ? 0 : controller.value,
                       ),
                       child: _MovieCardPageViewContent(
-                        likeCommentController: likeCommentController,
+                        likeCommentController: multiplePosterController,
                         onPosterTap: () {},
                         textHeight: textHeight!,
                         titleHeight: TextInfoService.textSize(
@@ -151,11 +151,11 @@ class MovieCardState extends ConsumerState<MovieCard>
               ),
               if (movie != null && movie!.length > 1)
                 AnimatedBuilder(
-                    animation: likeCommentController,
+                    animation: multiplePosterController,
                     builder: (context, child) {
-                      int page = likeCommentController.value.toInt();
-                      if (likeCommentController.value -
-                              likeCommentController.value.toInt() >
+                      int page = multiplePosterController.value.toInt();
+                      if (multiplePosterController.value -
+                              multiplePosterController.value.toInt() >
                           0.5) page++;
                       return Positioned(
                         top: 0,
@@ -173,18 +173,18 @@ class MovieCardState extends ConsumerState<MovieCard>
                     }),
               if (movie != null && movie!.length > 1)
                 AnimatedBuilder(
-                    animation: likeCommentController,
+                    animation: multiplePosterController,
                     builder: (context, child) {
                       return Positioned(
                         bottom: 27,
                         left: 68,
                         child: CurrentPostShower(
                           length: movie!.length,
-                          current: (likeCommentController.value -
-                                      likeCommentController.value.toInt()) >
+                          current: (multiplePosterController.value -
+                                      multiplePosterController.value.toInt()) >
                                   0.5
-                              ? likeCommentController.value.toInt() + 1
-                              : likeCommentController.value.toInt(),
+                              ? multiplePosterController.value.toInt() + 1
+                              : multiplePosterController.value.toInt(),
                         ),
                       );
                     })
@@ -198,7 +198,7 @@ class MovieCardState extends ConsumerState<MovieCard>
   void getInitData() {
     if (firstRun) {
       firstRun = false;
-      likeCommentController = AnimationController(
+      multiplePosterController = AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 0),
         lowerBound: 0.0,

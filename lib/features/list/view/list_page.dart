@@ -550,9 +550,8 @@ class CollectionInfoWidget extends ConsumerWidget {
                       type: 'list',
                       name: post!.posters[index].title,
                       author: post!.author,
-                      time: post!.time,
+                      creationTime: post!.creationTime,
                       liked: false,
-                      timeDate: post!.timeDate,
                       description: post!.posters[index].description,
                       hasBookmarked: false),
                   customOnItemTap: (post, index) {

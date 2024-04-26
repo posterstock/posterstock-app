@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:poster_stock/features/home/data/cached_home_service.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_base_model.dart';
@@ -20,12 +21,20 @@ class CachedHomeRepository {
         }
       }));
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
     return null;
   }
 
   Future<void> cachePosts(List<PostBaseModel> postMovieModels) async {
-    await service.cachePosts(postMovieModels);
+    try {
+      await service.cachePosts(postMovieModels);
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
   }
 }
