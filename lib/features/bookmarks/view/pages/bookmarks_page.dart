@@ -17,8 +17,6 @@ import 'package:poster_stock/features/create_poster/controller/create_poster_con
 import 'package:poster_stock/features/create_poster/model/media_model.dart';
 import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
-import 'package:poster_stock/features/poster/controller/comments_controller.dart';
-import 'package:poster_stock/features/profile/state_holders/profile_bookmarks_state_holder.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:url_launcher/url_launcher_string.dart';

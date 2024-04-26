@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
+import 'package:poster_stock/features/user/user_cache.dart';
 import 'package:poster_stock/features/user/user_network.dart';
 
 final userPostersNotifier = StateNotifierProvider.family
@@ -9,14 +10,22 @@ final userPostersNotifier = StateNotifierProvider.family
 
 class UserPostersNotifier extends StateNotifier<List<PostMovieModel?>> {
   final UserNetwork network = UserNetwork();
+  final UserCache cache = UserCache();
+
   final int userId;
   bool _hasMore = true;
   bool _loading = false;
+
   UserPostersNotifier(this.userId) : super(List.generate(12, (_) => null));
 
   Future<void> _init() async {
     if (!_hasMore) return;
+    final cachedResult = await cache.getUserPosts(userId);
+    if (cachedResult != null) {
+      state = cachedResult;
+    }
     final result = await network.getUserPosts(userId);
+    cache.cacheUserPosts(userId, result.$1);
     state = result.$1 ?? [];
     _hasMore = result.$2;
   }

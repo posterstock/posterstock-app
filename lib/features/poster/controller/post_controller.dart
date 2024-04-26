@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:poster_stock/features/home/models/list_base_model.dart';
+import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/list/repository/list_repository.dart';
 import 'package:poster_stock/features/poster/repository/post_repository.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
@@ -8,17 +8,17 @@ import 'package:poster_stock/features/poster/state_holder/poster_state_holder.da
 import 'package:poster_stock/features/profile/repository/profile_repository.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 
-final commentsControllerProvider = Provider<CommentsController>(
-      (ref) =>
-      CommentsController(
-        commentsStateHolder: ref.watch(commentsStateHolderProvider.notifier),
-        posterStateHolder: ref.watch(posterStateHolderProvider.notifier),
-        myProfileInfoStateHolder: ref.watch(myProfileInfoStateHolderProvider.notifier),
-        myListsStateHolder: ref.watch(myListsStateHolderProvider.notifier),
-      ),
+final postControllerProvider = Provider<PostController>(
+  (ref) => PostController(
+    commentsStateHolder: ref.watch(commentsStateHolderProvider.notifier),
+    posterStateHolder: ref.watch(posterStateHolderProvider.notifier),
+    myProfileInfoStateHolder:
+        ref.watch(myProfileInfoStateHolderProvider.notifier),
+    myListsStateHolder: ref.watch(myListsStateHolderProvider.notifier),
+  ),
 );
 
-class CommentsController {
+class PostController {
   final CommentsStateHolder commentsStateHolder;
   final PosterStateHolder posterStateHolder;
   final MyProfileInfoStateHolder myProfileInfoStateHolder;
@@ -26,10 +26,12 @@ class CommentsController {
   final ListRepository listRepository = ListRepository();
   final profileRepo = ProfileRepository();
   final postRepository = PostRepository();
+  final cachedPostRepository = CachedPostRepository();
+
   bool loadingComments = false;
   bool loadingPost = false;
 
-  CommentsController({
+  PostController({
     required this.commentsStateHolder,
     required this.posterStateHolder,
     required this.myProfileInfoStateHolder,
@@ -40,7 +42,6 @@ class CommentsController {
     commentsStateHolder.clearComments();
     posterStateHolder.clear();
   }
-
 
   Future<void> postComment(final int id, final String text) async {
     final result = await postRepository.postComment(id, text);
@@ -61,9 +62,15 @@ class CommentsController {
     print('comm$id');
     if (loadingComments) return;
     loadingComments = true;
-    final result =
-    await postRepository.getComments(id);
-    print(result);
+
+    var result = await cachedPostRepository.getComments(id);
+    if (result != null) {
+      await commentsStateHolder.updateComments(result);
+      loadingComments = false;
+    }
+
+    result = await postRepository.getComments(id);
+    cachedPostRepository.cacheComments(id, result);
     await commentsStateHolder.updateComments(result);
     loadingComments = false;
   }
@@ -75,14 +82,31 @@ class CommentsController {
     print(11);
     //await Future.delayed(Duration(milliseconds: 500));
     loadingPost = true;
-    var result = await postRepository.getPost(id);
+    var result = await cachedPostRepository.getPost(id);
+    if (result != null) {
+      result = await _prepareData(result, cached: true);
+      await posterStateHolder.updateState(result);
+      loadingPost = false;
+    }
+
+    result = await postRepository.getPost(id);
+    cachedPostRepository.cachePost(id, result);
+    result = await _prepareData(result);
+    await posterStateHolder.updateState(result);
+    loadingPost = false;
+  }
+
+  Future<PostMovieModel> _prepareData(PostMovieModel result,
+      {bool cached = false}) async {
     var splitted = result.tmdbLink!.split('/');
     if (splitted.last.isEmpty) splitted.removeLast();
     int tmdbId = result.mediaId ?? int.parse(splitted.last);
-    final hasInCollection = await postRepository.getInCollection(tmdbId);
-    result = result.copyWith(hasInCollection: hasInCollection);
-    await posterStateHolder.updateState(result);
-    loadingPost = false;
+    bool? hasInCollection = await cachedPostRepository.getInCollection(tmdbId);
+    if (!cached || hasInCollection == null) {
+      hasInCollection = await postRepository.getInCollection(tmdbId);
+      cachedPostRepository.cacheCollection(tmdbId, hasInCollection);
+    }
+    return result.copyWith(hasInCollection: hasInCollection);
   }
 
   Future<void> deletePost(final int id) async {
@@ -95,7 +119,8 @@ class CommentsController {
   }
 
   Future<void> getMyLists() async {
-    final result = await profileRepo.getProfileLists(myProfileInfoStateHolder.state!.id);
+    final result =
+        await profileRepo.getProfileLists(myProfileInfoStateHolder.state!.id);
     myListsStateHolder.updateLists(result);
   }
 

@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/features/create_poster/model/media_model.dart';
+import 'package:poster_stock/features/create_poster/state_holder/create_poster_chosen_movie_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../themes/constants.dart';
@@ -103,134 +106,194 @@ class _AppTextFieldState extends State<AppTextField> {
             height: Constants.fieldsAndButtonsHeight,
             child: Stack(
               children: [
-                TextField(
-                  textCapitalization:
-                      widget.textCapitalization ?? TextCapitalization.none,
-                  autofocus: widget.autofocus!,
-                  onTap: widget.onTap,
-                  keyboardType: widget.keyboardType,
-                  focusNode: widget.focus ?? focus,
-                  cursorColor: context.colors.textsPrimary!,
-                  inputFormatters: widget.inputFormatters,
-                  style: (widget.style ?? context.textStyles.callout!)
-                      .copyWith(color: context.colors.textsPrimary!),
-                  onSubmitted: widget.onSubmitted,
-                  controller: widget.controller ?? nullController,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 18),
-                    isDense: true,
-                    prefix: Text(
-                      widget.isUsername ? '@' : '',
+                Stack(
+                  children: [
+                    TextField(
+                      textCapitalization:
+                          widget.textCapitalization ?? TextCapitalization.none,
+                      autofocus: widget.autofocus!,
+                      onTap: widget.onTap,
+                      keyboardType: widget.keyboardType,
+                      focusNode: widget.focus ?? focus,
+                      cursorColor: context.colors.textsPrimary!,
+                      inputFormatters: widget.inputFormatters,
                       style: (widget.style ?? context.textStyles.callout!)
-                          .copyWith(
-                        color: Colors.transparent,
-                      ),
-                    ),
-                    prefixIcon: widget.searchField
-                        ? Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                            child: SvgPicture.asset(
-                              'assets/icons/ic_search.svg',
-                              width: 15,
-                              colorFilter: ColorFilter.mode(
-                                context.colors.iconsDisabled!,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                          )
-                        : null,
-                    suffixIcon: ((widget.crossButton == null ||
-                            widget.controller?.text == '' ||
-                            widget.controller?.text == null)
-                        ? (widget.tickOnSuccess &&
-                                (widget.controller ?? nullController)
-                                        .text
-                                        .length >
-                                    1 &&
-                                !widget.hasError
+                          .copyWith(color: context.colors.textsPrimary!),
+                      onSubmitted: widget.onSubmitted,
+                      controller: widget.controller ?? nullController,
+                      decoration: InputDecoration(
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 18),
+                        isDense: true,
+                        prefix: Text(
+                          widget.isUsername ? '@' : '',
+                          style: (widget.style ?? context.textStyles.callout!)
+                              .copyWith(
+                            color: Colors.transparent,
+                          ),
+                        ),
+                        prefixIcon: widget.searchField
                             ? Padding(
-                                padding: const EdgeInsets.all(16.0),
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 10, 0, 10),
                                 child: SvgPicture.asset(
-                                  'assets/icons/ic_check.svg',
+                                  'assets/icons/ic_search.svg',
+                                  width: 15,
                                   colorFilter: ColorFilter.mode(
-                                    context.colors.iconsActive!,
+                                    context.colors.iconsDisabled!,
                                     BlendMode.srcIn,
                                   ),
                                 ),
                               )
-                            : widget.removable ||
-                                    (widget.removableWhenNotEmpty &&
-                                        (widget.controller ?? nullController)
+                            : null,
+                        suffixIcon: ((widget.crossButton == null ||
+                                widget.controller?.text == '' ||
+                                widget.controller?.text == null)
+                            ? (widget.tickOnSuccess &&
+                                    (widget.controller ?? nullController)
                                             .text
-                                            .isNotEmpty)
-                                ? GestureDetector(
-                                    onTap: () {
-                                      widget.controller?.text = '';
-                                      nullController.text = '';
-                                      setState(() {});
-                                      if (widget.onRemoved != null) {
-                                        widget.onRemoved!();
-                                      }
-                                    },
-                                    child: Container(
-                                      color: Colors.transparent,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: SvgPicture.asset(
-                                          'assets/icons/ic_close.svg',
-                                          colorFilter: ColorFilter.mode(
-                                            widget.hasError
-                                                ? context.colors.textsError!
-                                                : context.colors.iconsDisabled!,
-                                            BlendMode.srcIn,
-                                          ),
-                                        ),
+                                            .length >
+                                        1 &&
+                                    !widget.hasError
+                                ? Padding(
+                                    key: const ValueKey<int>(3),
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: SvgPicture.asset(
+                                      'assets/icons/ic_check.svg',
+                                      colorFilter: ColorFilter.mode(
+                                        context.colors.iconsActive!,
+                                        BlendMode.srcIn,
                                       ),
                                     ),
                                   )
-                                : const Padding(
-                                    padding: EdgeInsets.all(16.0),
-                                    child: SizedBox(height: 24),
-                                  ))
-                        : widget.alternativeCancel
-                            ? null
-                            : GestureDetector(
-                                onTap: () {
-                                  if (widget.onRemoved != null) {
-                                    nullController.text = '';
-                                    widget.controller?.text = '';
-                                    widget.onRemoved!();
-                                    setState(() {});
-                                  }
-                                },
-                                child: Padding(
-                                  padding:
-                                      widget.crossPadding ?? EdgeInsets.zero,
-                                  child: widget.crossButton,
-                                ),
-                              )),
-                    filled: true,
-                    fillColor: focused
-                        ? context.colors.backgroundsPrimary
-                        : context.colors.backgroundsSecondary,
-                    enabledBorder: defaultBorder,
-                    focusedBorder: defaultBorder,
-                    border: defaultBorder,
-                    hintText: widget.hint,
-                    hintStyle: widget.style ?? context.textStyles.callout!,
-                  ),
-                  onChanged: (value) {
-                    if (widget.isUsername && value == '@') {
-                      (widget.controller ?? nullController).text = '';
-                    }
-                    if (widget.onChanged != null) {
-                      widget.onChanged!(
-                          (widget.controller ?? nullController).text);
-                    }
-                    setState(() {});
-                  },
-                  maxLines: widget.maxLines ?? 1,
-                  minLines: widget.minLines,
+                                : widget.removable ||
+                                        (widget.removableWhenNotEmpty &&
+                                            (widget.controller ??
+                                                    nullController)
+                                                .text
+                                                .isNotEmpty)
+                                    ? GestureDetector(
+                                        key: const ValueKey<int>(0),
+                                        onTap: () {
+                                          widget.controller?.text = '';
+                                          nullController.text = '';
+                                          setState(() {});
+                                          if (widget.onRemoved != null) {
+                                            widget.onRemoved!();
+                                          }
+                                        },
+                                        child: Container(
+                                          color: Colors.transparent,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: SvgPicture.asset(
+                                              'assets/icons/ic_close.svg',
+                                              colorFilter: ColorFilter.mode(
+                                                widget.hasError
+                                                    ? context.colors.textsError!
+                                                    : context
+                                                        .colors.iconsDisabled!,
+                                                BlendMode.srcIn,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : const Padding(
+                                        key: ValueKey<int>(2),
+                                        padding: EdgeInsets.all(16.0),
+                                        child: SizedBox(height: 24),
+                                      ))
+                            : widget.alternativeCancel && !focused
+                                ? null
+                                : GestureDetector(
+                                    key: const ValueKey<int>(1),
+                                    onTap: () {
+                                      if (widget.onRemoved != null) {
+                                        nullController.text = '';
+                                        widget.controller?.text = '';
+                                        widget.onRemoved!();
+                                        setState(() {});
+                                      }
+                                    },
+                                    child: Padding(
+                                      padding: widget.crossPadding ??
+                                          EdgeInsets.zero,
+                                      child: widget.crossButton,
+                                    ),
+                                  )),
+                        filled: true,
+                        fillColor: focused
+                            ? context.colors.backgroundsPrimary
+                            : context.colors.backgroundsSecondary,
+                        enabledBorder: defaultBorder,
+                        focusedBorder: defaultBorder,
+                        border: defaultBorder,
+                        hintText: widget.hint,
+                        hintStyle: widget.style ?? context.textStyles.callout!,
+                      ),
+                      onChanged: (value) {
+                        if (widget.isUsername && value == '@') {
+                          (widget.controller ?? nullController).text = '';
+                        }
+                        if (widget.onChanged != null) {
+                          widget.onChanged!(
+                              (widget.controller ?? nullController).text);
+                        }
+                        setState(() {});
+                      },
+                      maxLines: widget.maxLines ?? 1,
+                      minLines: widget.minLines,
+                    ),
+                    Consumer(builder: (context, ref, widget) {
+                      final MediaModel? chosenMovie =
+                          ref.watch(createPosterChoseMovieStateHolderProvider);
+                      if (chosenMovie?.startYear != null) {
+                        return Positioned(
+                          left: 48.0,
+                          top: 0,
+                          bottom: 0,
+                          child: IgnorePointer(
+                            ignoring: true,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    chosenMovie!.title,
+                                    style: context.textStyles.callout!.copyWith(
+                                        color: Colors.transparent,
+                                        overflow: TextOverflow.ellipsis),
+                                  ),
+                                  const SizedBox(
+                                    width: 8.0,
+                                  ),
+                                  Text(
+                                    chosenMovie.startYear.toString(),
+                                    style: context.textStyles.caption1!
+                                        .copyWith(
+                                            color:
+                                                context.colors.textsSecondary,
+                                            overflow: TextOverflow.ellipsis),
+                                  ),
+                                  if (chosenMovie.endYear != null)
+                                    Text(
+                                      ' - ${chosenMovie.endYear}',
+                                      style:
+                                          context.textStyles.caption1!.copyWith(
+                                        color: context.colors.textsSecondary,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    })
+                  ],
                 ),
                 Align(
                   alignment: Alignment.centerLeft,
@@ -260,7 +323,8 @@ class _AppTextFieldState extends State<AppTextField> {
             child: (!(widget.crossButton == null ||
                         widget.controller?.text == '' ||
                         widget.controller?.text == null) &&
-                    widget.alternativeCancel)
+                    widget.alternativeCancel &&
+                    !focused)
                 ? CupertinoButton(
                     padding: const EdgeInsets.only(left: 16.0),
                     child: Text(

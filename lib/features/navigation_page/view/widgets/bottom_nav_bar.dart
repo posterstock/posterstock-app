@@ -25,7 +25,6 @@ class AppNavigationBar extends ConsumerStatefulWidget {
 class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
   @override
   Widget build(BuildContext context) {
-    // final notsCount = ref.watch(notificationsCountStateHolderProvider);
     final router = ref.watch(navigationRouterStateHolderProvider);
     final myProfile = ref.watch(myProfileInfoStateHolderProvider);
     if (router == null || router != AutoTabsRouter.of(context)) {
@@ -93,30 +92,6 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                     ),
                     active: activeIndex == 0,
                   ),
-                  // BottomNavBarItem(
-                  //   onTap: () {
-                  //     ref
-                  //         .read(menuControllerProvider)
-                  //         .jumpToPage(1, context, ref);
-                  //   },
-                  //   icon: SvgPicture.asset(
-                  //     'assets/icons/ic_research.svg',
-                  //     colorFilter: ColorFilter.mode(
-                  //       context.colors.iconsDefault!,
-                  //       BlendMode.srcIn,
-                  //     ),
-                  //     width: 24,
-                  //   ),
-                  //   activeIcon: SvgPicture.asset(
-                  //     'assets/icons/ic_research_active.svg',
-                  //     colorFilter: ColorFilter.mode(
-                  //       context.colors.iconsDefault!,
-                  //       BlendMode.srcIn,
-                  //     ),
-                  //     width: 24,
-                  //   ),
-                  //   active: activeIndex == 1,
-                  // ),
                   BottomNavBarItem(
                     icon: const PlusButton(),
                     onTap: () {
@@ -124,73 +99,6 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                     },
                     active: false,
                   ),
-                  // BottomNavBarItem(
-                  //   onTap: () async {
-                  //     ref
-                  //         .read(menuControllerProvider)
-                  //         .jumpToPage(2, context, ref);
-                  //     (await SharedPreferences.getInstance())
-                  //         .setInt('notification_count', 0);
-                  //     ref
-                  //         .read(notificationsCountStateHolderProvider.notifier)
-                  //         .updateState(0);
-                  //     Future(() {
-                  //       ref
-                  //           .watch(notificationsStateHolderProvider.notifier)
-                  //           .clear();
-                  //     });
-                  //   },
-                  //   icon: Stack(
-                  //     children: [
-                  //       SizedBox(
-                  //         width: 30,
-                  //         height: 30,
-                  //         child: Center(
-                  //           child: SvgPicture.asset(
-                  //             'assets/icons/ic_notification-2.svg',
-                  //             colorFilter: ColorFilter.mode(
-                  //               context.colors.iconsDefault!,
-                  //               BlendMode.srcIn,
-                  //             ),
-                  //             width: 24,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //       Positioned(
-                  //         top: 0,
-                  //         right: 0,
-                  //         child: notsCount == 0
-                  //             ? SizedBox()
-                  //             : Container(
-                  //                 width: 15,
-                  //                 height: 15,
-                  //                 decoration: BoxDecoration(
-                  //                   shape: BoxShape.circle,
-                  //                   color: context.colors.buttonsError,
-                  //                 ),
-                  //                 child: Center(
-                  //                   child: Text(
-                  //                     notsCount.toString(),
-                  //                     style:
-                  //                         context.textStyles.caption2!.copyWith(
-                  //                       color: context.colors.textsBackground,
-                  //                     ),
-                  //                   ),
-                  //                 ),
-                  //               ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  //   activeIcon: SvgPicture.asset(
-                  //     'assets/icons/ic_notification.svg',
-                  //     colorFilter: ColorFilter.mode(
-                  //       context.colors.iconsDefault!,
-                  //       BlendMode.srcIn,
-                  //     ),
-                  //     width: 24,
-                  //   ),
-                  //   active: activeIndex == 2,
-                  // ),
                   BottomNavBarItem(
                     onTap: () {
                       ref

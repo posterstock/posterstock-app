@@ -204,14 +204,26 @@ abstract class $AppRouter extends _i19.RootStackRouter {
         ),
       );
     },
-    UserRouteRoute.name: (routeData) {
+    UserRouteId.name: (routeData) {
       final pathParams = routeData.inheritedPathParams;
-      final args = routeData.argsAs<UserRouteRouteArgs>(
-          orElse: () =>
-              UserRouteRouteArgs(username: pathParams.getString('username')));
+      final args = routeData.argsAs<UserRouteIdArgs>(
+          orElse: () => UserRouteIdArgs(id: pathParams.getInt('id')));
       return _i19.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: _i17.UserPageRoute(
+        child: _i17.UserPageId(
+          id: args.id,
+          key: args.key,
+        ),
+      );
+    },
+    UserRouteNamed.name: (routeData) {
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<UserRouteNamedArgs>(
+          orElse: () =>
+              UserRouteNamedArgs(username: pathParams.getString('username')));
+      return _i19.AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: _i17.UserPageNamed(
           username: args.username,
           key: args.key,
         ),
@@ -700,15 +712,54 @@ class UserRouteArgs {
 }
 
 /// generated route for
-/// [_i17.UserPageRoute]
-class UserRouteRoute extends _i19.PageRouteInfo<UserRouteRouteArgs> {
-  UserRouteRoute({
+/// [_i17.UserPageId]
+class UserRouteId extends _i19.PageRouteInfo<UserRouteIdArgs> {
+  UserRouteId({
+    required int id,
+    _i21.Key? key,
+    List<_i19.PageRouteInfo>? children,
+  }) : super(
+          UserRouteId.name,
+          args: UserRouteIdArgs(
+            id: id,
+            key: key,
+          ),
+          rawPathParams: {'id': id},
+          initialChildren: children,
+        );
+
+  static const String name = 'UserRouteId';
+
+  static const _i19.PageInfo<UserRouteIdArgs> page =
+      _i19.PageInfo<UserRouteIdArgs>(name);
+}
+
+class UserRouteIdArgs {
+  const UserRouteIdArgs({
+    required this.id,
+    this.key,
+  });
+
+  final int id;
+
+  final _i21.Key? key;
+
+  @override
+  String toString() {
+    return 'UserRouteIdArgs{id: $id, key: $key}';
+  }
+}
+
+/// generated route for
+/// [_i17.UserPageNamed]
+class UserRouteNamed extends _i19.PageRouteInfo<UserRouteNamedArgs> {
+  UserRouteNamed({
     required String username,
     _i21.Key? key,
     List<_i19.PageRouteInfo>? children,
   }) : super(
-          UserRouteRoute.name,
-          args: UserRouteRouteArgs(
+          UserRouteNamed.name,
+          args: UserRouteNamedArgs(
             username: username,
             key: key,
           ),
@@ -716,14 +767,14 @@ class UserRouteRoute extends _i19.PageRouteInfo<UserRouteRouteArgs> {
           initialChildren: children,
         );
 
-  static const String name = 'UserRouteRoute';
+  static const String name = 'UserRouteNamed';
 
-  static const _i19.PageInfo<UserRouteRouteArgs> page =
-      _i19.PageInfo<UserRouteRouteArgs>(name);
+  static const _i19.PageInfo<UserRouteNamedArgs> page =
+      _i19.PageInfo<UserRouteNamedArgs>(name);
 }
 
-class UserRouteRouteArgs {
-  const UserRouteRouteArgs({
+class UserRouteNamedArgs {
+  const UserRouteNamedArgs({
     required this.username,
     this.key,
   });
@@ -734,7 +785,7 @@ class UserRouteRouteArgs {
 
   @override
   String toString() {
-    return 'UserRouteRouteArgs{username: $username, key: $key}';
+    return 'UserRouteNamedArgs{username: $username, key: $key}';
   }
 }
 

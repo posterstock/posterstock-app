@@ -3,32 +3,38 @@ import 'package:poster_stock/features/home/models/post_base_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 
 class PostMovieModel extends PostBaseModel {
-  final String year;
   final String imagePath;
   final bool? hasBookmarked;
   final bool? hasInCollection;
   final String? tmdbLink;
   final String? mediaType;
   final int? mediaId;
+  final int startYear;
+  final int? endYear;
+  final int? createdAt;
 
   PostMovieModel({
-    required this.year,
     required this.imagePath,
     this.hasBookmarked,
     this.hasInCollection,
     this.tmdbLink,
     this.mediaId,
     this.mediaType,
+    required this.startYear,
+    this.endYear,
+    this.createdAt,
     required int id,
     required String name,
     required UserModel author,
     required String time,
     required bool liked,
     required DateTime timeDate,
+    required String type,
     int likes = 0,
     int comments = 0,
     String? description,
   }) : super(
+          type: type,
           id: id,
           name: name,
           author: author,
@@ -40,7 +46,23 @@ class PostMovieModel extends PostBaseModel {
           liked: liked,
         );
 
-  factory PostMovieModel.fromJson(Map<String, Object?> json,
+  get year => endYear == null
+      ? startYear.toString()
+      : '${startYear.toString()} - ${endYear.toString()}';
+
+  @override
+  get time => createdAt == null
+      ? ''
+      : _getTimeString(
+          DateTime.fromMillisecondsSinceEpoch(createdAt! * 1000),
+        );
+
+  @override
+  get timeDate => createdAt == null
+      ? DateTime.now()
+      : DateTime.fromMillisecondsSinceEpoch(createdAt! * 1000);
+
+  factory PostMovieModel.fromJson(Map<String, dynamic> json,
       {bool previewPrimary = false}) {
     const List<Color> avatar = [
       Color(0xfff09a90),
@@ -48,13 +70,13 @@ class PostMovieModel extends PostBaseModel {
       Color(0xff92bdf4),
     ];
     return PostMovieModel(
+      type: json['type'],
       id: json['id'] as int? ?? -1,
       liked: json['has_liked'] as bool? ?? false,
       hasBookmarked: json['has_bookmarked'] as bool?,
       hasInCollection: false,
-      year: (json['end_year'] as int?) == null
-          ? (json['start_year'] as int).toString()
-          : '${(json['start_year'] as int).toString()} - ${(json['end_year'] as int?).toString()}',
+      startYear: json['start_year'],
+      endYear: json['end_year'],
       imagePath: (previewPrimary
               ? (json['preview_image'] as String? ?? json['image'] as String?)
               : (json['image'] as String? ??
@@ -95,25 +117,31 @@ class PostMovieModel extends PostBaseModel {
   }
 
   Map<String, dynamic> toJson() => {
+        'type': type,
         'id': id,
         'has_liked': liked,
         'has_bookmarked': hasBookmarked,
-        'start_year': int.parse(year.split('-').first),
+        'start_year': startYear,
+        'end_year': endYear,
         'image': imagePath,
         'title': name,
         'description': description,
-        'tmdbLink': tmdbLink,
-        'mediaId': mediaId,
+        'tmdb_link': tmdbLink,
+        'media_id': mediaId,
         'media_type': mediaType,
         'likes_count': likes,
-        // 'created_at': timeDate
+        'created_at': createdAt,
+        'comments_count': comments,
+        'user': author.toJson()
       };
 
   @override
   PostMovieModel copyWith({
-    String? year,
+    int? startYear,
+    int? endYear,
     String? imagePath,
     int? id,
+    String? type,
     String? name,
     UserModel? author,
     String? time,
@@ -126,7 +154,9 @@ class PostMovieModel extends PostBaseModel {
     bool? hasInCollection,
   }) {
     return PostMovieModel(
-      year: year ?? this.year,
+      type: type ?? this.type,
+      startYear: startYear ?? this.startYear,
+      endYear: endYear ?? this.endYear,
       hasBookmarked: hasBookmarked ?? this.hasBookmarked,
       hasInCollection: hasInCollection ?? this.hasInCollection,
       imagePath: imagePath ?? this.imagePath,

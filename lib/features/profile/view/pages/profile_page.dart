@@ -14,7 +14,7 @@ import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/list/controller/list_controller.dart';
 import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
 import 'package:poster_stock/features/peek_pop/peek_and_pop_dialog.dart';
-import 'package:poster_stock/features/poster/controller/comments_controller.dart';
+import 'package:poster_stock/features/poster/controller/post_controller.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
@@ -525,7 +525,7 @@ class OtherProfileDialog extends ConsumerWidget {
                                     {
                                       try {
                                         await ref
-                                            .read(commentsControllerProvider)
+                                            .read(postControllerProvider)
                                             .deletePost(entityId!);
                                         ref
                                             .read(searchPostsStateHolderProvider
@@ -576,7 +576,7 @@ class OtherProfileDialog extends ConsumerWidget {
                                     {
                                       try {
                                         await ref
-                                            .read(commentsControllerProvider)
+                                            .read(postControllerProvider)
                                             .deleteComment(
                                                 postId!.id, entityId!);
                                         scaffoldMessengerKey.currentState

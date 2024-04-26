@@ -1,16 +1,13 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
-import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
-import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
+import 'package:poster_stock/common/widgets/description_textfield.dart';
 import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
 import 'package:poster_stock/features/create_list/state_holders/chosen_cover_state_holder.dart';
@@ -21,7 +18,6 @@ import 'package:poster_stock/features/create_list/view/widgets/%D1%81hoose_poste
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/poster/view/widgets/poster_tile.dart';
-import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_posts_state_holder.dart';
 import 'package:poster_stock/main.dart';
@@ -176,10 +172,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
     final searchValue = ref.watch(listSearchValueStateHolderProvider);
     final posts = ref.watch(accountPostersStateNotifier);
     final postersSearch = ref.watch(listSearchPostsStateHolderProvider);
-    final me = ref.watch(myProfileInfoStateHolderProvider);
-    if (posts == null) {
-      ref.read(profileControllerApiProvider).getUserInfo(null);
-    }
+    ref.watch(myProfileInfoStateHolderProvider);
     List<PostMovieModel?> posters;
     if (searchValue.isEmpty) {
       posters = posts.posters;
@@ -318,7 +311,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                         const SizedBox(height: 16.5),
                                         SizedBox(
                                           height: 36,
-                                          child: posters?.isEmpty == true &&
+                                          child: posters.isEmpty == true &&
                                                   searchController.text.isEmpty
                                               ? null
                                               : AppTextField(
@@ -363,7 +356,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                   ),
                                   pinned: true,
                                 ),
-                                if (posters?.isEmpty == true)
+                                if (posters.isEmpty == true)
                                   SliverFillRemaining(
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
@@ -396,7 +389,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                       ),
                                     ),
                                   ),
-                                if (posters?.isEmpty != true)
+                                if (posters.isEmpty != true)
                                   SliverPadding(
                                     padding: const EdgeInsets.fromLTRB(
                                         16, 0, 16, 24),
@@ -703,144 +696,5 @@ class AppDialogHeaderDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
     return false;
-  }
-}
-
-class DescriptionTextField extends StatefulWidget {
-  const DescriptionTextField(
-      {super.key,
-      this.hint,
-      this.showDivider = true,
-      this.button,
-      this.maxSymbols = 140,
-      this.buttonAddCheck = true,
-      this.controller,
-      this.buttonLoading = false,
-      this.onTap,
-      this.focus,
-      this.disableWithoutText = false});
-
-  final String? hint;
-  final bool showDivider;
-  final String? button;
-  final int maxSymbols;
-  final bool buttonAddCheck;
-  final bool buttonLoading;
-  final FocusNode? focus;
-  final TextEditingController? controller;
-  final void Function()? onTap;
-  final bool disableWithoutText;
-
-  @override
-  State<DescriptionTextField> createState() => _DescriptionTextFieldState();
-}
-
-class _DescriptionTextFieldState extends State<DescriptionTextField> {
-  TextEditingController? descriptionController;
-  bool disable = false;
-
-  @override
-  Widget build(BuildContext context) {
-    descriptionController ??= widget.controller ?? TextEditingController();
-    return Column(
-      children: [
-        if (widget.showDivider)
-          Divider(
-            height: 0.5,
-            thickness: 0.5,
-            color: context.colors.fieldsDefault,
-          ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: TextField(
-            textCapitalization: TextCapitalization.sentences,
-            focusNode: widget.focus,
-            minLines: 2,
-            maxLines: 5,
-            controller: descriptionController,
-            cursorWidth: 1,
-            cursorColor: context.colors.textsAction,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: widget.hint ?? 'Description your list',
-              hintStyle: context.textStyles.callout!.copyWith(
-                color: context.colors.textsDisabled,
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-            ),
-            style: context.textStyles.callout!.copyWith(
-              overflow: TextOverflow.visible,
-              color: context.colors.textsPrimary,
-            ),
-            onChanged: (String text) => setState(() {
-              if (text.isEmpty && widget.disableWithoutText) {
-                disable = true;
-              } else {
-                disable = false;
-              }
-            }),
-          ),
-        ),
-        Container(
-          height: 56 + MediaQuery.of(context).padding.bottom,
-          color: context.colors.backgroundsPrimary,
-          child: Row(
-            children: [
-              const Spacer(),
-              Text(
-                '${descriptionController!.text.length}/${widget.maxSymbols}',
-                style: context.textStyles.footNote!.copyWith(
-                  color: descriptionController!.text.length > widget.maxSymbols
-                      ? context.colors.textsError
-                      : context.colors.textsDisabled,
-                ),
-              ),
-              const SizedBox(width: 12),
-              SizedBox(
-                height: 32,
-                width: TextInfoService.textSize(
-                      widget.button ?? context.txt.listCreate_create,
-                      context.textStyles.calloutBold!.copyWith(
-                        color: context.colors.textsBackground,
-                      ),
-                    ).width +
-                    32,
-                child: AppTextButton(
-                  disabled: (descriptionController!.text.length >
-                          widget.maxSymbols) ||
-                      !widget.buttonAddCheck ||
-                      disable,
-                  onTap: widget.onTap,
-                  child: widget.buttonLoading
-                      ? Center(
-                          child: defaultTargetPlatform != TargetPlatform.android
-                              ? CupertinoActivityIndicator(
-                                  radius: 10.0,
-                                  color: context.colors.textsBackground!,
-                                )
-                              : SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    color: context.colors.textsBackground!,
-                                    strokeWidth: 2,
-                                  ),
-                                ),
-                        )
-                      : Text(
-                          widget.button ?? context.txt.listCreate_create,
-                          style: context.textStyles.calloutBold!.copyWith(
-                            color: context.colors.textsBackground,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                ),
-              ),
-              const SizedBox(width: 16),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 }

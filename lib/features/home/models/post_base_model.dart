@@ -1,7 +1,7 @@
-import 'package:poster_stock/features/home/models/comment_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 
 abstract class PostBaseModel {
+  final String type;
   final int id;
   final String name;
   final UserModel author;
@@ -13,6 +13,7 @@ abstract class PostBaseModel {
   final bool liked;
 
   PostBaseModel({
+    required this.type,
     required this.id,
     required this.name,
     required this.author,

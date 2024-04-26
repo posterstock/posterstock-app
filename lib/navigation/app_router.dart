@@ -37,7 +37,8 @@ class AppRouter extends $AppRouter {
         AutoRoute(page: ListRoute.page, path: '/lists/:id'),
         RedirectRoute(path: '/list/:id', redirectTo: '/lists/:id'),
         AutoRoute(page: UserRoute.page),
-        AutoRoute(path: '/:username', page: UserRouteRoute.page),
+        AutoRoute(path: '/users/:id', page: UserRouteId.page),
+        AutoRoute(path: '/:username', page: UserRouteNamed.page),
         AutoRoute(page: NotificationsRoute.page, path: '/notifications'),
         CustomRoute(
           page: PosterRoute.page,
@@ -54,7 +55,7 @@ class AppRouter extends $AppRouter {
                   children: <Widget>[
                     SlideTransition(
                       position: Tween<Offset>(
-                        begin: Offset(1.0, 0.0),
+                        begin: const Offset(1.0, 0.0),
                         end: Offset.zero,
                       ).animate(animation),
                       child: child,

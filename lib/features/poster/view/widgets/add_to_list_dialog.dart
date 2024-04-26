@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
-import 'package:poster_stock/features/poster/controller/comments_controller.dart';
+import 'package:poster_stock/features/poster/controller/post_controller.dart';
 import 'package:poster_stock/features/poster/state_holder/my_lists_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
 import 'package:poster_stock/main.dart';
@@ -26,7 +26,7 @@ class AddToListDialog extends ConsumerWidget {
     if (lists == null) {
       Future(() {
         try {
-          ref.read(commentsControllerProvider).getMyLists();
+          ref.read(postControllerProvider).getMyLists();
         } catch (e) {}
       });
     }
@@ -189,7 +189,7 @@ class AddToListDialog extends ConsumerWidget {
                                         );
                                         try {
                                           await ref
-                                              .read(commentsControllerProvider)
+                                              .read(postControllerProvider)
                                               .addPosterToList(
                                                 lists![index].id,
                                                 post!.id,

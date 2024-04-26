@@ -1,5 +1,5 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/features/account/account_cache.dart';
 import 'package:poster_stock/features/account/account_network.dart';
 import 'package:poster_stock/features/account/notifiers/account_notifier.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
@@ -14,6 +14,7 @@ class BookmarksNotifier extends StateNotifier<BookmarksState> {
       : super(const BookmarksState.holder());
   final AccountNotifier accountNotifier;
   final AccountNetwork network = AccountNetwork();
+  final AccountCache cache = AccountCache();
   bool _hasMore = true;
   bool _loading = false;
 
@@ -32,7 +33,14 @@ class BookmarksNotifier extends StateNotifier<BookmarksState> {
   //TODO: redundant, replace by tryLoad() and load()
   Future<void> load() async {
     if (!_hasMore || _loading) return;
+
+    var cachedList = await cache.getBookmarks();
+    if (cachedList != null) {
+      state = BookmarksState.list(cachedList);
+    }
+
     final (list, more) = await network.getBookmarks();
+    cache.cacheBookmarks(list);
     if (list?.isEmpty ?? true) {
       state = const BookmarksState.empty();
     } else {

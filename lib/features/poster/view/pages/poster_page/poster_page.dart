@@ -1,11 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/constants/durations.dart';
@@ -15,26 +10,24 @@ import 'package:poster_stock/common/menu/menu_state.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
-import 'package:poster_stock/common/widgets/app_text_button.dart';
+import 'package:poster_stock/common/widgets/comment_text_field.dart';
 import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
 import 'package:poster_stock/features/create_poster/controller/create_poster_controller.dart';
-import 'package:poster_stock/features/create_poster/model/media_model.dart';
 import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
-import 'package:poster_stock/features/home/view/helpers/custom_bounce_physic.dart';
-import 'package:poster_stock/features/home/view/widgets/movie_card.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
-import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
-import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
-import 'package:poster_stock/features/poster/controller/comments_controller.dart';
+import 'package:poster_stock/features/poster/controller/post_controller.dart';
 import 'package:poster_stock/features/poster/model/comment.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/page_transition_controller_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
 import 'package:poster_stock/features/poster/view/widgets/add_to_list_dialog.dart';
+import 'package:poster_stock/features/poster/view/widgets/image_dialog.dart';
+import 'package:poster_stock/features/poster/view/widgets/poster_actions.dart';
+import 'package:poster_stock/features/poster/view/widgets/poster_info.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
@@ -85,7 +78,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
   void initState() {
     super.initState();
     Future(() async {
-      ref.read(commentsControllerProvider).clear();
+      ref.read(postControllerProvider).clear();
       if (ref.read(pageTransitionControllerStateHolder)?.value == 1) {
         ref.read(pageTransitionControllerStateHolder)!.animateTo(
               0,
@@ -124,17 +117,15 @@ class _PosterPageState extends ConsumerState<PosterPage>
             el = rtr.topRoute;
           }
           if (el == null) {
-            ref.read(commentsControllerProvider).clear();
+            ref.read(postControllerProvider).clear();
             return;
           }
           final post = ref.watch(posterStateHolderProvider);
           if (post?.id == el.pathParams.getInt('id')) return;
-          ref.read(commentsControllerProvider).clear();
+          ref.read(postControllerProvider).clear();
+          ref.read(postControllerProvider).getPost(el.pathParams.getInt('id'));
           ref
-              .read(commentsControllerProvider)
-              .getPost(el.pathParams.getInt('id'));
-          ref
-              .read(commentsControllerProvider)
+              .read(postControllerProvider)
               .updateComments(el.pathParams.getInt('id'));
         });
       });
@@ -170,11 +161,9 @@ class _PosterPageState extends ConsumerState<PosterPage>
           el = null;
         }
         if (el == null) return;
+        ref.read(postControllerProvider).getPost(el.pathParams.getInt('id'));
         ref
-            .read(commentsControllerProvider)
-            .getPost(el.pathParams.getInt('id'));
-        ref
-            .read(commentsControllerProvider)
+            .read(postControllerProvider)
             .updateComments(el.pathParams.getInt('id'));
       });
     }
@@ -648,7 +637,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                             duration: const Duration(
                                                 milliseconds: 200));
                                     await ref
-                                        .read(commentsControllerProvider)
+                                        .read(postControllerProvider)
                                         .clear();
                                   },
                                 ),
@@ -702,7 +691,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                       iconAddition)
                                   .toInt()
                                   .toDouble(),
-                              child: _PosterActions(),
+                              child: const PosterActions(),
                             );
                           },
                         );
@@ -849,7 +838,11 @@ class _PosterPageState extends ConsumerState<PosterPage>
                 builder: (context) => CreatePosterDialog(
                   postMovieModel: post,
                 ),
-              );
+              ).whenComplete(() {
+                ref.read(createPosterControllerProvider).choosePoster(null);
+                ref.read(createPosterControllerProvider).chooseMovie(null);
+                ref.read(createPosterControllerProvider).updateSearch('');
+              });
             }
           },
         ),
@@ -907,838 +900,6 @@ class _PosterPageState extends ConsumerState<PosterPage>
           },
         )
       ]),
-    );
-  }
-}
-
-class CommentTextField extends ConsumerStatefulWidget {
-  const CommentTextField({
-    super.key,
-    required this.id,
-    this.isList = false,
-  });
-
-  final int id;
-  final bool isList;
-
-  @override
-  ConsumerState<CommentTextField> createState() => _CommentTextFieldState();
-}
-
-class _CommentTextFieldState extends ConsumerState<CommentTextField> {
-  final FocusNode focus = FocusNode();
-  final GlobalKey key = GlobalKey();
-  final TextEditingController controller = TextEditingController();
-  bool loading = false;
-
-  @override
-  Widget build(BuildContext context) {
-    focus.addListener(() {
-      setState(() {});
-    });
-    return NotificationListener(
-      onNotification: (not) {
-        return true;
-      },
-      child: Column(
-        children: [
-          Divider(
-            height: 0.5,
-            thickness: 0.5,
-            color: context.colors.fieldsDefault,
-          ),
-          Container(
-            height:
-                focus.hasFocus && MediaQuery.of(context).viewInsets.bottom != 0
-                    ? null
-                    : 56 + MediaQuery.of(context).padding.bottom,
-            color: context.colors.backgroundsPrimary,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: TextField(
-                key: key,
-                maxLines: null,
-                focusNode: focus,
-                controller: controller,
-                cursorWidth: 1,
-                cursorColor: context.colors.textsAction,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText:
-                      AppLocalizations.of(context)!.poster_reply_field_hint,
-                  hintStyle: context.textStyles.callout!.copyWith(
-                    color: context.colors.textsDisabled,
-                  ),
-                ),
-                textCapitalization: TextCapitalization.sentences,
-                onChanged: (value) {
-                  setState(() {});
-                },
-              ),
-            ),
-          ),
-          if (focus.hasFocus)
-            KeyboardVisibilityBuilder(builder: (context, visible) {
-              if (!visible) return const SizedBox();
-              return Container(
-                height: 56,
-                color: context.colors.backgroundsPrimary,
-                child: Row(
-                  children: [
-                    const Spacer(),
-                    Text(
-                      '${controller.text.length}/140',
-                      style: context.textStyles.footNote!.copyWith(
-                        color: controller.text.length > 140
-                            ? context.colors.textsError
-                            : context.colors.textsDisabled,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    SizedBox(
-                      height: 32,
-                      width: TextInfoService.textSize(
-                                  AppLocalizations.of(context)!.poster_reply,
-                                  context.textStyles.calloutBold!)
-                              .width +
-                          32,
-                      child: AppTextButton(
-                        text: AppLocalizations.of(context)!.poster_reply,
-                        disabled: controller.text.isEmpty ||
-                            controller.text.length > 140,
-                        child: loading
-                            ? Center(
-                                child: defaultTargetPlatform !=
-                                        TargetPlatform.android
-                                    ? CupertinoActivityIndicator(
-                                        radius: 10.0,
-                                        color: context.colors.textsBackground!,
-                                      )
-                                    : SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(
-                                          color:
-                                              context.colors.textsBackground!,
-                                          strokeWidth: 2,
-                                        ),
-                                      ),
-                              )
-                            : null,
-                        onTap: () async {
-                          loading = true;
-                          setState(() {});
-                          if (!widget.isList) {
-                            await ref
-                                .read(commentsControllerProvider)
-                                .postComment(widget.id, controller.text);
-                            await ref
-                                .read(homePagePostsControllerProvider)
-                                .addComment(widget.id);
-                          } else {
-                            await ref
-                                .read(commentsControllerProvider)
-                                .postCommentList(widget.id, controller.text);
-                            await ref
-                                .read(homePagePostsControllerProvider)
-                                .addCommentList(widget.id);
-                          }
-                          loading = false;
-                          setState(() {});
-                          controller.clear();
-                          focus.unfocus();
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                  ],
-                ),
-              );
-            })
-        ],
-      ),
-    );
-  }
-}
-
-class ImageDialog extends StatefulWidget {
-  const ImageDialog({
-    super.key,
-    required this.image,
-  });
-
-  final Widget image;
-
-  @override
-  State<ImageDialog> createState() => _ImageDialogState();
-}
-
-class _ImageDialogState extends State<ImageDialog>
-    with SingleTickerProviderStateMixin {
-  ScrollController? controller;
-  late final AnimationController animController;
-
-  @override
-  void initState() {
-    animController = AnimationController(
-      vsync: this,
-      duration: Duration.zero,
-    );
-    animController.animateTo(1);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    controller ??= ScrollController();
-    return AnimatedBuilder(
-      animation: animController,
-      builder: (context, child) {
-        return Dialog(
-          backgroundColor: Colors.black.withOpacity(animController.value),
-          insetPadding: EdgeInsets.zero,
-          child: child,
-        );
-      },
-      child: Listener(
-        behavior: HitTestBehavior.translucent,
-        onPointerUp: (_) {
-          if (controller!.offset.abs() >
-              (MediaQuery.of(context).size.height * 0.3)) {
-            Navigator.pop(context);
-          }
-        },
-        child: NotificationListener<ScrollNotification>(
-          onNotification: (notification) {
-            if (notification is ScrollUpdateNotification) {
-              animController.animateTo(
-                1 -
-                    (notification.metrics.pixels).abs() /
-                        (MediaQuery.of(context).size.height * 0.3),
-              );
-            }
-            return true;
-          },
-          child: Stack(
-            children: [
-              Center(
-                child: AnimatedBuilder(
-                  animation: animController,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(
-                          0, controller!.hasClients ? -controller!.offset : 0),
-                      child: child,
-                    );
-                  },
-                  child: Hero(
-                    tag: 'image',
-                    child: widget.image,
-                  ),
-                ),
-              ),
-              ListView(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: CustomBouncePhysic(),
-                ),
-                controller: controller,
-                children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height / 2,
-                  )
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class PosterPageAppBar extends StatelessWidget {
-  const PosterPageAppBar({
-    super.key,
-    required this.posterController,
-    required this.imageHeight,
-    this.child,
-  });
-
-  final AnimationController? posterController;
-  final double? imageHeight;
-  final Widget? child;
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverAppBar(
-      pinned: true,
-      systemOverlayStyle: SystemUiOverlayStyle(
-        statusBarBrightness: posterController!.value < imageHeight! * 0.5 &&
-                Theme.of(context).brightness == Brightness.light
-            ? Brightness.light
-            : Brightness.dark,
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: posterController!.value < imageHeight! * 0.5 &&
-                Theme.of(context).brightness == Brightness.light
-            ? Brightness.dark
-            : Brightness.light,
-      ),
-      backgroundColor: context.colors.backgroundsPrimary,
-      elevation: 0,
-      collapsedHeight: 42,
-      toolbarHeight: 42,
-      expandedHeight: (posterController!.value < imageHeight!
-                  ? imageHeight!
-                  : posterController!.value) >
-              imageHeight!
-          ? imageHeight!
-          : (posterController!.value < imageHeight!
-              ? imageHeight!
-              : posterController!.value),
-      leading: const SizedBox(),
-      flexibleSpace: FlexibleSpaceBarSettings(
-        toolbarOpacity: 1,
-        currentExtent: (posterController!.value < imageHeight!
-                ? imageHeight!
-                : posterController!.value) +
-            MediaQuery.of(context).viewPadding.top,
-        maxExtent: (posterController!.value < imageHeight!
-                ? imageHeight!
-                : posterController!.value) +
-            MediaQuery.of(context).viewPadding.top,
-        isScrolledUnder: false,
-        minExtent: 42,
-        child: child ?? const SizedBox(),
-      ),
-    );
-  }
-}
-
-class PosterInfo extends ConsumerWidget {
-  const PosterInfo({
-    super.key,
-    required this.likes,
-    required this.comments,
-    required this.liked,
-  });
-
-  final int likes;
-  final int comments;
-  final bool liked;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final post = ref.watch(posterStateHolderProvider);
-    final comments = ref.watch(commentsStateHolderProvider);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width:
-                  post == null ? null : MediaQuery.of(context).size.width - 112,
-              child: ShimmerLoader(
-                loaded: post != null,
-                child: TextOrContainer(
-                  emptyWidth: 160,
-                  emptyHeight: 20,
-                  text: post?.name,
-                  style: context.textStyles.title3,
-                ),
-              ),
-            ),
-            const Spacer(),
-          ],
-        ),
-        const SizedBox(
-          height: 6,
-        ),
-        ShimmerLoader(
-          loaded: post != null,
-          child: TextOrContainer(
-            emptyWidth: 100,
-            emptyHeight: 20,
-            text: post?.year.toString(),
-            style: context.textStyles.subheadline!.copyWith(
-              color: context.colors.textsSecondary,
-            ),
-          ),
-        ),
-        const SizedBox(
-          height: 16,
-        ),
-        Text(
-          (post?.description ?? '').length > 280
-              ? post!.description!.substring(0, 280)
-              : (post?.description ?? ''),
-          style: context.textStyles.callout!.copyWith(
-            color: context.colors.textsPrimary,
-          ),
-        ),
-        const SizedBox(
-          height: 16,
-        ),
-        Row(
-          children: [
-            const Spacer(),
-            LikeButton(
-              liked: (post?.liked ?? liked),
-              amount: (post?.likes == null ? likes : post!.likes),
-              onTap: () {
-                ref
-                    .read(homePagePostsControllerProvider)
-                    .setLikeId(post!.id, !(post.liked));
-                ref.read(posterStateHolderProvider.notifier).updateState(
-                      post.copyWith(
-                        liked: !(post.liked),
-                        likes: post.liked ? post.likes - 1 : post.likes + 1,
-                      ),
-                    );
-              },
-            ),
-            const SizedBox(width: 12),
-            ReactionButton(
-              iconPath: 'assets/icons/ic_comment2.svg',
-              iconColor: context.colors.iconsDisabled!,
-              amount: (comments?.length ?? this.comments),
-              onTap: () {},
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-// class PosterActionsDialog extends ConsumerWidget {
-//   const PosterActionsDialog({
-//     Key? key,
-//   }) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final myPoster = ref.watch(myProfileInfoStateHolderProvider);
-//     final post = ref.watch(posterStateHolderProvider)!;
-//     return Align(
-//       alignment: Alignment.bottomCenter,
-//       child: SizedBox(
-//         height: 490 -
-//             ((myPoster?.id != post.author.id) ? 0 : 40) -
-//             ((post.hasInCollection == true) ? 0 : 40),
-//         child: Scaffold(
-//           backgroundColor: Colors.transparent,
-//           body: Padding(
-//             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//             child: Column(
-//               children: [
-//                 ClipRRect(
-//                   borderRadius: BorderRadius.circular(16.0),
-//                   child: SizedBox(
-//                     height: 384 -
-//                         ((myPoster?.id != post.author.id) ? 0 : 40) -
-//                         ((post.hasInCollection == true) ? 0 : 40),
-//                     child: Material(
-//                       color: context.colors.backgroundsPrimary,
-//                       child: Column(
-//                         children: [
-//                           SizedBox(
-//                             height: 36,
-//                             child: Center(
-//                               child: Text(
-//                                 post.year.contains('-') ? "TV Show" : "Movie",
-//                                 style: context.textStyles.footNote!.copyWith(
-//                                   color: context.colors.textsSecondary,
-//                                 ),
-//                               ),
-//                             ),
-//                           ),
-//                           if (post.hasInCollection == true)
-//                             Divider(
-//                               height: 0.5,
-//                               thickness: 0.5,
-//                               color: context.colors.fieldsDefault,
-//                             ),
-//                           if (post.hasInCollection == true)
-//                             Expanded(
-//                               child: InkWell(
-//                                 onTap: () {
-//                                   showModalBottomSheet(
-//                                     context: context,
-//                                     isScrollControlled: true,
-//                                     backgroundColor: Colors.transparent,
-//                                     builder: (context) => AddToListDialog(),
-//                                   );
-//                                 },
-//                                 child: Center(
-//                                   //TODO REMOVE THIS IF THIS MOVIE NOT IN COLLECTION
-//                                   child: Text(
-//                                     AppLocalizations.of(context)!
-//                                         .poster_menu_listAdd,
-//                                     style: context.textStyles.bodyRegular!
-//                                         .copyWith(
-//                                       color: context.colors.textsPrimary,
-//                                     ),
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
-//                           Divider(
-//                             height: 0.5,
-//                             thickness: 0.5,
-//                             color: context.colors.fieldsDefault,
-//                           ),
-//                           Expanded(
-//                             child: InkWell(
-//                               onTap: () {
-//                                 if (post.tmdbLink != null) {
-//                                   launchUrlString(post.tmdbLink!);
-//                                 }
-//                               },
-//                               child: Center(
-//                                 child: Text(
-//                                   AppLocalizations.of(context)!
-//                                       .poster_menu_openTMDB,
-//                                   style:
-//                                       context.textStyles.bodyRegular!.copyWith(
-//                                     color: context.colors.textsPrimary,
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
-//                           ),
-//                           Divider(
-//                             height: 0.5,
-//                             thickness: 0.5,
-//                             color: context.colors.fieldsDefault,
-//                           ),
-//                           Expanded(
-//                             child: InkWell(
-//                               onTap: () {
-//                                 scaffoldMessengerKey.currentState?.showSnackBar(
-//                                   SnackBars.build(
-//                                     context,
-//                                     null,
-//                                     //TODO: localize
-//                                     "Not available yet",
-//                                   ),
-//                                 );
-//                               },
-//                               child: Center(
-//                                 child: Text(
-//                                   context.txt.watchlist_menu_whereToWatch,
-//                                   style:
-//                                       context.textStyles.bodyRegular!.copyWith(
-//                                     color: context.colors.textsPrimary,
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
-//                           ),
-//                           SizedBox(
-//                             height: 36,
-//                             child: Center(
-//                               child: Text(
-//                                 context.txt.poster,
-//                                 style: context.textStyles.footNote!.copyWith(
-//                                   color: context.colors.textsSecondary,
-//                                 ),
-//                               ),
-//                             ),
-//                           ),
-//                           if (myPoster?.id != post.author.id)
-//                             Divider(
-//                               height: 0.5,
-//                               thickness: 0.5,
-//                               color: context.colors.fieldsDefault,
-//                             ),
-//                           if (myPoster?.id != post.author.id)
-//                             Expanded(
-//                               child: InkWell(
-//                                 onTap: () {
-//                                   ref
-//                                       .read(homePagePostsControllerProvider)
-//                                       .setFollowId(
-//                                           post.id, !post.author.followed);
-//                                   ref
-//                                       .read(posterStateHolderProvider.notifier)
-//                                       .updateState(post.copyWith(
-//                                           author: post.author.copyWith(
-//                                               followed:
-//                                                   !post.author.followed)));
-//                                   ref.read(profileControllerApiProvider).follow(
-//                                         post!.author.id,
-//                                         post!.author.followed,
-//                                       );
-//                                 },
-//                                 child: Center(
-//                                   child: Text(
-//                                     //TODO: symplify
-//                                     "${post.author.followed ? context.txt.unfollow : context.txt.follow} ${post.author.name}",
-//                                     style: context.textStyles.bodyRegular!
-//                                         .copyWith(
-//                                       color: context.colors.textsPrimary,
-//                                     ),
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
-//                           Divider(
-//                             height: 0.5,
-//                             thickness: 0.5,
-//                             color: context.colors.fieldsDefault,
-//                           ),
-//                           Expanded(
-//                             child: InkWell(
-//                               onTap: () {
-//                                 Share.share(
-//                                     "https://posterstock.com/${post.author.username}/${post.id}");
-//                               },
-//                               child: Center(
-//                                 child: Text(
-//                                   context.txt.share,
-//                                   style:
-//                                       context.textStyles.bodyRegular!.copyWith(
-//                                     color: context.colors.textsPrimary,
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
-//                           ),
-//                           Divider(
-//                             height: 0.5,
-//                             thickness: 0.5,
-//                             color: context.colors.fieldsDefault,
-//                           ),
-//                           Expanded(
-//                             child: InkWell(
-//                               onTap: () async {
-//                                 if (myPoster?.id != post.author.id) {
-//                                   scaffoldMessengerKey.currentState
-//                                       ?.showSnackBar(
-//                                     SnackBars.build(
-//                                       context,
-//                                       null,
-//                                       //TODO: loclize
-//                                       "Not available yet",
-//                                     ),
-//                                   );
-//                                 } else {
-//                                   try {
-//                                     // await ref
-//                                     //     .read(commentsControllerProvider)
-//                                     //     .deletePost(post.id);
-//                                     await ref
-//                                         .read(accountPostersStateNotifier
-//                                             .notifier)
-//                                         .deletePost(post.id);
-//                                     scaffoldMessengerKey.currentState
-//                                         ?.showSnackBar(
-//                                       SnackBars.build(
-//                                         context,
-//                                         null,
-//                                         //TODO: localize
-//                                         "Deleted successfully",
-//                                       ),
-//                                     );
-//                                     Navigator.pop(context);
-//                                     AutoRouter.of(context).pop();
-//                                   } catch (e) {
-//                                     print("FEF");
-//                                     print(e);
-//                                     scaffoldMessengerKey.currentState
-//                                         ?.showSnackBar(
-//                                       SnackBars.build(
-//                                         context,
-//                                         null,
-//                                         //TODO: localize
-//                                         'Could not delete post',
-//                                       ),
-//                                     );
-//                                   }
-//                                   final myself = ref
-//                                       .watch(profileInfoStateHolderProvider)
-//                                       ?.mySelf;
-//                                   if (myself != false) {
-//                                     ref
-//                                         .read(profileControllerApiProvider)
-//                                         .getUserInfo(null);
-//                                   }
-//                                 }
-//                               },
-//                               child: Center(
-//                                 child: Text(
-//                                   (myPoster?.id != post.author.id)
-//                                       ? context.txt.report
-//                                       : context.txt.delete,
-//                                   style:
-//                                       context.textStyles.bodyRegular!.copyWith(
-//                                     color: context.colors.textsError,
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(
-//                   height: 12,
-//                 ),
-//                 ClipRRect(
-//                   borderRadius: BorderRadius.circular(16.0),
-//                   child: SizedBox(
-//                     height: 52,
-//                     child: Material(
-//                       color: context.colors.backgroundsPrimary,
-//                       child: InkWell(
-//                         onTap: () {
-//                           Navigator.pop(context);
-//                         },
-//                         child: Center(
-//                           child: Text(
-//                             context.txt.cancel,
-//                             style: context.textStyles.bodyRegular,
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-class _PosterActions extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final post = ref.watch(posterStateHolderProvider);
-    final profile = ref.watch(myProfileInfoStateHolderProvider)!;
-    if (post == null) {
-      return const SizedBox.shrink();
-    }
-    if (post?.hasInCollection == true) {
-      return GestureDetector(
-        onTap: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (_) => AddToListDialog(),
-          );
-        },
-        child: SizedBox(
-          width: 24,
-          height: 24,
-          child: SvgPicture.asset('assets/icons/ic_collections_add.svg'),
-        ),
-      );
-    } else {
-      return Row(
-        children: [
-          GestureDetector(
-            onTap: () async {
-              if (post != null) {
-                await ref.read(commentsControllerProvider).setBookmarked(
-                      post.id,
-                      !(post.hasBookmarked ?? true),
-                    );
-                final myself =
-                    ref.watch(profileInfoStateHolderProvider)?.mySelf;
-                if (myself != false) {
-                  ref.read(profileControllerApiProvider).getUserInfo(null);
-                }
-              }
-            },
-            child: SizedBox(
-              width: 24,
-              height: 24,
-              child: Image.asset(
-                post?.hasBookmarked == true
-                    ? 'assets/images/ic_bookmarks_filled.png'
-                    : 'assets/images/ic_bookmarks.png',
-                color: context.colors.iconsDefault!,
-                colorBlendMode: BlendMode.srcIn,
-              ),
-            ),
-          ),
-          const SizedBox(width: 20),
-          GestureDetector(
-            onTap: () {
-              ref.read(createPosterControllerProvider).chooseMovie(
-                    MediaModel(
-                      id: post!.mediaId!,
-                      title: post.name,
-                      type: post.mediaType == 'movie'
-                          ? MediaType.movie
-                          : MediaType.tv,
-                      startYear: int.parse(post.year.split(" - ")[0]),
-                      endYear: post.year.split(" - ").length == 1 ||
-                              post.year.split(" - ")[1].isEmpty
-                          ? null
-                          : int.parse(
-                              post.year.split(" - ")[1],
-                            ),
-                    ),
-                  );
-              if (post.hasInCollection == false) {
-                showModalBottomSheet(
-                  context: context,
-                  backgroundColor: Colors.transparent,
-                  isScrollControlled: true,
-                  useSafeArea: true,
-                  builder: (context) => const CreatePosterDialog(),
-                );
-              }
-            },
-            child: SizedBox(
-              width: 24,
-              height: 24,
-              child: Image.asset(
-                post?.hasInCollection == true
-                    ? 'assets/images/ic_collection_filled.png'
-                    : 'assets/images/ic_collection.png',
-                color: context.colors.iconsDefault!,
-                colorBlendMode: BlendMode.srcIn,
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-  }
-
-  Widget myPoster(BuildContext context, WidgetRef ref) {
-    final post = ref.watch(posterStateHolderProvider);
-    return post?.hasInCollection == true
-        ? const SizedBox.shrink()
-        : SizedBox(
-            width: 24,
-            height: 24,
-            child: SvgPicture.asset('assets/icons/ic_collections_add.svg'),
-          );
-  }
-
-  Widget userPoster(BuildContext context, WidgetRef ref) {
-    final post = ref.watch(posterStateHolderProvider);
-    return SizedBox(
-      width: 24,
-      height: 24,
-      child: Image.asset(
-        post?.hasInCollection == true
-            ? 'assets/images/ic_collection_filled.png'
-            : 'assets/images/ic_collection.png',
-        color: context.colors.iconsDefault!,
-        colorBlendMode: BlendMode.srcIn,
-      ),
     );
   }
 }

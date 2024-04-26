@@ -3,22 +3,17 @@ import 'package:poster_stock/features/account/account_cache.dart';
 import 'package:poster_stock/features/account/account_network.dart';
 import 'package:poster_stock/features/account/notifiers/account_notifier.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
-import 'package:poster_stock/features/profile/models/user_details_model.dart';
 
 final accountPostersStateNotifier =
     StateNotifierProvider.autoDispose<PostersNotifier, PostersState>(
   (ref) {
-    final UserDetailsModel? account = ref.watch(accountNotifier);
-    return PostersNotifier(account, ref.read(accountNotifier.notifier))
-      .._init();
+    return PostersNotifier(ref.watch(accountNotifier.notifier)).._init();
   },
 );
 
 class PostersNotifier extends StateNotifier<PostersState> {
-  PostersNotifier(this.account, this.accountNotifier)
-      : super(const PostersState.holder());
+  PostersNotifier(this.accountNotifier) : super(const PostersState.holder());
 
-  final UserDetailsModel? account;
   final AccountNotifier accountNotifier;
   final AccountNetwork network = AccountNetwork();
   final AccountCache cache = AccountCache();
@@ -54,7 +49,7 @@ class PostersNotifier extends StateNotifier<PostersState> {
   }
 
   Future<void> reload() async {
-    if (!_hasMore || _loading) return;
+    // if (!_hasMore || _loading) return;
     _loading = true;
     final (list, more) = await network.getPosters(_id, restart: true);
     state = PostersState.top(list!);

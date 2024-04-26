@@ -8,6 +8,7 @@ import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
+import 'package:poster_stock/common/widgets/comment_text_field.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
@@ -19,7 +20,6 @@ import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/list/controller/list_controller.dart';
 import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
-import 'package:poster_stock/features/poster/view/pages/poster_page/poster_page.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
@@ -298,7 +298,7 @@ class _ListPageState extends ConsumerState<ListPage>
                                                   .textStyles.subheadline!,
                                             ),
                                           ),
-                                          SizedBox(height: 12),
+                                          const SizedBox(height: 12),
                                           if (index - 1 != comments.length - 1)
                                             Divider(
                                               height: 0.5,
@@ -543,9 +543,11 @@ class CollectionInfoWidget extends ConsumerWidget {
                   shimmer: shimmer,
                   index: index,
                   post: PostMovieModel(
-                      year: post!.posters[index].years,
+                      startYear: post!.posters[index].startYear,
+                      endYear: post!.posters[index].endYear,
                       imagePath: post!.posters[index].image,
                       id: post!.posters[index].id,
+                      type: 'list',
                       name: post!.posters[index].title,
                       author: post!.author,
                       time: post!.time,
@@ -574,6 +576,7 @@ class CollectionInfoWidget extends ConsumerWidget {
 
 class ListActionsDialog extends ConsumerWidget {
   final ListType? type;
+
   const ListActionsDialog(this.type, {super.key});
 
   @override

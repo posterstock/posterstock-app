@@ -209,31 +209,6 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                 color: Colors.transparent,
               ),
             ),
-            // MenuButton(
-            //   width: width,
-            //   bottomPaddingMul: 0.24,
-            //   color: context.colors.backgroundsPrimary!,
-            //   hightlightColor: context.colors.textsPrimary!.withOpacity(0.2),
-            //   iconColor: context.colors.iconsActive!,
-            //   border: Border.all(
-            //     color: context.colors.fieldsHover!,
-            //   ),
-            //   picturePath: 'assets/icons/ic_lists.svg',
-            //   label: AppLocalizations.of(context)!.listCreate_create,
-            //   animationValue: controller.value,
-            //   onTap: () {
-            //     showModalBottomSheet(
-            //       context: context,
-            //       backgroundColor: Colors.transparent,
-            //       useRootNavigator: true,
-            //       isScrollControlled: true,
-            //       enableDrag: false,
-            //       isDismissible: false,
-            //       useSafeArea: true,
-            //       builder: (context) => const CreateListDialog(),
-            //     );
-            //   },
-            // ),
             MenuButton(
               width: width,
               bottomPaddingMul: 0.29,

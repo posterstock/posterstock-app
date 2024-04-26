@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 class UserModel {
@@ -31,12 +29,26 @@ class UserModel {
       id: json['id'] as int,
       name: json['name'] as String,
       username: json['username'] as String,
-      imagePath: (json['image'] as String?) == "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp" ? null : json['image'] as String?,
-      followed: (json['followed'] as bool?) ?? (json['is_following'] as bool?) ?? false,
+      imagePath: (json['image'] as String?) ==
+              "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp"
+          ? null
+          : json['image'] as String?,
+      followed: (json['followed'] as bool?) ??
+          (json['is_following'] as bool?) ??
+          false,
       description: json['description'] as String?,
       color: avatar[(json['id'] as int) % 3],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'username': username,
+        'image': imagePath,
+        'followed': followed,
+        'description': description,
+      };
 
   @override
   String toString() {
@@ -62,5 +74,4 @@ class UserModel {
       color: color ?? this.color,
     );
   }
-
 }

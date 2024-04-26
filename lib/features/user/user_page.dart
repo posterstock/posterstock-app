@@ -35,10 +35,30 @@ import 'package:share_plus/share_plus.dart';
 //TODO: replace all read(router)/watch(router) by context.router
 
 @RoutePage()
-class UserPageRoute extends ConsumerWidget {
+class UserPageId extends ConsumerWidget {
+  final int id;
+
+  const UserPageId({
+    @PathParam('id') required this.id,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.read(userControllerProvider(id));
+    final posters = ref.watch(userPostersNotifier(id));
+    final user = ref.watch(userNotifier(id));
+    return user == null || (posters.firstOrNull == null && posters.isNotEmpty)
+        ? const WaitProfile('')
+        : _UserPage(args: UserArgs(user.id, user.username, uid: true));
+  }
+}
+
+@RoutePage()
+class UserPageNamed extends ConsumerWidget {
   final String username;
 
-  const UserPageRoute({
+  const UserPageNamed({
     @PathParam('username') required this.username,
     super.key,
   });

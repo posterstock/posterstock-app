@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/features/home/repository/cached_home_repository.dart';
 import 'package:poster_stock/features/home/repository/home_page_posts_repository.dart';
 import 'package:poster_stock/features/home/repository/i_home_page_posts_repository.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
@@ -13,6 +14,8 @@ final homePagePostsControllerProvider = Provider<HomePagePostsController>(
 class HomePagePostsController {
   final HomePagePostsStateHolder homePagePostsState;
   final IHomePagePostsRepository repository;
+  final CachedHomeRepository cachedHomeRepository = CachedHomeRepository();
+
   bool gettingPosts = false;
   bool gotAll = false;
 
@@ -25,7 +28,16 @@ class HomePagePostsController {
     if (gettingPosts) return;
     if (!getNewPosts && gotAll) return;
     gettingPosts = true;
+    // final cachedResult = await cachedHomeRepository.getPosts();
+    // if (cachedResult != null) {
+    //   homePagePostsState.updateStateEnd(cachedResult);
+    //   // gettingPosts = false;
+    // }
+
     final result = await repository.getPosts(getNesPosts: getNewPosts);
+    // if (!getNewPosts && result?.$1 != null && result!.$1!.isNotEmpty) {
+    //   cachedHomeRepository.cachePosts(result.$1!);
+    // }
     gotAll = result?.$2 ?? false;
     try {
       if (getNewPosts) {

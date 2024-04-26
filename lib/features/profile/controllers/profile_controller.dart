@@ -1,6 +1,6 @@
 import 'package:async/async.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/features/account/account_cache.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
@@ -31,6 +31,8 @@ final profileControllerApiProvider = Provider.autoDispose<ProfileControllerApi>(
 
 class ProfileControllerApi {
   final IProfileRepository repo = ProfileRepository();
+  final AccountCache cache = AccountCache();
+
   final ProfileInfoStateHolder profileInfoStateHolder;
   final ProfilePostsStateHolder profilePostsStateHolder;
   final ProfileListsStateHolder profileListsStateHolder;
@@ -71,32 +73,32 @@ class ProfileControllerApi {
     await repo.follow(id, !follow);
   }
 
-  Future<void> updateBookmarks() async {
-    if (gttgUser) return;
-    if (gotAllBookmarks) return;
-    if (gettingBookmarks) return;
-    gettingBookmarks = true;
-    var result = await repo.getMyBookmarks();
-    final bookmarks = result.$1;
-    gotAllBookmarks = result.$2;
-    profileBookmarksStateHolder.updateState(bookmarks);
-    gettingBookmarks = false;
-  }
+  // Future<void> updateBookmarks() async {
+  //   if (gttgUser) return;
+  //   if (gotAllBookmarks) return;
+  //   if (gettingBookmarks) return;
+  //   gettingBookmarks = true;
+  //   var result = await repo.getMyBookmarks();
+  //   final bookmarks = result.$1;
+  //   gotAllBookmarks = result.$2;
+  //   profileBookmarksStateHolder.updateState(bookmarks);
+  //   gettingBookmarks = false;
+  // }
 
-  Future<void> updatePosts(int id) async {
-    if (gttgUser) return;
-    if (gotAllPosts) return;
-    if (gettingPosts) return;
-    print("GGGGGG");
-    gettingPosts = true;
-    var result = await repo.getProfilePosts(id);
-    final posts = result.$1;
-    gotAllPosts = result.$2;
-    print("UPDATING");
-    print(posts);
-    profilePostsStateHolder.updateState(posts);
-    gettingPosts = false;
-  }
+  // Future<void> updatePosts(int id) async {
+  //   if (gttgUser) return;
+  //   if (gotAllPosts) return;
+  //   if (gettingPosts) return;
+  //   print("GGGGGG");
+  //   gettingPosts = true;
+  //   var result = await repo.getProfilePosts(id);
+  //   final posts = result.$1;
+  //   gotAllPosts = result.$2;
+  //   print("UPDATING");
+  //   print(posts);
+  //   profilePostsStateHolder.updateState(posts);
+  //   gettingPosts = false;
+  // }
 
   Future<void> getUserInfo(dynamic usernameOrId) async {
     if (gettingUser == usernameOrId) return;
@@ -108,7 +110,20 @@ class ProfileControllerApi {
             try {
               gotAllBookmarks = false;
               gettingUser = usernameOrId;
+
+              if (usernameOrId == null) {
+                final user = await cache.getProfileInfo();
+                myProfileInfoStateHolder.updateState(user);
+              }
+
               final user = await repo.getProfileInfo(usernameOrId);
+              if (usernameOrId == null) {
+                myProfileInfoStateHolder.updateState(user);
+                cache.cacheProfileInfo(user);
+              } else {
+                profileBookmarksStateHolder.updateState(null);
+                gotAllBookmarks = false;
+              }
               var postsResponse =
                   await repo.getProfilePosts(user.id, restart: true);
               var posts = postsResponse.$1;
@@ -147,12 +162,6 @@ class ProfileControllerApi {
                     ),
                   )
                   .toList();
-              if (usernameOrId == null) {
-                myProfileInfoStateHolder.updateState(user);
-              } else {
-                profileBookmarksStateHolder.updateState(null);
-                gotAllBookmarks = false;
-              }
               profileInfoStateHolder.updateState(user);
               print("SETTING");
               profilePostsStateHolder.setState(posts);

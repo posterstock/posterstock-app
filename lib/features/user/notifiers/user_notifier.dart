@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/profile/data/profile_service.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
+import 'package:poster_stock/features/user/user_cache.dart';
 
 final userNotifier = StateNotifierProvider.family
     .autoDispose<UserNotifier, UserDetailsModel?, dynamic>(
@@ -10,14 +11,22 @@ final userNotifier = StateNotifierProvider.family
 class UserNotifier extends StateNotifier<UserDetailsModel?> {
   final dynamic id;
   final network = ProfileService();
+  final UserCache cache = UserCache();
 
   UserNotifier(this.id) : super(null);
 
   UserDetailsModel get user => state!;
 
   Future<void> load() async {
+    final cachedResult = await cache.getProfileInfo(id);
+    if (cachedResult != null) {
+      state = cachedResult;
+    }
     final json = await network.getProfileInfo(id);
     state = UserDetailsModel.fromJson(json);
+    if (state != null) {
+      cache.cacheUserInfo(id, state!);
+    }
   }
 
   Future<void> toggleFollow() async {
