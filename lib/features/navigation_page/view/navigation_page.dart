@@ -8,14 +8,14 @@ import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
-import 'package:poster_stock/features/create_poster/controller/create_poster_controller.dart';
-import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/menu_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/state_holder/previous_page_state_holder.dart';
 import 'package:poster_stock/features/navigation_page/view/widgets/bottom_nav_bar.dart';
 import 'package:poster_stock/features/notifications/state_holders/notifications_count_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/page_transition_controller_state_holder.dart';
+import 'package:poster_stock/features/poster_dialog/controller/create_poster_controller.dart';
+import 'package:poster_stock/features/poster_dialog/view/poster_dialog.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
@@ -223,12 +223,16 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
               animationValue: controller.value,
               onTap: () {
                 showModalBottomSheet(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(16.0)),
+                  ),
                   context: context,
-                  backgroundColor: Colors.transparent,
+                  // backgroundColor: Colors.transparent,
                   isScrollControlled: true,
-                  enableDrag: true,
                   useSafeArea: true,
-                  builder: (context) => const CreatePosterDialog(
+                  // enableDrag: true,
+                  builder: (context) => const PosterDialog(
                     bookmark: true,
                   ),
                 ).whenComplete(() {
@@ -252,12 +256,16 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
               animationValue: controller.value,
               onTap: () {
                 showModalBottomSheet(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(16.0)),
+                  ),
                   context: context,
-                  backgroundColor: Colors.transparent,
+                  // backgroundColor: Colors.transparent,
                   isScrollControlled: true,
                   useSafeArea: true,
-                  enableDrag: true,
-                  builder: (context) => const CreatePosterDialog(),
+                  // enableDrag: true,
+                  builder: (context) => const PosterDialog(),
                 ).whenComplete(() {
                   ref.read(createPosterControllerProvider).choosePoster(null);
                   ref.read(createPosterControllerProvider).chooseMovie(null);

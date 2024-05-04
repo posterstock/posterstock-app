@@ -50,12 +50,12 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
             color: context.colors.fieldsDefault,
           ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 12.0),
           child: TextField(
             textCapitalization: TextCapitalization.sentences,
             focusNode: widget.focus,
             minLines: 2,
-            maxLines: 2,
+            maxLines: 4,
             controller: descriptionController,
             cursorWidth: 1,
             cursorColor: context.colors.textsAction,
@@ -81,7 +81,7 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
           ),
         ),
         Container(
-          height: 56 + MediaQuery.of(context).padding.bottom,
+          height: 56.0,
           color: context.colors.backgroundsPrimary,
           child: Row(
             children: [

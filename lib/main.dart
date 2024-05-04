@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -68,11 +70,11 @@ void main() async {
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     // print('Token: ' + (await FirebaseMessaging.instance.getToken()).toString());
-    // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-    // PlatformDispatcher.instance.onError = (error, stack) {
-    //   FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    //   return true;
-    // };
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
   } catch (e) {
     debugPrint(e.toString());
   }
@@ -141,6 +143,7 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+
     final theme = ref.watch(themeStateHolderProvider);
     final appLocale = ref.watch(chosenLanguageStateHolder);
     final rtr = ref.watch(router);

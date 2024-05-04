@@ -11,6 +11,8 @@ class AppThemes {
 
   static final lightThemeData = ThemeData.light().copyWith(
       scaffoldBackgroundColor: _appLightColors.backgroundsPrimary,
+      bottomSheetTheme: BottomSheetThemeData(
+          backgroundColor: _appLightColors.backgroundsPrimary),
       splashColor: Colors.transparent,
       highlightColor: _appLightColors.backgroundsSecondary,
       extensions: [
@@ -20,6 +22,8 @@ class AppThemes {
 
   static final darkThemeData = ThemeData.dark().copyWith(
       scaffoldBackgroundColor: _appDarkColors.backgroundsPrimary,
+      bottomSheetTheme: BottomSheetThemeData(
+          backgroundColor: _appDarkColors.backgroundsPrimary),
       splashColor: Colors.transparent,
       highlightColor: _appDarkColors.backgroundsSecondary,
       extensions: [

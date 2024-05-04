@@ -1,17 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:poster_stock/features/account/notifiers/account_notifier.dart';
 import 'package:poster_stock/features/account/notifiers/bookmarks_notifier.dart';
 import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
-import 'package:poster_stock/features/create_poster/model/media_model.dart';
-import 'package:poster_stock/features/create_poster/repository/create_poster_repository.dart';
-import 'package:poster_stock/features/create_poster/state_holder/create_poster_chosen_movie_state_holder.dart';
-import 'package:poster_stock/features/create_poster/state_holder/create_poster_chosen_poster_state_holder.dart';
-import 'package:poster_stock/features/create_poster/state_holder/create_poster_images_state_holder.dart';
-import 'package:poster_stock/features/create_poster/state_holder/create_poster_search_list.dart';
-import 'package:poster_stock/features/create_poster/state_holder/create_poster_search_state_holder.dart';
+import 'package:poster_stock/features/poster_dialog/model/media_model.dart';
+import 'package:poster_stock/features/poster_dialog/repository/create_poster_repository.dart';
+import 'package:poster_stock/features/poster_dialog/state_holder/create_poster_chosen_movie_state_holder.dart';
+import 'package:poster_stock/features/poster_dialog/state_holder/create_poster_chosen_poster_state_holder.dart';
+import 'package:poster_stock/features/poster_dialog/state_holder/create_poster_images_state_holder.dart';
+import 'package:poster_stock/features/poster_dialog/state_holder/create_poster_search_list.dart';
+import 'package:poster_stock/features/poster_dialog/state_holder/create_poster_search_state_holder.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
-import 'package:poster_stock/features/profile/models/user_details_model.dart';
-import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 
 final createPosterControllerProvider =
@@ -33,10 +30,8 @@ final createPosterControllerProvider =
       createPosterSearchListStateHolderProvider.notifier,
     ),
     profileControllerApi: ref.read(profileControllerApiProvider),
-    accountNotifier: ref.read(accountNotifier.notifier),
     posterNotifier: ref.read(accountPostersStateNotifier.notifier),
     bookmarkNotifier: ref.read(accountBookmarksStateNotifier.notifier),
-    profileInfoStateHolder: ref.watch(profileInfoStateHolderProvider),
     languages: ref.watch(chosenLanguageStateHolder.notifier),
   ),
 );
@@ -48,10 +43,9 @@ class CreatePosterController {
   final CreatePosterChosenPosterStateHolder createPosterChosenPosterStateHolder;
   final CreatePosterSearchListStateHolder createPosterSearchListStateHolder;
   final ProfileControllerApi profileControllerApi;
-  final AccountNotifier accountNotifier;
+  // final AccountNotifier accountNotifier;
   final PostersNotifier posterNotifier;
   final BookmarksNotifier bookmarkNotifier;
-  final UserDetailsModel? profileInfoStateHolder;
   final CreatePosterRepository createPosterRepository =
       CreatePosterRepository();
   final ChosenLanguageStateHolder languages;
@@ -63,10 +57,8 @@ class CreatePosterController {
     required this.createPosterChosenPosterStateHolder,
     required this.createPosterSearchListStateHolder,
     required this.profileControllerApi,
-    required this.accountNotifier,
     required this.posterNotifier,
     required this.bookmarkNotifier,
-    required this.profileInfoStateHolder,
     required this.languages,
   });
 
@@ -129,7 +121,6 @@ class CreatePosterController {
       print(e);
     }
     createPosterChoseMovieStateHolder.updateValue(null);
-    // createPosterChosenPosterStateHolder.updateValue(null);
     createPosterSearchStateHolder.updateValue('');
     createPosterSearchListStateHolder.setValue(null);
     createPosterImagesStateHolder.setValue([]);

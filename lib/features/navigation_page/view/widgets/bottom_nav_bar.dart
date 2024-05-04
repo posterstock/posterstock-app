@@ -80,7 +80,7 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                         context.colors.iconsDefault!,
                         BlendMode.srcIn,
                       ),
-                      width: 34.0,
+                      width: 30.0,
                     ),
                     activeIcon: SvgPicture.asset(
                       'assets/icons/ic_home_mobile_active.svg',
@@ -88,7 +88,7 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
                         context.colors.iconsDefault!,
                         BlendMode.srcIn,
                       ),
-                      width: 34.0,
+                      width: 30.0,
                     ),
                     active: activeIndex == 0,
                   ),

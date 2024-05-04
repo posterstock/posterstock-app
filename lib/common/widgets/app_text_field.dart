@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:poster_stock/features/create_poster/model/media_model.dart';
-import 'package:poster_stock/features/create_poster/state_holder/create_poster_chosen_movie_state_holder.dart';
+import 'package:poster_stock/features/poster_dialog/model/media_model.dart';
+import 'package:poster_stock/features/poster_dialog/state_holder/create_poster_chosen_movie_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 import '../../themes/constants.dart';
@@ -76,10 +76,11 @@ class _AppTextFieldState extends State<AppTextField> {
   void initState() {
     focus = widget.focus ?? FocusNode();
     focus.addListener(() {
-      if (mounted)
+      if (mounted) {
         setState(() {
           focused = focus.hasFocus;
         });
+      }
     });
     super.initState();
   }
@@ -156,7 +157,7 @@ class _AppTextFieldState extends State<AppTextField> {
                                         1 &&
                                     !widget.hasError
                                 ? Padding(
-                                    key: const ValueKey<int>(3),
+                                    // key: const ValueKey<int>(3),
                                     padding: const EdgeInsets.all(16.0),
                                     child: SvgPicture.asset(
                                       'assets/icons/ic_check.svg',
@@ -173,7 +174,7 @@ class _AppTextFieldState extends State<AppTextField> {
                                                 .text
                                                 .isNotEmpty)
                                     ? GestureDetector(
-                                        key: const ValueKey<int>(0),
+                                        // key: const ValueKey<int>(0),
                                         onTap: () {
                                           widget.controller?.text = '';
                                           nullController.text = '';
@@ -200,14 +201,14 @@ class _AppTextFieldState extends State<AppTextField> {
                                         ),
                                       )
                                     : const Padding(
-                                        key: ValueKey<int>(2),
+                                        // key: ValueKey<int>(2),
                                         padding: EdgeInsets.all(16.0),
                                         child: SizedBox(height: 24),
                                       ))
                             : widget.alternativeCancel && !focused
                                 ? null
                                 : GestureDetector(
-                                    key: const ValueKey<int>(1),
+                                    // key: const ValueKey<int>(1),
                                     onTap: () {
                                       if (widget.onRemoved != null) {
                                         nullController.text = '';
@@ -251,8 +252,7 @@ class _AppTextFieldState extends State<AppTextField> {
                       if (chosenMovie?.startYear != null) {
                         return Positioned(
                           left: 48.0,
-                          top: 0,
-                          bottom: 0,
+                          bottom: 6.0,
                           child: IgnorePointer(
                             ignoring: true,
                             child: Align(

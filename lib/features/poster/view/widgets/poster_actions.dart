@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:poster_stock/features/create_poster/controller/create_poster_controller.dart';
-import 'package:poster_stock/features/create_poster/model/media_model.dart';
-import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
 import 'package:poster_stock/features/poster/controller/post_controller.dart';
 import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
 import 'package:poster_stock/features/poster/view/widgets/add_to_list_dialog.dart';
+import 'package:poster_stock/features/poster_dialog/controller/create_poster_controller.dart';
+import 'package:poster_stock/features/poster_dialog/model/media_model.dart';
+import 'package:poster_stock/features/poster_dialog/view/poster_dialog.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -88,7 +88,7 @@ class PosterActions extends ConsumerWidget {
                   backgroundColor: Colors.transparent,
                   isScrollControlled: true,
                   useSafeArea: true,
-                  builder: (context) => const CreatePosterDialog(),
+                  builder: (context) => const PosterDialog(),
                 );
               }
             },

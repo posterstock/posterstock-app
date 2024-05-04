@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:poster_stock/features/create_poster/controller/create_poster_controller.dart';
-import 'package:poster_stock/features/create_poster/model/media_model.dart';
-import 'package:poster_stock/features/create_poster/state_holder/create_poster_chosen_poster_state_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
+import 'package:poster_stock/features/poster_dialog/controller/create_poster_controller.dart';
+import 'package:poster_stock/features/poster_dialog/model/media_model.dart';
+import 'package:poster_stock/features/poster_dialog/state_holder/create_poster_chosen_poster_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class PosterRadio extends ConsumerWidget {

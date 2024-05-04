@@ -1,6 +1,6 @@
 import 'package:poster_stock/common/constants/languages.dart';
-import 'package:poster_stock/features/create_poster/data/create_poster_service.dart';
-import 'package:poster_stock/features/create_poster/model/media_model.dart';
+import 'package:poster_stock/features/poster_dialog/data/create_poster_service.dart';
+import 'package:poster_stock/features/poster_dialog/model/media_model.dart';
 
 class CreatePosterRepository {
   final service = CreatePosterService();

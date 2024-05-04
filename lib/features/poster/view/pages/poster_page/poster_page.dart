@@ -13,8 +13,6 @@ import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/comment_text_field.dart';
 import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
-import 'package:poster_stock/features/create_poster/controller/create_poster_controller.dart';
-import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
@@ -28,6 +26,8 @@ import 'package:poster_stock/features/poster/view/widgets/add_to_list_dialog.dar
 import 'package:poster_stock/features/poster/view/widgets/image_dialog.dart';
 import 'package:poster_stock/features/poster/view/widgets/poster_actions.dart';
 import 'package:poster_stock/features/poster/view/widgets/poster_info.dart';
+import 'package:poster_stock/features/poster_dialog/controller/create_poster_controller.dart';
+import 'package:poster_stock/features/poster_dialog/view/poster_dialog.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
@@ -813,8 +813,8 @@ class _PosterPageState extends ConsumerState<PosterPage>
                       author: post.author
                           .copyWith(followed: !post.author.followed)));
               ref.read(profileControllerApiProvider).follow(
-                    post!.author.id,
-                    post!.author.followed,
+                    post.author.id,
+                    post.author.followed,
                   );
             },
           ),
@@ -831,11 +831,15 @@ class _PosterPageState extends ConsumerState<PosterPage>
                   "https://posterstock.com/${post.author.username}/${post.id}");
             } else {
               showModalBottomSheet(
+                shape: const RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(16.0)),
+                ),
                 context: context,
-                backgroundColor: Colors.transparent,
+                // backgroundColor: Colors.transparent,
                 isScrollControlled: true,
                 useSafeArea: true,
-                builder: (context) => CreatePosterDialog(
+                builder: (context) => PosterDialog(
                   postMovieModel: post,
                 ),
               ).whenComplete(() {

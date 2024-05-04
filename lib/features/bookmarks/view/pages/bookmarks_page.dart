@@ -13,10 +13,10 @@ import 'package:poster_stock/features/account/notifiers/bookmarks_notifier.dart'
 import 'package:poster_stock/features/bookmarks/controller/bookmarks_controller.dart';
 import 'package:poster_stock/features/bookmarks/state_holders/bookmark_details_state_holder.dart';
 import 'package:poster_stock/features/bookmarks/state_holders/bookmark_list_state_holder.dart';
-import 'package:poster_stock/features/create_poster/controller/create_poster_controller.dart';
-import 'package:poster_stock/features/create_poster/model/media_model.dart';
-import 'package:poster_stock/features/create_poster/view/create_poster_dialog.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
+import 'package:poster_stock/features/poster_dialog/controller/create_poster_controller.dart';
+import 'package:poster_stock/features/poster_dialog/model/media_model.dart';
+import 'package:poster_stock/features/poster_dialog/view/poster_dialog.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -220,7 +220,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
                 backgroundColor: Colors.transparent,
                 isScrollControlled: true,
                 useSafeArea: true,
-                builder: (context) => const CreatePosterDialog(),
+                builder: (context) => const PosterDialog(),
               );
             }
           },
