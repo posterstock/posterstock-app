@@ -396,7 +396,7 @@ class _State extends ConsumerState<_UserPage> with TickerProviderStateMixin {
       MenuState(user.name, [
         MenuItem(
           'assets/icons/ic_share.svg',
-          context.txt.share,
+          context.txt.profile_menu_share,
           () async {
             await Share.share('https://posterstock.com/${user.username}');
           },
