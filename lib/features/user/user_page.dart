@@ -369,6 +369,16 @@ class _State extends ConsumerState<_UserPage> with TickerProviderStateMixin {
   }
 
   double toolbarHeight(UserDetailsModel user) {
+    int st = 0;
+    switch (st) {
+      case 0:
+        st++;
+        break;
+      case 1:
+        st--;
+        break;
+    }
+
     return 225 +
         ((user.description != null)
             ? TextInfoService.textSizeConstWidth(

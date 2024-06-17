@@ -77,11 +77,11 @@ class NavigationPage extends ConsumerWidget {
       },
       child: AutoTabsRouter.pageView(
         physics: const NeverScrollableScrollPhysics(),
-        routes: [
-          const PageRouteInfo(HomeRoute.name),
+        routes: const [
+          PageRouteInfo(HomeRoute.name),
           // const PageRouteInfo(SearchRoute.name),
           // const NotificationsRoute(),
-          const AccountRoute(),
+          AccountRoute(),
           // ProfileRoute()
         ],
         builder: (context, child, _) {

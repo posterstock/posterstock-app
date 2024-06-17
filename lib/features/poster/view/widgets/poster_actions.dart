@@ -34,7 +34,13 @@ class PosterActions extends ConsumerWidget {
         child: SizedBox(
           width: 24,
           height: 24,
-          child: SvgPicture.asset('assets/icons/ic_collections_add.svg'),
+          child: SvgPicture.asset(
+            'assets/icons/ic_collections_add.svg',
+            colorFilter: ColorFilter.mode(
+              context.colors.iconsDefault!,
+              BlendMode.srcIn,
+            ),
+          ),
         ),
       );
     } else {

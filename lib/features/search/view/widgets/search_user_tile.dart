@@ -102,7 +102,7 @@ class SearchUserTile extends ConsumerWidget {
                   const SizedBox(height: 5),
                   Row(
                     children: [
-                      SvgPicture.asset(
+                      SvgPicture.asset( 
                         'assets/icons/ic_lists.svg',
                         width: 16,
                         colorFilter: ColorFilter.mode(

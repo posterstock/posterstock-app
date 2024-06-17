@@ -196,14 +196,15 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
       locale: appLocale?.locale,
       builder: (context, child) {
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: const TextScaler.linear(1.0)),
           child: ScrollConfiguration(
             behavior: CustomScrollBehavior(),
             child: child ?? const SizedBox(),
           ),
         );
       },
-      theme: theme.copyWith(useMaterial3: false),
+      theme: theme.copyWith(),
     );
   }
 }

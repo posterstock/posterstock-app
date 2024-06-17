@@ -40,7 +40,7 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar> {
         ref.watch(homePageScrollControllerStateHolderProvider);
     return SafeArea(
       child: SizedBox(
-        height: 60.0,
+        height: 56.0,
         width: double.infinity,
         child: Column(
           children: [

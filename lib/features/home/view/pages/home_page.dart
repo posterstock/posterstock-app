@@ -170,8 +170,9 @@ class HomePage extends ConsumerWidget {
                       FutureBuilder(
                         future: postsFuture,
                         builder: (context, snapshot) {
-                          if (posts?[index].isEmpty ?? false)
+                          if (posts?[index].isEmpty ?? false) {
                             return const SizedBox();
+                          }
                           return PostBase(
                             key: Key(posts?[index][0].id.toString() ??
                                 index.toString()),

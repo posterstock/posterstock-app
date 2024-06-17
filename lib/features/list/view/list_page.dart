@@ -520,7 +520,7 @@ class CollectionInfoWidget extends ConsumerWidget {
             height: ((post?.posters.length ?? 0) % 3 == 0
                     ? (post?.posters.length ?? 0) / 3
                     : (post?.posters.length ?? 0) ~/ 3 + 1) *
-                220,
+                225,
             child: GridView.builder(
               padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(
