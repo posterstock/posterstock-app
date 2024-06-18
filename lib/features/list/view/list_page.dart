@@ -604,7 +604,7 @@ class ListActionsDialog extends ConsumerWidget {
                             height: 36,
                             child: Center(
                               child: Text(
-                                'List',
+                                AppLocalizations.of(context)!.lists,
                                 style: context.textStyles.footNote!.copyWith(
                                   color: context.colors.textsSecondary,
                                 ),
@@ -640,7 +640,7 @@ class ListActionsDialog extends ConsumerWidget {
                                 },
                                 child: Center(
                                   child: Text(
-                                    '${list.author.followed ? 'Un' : 'F'}ollow ${list.author.name}',
+                                    '${list.author.followed ? AppLocalizations.of(context)!.unfollow : AppLocalizations.of(context)!.follow} ${list.author.name}',
                                     style: context.textStyles.bodyRegular!
                                         .copyWith(
                                       color: context.colors.textsPrimary,

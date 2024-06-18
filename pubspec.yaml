@@ -1,7 +1,7 @@
 name: poster_stock
 description: A new Flutter project.
 
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.2.3+37
 
@@ -40,7 +40,7 @@ dependencies:
   shared_preferences: ^2.2.0
   firebase_messaging: ^14.6.8
   flutter_local_notifications: ^15.1.0+1
-  davinci: ^2.1.1  #https://pub.dev/packages/davinci
+  davinci: ^2.1.1 #https://pub.dev/packages/davinci
   transparent_image: ^2.0.1
   async: ^2.11.0
   image: ^4.0.17
@@ -64,7 +64,6 @@ dev_dependencies:
 dependency_overrides:
   intl: ^0.18.1
 
-
 flutter_native_splash:
   background_image: "assets/background.png"
   android_12:
@@ -81,9 +80,7 @@ flutter_launcher_icons:
     generate: true
     image_path: "assets/launcher_icon.png"
 
-
 flutter:
-
   generate: true
 
   uses-material-design: true
