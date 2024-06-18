@@ -239,13 +239,17 @@ class EditProfilePage extends ConsumerWidget {
                         isScrollControlled: true,
                         useSafeArea: true,
                         builder: (context) => GestureDetector(
+                          behavior: HitTestBehavior.opaque, // Добавьте это
                           onTap: () {
                             Navigator.pop(context);
                           },
                           child: Container(
                             height: double.infinity,
                             color: Colors.transparent,
-                            child: const ProfilePhotoDialog(),
+                            child: GestureDetector(
+                              onTap: () {},
+                              child: const ProfilePhotoDialog(),
+                            ),
                           ),
                         ),
                       );

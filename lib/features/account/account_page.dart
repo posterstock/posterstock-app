@@ -264,6 +264,7 @@ class _AccountState extends ConsumerState<_AccountScreen>
                                 child: AppTextField(
                                   controller: searchController,
                                   searchField: true,
+                                  autofocus: true,
                                   hint: context.txt.search,
                                   removableWhenNotEmpty: true,
                                   crossPadding: const EdgeInsets.all(8.0),
@@ -403,11 +404,17 @@ class _AccountState extends ConsumerState<_AccountScreen>
       isScrollControlled: true,
       useSafeArea: true,
       builder: (context) => GestureDetector(
-        onTap: context.back,
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          Navigator.of(context).pop();
+        },
         child: Container(
           height: double.infinity,
           color: Colors.transparent,
-          child: const ProfilePhotoDialog(),
+          child: GestureDetector(
+            onTap: () {},
+            child: const ProfilePhotoDialog(),
+          ),
         ),
       ),
     );

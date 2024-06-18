@@ -188,7 +188,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
           if (!exit) {
             await dragController.animateTo(
               0.7,
-              duration: Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 300),
               curve: Curves.linear,
             );
             popping = false;
@@ -307,7 +307,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                           style: context.textStyles.bodyBold,
                                         ),
                                         const SizedBox(height: 0.5),
-                                        SubTextCreateList(),
+                                        const SubTextCreateList(),
                                         const SizedBox(height: 16.5),
                                         SizedBox(
                                           height: 36,
@@ -532,7 +532,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                     }
                                     ref
                                         .read(pickCoverControllerProvider)
-                                        .setImage(image!.path);
+                                        .setImage(image.path);
                                   });
                                 },
                                 child: Container(
@@ -614,6 +614,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                             onTap: () async {
                               loading = true;
                               setState(() {});
+                              print('>>>>>>>>>>> begin');
                               await ref
                                   .read(pickCoverControllerProvider)
                                   .createList(

@@ -44,6 +44,7 @@ class SearchPage extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: AppTextField(
+                      autofocus: true,
                       controller: textController,
                       searchField: true,
                       hint: context.txt.search,
