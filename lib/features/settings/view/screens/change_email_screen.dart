@@ -72,7 +72,7 @@ class ChangeEmailPage extends ConsumerWidget {
                             );
                       }
                     },
-                    child: Text(context.txt.next),
+                    child: Text(context.txt.change_email_screen_next),
                   ),
                 ],
               ),

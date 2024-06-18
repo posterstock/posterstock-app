@@ -206,7 +206,7 @@ class _AccountState extends ConsumerState<_AccountScreen>
                                 onTap: () {
                                   ref.watch(router)!.push(EditProfileRoute());
                                 },
-                                text: context.txt.edit.capitalize(),
+                                text: context.txt.account_edit.capitalize(),
                                 backgroundColor: context.colors.fieldsDefault,
                                 textColor: context.colors.textsPrimary,
                               ),
@@ -265,7 +265,7 @@ class _AccountState extends ConsumerState<_AccountScreen>
                                   controller: searchController,
                                   searchField: true,
                                   autofocus: true,
-                                  hint: context.txt.search,
+                                  hint: context.txt.search_page_search_hint,
                                   removableWhenNotEmpty: true,
                                   crossPadding: const EdgeInsets.all(8.0),
                                   crossButton: SvgPicture.asset(
@@ -381,7 +381,7 @@ class _AccountState extends ConsumerState<_AccountScreen>
         ),
         MenuItem(
           'assets/icons/search.svg',
-          context.txt.search,
+          context.txt.search_page_search_hint,
           () {
             context.router.push(const PageRouteInfo(SearchRoute.name));
             // animationController.animateTo(1);
@@ -449,9 +449,11 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
   Widget build(BuildContext context) {
     // final accountController = ref.read(accountControllerProvider);
     final lists = ref.watch(accountListsStateNotifier);
+    // ignore: unused_local_variable
     final searchValue = ref.watch(listSearchValueStateHolderProvider);
     final posters = ref.watch(accountPostersStateNotifier);
     // final posters = accountController.posters;
+    // ignore: unused_local_variable
     final postersSearch = ref.watch(listSearchPostsStateHolderProvider);
     final bookmarks = ref.watch(accountBookmarksStateNotifier);
     // final profile = ref.watch(profileInfoStateHolderProvider);

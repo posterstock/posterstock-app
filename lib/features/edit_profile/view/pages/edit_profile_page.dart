@@ -25,7 +25,6 @@ import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_use
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_username_state_holder.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
-import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 

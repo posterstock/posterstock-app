@@ -200,7 +200,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
 
             ref.read(createPosterControllerProvider).chooseMovie(
                   MediaModel(
-                    id: bookmark!.mediaId!,
+                    id: bookmark.mediaId!,
                     title: bookmark.name,
                     type: bookmark.mediaType == 'movie'
                         ? MediaType.movie

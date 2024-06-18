@@ -403,7 +403,7 @@ class _State extends ConsumerState<_UserPage> with TickerProviderStateMixin {
         ),
         MenuItem(
           'assets/icons/search.svg',
-          context.txt.search,
+          context.txt.search_page_search_hint,
           () {
             context.router.push(const PageRouteInfo(SearchRoute.name));
             // animationController.animateTo(1);
@@ -447,7 +447,7 @@ class SearchField extends ConsumerWidget {
     return AppTextField(
       controller: searchController,
       searchField: true,
-      hint: context.txt.search,
+      hint: context.txt.search_page_search_hint,
       removableWhenNotEmpty: true,
       crossPadding: const EdgeInsets.all(8),
       crossButton: SvgPicture.asset(

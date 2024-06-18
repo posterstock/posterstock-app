@@ -3,9 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:poster_stock/common/data/exceptions.dart';
-import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/features/auth/data/handlers/auth_handler.dart';
-import 'package:poster_stock/main.dart';
 import 'package:supertokens_flutter/dio.dart';
 import 'package:supertokens_flutter/supertokens.dart';
 
@@ -94,7 +92,7 @@ class AuthService {
           },*/
           "redirectURIInfo": {
             "redirectURIOnProviderDashboard":
-            "https://api.posterstock.com/auth/callback/apple",
+                "https://api.posterstock.com/auth/callback/apple",
             "redirectURIQueryParams": {
               "code": code,
               "user": {
@@ -121,7 +119,6 @@ class AuthService {
     String? name,
     String? surname,
     String? email,
-
   }) async {
     try {
       final response = await _dio.post(

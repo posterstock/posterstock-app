@@ -819,7 +819,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
           ),
         MenuItem(
           'assets/icons/ic_share.svg',
-          context.txt.share,
+          context.txt.profile_menu_shareMy,
           () {
             Share.share(
                 "https://posterstock.com/${post.author.username}/${post.id}");

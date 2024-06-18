@@ -133,7 +133,7 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                               },
                               child: Center(
                                 child: Text(
-                                  context.txt.discart,
+                                  context.txt.cancel,
                                   style:
                                       context.textStyles.bodyRegular!.copyWith(
                                     color: context.colors.textsError,
@@ -340,8 +340,8 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
           hint: context.txt.search_add_poster_hint,
           showDivider: true,
           button: widget.postMovieModel != null
-              ? context.txt.save
-              : context.txt.add,
+              ? context.txt.poster_dialog_save
+              : context.txt.poster_dialog_add_button,
           buttonAddCheck: !(chosenCover == null),
           disableWithoutText: widget.postMovieModel != null ? false : true,
           buttonLoading: ref.watch(createPosterLoadingStateHolderProvider),
@@ -523,8 +523,8 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                     widget.postMovieModel != null
                         ? context.txt.posterEdit_editPoster
                         : widget.bookmark
-                            ? context.txt.home_add_watchlist
-                            : context.txt.home_add_poster,
+                            ? context.txt.poster_dialog_watchlistAdd_header
+                            : context.txt.poster_dialog_add_header,
                     style: context.textStyles.bodyBold,
                   ),
                   SizedBox(height: widget.postMovieModel == null ? 24.0 : 12.0),

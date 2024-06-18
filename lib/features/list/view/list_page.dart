@@ -676,7 +676,8 @@ class ListActionsDialog extends ConsumerWidget {
                               },
                               child: Center(
                                 child: Text(
-                                  AppLocalizations.of(context)!.share,
+                                  AppLocalizations.of(context)!
+                                      .profile_menu_shareMy,
                                   style:
                                       context.textStyles.bodyRegular!.copyWith(
                                     color: context.colors.textsPrimary,

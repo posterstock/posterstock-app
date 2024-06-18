@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:dio/dio.dart';
 import 'package:supertokens_flutter/dio.dart';
 import 'package:supertokens_flutter/supertokens.dart';

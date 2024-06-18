@@ -47,7 +47,7 @@ class SearchPage extends ConsumerWidget {
                       autofocus: true,
                       controller: textController,
                       searchField: true,
-                      hint: context.txt.search,
+                      hint: context.txt.search_page_search_hint,
                       removableWhenNotEmpty: true,
                       crossPadding: const EdgeInsets.all(8.0),
                       crossButton: SvgPicture.asset(
