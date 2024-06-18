@@ -357,8 +357,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                                           const EdgeInsets.only(
                                                               right: 16.0),
                                                       child: Text(
-                                                        comments[index].text ??
-                                                            '',
+                                                        comments[index].text,
                                                         style: context
                                                             .textStyles
                                                             .subheadline,
@@ -819,17 +818,18 @@ class _PosterPageState extends ConsumerState<PosterPage>
             },
           ),
         MenuItem(
-          (myPoster?.id != post.author.id)
-              ? 'assets/icons/ic_share.svg'
-              : 'assets/icons/ic_edit.svg',
-          (myPoster?.id != post.author.id)
-              ? context.txt.share
-              : context.txt.posterEdit_editPoster,
+          'assets/icons/ic_share.svg',
+          context.txt.share,
           () {
-            if (myPoster?.id != post.author.id) {
-              Share.share(
-                  "https://posterstock.com/${post.author.username}/${post.id}");
-            } else {
+            Share.share(
+                "https://posterstock.com/${post.author.username}/${post.id}");
+          },
+        ),
+        if (myPoster?.id == post.author.id)
+          MenuItem(
+            'assets/icons/ic_edit.svg',
+            context.txt.posterEdit_editPoster,
+            () {
               showModalBottomSheet(
                 shape: const RoundedRectangleBorder(
                   borderRadius:
@@ -847,9 +847,8 @@ class _PosterPageState extends ConsumerState<PosterPage>
                 ref.read(createPosterControllerProvider).chooseMovie(null);
                 ref.read(createPosterControllerProvider).updateSearch('');
               });
-            }
-          },
-        ),
+            },
+          ),
         MenuItem.danger(
           (myPoster?.id != post.author.id)
               ? 'assets/icons/ic_danger.svg'
