@@ -135,7 +135,7 @@ void showPush(RemoteMessage message, {WidgetRef? ref}) async {
           ByteArrayAndroidBitmap.fromBase64String(base64Encode(response.data)),
     );
   } catch (e) {
-    Logger.e('Ошибка при получении картинки $e');
+    Logger.e('Ошибка при удалении постера $e');
   }
   DarwinNotificationDetails iosNotificationDetails = DarwinNotificationDetails(
       categoryIdentifier: darwinNotificationCategoryPlain,
