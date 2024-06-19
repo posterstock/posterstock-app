@@ -19,7 +19,7 @@ class SnackBars {
       backgroundColor: Colors.black.withOpacity(0.8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       behavior: SnackBarBehavior.floating,
-      duration: duration ?? Duration(seconds: 4),
+      duration: duration ?? const Duration(seconds: 4),
       margin: const EdgeInsets.all(8.0),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       content: Row(
@@ -51,7 +51,7 @@ class SnackBars {
             child: Text(
               text,
               style: !context.mounted
-                  ? TextStyle(color: Colors.white)
+                  ? const TextStyle(color: Colors.white)
                   : context.textStyles.bodyRegular!.copyWith(
                       color: Colors.white,
                     ),

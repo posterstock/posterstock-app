@@ -1,12 +1,9 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:poster_stock/common/data/dio_keeper.dart';
-import 'package:poster_stock/features/home/models/list_base_model.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
-import 'package:poster_stock/features/home/models/post_movie_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supertokens_flutter/supertokens.dart';
 
 class PostService {
   final Dio _dio = DioKeeper.getDio();
@@ -22,17 +19,17 @@ class PostService {
             },
           ),
           data: jsonEncode({'text': text}));
-      print(response.data);
+
       return response.data;
     } on DioError catch (e) {
-      print(e.response?.headers);
+      Logger.e('Ошибка при отправке комментария $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
 
   Future<void> deleteComment(int postId, int id) async {
     try {
-      print('/api/posters/$postId/comments/$id');
       await _dio.delete(
         '/api/posters/$postId/comments/$id',
         options: Options(
@@ -44,7 +41,8 @@ class PostService {
         ),
       );
     } on DioError catch (e) {
-      print(e.response?.headers);
+      Logger.e('Ошибка при удалении комментария $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -60,10 +58,10 @@ class PostService {
             },
           ),
           data: jsonEncode({'text': text}));
-      print(response.data);
       return response.data;
     } on DioError catch (e) {
-      print(e.response?.headers);
+      Logger.e('Ошибка при отправке комментария $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -80,10 +78,10 @@ class PostService {
           },
         ),
       );
-      print(response.data);
       return response.data['has_in_collection'];
     } on DioError catch (e) {
-      print(e.response?.headers);
+      Logger.e('Ошибка при проверке коллекции $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -100,10 +98,11 @@ class PostService {
           },
         ),
       );
-      print(response.data);
+
       return response.data;
     } on DioError catch (e) {
-      print(e.response);
+      Logger.e('Ошибка при получении комментариев $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -111,12 +110,10 @@ class PostService {
   Future<void> setBookmarked(int id, bool bookmarked) async {
     try {
       // final token = await SuperTokens.getAccessToken();
-      // print('token: $token');
-      // print('setBookmarked: $id $bookmarked');
       final path = bookmarked
           ? '/api/posters/$id/bookmark'
           : '/api/posters/$id/unbookmark';
-      Response response = await _dio.post(
+      await _dio.post(
         path,
         options: Options(
           contentType: 'application/json',
@@ -126,32 +123,32 @@ class PostService {
           },
         ),
       );
-      // if (bookmarked) {
-      //   response = await _dio.post(
-      //     '/api/posters/$id/bookmark',
-      //     options: Options(
-      //       contentType: 'application/json',
-      //       headers: {
-      //         'accept': 'application/json',
-      //         'Content-Type': 'application/json'
-      //       },
-      //     ),
-      //   );
-      // } else {
-      //   response = await _dio.post(
-      //     '/api/posters/$id/unbookmark',
-      //     options: Options(
-      //       contentType: 'application/json',
-      //       headers: {
-      //         'accept': 'application/json',
-      //         'Content-Type': 'application/json'
-      //       },
-      //     ),
-      //   );
-      // }
-      print('request success');
+      if (bookmarked) {
+        await _dio.post(
+          '/api/posters/$id/bookmark',
+          options: Options(
+            contentType: 'application/json',
+            headers: {
+              'accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+          ),
+        );
+      } else {
+        await _dio.post(
+          '/api/posters/$id/unbookmark',
+          options: Options(
+            contentType: 'application/json',
+            headers: {
+              'accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+          ),
+        );
+      }
     } on DioError catch (e) {
-      print(e);
+      Logger.e('Ошибка при отправке комментария $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -168,11 +165,11 @@ class PostService {
           },
         ),
       );
-      print('$id ${response.data}');
       return response.data;
     } on DioError catch (e) {
-      print(18);
-      print(e.response);
+      Logger.e('Ошибка при получении постера $e');
+      Logger.e(e.response?.headers);
+
       rethrow;
     }
   }
@@ -189,13 +186,10 @@ class PostService {
           },
         ),
       );
-      print('$id ${response.data}');
       return response.data;
     } on DioError catch (e) {
-      print(18);
-      print(e.response);
-      print(e.response?.data);
-      print(e.response?.headers);
+      Logger.e('Ошибка при удалении постера $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -203,7 +197,6 @@ class PostService {
   Future<void> addPosterToList(MultiplePostModel listId, int postId) async {
     try {
       var idPosters = listId.posters.map((e) => e.id).toList()..add(postId);
-      print(idPosters);
       final response = await _dio.post(
         'api/lists/${listId.id}',
         options: Options(
@@ -219,11 +212,10 @@ class PostService {
           'description': listId.description,
         }),
       );
-      print(response.data);
       return response.data;
-    } on DioError catch (_) {
-      print(_.response?.headers);
-      print(_.response?.data);
+    } on DioError catch (e) {
+      Logger.e('Ошибка при добавлении постера в список $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }

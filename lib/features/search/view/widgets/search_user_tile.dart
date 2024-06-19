@@ -22,7 +22,6 @@ class SearchUserTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print(user.id);
     return InkWell(
       onTap: () => context.pushRoute(
         UserRoute(args: UserArgs(user.id, user.username)),
@@ -102,7 +101,7 @@ class SearchUserTile extends ConsumerWidget {
                   const SizedBox(height: 5),
                   Row(
                     children: [
-                      SvgPicture.asset( 
+                      SvgPicture.asset(
                         'assets/icons/ic_lists.svg',
                         width: 16,
                         colorFilter: ColorFilter.mode(

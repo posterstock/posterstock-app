@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
@@ -373,7 +376,7 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                     descController.text);
               }
             } catch (_) {
-              print(_);
+              Logger.e('Ошибка при создании постера $_');
             }
             ref
                 .read(createPosterLoadingStateHolderProvider.notifier)
@@ -381,14 +384,10 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
             ref.read(menuControllerProvider).hideMenu();
             if (context.mounted) {
               Navigator.pop(context);
-              final selectedImage = ref
-                  .read(createPosterControllerProvider)
-                  .createPosterChosenPosterStateHolder
-                  .state;
-              PostMovieModel? updatedState = ref
-                  .read(posterStateHolderProvider.notifier)
-                  .state
-                  ?.copyWith(description: descController.text);
+              final selectedImage =
+                  ref.read(createPosterChosenPosterStateHolderProvider);
+              PostMovieModel? updatedState =
+                  ref.read(posterStateHolderProvider);
               if (selectedImage != null) {
                 updatedState =
                     updatedState?.copyWith(imagePath: selectedImage.$2);
@@ -454,7 +453,7 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                         .read(createPosterControllerProvider)
                         .createBookmark();
                   } catch (_) {
-                    print(_);
+                    Logger.e('Ошибка при создании закладки $_');
                   }
                   ref
                       .read(createPosterLoadingStateHolderProvider.notifier)

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:poster_stock/common/data/exceptions.dart';
 import 'package:poster_stock/features/auth/data/handlers/auth_handler.dart';
 import 'package:supertokens_flutter/dio.dart';
@@ -32,18 +33,14 @@ class AuthService {
           },
         ),
       );
-      print("SUCCESS");
-      print(response.data);
       return response.data;
     } on DioError catch (e) {
-      print(e.response?.data);
-      print(e.response?.headers);
+      Logger.e('Ошибка при регистрации FCM $e');
+      Logger.e(e.response?.data);
     }
   }
 
   Future<void> removeFCMToken(String token, String userToken) async {
-    print(token);
-    print(userToken);
     try {
       final response = await _dio.delete(
         'api/notifications/drop/$token',
@@ -55,12 +52,12 @@ class AuthService {
           },
         ),
       );
-      print("HHEHEHEHEHHEHE");
-      print(response.data);
+
       return response.data;
     } on DioError catch (e) {
-      print(e.response?.headers);
-      print(e.response?.data);
+      Logger.e('Ошибка при удалении FCM $e');
+      Logger.e(e.response?.headers);
+      Logger.e(e.response?.data);
       rethrow;
     }
   }
@@ -105,8 +102,9 @@ class AuthService {
       );
       return response.data;
     } on DioError catch (e) {
-      print(e.response?.data);
-      print(e.response?.headers);
+      Logger.e('Ошибка при регистрации Apple $e');
+      Logger.e(e.response?.data);
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -139,14 +137,12 @@ class AuthService {
           },
         }),
       );
-      print(response.data);
-      print(response.headers);
+
       return response.data;
     } on DioError catch (e) {
-      print("FFF");
-      print(e.response);
-      print(e.response?.data);
-      print(e.response?.headers);
+      Logger.e('Ошибка при регистрации Google $e');
+      Logger.e(e.response?.data);
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -163,10 +159,9 @@ class AuthService {
             },
           ),
           queryParameters: {'email': email});
-      print(response.data);
       return response.data['exists'];
     } on DioError catch (e) {
-      print(e.response);
+      Logger.e('Ошибка при получении регистрации $e');
       rethrow;
     }
   }
@@ -227,13 +222,12 @@ class AuthService {
           },
         ),
       );
-      print(response.data);
       if (AuthHandler.handleResponse(response.data)) {
         return await SuperTokens.getAccessToken();
       }
       throw AuthException();
     } on DioError catch (e) {
-      print(e);
+      Logger.e('Ошибка при подтверждении кода $e');
       rethrow;
     }
   }

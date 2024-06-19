@@ -106,7 +106,6 @@ class _UserPage extends ConsumerStatefulWidget {
 
   const _UserPage({
     required this.args,
-    super.key,
   });
 
   @override

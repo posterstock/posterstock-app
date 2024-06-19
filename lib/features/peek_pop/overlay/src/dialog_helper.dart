@@ -25,34 +25,32 @@ class DialogHelper {
   final List<IndexedData<StreamController<double>>> _currentController = [];
 
   Future<bool> onWillPop() {
-    return _currentCallback.isEmpty ? Future.value(true) : _currentCallback.last.data.call();
+    return _currentCallback.isEmpty
+        ? Future.value(true)
+        : _currentCallback.last.data.call();
   }
 
   // Shows the dialog
-  void show(BuildContext context, DialogWidget dialog, {bool rootOverlay = true, int? id, bool hidePrevious = true}) {
+  void show(BuildContext context, DialogWidget dialog,
+      {bool rootOverlay = true, int? id, bool hidePrevious = true}) {
     if (hidePrevious || id == null) hideImmediate(context);
 
     OverlayState? overlayState = rootOverlay
-      ? context.findRootAncestorStateOfType<OverlayState>()
-      : context.findAncestorStateOfType<OverlayState>();
+        ? context.findRootAncestorStateOfType<OverlayState>()
+        : context.findAncestorStateOfType<OverlayState>();
 
     if (dialog.closable) {
-      _currentCallback.add(
-        IndexedData<Future<bool> Function()>(
+      _currentCallback.add(IndexedData<Future<bool> Function()>(
           id: id,
           data: () {
             hide(context, id: id);
             return Future.value(false);
-          })
-      );
-
+          }));
     } else {
-      _currentCallback.add(
-        IndexedData<Future<bool> Function()>(
-          id: id,
-          data: () => Future.value(true),
-        )
-      );
+      _currentCallback.add(IndexedData<Future<bool> Function()>(
+        id: id,
+        data: () => Future.value(true),
+      ));
     }
 
     if (_currentCallback.length == 1) {
@@ -71,19 +69,10 @@ class DialogHelper {
       maintainState: true,
     );
 
-    _currentController.add(
-      IndexedData<StreamController<double>>(
-        id: id,
-        data: controller
-      )
-    );
+    _currentController
+        .add(IndexedData<StreamController<double>>(id: id, data: controller));
 
-    _currentOverlay.add(
-      IndexedData<OverlayEntry>(
-        id: id,
-        data: overlayEntry
-      )
-    );
+    _currentOverlay.add(IndexedData<OverlayEntry>(id: id, data: overlayEntry));
 
     overlayState?.insert(overlayEntry);
     controller.add(1.0);
@@ -96,13 +85,12 @@ class DialogHelper {
     }
 
     _currentController
-      .where((controller) => controller.id == id || id == null)
-      .forEach((controller) => controller.data.add(0.0));
+        .where((controller) => controller.id == id || id == null)
+        .forEach((controller) => controller.data.add(0.0));
 
-    Future
-      .delayed(defaultDuration)
-      .then((_) => _hide(id))
-      .catchError((error){});
+    Future.delayed(defaultDuration)
+        .then((_) => _hide(id))
+        .catchError((error) {});
   }
 
   // Hide opened dialog without animation, clear closable callback if any
@@ -120,7 +108,7 @@ class DialogHelper {
       if (overlay.id == id || id == null) {
         try {
           overlay.data.remove();
-        } catch(_) {
+        } catch (_) {
           debugPrint(_.toString());
         }
 
@@ -134,7 +122,7 @@ class DialogHelper {
       if (controller.id == id || id == null) {
         try {
           controller.data.close();
-        } catch(_) {
+        } catch (_) {
           debugPrint(_.toString());
         }
         return true;

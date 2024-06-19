@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:poster_stock/common/data/dio_keeper.dart';
 import 'package:poster_stock/features/list/view/list_page.dart';
 
@@ -20,6 +21,7 @@ class ListService {
           data: jsonEncode({'text': text}));
       return response.data;
     } on DioError catch (e) {
+      Logger.e('Ошибка при отправке комментария $e');
       rethrow;
     }
   }
@@ -37,7 +39,7 @@ class ListService {
         ),
       );
     } on DioError catch (e) {
-      print(e.response?.headers);
+      Logger.e('Ошибка при удалении комментария $e');
       rethrow;
     }
   }
@@ -54,10 +56,9 @@ class ListService {
           },
         ),
       );
-      print(response.data);
       return response.data;
     } on DioError catch (e) {
-      print(e.response);
+      Logger.e('Ошибка при получении комментариев $e');
       rethrow;
     }
   }
@@ -99,11 +100,12 @@ class ListService {
       );
       (response.data as Map<String, dynamic>).forEach(
         (key, value) {
-          print('$key : $value');
+          Logger.i('$key : $value');
         },
       );
       return response.data;
     } on DioError catch (e) {
+      Logger.e('Ошибка при получении поста $e');
       rethrow;
     }
   }
@@ -120,11 +122,9 @@ class ListService {
           },
         ),
       );
-      print('$id ${response.data}');
       return response.data;
     } on DioError catch (e) {
-      print(18);
-      print(e.response);
+      Logger.e('Ошибка при удалении списка $e');
       rethrow;
     }
   }
@@ -140,10 +140,9 @@ class ListService {
             },
           ),
           queryParameters: {'lang': lang});
-      print('$lang ${response.data}');
       return response.data;
     } on DioError catch (e) {
-      print(e.response);
+      Logger.e('Ошибка при изменении языка по умолчанию $e');
       rethrow;
     }
   }

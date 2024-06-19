@@ -1,4 +1,5 @@
 import 'package:async/async.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/account/account_cache.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
@@ -163,23 +164,24 @@ class ProfileControllerApi {
                   )
                   .toList();
               profileInfoStateHolder.updateState(user);
-              print("SETTING");
               profilePostsStateHolder.setState(posts);
               profileListsStateHolder.setState(lists);
               profileBookmarksStateHolder.setState(bookmarks);
               if (gettingUser != usernameOrId) {
                 clearUser();
               }
-              //print(profilePostsStateHolder.state);
               gettingUser = 'profile';
               gttgUser = false;
             } catch (e) {
+              Logger.e('Ошибка при получении пользователя $e');
               gettingUser = 'profile';
               gttgUser = false;
             }
           }),
         ),
       );
-    } catch (e) {}
+    } catch (e) {
+      Logger.e('Ошибка при получении пользователя $e');
+    }
   }
 }

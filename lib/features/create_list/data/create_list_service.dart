@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:image/image.dart';
 import 'package:supertokens_flutter/dio.dart';
 import 'package:supertokens_flutter/supertokens.dart';
@@ -68,30 +69,24 @@ class CreateListService {
         im = copyResize(im, width: 540);
 
         var pnImage = encodePng(im);
-        print(generated == true ? 'generated${pnImage.hashCode}' : null);
         FormData formData = FormData.fromMap({
           "image": MultipartFile.fromBytes(pnImage,
               filename:
                   generated == true ? 'generated${pnImage.hashCode}' : null),
         });
-        print(base64Encode(image));
-        var response1 = await _dio.post(
+        await _dio.post(
           'api/lists/${response.data['id']}/image',
           options: Options(
             headers: {'content-type': 'multipart/form-data'},
           ),
           data: formData,
         );
-        print(response1);
       }
-      print(response);
     } on DioError catch (e) {
       if (!created) {
         return false;
       }
-      print(e.response);
-      print(e.message);
-      print(e.response?.headers);
+      Logger.e('Ошибка при создании списка $e');
     }
     return null;
   }
@@ -102,19 +97,18 @@ class CreateListService {
       cursor = null;
     }
     try {
-      final response = await _dio.get(
-        'api/posters/search/',
-        queryParameters: {
-          'query' : searchValue,
-          'cursor' : cursor,
-          'user_id' : userId,
-        }
-      );
-      print(response);
+      final response = await _dio.get('api/posters/search/', queryParameters: {
+        'query': searchValue,
+        'cursor': cursor,
+        'user_id': userId,
+      });
       cursor = response.data['next_cursor'];
-      return (response.data['posters'] as List<dynamic>? ?? [], !response.data['has_more']);
+      return (
+        response.data['posters'] as List<dynamic>? ?? [],
+        !response.data['has_more']
+      );
     } on DioError catch (e) {
-      print(e.response);
+      Logger.e('Ошибка при поиске постеров $e');
       return ([], false);
     }
   }

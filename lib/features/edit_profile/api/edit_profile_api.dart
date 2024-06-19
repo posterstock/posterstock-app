@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:image/image.dart';
 import 'package:supertokens_flutter/dio.dart';
 import 'package:supertokens_flutter/supertokens.dart';
@@ -44,8 +45,9 @@ class EditProfileApi {
           headers: {'Authorization': 'Bearer $token'},
         ),
       );
-    } on DioError catch(e) {
-      print(e.message);
+    } on DioError catch (e) {
+      Logger.e('Ошибка при удалении аккаунта $e');
+      Logger.e(e.message);
       rethrow;
     }
   }
@@ -58,8 +60,9 @@ class EditProfileApi {
           headers: {'Authorization': 'Bearer $token'},
         ),
       );
-    } on DioError catch(e) {
-      print(e.message);
+    } on DioError catch (e) {
+      Logger.e('Ошибка при блокировке аккаунта $e');
+      Logger.e(e.message);
       rethrow;
     }
   }
@@ -72,8 +75,9 @@ class EditProfileApi {
           headers: {'Authorization': 'Bearer $token'},
         ),
       );
-    } on DioError catch(e) {
-      print(e.message);
+    } on DioError catch (e) {
+      Logger.e('Ошибка при разблокировке аккаунта $e');
+      Logger.e(e.message);
       rethrow;
     }
   }
@@ -84,9 +88,9 @@ class EditProfileApi {
     String? description,
     Uint8List? avatar,
   }) async {
-    print("$name $username $description");
     try {
       try {
+        // ignore: unused_local_variable
         var response = await _dio.post(
           'api/profiles',
           options: Options(
@@ -98,11 +102,10 @@ class EditProfileApi {
           }),
         );
       } catch (e) {
-
+        Logger.e('Ошибка при изменении профиля $e');
       }
       try {
-        print(19);
-        print(username);
+        // ignore: unused_local_variable
         var r1 = await _dio.post(
           'api/profiles/username',
           options: Options(
@@ -112,11 +115,8 @@ class EditProfileApi {
             "username": username,
           }),
         );
-        print(r1.data);
-        print(r1.headers);
       } on DioError catch (e) {
-        print(e.response?.data);
-        print(e.response?.headers);
+        Logger.e('Ошибка при изменении профиля $e');
       }
       if (avatar == null) return;
       Image? img = decodeImage(avatar);
@@ -130,22 +130,21 @@ class EditProfileApi {
         height: img.width,
       );
       im = copyResize(im, width: 300);
-      print(im.width);
 
       var pnImage = encodePng(im);
       FormData formData = FormData.fromMap({
         "image": MultipartFile.fromBytes(pnImage),
       });
-      var responseImage = await _dio.post(
+      await _dio.post(
         'api/profiles/image',
         options: Options(
           headers: {'content-type': 'multipart/form-data'},
         ),
         data: formData,
       );
-      print(responseImage);
     } on DioError catch (e) {
-      print(e.response);
+      Logger.e('Ошибка при изменении аватара $e');
+
       rethrow;
     }
   }

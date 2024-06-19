@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -68,9 +70,9 @@ class PostsCollectionTile extends ConsumerWidget {
         color: Colors.transparent,
         child: PosterImageDialog(
           imagePath: imagePath ?? post?.imagePath ?? '',
-          name: post == null ? null : post!.name,
-          year: post == null ? null : post!.year.toString(),
-          description: post == null ? null : post!.description,
+          name: post?.name,
+          year: post?.year.toString(),
+          description: post?.description,
         ),
       ),
       child: Column(
@@ -355,8 +357,6 @@ class OtherProfileDialog extends ConsumerWidget {
                                       user1!.id,
                                       !user1!.followed,
                                     );
-                                print("GG");
-                                print(user1!.id);
                                 await ref
                                     .read(profileControllerApiProvider)
                                     .follow(

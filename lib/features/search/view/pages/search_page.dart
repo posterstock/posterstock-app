@@ -215,7 +215,7 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
                         ),
                       );
                     }
-                    return SearchUserTile(user: users![index]);
+                    return SearchUserTile(user: users[index]);
                   },
                   separatorBuilder: (BuildContext context, int index) {
                     return Padding(
@@ -281,7 +281,7 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
                       );
                     }
                     return PostBase(
-                      key: Key(posters![index].id.toString()),
+                      key: Key(posters[index].id.toString()),
                       poster: posters[index],
                       showSuggestion: false,
                     );

@@ -15,4 +15,6 @@ class BookmarksIdStateHolder extends StateNotifier<int?> {
   void clearState() {
     state = null;
   }
+
+  int? get currentState => state;
 }

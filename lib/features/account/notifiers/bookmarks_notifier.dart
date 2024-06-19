@@ -18,7 +18,7 @@ class BookmarksNotifier extends StateNotifier<BookmarksState> {
   bool _hasMore = true;
   bool _loading = false;
 
-  int get _id => accountNotifier.account!.id;
+  int get id => accountNotifier.account!.id;
 
   Future<void> _init() async {
     if (accountNotifier.account == null) return;

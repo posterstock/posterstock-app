@@ -36,7 +36,7 @@ class PostGridItemWidget extends StatelessWidget {
 class _PosterTile extends StatelessWidget {
   final PostMovieModel poster;
 
-  const _PosterTile(this.poster, {super.key});
+  const _PosterTile(this.poster);
 
   @override
   Widget build(BuildContext context) {

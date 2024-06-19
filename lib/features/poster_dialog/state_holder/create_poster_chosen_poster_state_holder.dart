@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final createPosterChosenPosterStateHolderProvider =
-StateNotifierProvider<CreatePosterChosenPosterStateHolder, (int, String)?>(
-      (ref) => CreatePosterChosenPosterStateHolder(null),
+    StateNotifierProvider<CreatePosterChosenPosterStateHolder, (int, String)?>(
+  (ref) => CreatePosterChosenPosterStateHolder(null),
 );
 
 class CreatePosterChosenPosterStateHolder
@@ -12,4 +12,6 @@ class CreatePosterChosenPosterStateHolder
   void updateValue((int, String)? value) {
     state = value;
   }
+
+  (int, String)? get currentState => state;
 }

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:supertokens_flutter/dio.dart';
 import 'package:supertokens_flutter/supertokens.dart';
 
@@ -50,7 +51,7 @@ class BookmarksService {
         !response.data['has_more'],
       );
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при получении закладок $e');
     }
     return ([], false);
   }

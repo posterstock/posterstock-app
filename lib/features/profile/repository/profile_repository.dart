@@ -1,3 +1,4 @@
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:poster_stock/features/home/models/list_base_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
@@ -28,7 +29,7 @@ class ProfileRepository implements IProfileRepository {
         result.$2
       );
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при получении постеров $e');
     }
     return (<PostMovieModel>[], true);
   }
@@ -52,7 +53,7 @@ class ProfileRepository implements IProfileRepository {
         result.$2
       );
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при получении постеров $e');
     }
     return (<PostMovieModel>[], false);
   }
@@ -68,7 +69,7 @@ class ProfileRepository implements IProfileRepository {
               .toList() ??
           [];
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при получении списков $e');
     }
     return [];
   }

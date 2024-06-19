@@ -297,8 +297,6 @@ class AuthPage extends ConsumerWidget {
             state: credential.state,
             clientId: credential.identityToken,
           );
-      print(success);
-      print(12);
       if (success) {
         await ref.watch(router)!.replaceNamed('/');
         /*ref.watch(router)!.pushAndPopUntil(
@@ -323,6 +321,7 @@ class AuthPage extends ConsumerWidget {
         clientId: Platform.isIOS
             ? '405674784124-v0infd39p5s4skn9s89cg57a6i00ferr.apps.googleusercontent.com'
             : (kDebugMode && false
+                // ignore: dead_code
                 ? '405674784124-buqlusrif3nur8sqk7li6u1ruq6votji.apps.googleusercontent.com'
                 : '405674784124-srh0usjhjk28idl1mhqj1oo3ipktujlb.apps.googleusercontent.com'),
         serverClientId:
@@ -349,7 +348,6 @@ class AuthPage extends ConsumerWidget {
             email: result?.email,
           );
       if (success) {
-        print("OKEE");
         ref.read(authControllerProvider).stopLoading();
         await ref.watch(router)!.replaceNamed('/');
         /*ref.watch(router)!.pushAndPopUntil(
@@ -361,14 +359,14 @@ class AuthPage extends ConsumerWidget {
       }
     } on DioError catch (e) {
       scaffoldMessengerKey.currentState?.showSnackBar(SnackBars.build(
+          // ignore: use_build_context_synchronously
           context,
           null,
-          (e.response?.headers ?? " ").toString() +
-              "\n" +
-              (e.response?.data.toString() ?? "")));
+          "${e.response?.headers ?? " "}\n${e.response?.data.toString() ?? ""}"));
       ref.read(authControllerProvider).stopLoading();
     } catch (e) {
       scaffoldMessengerKey.currentState
+          // ignore: use_build_context_synchronously
           ?.showSnackBar(SnackBars.build(context, null, e.toString()));
       ref.read(authControllerProvider).stopLoading();
     }
@@ -401,7 +399,6 @@ class AuthPage extends ConsumerWidget {
               ..removeUsernameError();
           });
         } else {
-          print("FF");
           ref.watch(router)!.pushNamed('/auth/login').then((value) {
             ref.read(authControllerProvider).stopLoading();
             ref.read(signUpControllerProvider)

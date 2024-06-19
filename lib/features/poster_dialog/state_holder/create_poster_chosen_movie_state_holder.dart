@@ -12,4 +12,6 @@ class CreatePosterChoseMovieStateHolder extends StateNotifier<MediaModel?> {
   void updateValue(MediaModel? value) {
     state = value;
   }
+
+  MediaModel? get currentState => state;
 }

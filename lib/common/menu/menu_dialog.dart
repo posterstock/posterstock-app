@@ -66,7 +66,6 @@ class MenuDialog extends StatelessWidget {
                       : const SizedBox(),
             )
             .toList(),
-        //FIXME: crunch: dialog show behind navigationBar
         SizedBox(height: MediaQuery.of(context).padding.bottom)
       ],
     );

@@ -14,7 +14,7 @@ import 'package:poster_stock/features/create_list/state_holders/chosen_cover_sta
 import 'package:poster_stock/features/create_list/state_holders/create_list_chosen_poster_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/list_search_posters_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/lists_search_value_state_holder.dart';
-import 'package:poster_stock/features/create_list/view/widgets/%D1%81hoose_poster_tile.dart';
+import 'package:poster_stock/features/create_list/view/widgets/choose_poster_tile.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/poster/view/widgets/poster_tile.dart';
@@ -59,11 +59,10 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
   }
 
   Future<bool> tryExit(WidgetRef ref) async {
-    print(exiting);
     if (exiting) return false;
     exiting = true;
     var list = ref.read(listSearchValueStateHolderProvider);
-    print(list);
+
     if (list.isEmpty) {
       exiting = false;
       ref.read(menuControllerProvider).hideMenu();
@@ -180,7 +179,6 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
       posters = postersSearch ?? List.generate(12, (_) => null);
     }
     dragController.addListener(() async {
-      print(dragController.size);
       if (dragController.size < 0.1) {
         if (!disposed && !popping) {
           popping = true;
@@ -199,6 +197,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
           ref.read(listSearchValueStateHolderProvider.notifier).clearState();
           popping = false;
           disposed = true;
+          // ignore: use_build_context_synchronously
           if (Navigator.of(context).canPop()) Navigator.of(context).pop();
         }
       }
@@ -244,7 +243,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                         .read(listSearchValueStateHolderProvider.notifier)
                         .clearState();
                     ref.read(pickCoverControllerProvider).clearAll();
-                    print("POP BBB");
+                    // ignore: use_build_context_synchronously
                     Navigator.pop(context);
                   },
                   child: Container(
@@ -517,6 +516,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                     } catch (e) {
                                       scaffoldMessengerKey.currentState
                                           ?.showSnackBar(
+                                        // ignore: use_build_context_synchronously
                                         SnackBars.build(context, null,
                                             "Could not pick image"),
                                       );
@@ -525,6 +525,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                     if (image == null) {
                                       scaffoldMessengerKey.currentState
                                           ?.showSnackBar(
+                                        // ignore: use_build_context_synchronously
                                         SnackBars.build(context, null,
                                             "Could not pick image"),
                                       );
@@ -614,7 +615,6 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                             onTap: () async {
                               loading = true;
                               setState(() {});
-                              print('>>>>>>>>>>> begin');
                               await ref
                                   .read(pickCoverControllerProvider)
                                   .createList(
@@ -623,7 +623,6 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                     context: context,
                                   );
                               if (context.mounted) {
-                                print("POP CCC");
                                 Navigator.pop(context);
                                 ref.read(menuControllerProvider).switchMenu();
                               }

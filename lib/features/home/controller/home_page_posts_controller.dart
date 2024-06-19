@@ -1,3 +1,4 @@
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/home/repository/cached_home_repository.dart';
 import 'package:poster_stock/features/home/repository/home_page_posts_repository.dart';
@@ -52,7 +53,7 @@ class HomePagePostsController {
         await homePagePostsState.updateStateEnd(result?.$1);
       }
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при получении постов $e');
     }
     gettingPosts = false;
   }

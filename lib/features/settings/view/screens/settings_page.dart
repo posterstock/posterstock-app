@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -390,7 +393,7 @@ class SettingsPage extends ConsumerWidget {
                                     .read(signUpControllerProvider)
                                     .removeFCMToken();
                                 ref
-                                    ?.read(notificationsCountStateHolderProvider
+                                    .read(notificationsCountStateHolderProvider
                                         .notifier)
                                     .updateState(0);
                                 await FirebaseMessaging.instance.deleteToken();
@@ -398,7 +401,9 @@ class SettingsPage extends ConsumerWidget {
                               try {
                                 try {
                                   await EditProfileApi().deleteAccount();
-                                } catch (e) {}
+                                } catch (e) {
+                                  Logger.e('Ошибка при удалении аккаунта $e');
+                                }
                                 TokenKeeper.token = null;
                                 await prefs.remove('token');
                                 await prefs.remove('google');
@@ -407,12 +412,15 @@ class SettingsPage extends ConsumerWidget {
                                 apple = false;
                                 google = false;
                                 email = null;
-                              } catch (e) {}
+                              } catch (e) {
+                                Logger.e('Ошибка при удалении аккаунта $e');
+                              }
                               ref.read(authControllerProvider).stopLoading();
                               ref.watch(router)!.pushAndPopUntil(AuthRoute(),
                                   predicate: (value) => false);
-                              if (Navigator.canPop(context))
+                              if (Navigator.canPop(context)) {
                                 Navigator.pop(context);
+                              }
                             },
                             onTap: () async {
                               final prefs =
@@ -422,7 +430,7 @@ class SettingsPage extends ConsumerWidget {
                                     .read(signUpControllerProvider)
                                     .removeFCMToken();
                                 ref
-                                    ?.read(notificationsCountStateHolderProvider
+                                    .read(notificationsCountStateHolderProvider
                                         .notifier)
                                     .updateState(0);
                                 await FirebaseMessaging.instance.deleteToken();
@@ -437,12 +445,15 @@ class SettingsPage extends ConsumerWidget {
                                 apple = false;
                                 google = false;
                                 email = null;
-                              } catch (e) {}
+                              } catch (e) {
+                                Logger.e('Ошибка при выходе $e');
+                              }
                               ref.read(authControllerProvider).stopLoading();
                               ref.watch(router)!.pushAndPopUntil(AuthRoute(),
                                   predicate: (value) => false);
-                              if (Navigator.canPop(context))
+                              if (Navigator.canPop(context)) {
                                 Navigator.pop(context);
+                              }
                             },
                           ),
                         ),

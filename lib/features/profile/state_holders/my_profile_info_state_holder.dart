@@ -16,4 +16,6 @@ class MyProfileInfoStateHolder extends StateNotifier<UserDetailsModel?> {
   Future<void> clearState() async {
     state = null;
   }
+
+  UserDetailsModel? get currentState => state;
 }

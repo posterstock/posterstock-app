@@ -311,7 +311,7 @@ class _MovieCardPageViewContent extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextOrContainer(
-              text: movie != null ? movie!.name : null,
+              text: movie?.name,
               overflow: TextOverflow.ellipsis,
               style: context.textStyles.subheadlineBold!,
               emptyWidth: 146,
@@ -322,7 +322,7 @@ class _MovieCardPageViewContent extends ConsumerWidget {
               height: movie != null ? 5 : 8,
             ),
             TextOrContainer(
-              text: movie != null ? movie!.year.toString() : null,
+              text: movie?.year.toString(),
               style: context.textStyles.caption1!.copyWith(
                 color: context.colors.textsSecondary,
               ),

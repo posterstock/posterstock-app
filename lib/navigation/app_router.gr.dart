@@ -31,7 +31,7 @@ import 'package:poster_stock/features/poster/view/pages/poster_page/poster_page.
     as _i13;
 import 'package:poster_stock/features/search/view/pages/search_page.dart'
     as _i14;
-import 'package:poster_stock/features/settings/view/screens/change_email_%20code_screen.dart'
+import 'package:poster_stock/features/settings/view/screens/change_email_code_screen.dart'
     as _i4;
 import 'package:poster_stock/features/settings/view/screens/change_email_screen.dart'
     as _i5;

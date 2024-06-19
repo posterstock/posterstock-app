@@ -1,8 +1,5 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
-import 'package:logger/logger.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:poster_stock/features/home/data/i_home_page_api.dart';
 import 'package:supertokens_flutter/dio.dart';
 import 'package:supertokens_flutter/supertokens.dart';
@@ -58,8 +55,7 @@ class HomePageApi implements IHomePageApi {
       if (!getNewPosts) postsCursor = response.data['next_cursor'] as String?;
       return (response.data as Map<String, dynamic>?, loadedAll);
     } on DioError catch (e) {
-      print(e.response?.data);
-      print(e.response?.headers);
+      Logger.e('Ошибка при получении постов $e');
       rethrow;
     }
   }
@@ -68,14 +64,14 @@ class HomePageApi implements IHomePageApi {
   Future<void> setLike(int id, bool like) async {
     try {
       if (like) {
-        var response = await _dio.post(
+        await _dio.post(
           'api/posters/$id/like',
           options: Options(
             headers: {'Authorization': 'Bearer $token'},
           ),
         );
       } else {
-        var response = await _dio.post(
+        await _dio.post(
           'api/posters/$id/unlike',
           options: Options(
             headers: {'Authorization': 'Bearer $token'},
@@ -83,6 +79,7 @@ class HomePageApi implements IHomePageApi {
         );
       }
     } on DioError catch (e) {
+      Logger.e('Ошибка при постановке лайка $e');
       rethrow;
     }
   }
@@ -91,14 +88,14 @@ class HomePageApi implements IHomePageApi {
   Future<void> setLikeList(int id, bool like) async {
     try {
       if (like) {
-        var response = await _dio.post(
+        await _dio.post(
           'api/lists/$id/like',
           options: Options(
             headers: {'Authorization': 'Bearer $token'},
           ),
         );
       } else {
-        var response = await _dio.post(
+        await _dio.post(
           'api/lists/$id/unlike',
           options: Options(
             headers: {'Authorization': 'Bearer $token'},
@@ -106,6 +103,7 @@ class HomePageApi implements IHomePageApi {
         );
       }
     } on DioError catch (e) {
+      Logger.e('Ошибка при постановке лайка $e');
       rethrow;
     }
   }

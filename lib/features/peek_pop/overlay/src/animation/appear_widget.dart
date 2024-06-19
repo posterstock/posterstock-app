@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
@@ -18,18 +17,23 @@ class AppearWidget extends StatefulWidget {
   final Duration _duration;
   final AppearStyle _style;
 
-  AppearWidget({required Widget child, required progress, required Duration duration, AppearStyle style = AppearStyle.opacity}):
-      _child = child,
-      _progress = progress,
-      _duration = duration,
-      _style = style;
+  const AppearWidget(
+      {super.key,
+      required Widget child,
+      required progress,
+      required Duration duration,
+      AppearStyle style = AppearStyle.opacity})
+      : _child = child,
+        _progress = progress,
+        _duration = duration,
+        _style = style;
 
   @override
-  _AppearWidgetState createState() => _AppearWidgetState();
+  AppearWidgetState createState() => AppearWidgetState();
 }
 
-class _AppearWidgetState extends State<AppearWidget> with SingleTickerProviderStateMixin {
-
+class AppearWidgetState extends State<AppearWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late StreamSubscription _subscription;
 
@@ -57,15 +61,15 @@ class _AppearWidgetState extends State<AppearWidget> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _controller,
-      child: widget._child,
-      builder: (_, child) => Opacity(
-      opacity: _controller.value,
-      child: child,
-    ));
+        animation: _controller,
+        child: widget._child,
+        builder: (_, child) => Opacity(
+              opacity: _controller.value,
+              child: child,
+            ));
   }
 
-  Widget _getWidget(Widget? child, double progress) {
+  Widget getWidget(Widget? child, double progress) {
     switch (widget._style) {
       case AppearStyle.opacity:
         return Opacity(
@@ -73,10 +77,10 @@ class _AppearWidgetState extends State<AppearWidget> with SingleTickerProviderSt
           child: child,
         );
       default:
-      return Opacity(
-        opacity: progress,
-        child: child,
-      );
+        return Opacity(
+          opacity: progress,
+          child: child,
+        );
     }
   }
 }

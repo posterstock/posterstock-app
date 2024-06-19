@@ -46,7 +46,7 @@ class MenuController {
 
   void jumpToPage(int page, BuildContext context, WidgetRef ref) {
     FocusScope.of(context).unfocus();
-    if (previousPageState.state.isNotEmpty) {
+    if (previousPageState.currentState.isNotEmpty) {
       ref.watch(router)!.popUntilRouteWithPath('/');
     }
     if (menuValue == true) {
@@ -63,7 +63,7 @@ class MenuController {
     if (menuValue == true) {
       menuState.updateState(!menuValue);
     }
-    final page = previousPageState.state.last;
+    final page = previousPageState.currentState.last;
     previousPageState.removeLast();
     routerState.updatePage(page);
     pagesState.updatePage(page);

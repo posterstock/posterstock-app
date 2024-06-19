@@ -1,8 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:poster_stock/common/data/dio_keeper.dart';
-import 'package:poster_stock/features/profile/models/user_details_model.dart';
-import 'package:supertokens_flutter/dio.dart';
-import 'package:supertokens_flutter/supertokens.dart';
 
 class UsersListService {
   final Dio _dio = DioKeeper.getDio();
@@ -18,7 +16,6 @@ class UsersListService {
     if (followers != this.followers || lastId != id) {
       cursor = null;
     }
-    print(cursor);
     this.followers = followers;
     lastId = id;
     try {
@@ -32,14 +29,13 @@ class UsersListService {
           'cursor': cursor,
         },
       );
-      print(response.data);
       cursor = response.data['next_cursor'];
-      print(cursor);
       return (
         response.data['users_short'] as List<dynamic>? ?? [],
         !response.data['has_more']
       );
     } on DioError catch (e) {
+      Logger.e('Ошибка при получении списка пользователей $e');
       rethrow;
     }
   }

@@ -1,10 +1,9 @@
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/list/repository/list_repository.dart';
 import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
 import 'package:poster_stock/features/list/view/list_page.dart';
-import 'package:poster_stock/features/poster/repository/post_repository.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
-import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 
 final listsControllerProvider = Provider<ListsController>(
@@ -59,7 +58,7 @@ class ListsController {
       final result = await postRepository.getPost(id);
       await posterStateHolder.updateState(result);
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при получении поста $e');
       loadingPost = false;
     }
     loadingPost = false;
@@ -67,7 +66,7 @@ class ListsController {
 
   Future<void> getSpecialList(ListType type) async {
     final result = await postRepository.getSpecialList(
-      profileStateHolder.state!.id,
+      profileStateHolder.currentState!.id,
       type,
     );
     await posterStateHolder.updateState(result);

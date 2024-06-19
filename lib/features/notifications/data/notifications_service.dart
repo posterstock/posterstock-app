@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:poster_stock/features/notifications/data/i_notifications_service.dart';
 import 'package:supertokens_flutter/dio.dart';
 import 'package:supertokens_flutter/supertokens.dart';
@@ -49,12 +50,11 @@ class NotificationsService implements INotificationsService {
       );
       if (response.data['hasMore'] == false) loadedAll = true;
       if (!getNewPosts) cursor = response.data['next_cursor'];
-      print(response.data);
       return response.data;
     } on DioError catch (e) {
-      print(e.message);
-      print(e.response);
-      print(e.response?.headers);
+      Logger.e('Ошибка при получении уведомлений $e');
+      Logger.e(e.message);
+
       rethrow;
     }
   }

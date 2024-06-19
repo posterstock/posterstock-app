@@ -1,3 +1,4 @@
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/notifications/repositories/notifications_repository.dart';
 import 'package:poster_stock/features/notifications/state_holders/notifications_state_holder.dart';
@@ -39,7 +40,7 @@ class NotificationsController {
       //   notificationsState.updateState(nots);
       // }
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при получении уведомлений $e');
     }
     loading = false;
   }

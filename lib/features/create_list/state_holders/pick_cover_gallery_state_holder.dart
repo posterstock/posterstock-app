@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager/photo_manager.dart';
 
@@ -18,5 +16,4 @@ class PickCoverGalleryStateHolder extends StateNotifier<List<AssetEntity?>> {
   void addElements(List<AssetEntity?> images) {
     state = [...state, ...images];
   }
-
 }

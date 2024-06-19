@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:poster_stock/common/constants/languages.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:supertokens_flutter/dio.dart';
@@ -42,10 +43,10 @@ class CreatePosterService {
           },
         ),
       );
-      print(response.data);
       return response.data;
     } on DioError catch (e) {
-      print(e.response?.headers);
+      Logger.e('Ошибка при создании закладки $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -69,10 +70,11 @@ class CreatePosterService {
           },
         ),
       );
-      print(response.data);
+
       return response.data;
     } on DioError catch (e) {
-      print(e.response?.headers);
+      Logger.e('Ошибка при создании постера $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -92,10 +94,11 @@ class CreatePosterService {
           },
         ),
       );
-      print(response.data);
+
       return response.data;
     } on DioError catch (e) {
-      print(e.response?.headers);
+      Logger.e('Ошибка при редактировании постера $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -113,18 +116,16 @@ class CreatePosterService {
             'query': searchValue,
             'lang': language.locale.toLanguageTag(),
           });
-      print(response.data);
       return response.data;
     } on DioError catch (e) {
-      print(e.response);
+      Logger.e('Ошибка при поиске медиа $e');
+      Logger.e(e.response);
       rethrow;
     }
   }
 
   Future<Map<String, dynamic>> getMediaPosters(
       String mediaType, int mediaId) async {
-    print(mediaType);
-    print(mediaId);
     token = await SuperTokens.getAccessToken();
     try {
       var response = await _dio.get(
@@ -133,10 +134,10 @@ class CreatePosterService {
           headers: {'Authorization': 'Bearer $token'},
         ),
       );
-      print(response.data);
       return response.data;
     } on DioError catch (e) {
-      print(e.response);
+      Logger.e('Ошибка при получении постеров $e');
+      Logger.e(e.response);
       rethrow;
     }
   }

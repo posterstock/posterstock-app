@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -146,7 +149,9 @@ class _ListPageState extends ConsumerState<ListPage>
               .stackData
               .lastWhere((element) => element.route.path == '/list/:id');
           ref.read(listsControllerProvider).getPost(el.pathParams.getInt('id'));
-        } catch (e) {}
+        } catch (e) {
+          Logger.e('Ошибка при получении списка $e');
+        }
       });
     }
     final comments = ref.watch(commentsStateHolderProvider);
@@ -235,7 +240,7 @@ class _ListPageState extends ConsumerState<ListPage>
                     ],
                   ),
                   SliverPadding(
-                    padding: EdgeInsets.only(bottom: 16.0),
+                    padding: const EdgeInsets.only(bottom: 16.0),
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
@@ -483,7 +488,7 @@ class CollectionInfoWidget extends ConsumerWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              Spacer(),
+              const Spacer(),
               LikeButton(
                 amount: post?.likes ?? 0,
                 liked: post?.liked ?? false,
@@ -501,7 +506,7 @@ class CollectionInfoWidget extends ConsumerWidget {
                       );
                 },
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               ReactionButton(
                 iconPath: 'assets/icons/ic_comment2.svg',
                 iconColor: context.colors.iconsDisabled!,
@@ -722,7 +727,7 @@ class ListActionsDialog extends ConsumerWidget {
                                       ),
                                     );
                                   } catch (_) {
-                                    print(_);
+                                    Logger.e('Ошибка при удалении списка $_');
                                     scaffoldMessengerKey.currentState
                                         ?.showSnackBar(
                                       SnackBars.build(

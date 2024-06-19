@@ -26,8 +26,5 @@ class UsersListRepository {
     _api.followers = null;
     _api.lastId = null;
     _api.cursor = null;
-    print(_api.lastId);
-    print(_api.followers);
-    print('end2');
   }
 }

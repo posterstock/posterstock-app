@@ -49,8 +49,6 @@ class NavigationPage extends ConsumerWidget {
       }
     });
     Future(() {
-      print(TokenKeeper.token);
-      print(18881);
       if (TokenKeeper.token == null) {
         rtr?.replaceNamed(
           '/auth',

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:davinci/core/davinci_capture.dart';
@@ -78,7 +80,7 @@ class PickCoverController {
     required BuildContext context,
   }) async {
     try {
-      bool generated = chosenCoverStateHolder.state == null;
+      bool generated = chosenCoverStateHolder.currentState == null;
       Uint8List? image = await showScreenshot(context);
       bool? value = await repository.createList(
         title: title,
@@ -118,8 +120,8 @@ class PickCoverController {
   }
 
   Future<Uint8List?> showScreenshot(BuildContext context) async {
-    if (chosenCoverStateHolder.state != null) {
-      return File(chosenCoverStateHolder.state!).readAsBytesSync();
+    if (chosenCoverStateHolder.currentState != null) {
+      return File(chosenCoverStateHolder.currentState!).readAsBytesSync();
     }
     int width = MediaQuery.of(context).size.width.toInt();
     Widget widget;
@@ -219,8 +221,10 @@ class PickCoverController {
     });
     if (loadedAll) return;
     if (stop) return;
-    final list =
-        await repository.searchPosts(value, myProfileInfoStateHolder.state!.id);
+    final list = await repository.searchPosts(
+      value,
+      myProfileInfoStateHolder.currentState!.id,
+    );
     loadedAll = list.$2;
     if (searchValue == value) {
       searchPostsStateHolder.updateState(list.$1);

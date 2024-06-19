@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/constants/durations.dart';
@@ -884,8 +887,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                 );
                 AutoRouter.of(context).pop();
               } catch (e) {
-                print("FEF");
-                print(e);
+                Logger.e('Ошибка при удалении постера $e');
                 scaffoldMessengerKey.currentState?.showSnackBar(
                   SnackBars.build(
                     context,
