@@ -12,6 +12,7 @@ import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/comment_text_field.dart';
+import 'package:poster_stock/features/account/notifiers/lists_notifier.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
@@ -716,6 +717,10 @@ class ListActionsDialog extends ConsumerWidget {
                                     ref
                                         .read(profileControllerApiProvider)
                                         .getUserInfo(null, context);
+                                    await ref
+                                        .read(
+                                            accountListsStateNotifier.notifier)
+                                        .reload();
                                     Navigator.of(context).pop();
                                     ref.watch(router)!.pop();
                                     scaffoldMessengerKey.currentState
