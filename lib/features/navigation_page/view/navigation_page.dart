@@ -29,9 +29,10 @@ class NavigationPage extends ConsumerWidget {
   NavigationPage({Key? key}) : super(key: navigationKey);
 
   @override
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     Future(() async {
-      ref.read(profileControllerApiProvider).getUserInfo(null);
+      ref.read(profileControllerApiProvider).getUserInfo(null, context);
       final prefs = await SharedPreferences.getInstance();
       int count = prefs.getInt('notification_count') ?? 0;
       ref
@@ -58,7 +59,12 @@ class NavigationPage extends ConsumerWidget {
       }
     });
     final pageTransitionController =
-        ref.watch(pageTransitionControllerStateHolder)!;
+        ref.watch(pageTransitionControllerStateHolder);
+
+    if (pageTransitionController == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+
     return AnimatedBuilder(
       animation: pageTransitionController,
       builder: (context, child) {
@@ -77,10 +83,7 @@ class NavigationPage extends ConsumerWidget {
         physics: const NeverScrollableScrollPhysics(),
         routes: const [
           PageRouteInfo(HomeRoute.name),
-          // const PageRouteInfo(SearchRoute.name),
-          // const NotificationsRoute(),
           AccountRoute(),
-          // ProfileRoute()
         ],
         builder: (context, child, _) {
           return WillPopScope(

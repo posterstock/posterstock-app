@@ -163,7 +163,7 @@ class EditProfilePage extends ConsumerWidget {
                                     .save();
                                 await ref
                                     .read(profileControllerApiProvider)
-                                    .getUserInfo(null);
+                                    .getUserInfo(null, context);
                                 ref
                                     .read(editProfileControllerProvider)
                                     .setLoading(false);

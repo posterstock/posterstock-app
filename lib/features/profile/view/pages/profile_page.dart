@@ -542,7 +542,7 @@ class OtherProfileDialog extends ConsumerWidget {
                                         );
                                         ref
                                             .read(profileControllerApiProvider)
-                                            .getUserInfo(null);
+                                            .getUserInfo(null, context);
                                         Navigator.pop(context);
                                       } catch (_) {
                                         scaffoldMessengerKey.currentState

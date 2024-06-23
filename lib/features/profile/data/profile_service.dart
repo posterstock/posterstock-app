@@ -107,7 +107,7 @@ class ProfileService {
 
   Future<bool?> getBlocked(int id) async {
     try {
-      final response = await _dio.post(
+      final response = await _dio.get(
         '/api/users/$id/blocked',
       );
       return response.data as bool;

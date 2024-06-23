@@ -899,7 +899,9 @@ class _PosterPageState extends ConsumerState<PosterPage>
               }
               final myself = ref.watch(profileInfoStateHolderProvider)?.mySelf;
               if (myself != false) {
-                ref.read(profileControllerApiProvider).getUserInfo(null);
+                ref
+                    .read(profileControllerApiProvider)
+                    .getUserInfo(null, context);
               }
             }
           },

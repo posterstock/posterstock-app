@@ -89,7 +89,7 @@ class PickCoverController {
         image: image,
         generated: generated,
       );
-      profileControllerApi.getUserInfo(null);
+      profileControllerApi.getUserInfo(null, context);
       if (value == false) {
         scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBars.build(

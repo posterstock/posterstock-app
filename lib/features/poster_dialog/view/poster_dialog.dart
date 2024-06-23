@@ -368,12 +368,13 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
               if (widget.postMovieModel == null) {
                 await ref
                     .read(createPosterControllerProvider)
-                    .createPoster(descController.text);
+                    .createPoster(descController.text, context);
               } else {
                 await ref.read(createPosterControllerProvider).editPoster(
                     widget.postMovieModel!.id,
                     widget.postMovieModel!.imagePath,
-                    descController.text);
+                    descController.text,
+                    context);
               }
             } catch (_) {
               Logger.e('Ошибка при создании постера $_');
@@ -451,7 +452,7 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                         .updateValue(true);
                     await ref
                         .read(createPosterControllerProvider)
-                        .createBookmark();
+                        .createBookmark(context);
                   } catch (_) {
                     Logger.e('Ошибка при создании закладки $_');
                   }

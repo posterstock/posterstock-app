@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/account/notifiers/bookmarks_notifier.dart';
@@ -92,7 +93,7 @@ class CreatePosterController {
     createPosterChosenPosterStateHolder.updateValue(poster);
   }
 
-  Future<void> createPoster(String description) async {
+  Future<void> createPoster(String description, BuildContext context) async {
     var mediaState = createPosterChoseMovieStateHolder.currentState;
     var image = createPosterChosenPosterStateHolder.currentState;
     try {
@@ -103,7 +104,7 @@ class CreatePosterController {
           description,
           languages.currentState!);
       posterNotifier.reload();
-      profileControllerApi.getUserInfo(null); //TODO: redundant
+      profileControllerApi.getUserInfo(null, context); //TODO: redundant
     } catch (e) {
       Logger.e('Ошибка при создании постера $e');
     }
@@ -114,7 +115,8 @@ class CreatePosterController {
     createPosterImagesStateHolder.setValue([]);
   }
 
-  Future<void> editPoster(int id, String image, String description) async {
+  Future<void> editPoster(
+      int id, String image, String description, BuildContext context) async {
     var selectedImage = createPosterChosenPosterStateHolder.currentState;
     if (selectedImage != null) {
       image = selectedImage.$2;
@@ -122,7 +124,8 @@ class CreatePosterController {
     try {
       await createPosterRepository.editPoster(id, image, description);
       posterNotifier.reload();
-      profileControllerApi.getUserInfo(null);
+      // ignore: use_build_context_synchronously
+      profileControllerApi.getUserInfo(null, context);
     } catch (e) {
       Logger.e('Ошибка при редактировании постера $e');
     }
@@ -132,7 +135,7 @@ class CreatePosterController {
     createPosterImagesStateHolder.setValue([]);
   }
 
-  Future<void> createBookmark() async {
+  Future<void> createBookmark(BuildContext context) async {
     var mediaState = createPosterChoseMovieStateHolder.currentState;
     var image = createPosterChosenPosterStateHolder.currentState;
     try {
@@ -143,7 +146,8 @@ class CreatePosterController {
         languages.currentState!,
       );
       bookmarkNotifier.reload();
-      profileControllerApi.getUserInfo(null); //TODO: redundant
+      // ignore: use_build_context_synchronously
+      profileControllerApi.getUserInfo(null, context); //TODO: redundant
     } catch (e) {
       Logger.e('Ошибка при создании закладки $e');
     }

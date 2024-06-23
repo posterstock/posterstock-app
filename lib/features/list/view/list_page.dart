@@ -715,7 +715,7 @@ class ListActionsDialog extends ConsumerWidget {
                                         .deleteList(list.id);
                                     ref
                                         .read(profileControllerApiProvider)
-                                        .getUserInfo(null);
+                                        .getUserInfo(null, context);
                                     Navigator.of(context).pop();
                                     ref.watch(router)!.pop();
                                     scaffoldMessengerKey.currentState

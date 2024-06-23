@@ -8,6 +8,7 @@ import 'package:poster_stock/common/helpers/custom_ink_well.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/common/widgets/description_textfield.dart';
+import 'package:poster_stock/features/account/notifiers/lists_notifier.dart';
 import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
 import 'package:poster_stock/features/create_list/state_holders/chosen_cover_state_holder.dart';
@@ -624,8 +625,10 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                   );
                               if (context.mounted) {
                                 Navigator.pop(context);
-                                ref.read(menuControllerProvider).switchMenu();
                               }
+                              await ref
+                                  .read(accountListsStateNotifier.notifier)
+                                  .reload();
                               loading = false;
                               setState(() {});
                             },

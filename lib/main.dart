@@ -6,6 +6,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -167,6 +168,7 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
     });
     return MaterialApp.router(
       routerConfig: App._appRouter!.config(deepLinkBuilder: (deepLink) {
+        Logger.i('diplink == ${deepLink.path} ${deepLink.uri}');
         if (initLink != null) {
           var route =
               App._appRouter!.matcher.match(initLink!)?[0].toPageRouteInfo();
