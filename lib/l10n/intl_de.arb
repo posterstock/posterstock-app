@@ -2,6 +2,8 @@
   "@@locale": "de",
   "account_edit": "Bearbeiten",
   "@account_edit": {},
+  "list_edit": "Liste bearbeiten",
+  "@list_edit": {},
   "account_page_search_hint": "Profile suchen",
   "@account_page_search_hint": {},
   "acounts": "Konten",

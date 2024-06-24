@@ -38,4 +38,8 @@ class ListsNotifier extends StateNotifier<List<ListBaseModel?>> {
   Future<void> reload() async {
     await load();
   }
+
+  ListBaseModel? getListById(int id) {
+    return state[id];
+  }
 }

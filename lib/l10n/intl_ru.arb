@@ -2,6 +2,8 @@
   "@@locale": "ru",
   "account_edit": "Редактировать",
   "@account_edit": {},
+  "list_edit": "Редактировать список",
+  "@list_edit": {},
   "account_page_search_hint": "Поиск пользователей",
   "@account_page_search_hint": {},
   "acounts": "Аккаунты",

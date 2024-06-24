@@ -1,5 +1,6 @@
 import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/list/repository/list_repository.dart';
 import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
 import 'package:poster_stock/features/list/view/list_page.dart';
@@ -74,5 +75,9 @@ class ListsController {
 
   Future<void> deleteList(int id) async {
     await postRepository.deleteList(id);
+  }
+
+  Future<MultiplePostModel> getPostbyId(int id) async {
+    return await postRepository.getPost(id);
   }
 }

@@ -74,20 +74,26 @@ class PickCoverController {
     createListChosenPosterStateHolder.clear();
   }
 
-  Future<void> createList({
-    required String title,
-    required String description,
-    required BuildContext context,
-  }) async {
+  Future<void> createList(
+      {required String title,
+      required String description,
+      required BuildContext context,
+      int? id,
+      String? imagePath}) async {
     try {
       bool generated = chosenCoverStateHolder.currentState == null;
-      Uint8List? image = await showScreenshot(context);
+      Uint8List? image;
+      if (imagePath == null) {
+        image = await showScreenshot(context);
+      }
       bool? value = await repository.createList(
         title: title,
         description: description,
         posters: createListChosenPosterState.map((e) => e.$1).toList(),
         image: image,
         generated: generated,
+        id: id,
+        imagePath: imagePath,
       );
       profileControllerApi.getUserInfo(null, context);
       if (value == false) {

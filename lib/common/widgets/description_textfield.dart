@@ -10,7 +10,7 @@ class DescriptionTextField extends StatefulWidget {
       {super.key,
       this.hint,
       this.showDivider = true,
-      this.button,
+      required this.button,
       this.maxSymbols = 140,
       this.buttonAddCheck = true,
       this.controller,
@@ -21,7 +21,7 @@ class DescriptionTextField extends StatefulWidget {
 
   final String? hint;
   final bool showDivider;
-  final String? button;
+  final String button;
   final int maxSymbols;
   final bool buttonAddCheck;
   final bool buttonLoading;
@@ -98,7 +98,7 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
               SizedBox(
                 height: 32,
                 width: TextInfoService.textSize(
-                      widget.button ?? context.txt.listCreate_create,
+                      widget.button,
                       context.textStyles.calloutBold!.copyWith(
                         color: context.colors.textsBackground,
                       ),
@@ -127,7 +127,7 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
                                 ),
                         )
                       : Text(
-                          widget.button ?? context.txt.listCreate_create,
+                          widget.button,
                           style: context.textStyles.calloutBold!.copyWith(
                             color: context.colors.textsBackground,
                           ),

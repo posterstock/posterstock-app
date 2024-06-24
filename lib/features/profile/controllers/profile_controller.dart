@@ -1,6 +1,5 @@
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/account/account_cache.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';

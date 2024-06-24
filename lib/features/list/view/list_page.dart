@@ -7,6 +7,7 @@ import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gap/gap.dart';
 import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
@@ -14,6 +15,7 @@ import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/comment_text_field.dart';
 import 'package:poster_stock/features/account/notifiers/lists_notifier.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
+import 'package:poster_stock/features/create_list/view/create_list_dialog.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
@@ -23,6 +25,7 @@ import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/list/controller/list_controller.dart';
 import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
+import 'package:poster_stock/features/list/view/menu_item.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
@@ -591,7 +594,7 @@ class ListActionsDialog extends ConsumerWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: SizedBox(
-        height: list!.author.id != myself?.id ? 310 : 255,
+        height: list!.author.id != myself?.id ? 340 : 285,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Scaffold(
@@ -601,7 +604,7 @@ class ListActionsDialog extends ConsumerWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16.0),
                   child: SizedBox(
-                    height: list.author.id != myself?.id ? 190 : 145,
+                    height: list.author.id != myself?.id ? 240 : 195,
                     child: Material(
                       color: context.colors.backgroundsPrimary,
                       child: Column(
@@ -617,152 +620,133 @@ class ListActionsDialog extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          if (list.author.id != myself?.id)
-                            Divider(
-                              height: 0.5,
-                              thickness: 0.5,
-                              color: context.colors.fieldsDefault,
-                            ),
-                          if (list.author.id != myself?.id)
-                            Expanded(
-                              child: InkWell(
-                                onTap: () {
-                                  ref
-                                      .read(homePagePostsControllerProvider)
-                                      .setFollowId(list.author.id,
-                                          !list.author.followed);
-                                  ref
-                                      .read(listsStateHolderProvider.notifier)
-                                      .updateState(
-                                        list.copyWith(
-                                          author: list.author.copyWith(
-                                              followed: !list.author.followed),
-                                        ),
-                                      );
-                                  ref.read(profileControllerApiProvider).follow(
-                                        list.author.id,
-                                        list.author.followed,
-                                      );
-                                },
-                                child: Center(
-                                  child: Text(
-                                    '${list.author.followed ? AppLocalizations.of(context)!.unfollow : AppLocalizations.of(context)!.follow} ${list.author.name}',
-                                    style: context.textStyles.bodyRegular!
-                                        .copyWith(
-                                      color: context.colors.textsPrimary,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
                           Divider(
                             height: 0.5,
                             thickness: 0.5,
                             color: context.colors.fieldsDefault,
                           ),
-                          Expanded(
-                            child: InkWell(
+                          if (list.author.id != myself?.id)
+                            MenuItemList(
+                              image: list.author.followed
+                                  ? 'ic_unfollow'
+                                  : 'ic_follow',
+                              text:
+                                  '${list.author.followed ? AppLocalizations.of(context)!.unfollow : AppLocalizations.of(context)!.follow} ${list.author.name}',
                               onTap: () {
-                                final profile = myself!.username;
-                                String link;
-                                switch (type) {
-                                  case ListType.favorited:
-                                    link =
-                                        'https://posterstock.com/$profile/favorites';
-                                    break;
-                                  case ListType.recomends:
-                                    link =
-                                        'https://posterstock.com/$profile/recommends';
-                                    break;
-                                  default:
-                                    link =
-                                        'https://posterstock.com/list/${list.id}';
-                                }
-                                Share.share(link);
+                                ref
+                                    .read(homePagePostsControllerProvider)
+                                    .setFollowId(
+                                        list.author.id, !list.author.followed);
+                                ref
+                                    .read(listsStateHolderProvider.notifier)
+                                    .updateState(
+                                      list.copyWith(
+                                        author: list.author.copyWith(
+                                            followed: !list.author.followed),
+                                      ),
+                                    );
+                                ref.read(profileControllerApiProvider).follow(
+                                      list.author.id,
+                                      list.author.followed,
+                                    );
                               },
-                              child: Center(
-                                child: Text(
-                                  AppLocalizations.of(context)!
-                                      .profile_menu_shareMy,
-                                  style:
-                                      context.textStyles.bodyRegular!.copyWith(
-                                    color: context.colors.textsPrimary,
-                                  ),
-                                ),
-                              ),
                             ),
+                          MenuItemList(
+                            image: 'ic_share',
+                            text: AppLocalizations.of(context)!
+                                .profile_menu_shareMy,
+                            onTap: () {
+                              final profile = myself!.username;
+                              String link;
+                              switch (type) {
+                                case ListType.favorited:
+                                  link =
+                                      'https://posterstock.com/$profile/favorites';
+                                  break;
+                                case ListType.recomends:
+                                  link =
+                                      'https://posterstock.com/$profile/recommends';
+                                  break;
+                                default:
+                                  link =
+                                      'https://posterstock.com/list/${list.id}';
+                              }
+                              Share.share(link);
+                            },
                           ),
-                          Divider(
-                            height: 0.5,
-                            thickness: 0.5,
-                            color: context.colors.fieldsDefault,
+                          MenuItemList(
+                            image: 'ic_edit',
+                            text: AppLocalizations.of(context)!.account_edit,
+                            onTap: () async {
+                              showModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.transparent,
+                                useRootNavigator: true,
+                                isScrollControlled: true,
+                                enableDrag: false,
+                                isDismissible: false,
+                                useSafeArea: true,
+                                builder: (context) =>
+                                    CreateListDialog(id: list.id),
+                              );
+                            },
                           ),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () async {
-                                if (list.author.id != myself?.id) {
+                          MenuItemList(
+                            image: 'ic_trash2',
+                            text: list.author.id != myself?.id
+                                ? AppLocalizations.of(context)!.report
+                                : AppLocalizations.of(context)!.delete,
+                            isRed: true,
+                            onTap: () async {
+                              if (list.author.id != myself?.id) {
+                                scaffoldMessengerKey.currentState?.showSnackBar(
+                                  SnackBars.build(
+                                    context,
+                                    null,
+                                    'Not available yet',
+                                  ),
+                                );
+                              } else {
+                                try {
+                                  await ref
+                                      .read(listsControllerProvider)
+                                      .deleteList(list.id);
+                                  ref
+                                      .read(profileControllerApiProvider)
+                                      .getUserInfo(null, context);
+                                  await ref
+                                      .read(accountListsStateNotifier.notifier)
+                                      .reload();
+                                  Navigator.of(context).pop();
+                                  ref.watch(router)!.pop();
                                   scaffoldMessengerKey.currentState
                                       ?.showSnackBar(
                                     SnackBars.build(
                                       context,
                                       null,
-                                      'Not available yet',
+                                      "List deleted successfully",
                                     ),
                                   );
-                                } else {
-                                  try {
-                                    await ref
-                                        .read(listsControllerProvider)
-                                        .deleteList(list.id);
-                                    ref
-                                        .read(profileControllerApiProvider)
-                                        .getUserInfo(null, context);
-                                    await ref
-                                        .read(
-                                            accountListsStateNotifier.notifier)
-                                        .reload();
-                                    Navigator.of(context).pop();
-                                    ref.watch(router)!.pop();
-                                    scaffoldMessengerKey.currentState
-                                        ?.showSnackBar(
-                                      SnackBars.build(
-                                        context,
-                                        null,
-                                        "List deleted successfully",
-                                      ),
-                                    );
-                                  } catch (_) {
-                                    Logger.e('Ошибка при удалении списка $_');
-                                    scaffoldMessengerKey.currentState
-                                        ?.showSnackBar(
-                                      SnackBars.build(
-                                        context,
-                                        null,
-                                        "Could not delete list",
-                                      ),
-                                    );
-                                  }
+                                } catch (_) {
+                                  Logger.e('Ошибка при удалении списка $_');
+                                  scaffoldMessengerKey.currentState
+                                      ?.showSnackBar(
+                                    SnackBars.build(
+                                      context,
+                                      null,
+                                      "Could not delete list",
+                                    ),
+                                  );
                                 }
-                              },
-                              child: Center(
-                                child: Text(
-                                  list.author.id != myself?.id
-                                      ? AppLocalizations.of(context)!.report
-                                      : AppLocalizations.of(context)!.delete,
-                                  style:
-                                      context.textStyles.bodyRegular!.copyWith(
-                                    color: context.colors.textsError,
-                                  ),
-                                ),
-                              ),
-                            ),
+                              }
+                            },
                           ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const Gap(12),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16.0),
                   child: SizedBox(

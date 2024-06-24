@@ -47,46 +47,65 @@ class CreateListService {
     required List<int> posters,
     Uint8List? image,
     bool? generated = false,
+    int? id,
+    String? imagePath,
   }) async {
+    bool isServerImage = imagePath != null && imagePath.contains('http');
+    String path = (id == null) ? 'api/lists' : 'api/lists/$id/';
+    print('imagePath >>> $isServerImage == $imagePath $title === $path');
     bool created = false;
+    int? thisId = id;
+    Response response;
     try {
-      var response = await _dio.post(
-        'api/lists',
+      response = await _dio.post(
+        (id == null) ? 'api/lists' : 'api/lists/$id',
         data: jsonEncode({
           'description': description,
           'posters': posters,
           'title': title,
         }),
       );
-      created = true;
-      if (image != null) {
-        Image? img = decodeImage(image);
-        Image? im = copyCrop(img!,
-            x: 0,
-            y: (img.height - ((img.width ~/ 195) * 120)) ~/ 2,
-            width: img.width,
-            height: (img.width ~/ 195) * 120);
-        im = copyResize(im, width: 540);
-
-        var pnImage = encodePng(im);
-        FormData formData = FormData.fromMap({
-          "image": MultipartFile.fromBytes(pnImage,
-              filename:
-                  generated == true ? 'generated${pnImage.hashCode}' : null),
-        });
-        await _dio.post(
-          'api/lists/${response.data['id']}/image',
-          options: Options(
-            headers: {'content-type': 'multipart/form-data'},
-          ),
-          data: formData,
-        );
+      if (id == null) {
+        thisId = response.data['id'];
       }
+      created = true;
+      Image? img;
+      if (isServerImage) {
+        var response = await _dio.get(
+          imagePath,
+          options: Options(responseType: ResponseType.bytes),
+        );
+        img = decodeImage(Uint8List.fromList(response.data));
+      } else {
+        img = decodeImage(image!);
+      }
+      Image? im = copyCrop(img!,
+          x: 0,
+          y: (img.height - ((img.width ~/ 195) * 120)) ~/ 2,
+          width: img.width,
+          height: (img.width ~/ 195) * 120);
+      im = copyResize(im, width: 540);
+      var pnImage = encodePng(im);
+      FormData formData = FormData.fromMap({
+        "image": MultipartFile.fromBytes(pnImage,
+            filename:
+                generated == true ? 'generated${pnImage.hashCode}' : null),
+      });
+
+      await _dio.post(
+        'api/lists/$thisId/image',
+        options: Options(
+          headers: {'content-type': 'multipart/form-data'},
+        ),
+        data: formData,
+      );
     } on DioError catch (e) {
+      RequestOptions req = e.requestOptions;
+      Logger.e(
+          'Ошибка при создании списка $e \n${req.data} \n${e.error}  \n${req.uri}');
       if (!created) {
         return false;
       }
-      Logger.e('Ошибка при создании списка $e');
     }
     return null;
   }

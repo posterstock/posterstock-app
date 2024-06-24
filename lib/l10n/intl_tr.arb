@@ -2,6 +2,8 @@
   "@@locale": "tr",
   "account_edit": "Düzenle",
   "@account_edit": {},
+  "list_edit": "Listeyi düzenle",
+  "@list_edit": {},
   "account_page_search_hint": "Profilleri ara",
   "@account_page_search_hint": {},
   "acounts": "Hesaplar",

@@ -12,6 +12,8 @@ class CreateListRepository {
     required List<int> posters,
     Uint8List? image,
     bool? generated,
+    int? id,
+    String? imagePath,
   }) async {
     return await service.createList(
       title: title,
@@ -19,11 +21,17 @@ class CreateListRepository {
       posters: posters,
       image: image,
       generated: generated,
+      id: id,
+      imagePath: imagePath,
     );
   }
 
-  Future<(List<PostMovieModel>, bool)> searchPosts(String value, int userId) async {
+  Future<(List<PostMovieModel>, bool)> searchPosts(
+      String value, int userId) async {
     final rawList = await service.searchPosts(value, userId);
-    return (rawList.$1?.map((e) => PostMovieModel.fromJson(e)).toList() ?? [], rawList.$2);
+    return (
+      rawList.$1?.map((e) => PostMovieModel.fromJson(e)).toList() ?? [],
+      rawList.$2
+    );
   }
 }
