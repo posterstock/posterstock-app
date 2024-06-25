@@ -237,11 +237,14 @@ class _AccountState extends ConsumerState<_AccountScreen>
                 toolbarHeight: 48,
                 pinned: true,
                 leading: const SizedBox(),
-                flexibleSpace: AppTabBar(tabController, [
-                  context.txt.profile_watched,
-                  context.txt.profile_watchlist,
-                  context.txt.lists,
-                ]),
+                flexibleSpace: AppTabBar(
+                  tabController,
+                  [
+                    context.txt.profile_watched,
+                    context.txt.profile_watchlist,
+                    context.txt.lists,
+                  ],
+                ),
               ),
               SliverToBoxAdapter(
                 child: AnimatedBuilder(

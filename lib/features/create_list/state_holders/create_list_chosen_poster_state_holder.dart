@@ -13,7 +13,6 @@ class CreateListChosenPosterStateHolder
   void switchElement((int, String) poster) {
     if (state.any((e) => e.$1 == poster.$1)) {
       state.removeWhere((e) => e.$1 == poster.$1);
-      print('<<<<<<<<<');
       // state.remove(poster);
     } else {
       state.add(poster);

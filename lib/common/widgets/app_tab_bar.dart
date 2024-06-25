@@ -19,11 +19,21 @@ class AppTabBar extends StatelessWidget {
     return TabBar(
       controller: tabController,
       labelColor: context.colors.textsPrimary,
-      indicatorColor: context.colors.iconsActive,
+      // indicatorColor: context.colors.iconsActive,
       labelPadding: const EdgeInsets.symmetric(vertical: 14),
       labelStyle: context.textStyles.subheadlineBold,
-      // unselectedLabelStyle: context.textStyles.subheadline,
+      indicatorSize: TabBarIndicatorSize.tab,
+      dividerColor: context.colors.fieldsDefault,
+      dividerHeight: 1,
       tabs: tabs,
+      indicator: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: context.colors.iconsActive!,
+            width: 2, // Толщина полоски таба
+          ),
+        ),
+      ),
     );
   }
 }

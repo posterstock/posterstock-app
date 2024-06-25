@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 
 import '../overlay_dialog.dart';
 import 'animation/appear_widget.dart';
@@ -109,7 +110,7 @@ class DialogHelper {
         try {
           overlay.data.remove();
         } catch (_) {
-          debugPrint(_.toString());
+          Logger.e('Ошибка removeWhere $_ ');
         }
 
         return true;
@@ -123,7 +124,7 @@ class DialogHelper {
         try {
           controller.data.close();
         } catch (_) {
-          debugPrint(_.toString());
+          Logger.e('Ошибка removeWhere $_ ');
         }
         return true;
       }

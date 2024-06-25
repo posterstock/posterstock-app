@@ -37,7 +37,7 @@ final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  debugPrint(
+  Logger.i(
       "Handling a background message: ${message.messageId}${message.data}");
   showPush(message);
 }
@@ -57,7 +57,7 @@ void main() async {
   try {
     PhotoManager.clearFileCache();
   } catch (e) {
-    debugPrint(e.toString());
+    Logger.e('Ошибка очистки кэша $e');
   }
   try {
     await flutterLocalNotificationsPlugin
@@ -70,14 +70,13 @@ void main() async {
     );
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    // print('Token: ' + (await FirebaseMessaging.instance.getToken()).toString());
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     PlatformDispatcher.instance.onError = (error, stack) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
   } catch (e) {
-    debugPrint(e.toString());
+    Logger.e('Ошибка FirebaseCrashlytics $e');
   }
   try {
     final prefs = await SharedPreferences.getInstance();
@@ -89,7 +88,7 @@ void main() async {
     email = prefs.getString('email');
     storedLocale = prefs.getString('locale');
   } catch (e) {
-    debugPrint(e.toString());
+    Logger.e('Ошибка SharedPreferences $e ');
   }
   await Hive.initFlutter();
 

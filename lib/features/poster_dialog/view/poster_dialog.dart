@@ -136,7 +136,7 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                               },
                               child: Center(
                                 child: Text(
-                                  context.txt.cancel,
+                                  context.txt.discard,
                                   style:
                                       context.textStyles.bodyRegular!.copyWith(
                                     color: context.colors.textsError,

@@ -117,7 +117,7 @@ class NavigationPage extends ConsumerWidget {
                   bottom: 0,
                   child: Padding(
                     padding: EdgeInsets.only(
-                      bottom: 57 + MediaQuery.of(context).padding.bottom,
+                      bottom: 55 + MediaQuery.of(context).padding.bottom,
                     ),
                     child: const Material(
                       color: Colors.transparent,

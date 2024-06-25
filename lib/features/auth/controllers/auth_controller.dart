@@ -1,5 +1,4 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/data/exceptions.dart';
@@ -108,13 +107,13 @@ class AuthController {
     try {
       //await removeFCMToken();
     } catch (e) {
-      debugPrint(e.toString());
+      Logger.e('Ошибка registerNotification $e ');
     }
     try {
       await repository.registerNotification(
           (await FirebaseMessaging.instance.getToken())!, userToken);
     } catch (e) {
-      debugPrint(e.toString());
+      Logger.e('Ошибка FirebaseMessaging $e ');
     }
   }
 

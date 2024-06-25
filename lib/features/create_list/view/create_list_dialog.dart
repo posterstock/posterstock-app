@@ -22,7 +22,6 @@ import 'package:poster_stock/features/list/controller/list_controller.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/poster/view/widgets/poster_tile.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
-import 'package:poster_stock/features/profile/state_holders/profile_posts_state_holder.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
