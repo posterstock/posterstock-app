@@ -75,15 +75,7 @@ class _ListPageState extends ConsumerState<ListPage>
     ),
   );
 
-  @override
-  void initState() {
-    super.initState();
-    animationController = AnimationController(
-      vsync: this,
-      lowerBound: 36,
-      upperBound: 1000,
-      duration: Duration.zero,
-    );
+  Future init() async {
     Future(() async {
       ref.read(listsControllerProvider).clear();
       if (widget.type != null) {
@@ -94,6 +86,18 @@ class _ListPageState extends ConsumerState<ListPage>
       animationController
           .animateTo(MediaQuery.of(context).size.width / 540 * 300);
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    animationController = AnimationController(
+      vsync: this,
+      lowerBound: 36,
+      upperBound: 1000,
+      duration: Duration.zero,
+    );
+    init();
   }
 
   double velocity = 0;
@@ -225,7 +229,11 @@ class _ListPageState extends ConsumerState<ListPage>
                               },
                               child: Container(
                                 color: Colors.transparent,
-                                child: ListActionsDialog(widget.type),
+                                child: ListActionsDialog(widget.type, () async {
+                                  await ref
+                                      .read(listsControllerProvider)
+                                      .getPost(widget.id);
+                                }),
                               ),
                             ),
                           );
@@ -584,8 +592,9 @@ class CollectionInfoWidget extends ConsumerWidget {
 
 class ListActionsDialog extends ConsumerWidget {
   final ListType? type;
+  final Function afterEditList;
 
-  const ListActionsDialog(this.type, {super.key});
+  const ListActionsDialog(this.type, this.afterEditList, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -678,7 +687,7 @@ class ListActionsDialog extends ConsumerWidget {
                             image: 'ic_edit',
                             text: AppLocalizations.of(context)!.account_edit,
                             onTap: () async {
-                              showModalBottomSheet(
+                              await showModalBottomSheet(
                                 context: context,
                                 backgroundColor: Colors.transparent,
                                 useRootNavigator: true,
@@ -689,6 +698,7 @@ class ListActionsDialog extends ConsumerWidget {
                                 builder: (context) =>
                                     CreateListDialog(id: list.id),
                               );
+                              afterEditList();
                             },
                           ),
                           MenuItemList(

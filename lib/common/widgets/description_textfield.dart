@@ -107,7 +107,7 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
                 child: AppTextButton(
                   disabled: (descriptionController!.text.length >
                           widget.maxSymbols) ||
-                      !widget.buttonAddCheck ||
+                      !widget.buttonAddCheck || 
                       disable,
                   onTap: widget.onTap,
                   child: widget.buttonLoading

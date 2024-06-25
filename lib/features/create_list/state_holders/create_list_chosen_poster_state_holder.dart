@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 
 final createListChosenPosterStateHolderProvider = StateNotifierProvider<
     CreateListChosenPosterStateHolder, List<(int, String)>>(
@@ -9,13 +10,24 @@ class CreateListChosenPosterStateHolder
     extends StateNotifier<List<(int, String)>> {
   CreateListChosenPosterStateHolder(super.state);
 
-  void switchElement((int, String) posterIdImage) {
-    if (state.contains(posterIdImage)) {
-      state.remove(posterIdImage);
+  void switchElement((int, String) poster) {
+    if (state.any((e) => e.$1 == poster.$1)) {
+      state.removeWhere((e) => e.$1 == poster.$1);
+      print('<<<<<<<<<');
+      // state.remove(poster);
     } else {
-      state.add(posterIdImage);
+      state.add(poster);
     }
     state = [...state];
+  }
+
+  void setElements(List<MultiplePostSingleModel> list) {
+    for (var item in list) {
+      if (!state.contains(item.image)) {
+        state.add((item.id, item.image));
+      }
+      state = [...state];
+    }
   }
 
   void clear() {

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -50,9 +51,6 @@ class CreateListService {
     int? id,
     String? imagePath,
   }) async {
-    bool isServerImage = imagePath != null && imagePath.contains('http');
-    String path = (id == null) ? 'api/lists' : 'api/lists/$id/';
-    print('imagePath >>> $isServerImage == $imagePath $title === $path');
     bool created = false;
     int? thisId = id;
     Response response;
@@ -70,14 +68,18 @@ class CreateListService {
       }
       created = true;
       Image? img;
-      if (isServerImage) {
+
+      if (imagePath == null) {
+        img = decodeImage(image!);
+      } else if (imagePath.contains('http')) {
         var response = await _dio.get(
           imagePath,
           options: Options(responseType: ResponseType.bytes),
         );
         img = decodeImage(Uint8List.fromList(response.data));
       } else {
-        img = decodeImage(image!);
+        img = decodeImage(File(imagePath).readAsBytesSync());
+        // img = decodeImage(Uint8List.fromList(response.data));
       }
       Image? im = copyCrop(img!,
           x: 0,

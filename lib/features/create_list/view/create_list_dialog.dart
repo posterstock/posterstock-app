@@ -55,20 +55,21 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
     Future(() async {
       ref.read(pickCoverControllerProvider).clearAll();
       await ref.read(listSearchValueStateHolderProvider.notifier).clearState();
-      await ref.read(profilePostsStateHolderProvider.notifier).clearState();
+      ref.watch(createListChosenPosterStateHolderProvider);
       if (widget.id != null) {
         post = await ref.read(listsControllerProvider).getPostbyId(widget.id!);
         nameController.text = post!.name;
         image = post!.image ?? '';
         descriptionController.text = post!.description ?? '';
+        descriptionController.addListener(() {
+          setState(() {});
+        });
         await ref.read(pickCoverControllerProvider).setImage(image!);
 
         List<MultiplePostSingleModel> thisPosters = post!.posters;
-        for (var item in thisPosters) {
-          ref
-              .read(createListChosenPosterStateHolderProvider.notifier)
-              .switchElement((item.id, item.image));
-        }
+        ref
+            .read(createListChosenPosterStateHolderProvider.notifier)
+            .setElements(thisPosters);
       }
     });
   }
@@ -77,6 +78,10 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
   void dispose() {
     disposed = true;
     super.dispose();
+    dragController.dispose();
+    searchController.dispose();
+    nameController.dispose();
+    descriptionController.dispose();
   }
 
   Future<bool> tryExit(WidgetRef ref) async {
@@ -642,7 +647,9 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                         .watch(
                                             createListChosenPosterStateHolderProvider)
                                         .length <
-                                    31,
+                                    31 &&
+                                (descriptionController.text.isNotEmpty &&
+                                    widget.id != null),
                             controller: descriptionController,
                             buttonLoading: loading,
                             onTap: () async {
