@@ -33,6 +33,8 @@ import 'navigation/app_router.gr.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
+String textDeepLink = '';
+
 /// Тут логика по получению пушей в бэкграугнде
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -167,7 +169,8 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
     });
     return MaterialApp.router(
       routerConfig: App._appRouter!.config(deepLinkBuilder: (deepLink) {
-        Logger.i('diplink == ${deepLink.path} ${deepLink.uri}');
+        textDeepLink = '${deepLink.path} == ${deepLink.uri}';
+        Logger.i('diplink == $textDeepLink');
         if (initLink != null) {
           var route =
               App._appRouter!.matcher.match(initLink!)?[0].toPageRouteInfo();

@@ -3,7 +3,15 @@ description: A new Flutter project.
 
 publish_to: "none"
 
-version: 1.2.4+38
+version: 1.2.5+38
+
+# Variant: release
+# Config: release
+# Store: D:\Projects\poster\poster_app\android\upload-keystore.jks
+# Alias: upload
+# MD5: D4:0A:54:E8:24:74:2D:FD:2D:B4:68:4B:F2:72:29:85
+# SHA1: FA:8F:EE:97:C9:06:2F:F3:8D:A4:09:B6:7E:BE:AC:92:9D:C7:38:04
+# SHA-256: D1:46:4A:D5:68:55:3C:5E:AE:74:46:12:1C:E1:5E:C4:38:7B:6A:BD:16:BE:C0:29:63:61:4E:93:C7:25:CE:99
 
 environment:
   sdk: ">=3.2.3 <4.0.0"
@@ -52,6 +60,7 @@ dependencies:
   hive_flutter: ^1.1.0
   gap: ^3.0.1 #https://pub.dev/packages/gap
   flutter_easylogger: ^2.3.3 #https://pub.dev/packages/flutter_easylogger
+  
 
 dev_dependencies:
   flutter_test:

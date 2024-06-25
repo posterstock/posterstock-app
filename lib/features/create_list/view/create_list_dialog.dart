@@ -631,6 +631,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                           ),
                         ),
                         Container(
+                          height: 140,
                           color: context.colors.backgroundsPrimary,
                           child: DescriptionTextField(
                             button: (widget.id != null)

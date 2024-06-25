@@ -58,6 +58,18 @@ class ProfileService {
     );
   }
 
+  Future<Map<String, dynamic>> getProfileInfoByName(String name) async {
+    try {
+      final response = await _dio.get('/api/users/u/$name');
+      
+      return response.data;
+    } on DioError catch (e) {
+      Logger.e('Ошибка при получении пользователя по имени $e');
+      Logger.e(e.response?.headers);
+      rethrow;
+    }
+  }
+
   Future<Map<String, dynamic>> getProfileInfo(dynamic id) async {
     try {
       if (id == null) {
