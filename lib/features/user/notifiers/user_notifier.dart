@@ -18,7 +18,6 @@ class UserNotifier extends StateNotifier<UserDetailsModel?> {
   UserDetailsModel get user => state!;
 
   Future<void> load() async {
-    print('start');
     int curId = 0;
     if (id is String) {
       final json = await network.getProfileInfo(id);
