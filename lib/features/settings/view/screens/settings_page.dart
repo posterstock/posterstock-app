@@ -7,7 +7,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:gap/gap.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
@@ -502,16 +501,8 @@ class SettingsPage extends ConsumerWidget {
                           );
                         },
                       ),
-                      const Gap(30),
-                      if (textDeepLink != '/ == /')
-                        Text(
-                          textDeepLink,
-                          style: context.textStyles.footNote!.copyWith(
-                            color: context.colors.textsDisabled,
-                          ),
-                        ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),

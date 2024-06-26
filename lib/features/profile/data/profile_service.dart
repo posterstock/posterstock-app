@@ -61,7 +61,7 @@ class ProfileService {
   Future<Map<String, dynamic>> getProfileInfoByName(String name) async {
     try {
       final response = await _dio.get('/api/users/u/$name');
-      
+
       return response.data;
     } on DioError catch (e) {
       Logger.e('Ошибка при получении пользователя по имени $e');
