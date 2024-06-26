@@ -603,7 +603,7 @@ class ListActionsDialog extends ConsumerWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: SizedBox(
-        height: list!.author.id != myself?.id ? 340 : 285,
+        height: list!.author.id != myself?.id ? 340 : 340,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Scaffold(
@@ -613,7 +613,7 @@ class ListActionsDialog extends ConsumerWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16.0),
                   child: SizedBox(
-                    height: list.author.id != myself?.id ? 240 : 195,
+                    height: list.author.id != myself?.id ? 250 : 250,
                     child: Material(
                       color: context.colors.backgroundsPrimary,
                       child: Column(
@@ -634,32 +634,31 @@ class ListActionsDialog extends ConsumerWidget {
                             thickness: 0.5,
                             color: context.colors.fieldsDefault,
                           ),
-                          if (list.author.id != myself?.id)
-                            MenuItemList(
-                              image: list.author.followed
-                                  ? 'ic_unfollow'
-                                  : 'ic_follow',
-                              text:
-                                  '${list.author.followed ? AppLocalizations.of(context)!.unfollow : AppLocalizations.of(context)!.follow} ${list.author.name}',
-                              onTap: () {
-                                ref
-                                    .read(homePagePostsControllerProvider)
-                                    .setFollowId(
-                                        list.author.id, !list.author.followed);
-                                ref
-                                    .read(listsStateHolderProvider.notifier)
-                                    .updateState(
-                                      list.copyWith(
-                                        author: list.author.copyWith(
-                                            followed: !list.author.followed),
-                                      ),
-                                    );
-                                ref.read(profileControllerApiProvider).follow(
-                                      list.author.id,
-                                      list.author.followed,
-                                    );
-                              },
-                            ),
+                          MenuItemList(
+                            image: list.author.followed
+                                ? 'ic_unfollow'
+                                : 'ic_follow',
+                            text:
+                                '${list.author.followed ? AppLocalizations.of(context)!.unfollow : AppLocalizations.of(context)!.follow} ${list.author.name}',
+                            onTap: () {
+                              ref
+                                  .read(homePagePostsControllerProvider)
+                                  .setFollowId(
+                                      list.author.id, !list.author.followed);
+                              ref
+                                  .read(listsStateHolderProvider.notifier)
+                                  .updateState(
+                                    list.copyWith(
+                                      author: list.author.copyWith(
+                                          followed: !list.author.followed),
+                                    ),
+                                  );
+                              ref.read(profileControllerApiProvider).follow(
+                                    list.author.id,
+                                    list.author.followed,
+                                  );
+                            },
+                          ),
                           MenuItemList(
                             image: 'ic_share',
                             text: AppLocalizations.of(context)!

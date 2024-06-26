@@ -19,9 +19,10 @@ class MenuItemList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('followed $image');
     return Expanded(
       child: Column(children: [
-        const Gap(15),
+        const Gap(10),
         InkWell(
           onTap: onTap,
           child: Center(
@@ -38,7 +39,7 @@ class MenuItemList extends StatelessWidget {
                     BlendMode.srcIn,
                   ),
                 ),
-                const Gap(15),
+                const Gap(10),
                 Text(
                   text,
                   style: context.textStyles.bodyRegular!.copyWith(
@@ -51,7 +52,7 @@ class MenuItemList extends StatelessWidget {
             ),
           ),
         ),
-        const Gap(15),
+        const Gap(20),
         if (!isRed)
           Divider(
             height: 0.5,
