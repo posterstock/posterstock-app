@@ -7,8 +7,9 @@ import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:gap/gap.dart';
 import 'package:poster_stock/common/constants/durations.dart';
+import 'package:poster_stock/common/menu/menu_dialog.dart';
+import 'package:poster_stock/common/menu/menu_state.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
@@ -25,7 +26,6 @@ import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/list/controller/list_controller.dart';
 import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
-import 'package:poster_stock/features/list/view/menu_item.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
@@ -217,26 +217,9 @@ class _ListPageState extends ConsumerState<ListPage>
                     leading: const CustomBackButton(),
                     actions: [
                       GestureDetector(
-                        onTap: () {
+                        onTap: () async {
                           if (posts == null) return;
-                          showModalBottomSheet(
-                            context: context,
-                            backgroundColor: Colors.transparent,
-                            isScrollControlled: true,
-                            builder: (context) => GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                color: Colors.transparent,
-                                child: ListActionsDialog(widget.type, () async {
-                                  await ref
-                                      .read(listsControllerProvider)
-                                      .getPost(widget.id);
-                                }),
-                              ),
-                            ),
-                          );
+                          await showMenuList();
                         },
                         child: Padding(
                           padding: const EdgeInsets.only(right: 16),
@@ -424,6 +407,121 @@ class _ListPageState extends ConsumerState<ListPage>
     );
   }
 
+  Future showMenuList() async {
+    final list = ref.watch(listsStateHolderProvider);
+    final myself = ref.watch(myProfileInfoStateHolderProvider);
+    MenuDialog.showBottom(
+      context,
+      MenuState(null, [
+        MenuTitle(context.txt.lists),
+        if (list!.author.id != myself?.id)
+          MenuItem(
+            list.author.followed
+                ? 'assets/icons/ic_unfollow.svg'
+                : 'assets/icons/ic_follow.svg',
+            '${list.author.followed ? AppLocalizations.of(context)!.unfollow : AppLocalizations.of(context)!.follow} ${list.author.name}',
+            () {
+              ref
+                  .read(homePagePostsControllerProvider)
+                  .setFollowId(list.author.id, !list.author.followed);
+              ref.read(listsStateHolderProvider.notifier).updateState(
+                    list.copyWith(
+                      author:
+                          list.author.copyWith(followed: !list.author.followed),
+                    ),
+                  );
+              ref.read(profileControllerApiProvider).follow(
+                    list.author.id,
+                    list.author.followed,
+                  );
+            },
+          ),
+        MenuItem(
+          'assets/icons/ic_share.svg',
+          context.txt.list_page_share,
+          () {
+            final profile = myself!.username;
+            String link;
+            switch (widget.type) {
+              case ListType.favorited:
+                link = 'https://posterstock.com/$profile/favorites';
+                break;
+              case ListType.recomends:
+                link = 'https://posterstock.com/$profile/recommends';
+                break;
+              default:
+                link = 'https://posterstock.com/list/${list.id}';
+            }
+            Share.share(link);
+          },
+        ),
+        if (list.author.id == myself?.id)
+          MenuItem(
+            'assets/icons/ic_edit.svg',
+            context.txt.list_edit,
+            () async {
+              await showModalBottomSheet(
+                context: context,
+                backgroundColor: Colors.transparent,
+                useRootNavigator: true,
+                isScrollControlled: true,
+                enableDrag: false,
+                isDismissible: false,
+                useSafeArea: true,
+                builder: (context) => CreateListDialog(id: list.id),
+              );
+              await ref.read(listsControllerProvider).getPost(widget.id);
+            },
+          ),
+        MenuItem.danger(
+          (list.author.id != myself?.id)
+              ? 'assets/icons/ic_danger.svg'
+              : 'assets/icons/ic_trash2.svg',
+          (list.author.id != myself?.id)
+              ? context.txt.report
+              : context.txt.delete,
+          () async {
+            if (list.author.id != myself?.id) {
+              scaffoldMessengerKey.currentState?.showSnackBar(
+                SnackBars.build(
+                  context,
+                  null,
+                  'Not available yet',
+                ),
+              );
+            } else {
+              try {
+                await ref.read(listsControllerProvider).deleteList(list.id);
+                ref
+                    .read(profileControllerApiProvider)
+                    .getUserInfo(null, context);
+                await ref.read(accountListsStateNotifier.notifier).reload();
+                Navigator.of(context).pop();
+                ref.watch(router)!.pop();
+                scaffoldMessengerKey.currentState?.showSnackBar(
+                  SnackBars.build(
+                    context,
+                    null,
+                    "List deleted successfully",
+                  ),
+                );
+              } catch (_) {
+                Logger.e('Ошибка при удалении списка $_');
+                scaffoldMessengerKey.currentState?.showSnackBar(
+                  SnackBars.build(
+                    context,
+                    null,
+                    "Could not delete list",
+                  ),
+                );
+              }
+            }
+          },
+        )
+      ]),
+    );
+  }
+
   double getEmptySpaceHeightForCollection(
       BuildContext context, MultiplePostModel? posts) {
     final comments = ref.watch(commentsStateHolderProvider);
@@ -585,199 +683,6 @@ class CollectionInfoWidget extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
         ],
-      ),
-    );
-  }
-}
-
-class ListActionsDialog extends ConsumerWidget {
-  final ListType? type;
-  final Function afterEditList;
-
-  const ListActionsDialog(this.type, this.afterEditList, {super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final list = ref.watch(listsStateHolderProvider);
-    final myself = ref.watch(myProfileInfoStateHolderProvider);
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: SizedBox(
-        height: list!.author.id != myself?.id ? 340 : 340,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Column(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16.0),
-                  child: SizedBox(
-                    height: list.author.id != myself?.id ? 250 : 250,
-                    child: Material(
-                      color: context.colors.backgroundsPrimary,
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 36,
-                            child: Center(
-                              child: Text(
-                                AppLocalizations.of(context)!.lists,
-                                style: context.textStyles.footNote!.copyWith(
-                                  color: context.colors.textsSecondary,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Divider(
-                            height: 0.5,
-                            thickness: 0.5,
-                            color: context.colors.fieldsDefault,
-                          ),
-                          MenuItemList(
-                            image: list.author.followed
-                                ? 'ic_unfollow'
-                                : 'ic_follow',
-                            text:
-                                '${list.author.followed ? AppLocalizations.of(context)!.unfollow : AppLocalizations.of(context)!.follow} ${list.author.name}',
-                            onTap: () {
-                              ref
-                                  .read(homePagePostsControllerProvider)
-                                  .setFollowId(
-                                      list.author.id, !list.author.followed);
-                              ref
-                                  .read(listsStateHolderProvider.notifier)
-                                  .updateState(
-                                    list.copyWith(
-                                      author: list.author.copyWith(
-                                          followed: !list.author.followed),
-                                    ),
-                                  );
-                              ref.read(profileControllerApiProvider).follow(
-                                    list.author.id,
-                                    list.author.followed,
-                                  );
-                            },
-                          ),
-                          MenuItemList(
-                            image: 'ic_share',
-                            text: AppLocalizations.of(context)!
-                                .profile_menu_shareMy,
-                            onTap: () {
-                              final profile = myself!.username;
-                              String link;
-                              switch (type) {
-                                case ListType.favorited:
-                                  link =
-                                      'https://posterstock.com/$profile/favorites';
-                                  break;
-                                case ListType.recomends:
-                                  link =
-                                      'https://posterstock.com/$profile/recommends';
-                                  break;
-                                default:
-                                  link =
-                                      'https://posterstock.com/list/${list.id}';
-                              }
-                              Share.share(link);
-                            },
-                          ),
-                          MenuItemList(
-                            image: 'ic_edit',
-                            text: AppLocalizations.of(context)!.account_edit,
-                            onTap: () async {
-                              await showModalBottomSheet(
-                                context: context,
-                                backgroundColor: Colors.transparent,
-                                useRootNavigator: true,
-                                isScrollControlled: true,
-                                enableDrag: false,
-                                isDismissible: false,
-                                useSafeArea: true,
-                                builder: (context) =>
-                                    CreateListDialog(id: list.id),
-                              );
-                              afterEditList();
-                            },
-                          ),
-                          MenuItemList(
-                            image: 'ic_trash2',
-                            text: list.author.id != myself?.id
-                                ? AppLocalizations.of(context)!.report
-                                : AppLocalizations.of(context)!.delete,
-                            isRed: true,
-                            onTap: () async {
-                              if (list.author.id != myself?.id) {
-                                scaffoldMessengerKey.currentState?.showSnackBar(
-                                  SnackBars.build(
-                                    context,
-                                    null,
-                                    'Not available yet',
-                                  ),
-                                );
-                              } else {
-                                try {
-                                  await ref
-                                      .read(listsControllerProvider)
-                                      .deleteList(list.id);
-                                  ref
-                                      .read(profileControllerApiProvider)
-                                      .getUserInfo(null, context);
-                                  await ref
-                                      .read(accountListsStateNotifier.notifier)
-                                      .reload();
-                                  Navigator.of(context).pop();
-                                  ref.watch(router)!.pop();
-                                  scaffoldMessengerKey.currentState
-                                      ?.showSnackBar(
-                                    SnackBars.build(
-                                      context,
-                                      null,
-                                      "List deleted successfully",
-                                    ),
-                                  );
-                                } catch (_) {
-                                  Logger.e('Ошибка при удалении списка $_');
-                                  scaffoldMessengerKey.currentState
-                                      ?.showSnackBar(
-                                    SnackBars.build(
-                                      context,
-                                      null,
-                                      "Could not delete list",
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const Gap(12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16.0),
-                  child: SizedBox(
-                    height: 52,
-                    child: Material(
-                      color: context.colors.backgroundsPrimary,
-                      child: InkWell(
-                        onTap: () => Navigator.pop(context),
-                        child: Center(
-                          child: Text(
-                            AppLocalizations.of(context)!.cancel,
-                            style: context.textStyles.bodyRegular,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
