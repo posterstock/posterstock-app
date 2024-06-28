@@ -496,7 +496,6 @@ class _ListPageState extends ConsumerState<ListPage>
                     .read(profileControllerApiProvider)
                     .getUserInfo(null, context);
                 await ref.read(accountListsStateNotifier.notifier).reload();
-                Navigator.of(context).pop();
                 ref.watch(router)!.pop();
                 scaffoldMessengerKey.currentState?.showSnackBar(
                   SnackBars.build(

@@ -2,10 +2,10 @@
 
 import 'dart:io';
 
-import 'package:davinci/core/davinci_capture.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
@@ -18,6 +18,7 @@ import 'package:poster_stock/features/create_list/state_holders/pick_cover_galle
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:poster_stock/main.dart';
+import 'package:screenshot/screenshot.dart';
 
 final pickCoverControllerProvider = Provider.autoDispose<PickCoverController>(
   (ref) => PickCoverController(
@@ -83,8 +84,10 @@ class PickCoverController {
     try {
       bool generated = chosenCoverStateHolder.currentState == null;
       Uint8List? image;
+      Logger.d('image == $image $imagePath');
       if (imagePath == null) {
         image = await showScreenshot(context);
+        Logger.d('imageEnd == ${image?.length} ');
       }
       bool? value = await repository.createList(
         title: title,
@@ -144,6 +147,7 @@ class PickCoverController {
         await precacheImage(MemoryImage(wid.data as Uint8List), context);
         data.add(wid.data as Uint8List);
       } catch (e) {
+        Logger.e('ошибка при создания обложки $e');
         scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBars.build(
             context,
@@ -175,26 +179,33 @@ class PickCoverController {
         ),
       ),
     );
+    Logger.i('widget === $width $widget ');
+    Uint8List? im = Uint8List(0);
     if (context.mounted) {
-      Uint8List im = await DavinciCapture.offStage(
+      ScreenshotController screenshotController = ScreenshotController();
+
+      await screenshotController
+          .captureFromWidget(
         widget,
-        context: context,
-        saveToDevice: false,
-        openFilePreview: false,
-        returnImageUint8List: true,
-        wait: const Duration(milliseconds: 500),
-      );
+      )
+          .then((capturedImage) {
+        Logger.e('capturedImage === ${capturedImage.length}');
+        im = capturedImage;
+        return capturedImage;
+      });
       for (int i = 0; i < (images.length > 7 ? 7 : images.length); i++) {
         try {
           await MemoryImage(data[i]).evict();
         } catch (e) {
-          rethrow;
+          Logger.e('ошибка MemoryImag === $e');
         }
       }
+
       return im;
     } else {
-      throw Exception();
+      Logger.e('ошибка capturedImage ');
     }
+    return null;
   }
 
   Future<void> loadPage() async {

@@ -48,7 +48,7 @@ dependencies:
   shared_preferences: ^2.2.0
   firebase_messaging: ^14.6.8
   flutter_local_notifications: ^15.1.0+1
-  davinci: ^2.1.1 #https://pub.dev/packages/davinci
+  
   transparent_image: ^2.0.1
   async: ^2.11.0
   image: ^4.0.17
@@ -60,6 +60,7 @@ dependencies:
   hive_flutter: ^1.1.0
   gap: ^3.0.1 #https://pub.dev/packages/gap
   flutter_easylogger: ^2.3.3 #https://pub.dev/packages/flutter_easylogger
+  screenshot: ^3.0.0 #https://pub.dev/packages/screenshot
   
 
 dev_dependencies:
