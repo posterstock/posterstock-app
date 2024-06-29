@@ -3,7 +3,9 @@ platform :ios, '14.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
-
+pod 'FirebaseMessaging', '10.27.0', :modular_headers => true
+pod 'FirebaseCrashlytics', '10.27.0', :modular_headers => true
+pod 'FirebaseCore',  :modular_headers => true
 project 'Runner', {
   'Debug' => :debug,
   'Profile' => :release,
@@ -39,10 +41,12 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
+         config.build_settings['ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES'] = '$(inherited)'
     xcconfig_path = config.base_configuration_reference.real_path
     xcconfig = File.read(xcconfig_path)
     xcconfig_mod = xcconfig.gsub(/DT_TOOLCHAIN_DIR/, "TOOLCHAIN_DIR")
-    File.open(xcconfig_path, "w") { |file| file << xcconfig_mod }
+    File.open(xcconfig_path, "w") { |file| file << xcconfig_mod }   
+   
     end
   end
 end
