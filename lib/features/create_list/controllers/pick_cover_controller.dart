@@ -84,10 +84,9 @@ class PickCoverController {
     try {
       bool generated = chosenCoverStateHolder.currentState == null;
       Uint8List? image;
-      Logger.d('image == $image $imagePath');
+
       if (imagePath == null) {
         image = await showScreenshot(context);
-        Logger.d('imageEnd == ${image?.length} ');
       }
       bool? value = await repository.createList(
         title: title,
@@ -136,7 +135,7 @@ class PickCoverController {
     Widget widget;
     List<String> images = createListChosenPosterState.map((e) => e.$2).toList();
     List<Uint8List> data = [];
-    for (int i = 0; i < (images.length > 7 ? 7 : images.length); i++) {
+    for (int i = 0; i < (images.length > 6 ? 6 : images.length); i++) {
       try {
         var wid = await Dio().get(
           images[i],
@@ -179,21 +178,18 @@ class PickCoverController {
         ),
       ),
     );
-    Logger.i('widget === $width $widget ');
     Uint8List? im = Uint8List(0);
     if (context.mounted) {
       ScreenshotController screenshotController = ScreenshotController();
-
       await screenshotController
           .captureFromWidget(
         widget,
       )
           .then((capturedImage) {
-        Logger.e('capturedImage === ${capturedImage.length}');
         im = capturedImage;
         return capturedImage;
       });
-      for (int i = 0; i < (images.length > 7 ? 7 : images.length); i++) {
+      for (int i = 0; i < (images.length > 6 ? 6 : images.length); i++) {
         try {
           await MemoryImage(data[i]).evict();
         } catch (e) {

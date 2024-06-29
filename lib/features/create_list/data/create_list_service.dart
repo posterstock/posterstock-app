@@ -68,18 +68,13 @@ class CreateListService {
       }
       created = true;
       Image? img;
-
+      if (imagePath != null && imagePath.contains('http')) {
+        return null;
+      }
       if (imagePath == null) {
         img = decodeImage(image!);
-      } else if (imagePath.contains('http')) {
-        var response = await _dio.get(
-          imagePath,
-          options: Options(responseType: ResponseType.bytes),
-        );
-        img = decodeImage(Uint8List.fromList(response.data));
       } else {
         img = decodeImage(File(imagePath).readAsBytesSync());
-        // img = decodeImage(Uint8List.fromList(response.data));
       }
       Image? im = copyCrop(img!,
           x: 0,
