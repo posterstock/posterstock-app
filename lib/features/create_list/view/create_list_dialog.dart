@@ -645,52 +645,47 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                               ],
                             ),
                           ),
-                          SafeArea(
-                            top: false,
-                            child: Container(
-                              color: context.colors.backgroundsPrimary,
-                              child: DescriptionTextField(
-                                button: (widget.id != null)
-                                    ? context.txt.poster_dialog_save
-                                    : context.txt.listCreate_createNow,
-                                buttonAddCheck: nameController
-                                        .text.isNotEmpty &&
-                                    ref
-                                            .watch(
-                                                createListChosenPosterStateHolderProvider)
-                                            .length >
-                                        2 &&
-                                    ref
-                                            .watch(
-                                                createListChosenPosterStateHolderProvider)
-                                            .length <
-                                        31,
-                                controller: descriptionController,
-                                buttonLoading: loading,
-                                onTap: () async {
-                                  loading = true;
-                                  setState(() {});
-                                  await ref
-                                      .read(pickCoverControllerProvider)
-                                      .createList(
-                                        title: nameController.text,
-                                        description: descriptionController.text,
-                                        context: context,
-                                        id: widget.id,
-                                        imagePath: image,
-                                      );
-                                  loading = false;
-                                  setState(() {});
-                                  if (context.mounted) {
-                                    Navigator.pop(context);
-                                    if (widget.id != null)
-                                      Navigator.pop(context);
-                                  }
-                                  await ref
-                                      .read(accountListsStateNotifier.notifier)
-                                      .reload();
-                                },
-                              ),
+                          Container(
+                            color: context.colors.backgroundsPrimary,
+                            child: DescriptionTextField(
+                              button: (widget.id != null)
+                                  ? context.txt.poster_dialog_save
+                                  : context.txt.listCreate_createNow,
+                              buttonAddCheck: nameController.text.isNotEmpty &&
+                                  ref
+                                          .watch(
+                                              createListChosenPosterStateHolderProvider)
+                                          .length >
+                                      2 &&
+                                  ref
+                                          .watch(
+                                              createListChosenPosterStateHolderProvider)
+                                          .length <
+                                      31,
+                              controller: descriptionController,
+                              buttonLoading: loading,
+                              onTap: () async {
+                                loading = true;
+                                setState(() {});
+                                await ref
+                                    .read(pickCoverControllerProvider)
+                                    .createList(
+                                      title: nameController.text,
+                                      description: descriptionController.text,
+                                      context: context,
+                                      id: widget.id,
+                                      imagePath: image,
+                                    );
+                                loading = false;
+                                setState(() {});
+                                if (context.mounted) {
+                                  Navigator.pop(context);
+                                  if (widget.id != null) Navigator.pop(context);
+                                }
+                                await ref
+                                    .read(accountListsStateNotifier.notifier)
+                                    .reload();
+                              },
                             ),
                           ),
                         ],
