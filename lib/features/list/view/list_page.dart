@@ -178,230 +178,238 @@ class _ListPageState extends ConsumerState<ListPage>
           jumpToEnd();
         }
       },
-      child: Scaffold(
-        body: Stack(
-          children: [
-            NotificationListener<ScrollNotification>(
-              onNotification: (notification) {
-                if (notification is ScrollUpdateNotification) {
-                  velocity = notification.dragDetails?.delta.dy ?? 0;
-                  if (notification.metrics.pixels < 0) {
-                    animationController
-                        .animateTo(newHeight - notification.metrics.pixels);
-                  } else {
-                    animationController
-                        .animateTo(newHeight - notification.metrics.pixels);
+      child: SafeArea(
+        child: Scaffold(
+          body: Stack(
+            children: [
+              NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  if (notification is ScrollUpdateNotification) {
+                    velocity = notification.dragDetails?.delta.dy ?? 0;
+                    if (notification.metrics.pixels < 0) {
+                      animationController
+                          .animateTo(newHeight - notification.metrics.pixels);
+                    } else {
+                      animationController
+                          .animateTo(newHeight - notification.metrics.pixels);
+                    }
                   }
-                }
-                if (notification is ScrollEndNotification) {
-                  if (notification.metrics.pixels > newHeight) return false;
-                  if (notification.metrics.pixels < 0) return false;
-                  jumpToEnd();
-                }
-                return true;
-              },
-              child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
-                controller: scrollController,
-                slivers: [
-                  SliverAppBar(
-                    backgroundColor: context.colors.backgroundsPrimary,
-                    elevation: 0,
-                    leadingWidth: 130,
-                    toolbarHeight: 42,
-                    expandedHeight: 292,
-                    collapsedHeight: 42,
-                    pinned: true,
-                    leading: const CustomBackButton(),
-                    actions: [
-                      GestureDetector(
-                        onTap: () async {
-                          if (posts == null) return;
-                          await showMenuList();
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 16),
-                          child: SvgPicture.asset(
-                            'assets/icons/ic_dots.svg',
-                            colorFilter: ColorFilter.mode(
-                              context.colors.iconsDefault!,
-                              BlendMode.srcIn,
+                  if (notification is ScrollEndNotification) {
+                    if (notification.metrics.pixels > newHeight) return false;
+                    if (notification.metrics.pixels < 0) return false;
+                    jumpToEnd();
+                  }
+                  return true;
+                },
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  controller: scrollController,
+                  slivers: [
+                    SliverAppBar(
+                      backgroundColor: context.colors.backgroundsPrimary,
+                      elevation: 0,
+                      leadingWidth: 130,
+                      toolbarHeight: 42,
+                      expandedHeight: 292,
+                      collapsedHeight: 42,
+                      pinned: true,
+                      leading: const CustomBackButton(),
+                      actions: [
+                        GestureDetector(
+                          onTap: () async {
+                            if (posts == null) return;
+                            await showMenuList();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: SvgPicture.asset(
+                              'assets/icons/ic_dots.svg',
+                              colorFilter: ColorFilter.mode(
+                                context.colors.iconsDefault!,
+                                BlendMode.srcIn,
+                              ),
                             ),
                           ),
-                        ),
-                      )
-                    ],
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          if (index == 0) {
-                            return CollectionInfoWidget(
-                              shimmer: shimmer,
-                              post: posts,
-                            );
-                          }
-                          if (index == (comments?.length ?? 0) + 1) {
-                            return SizedBox(
-                              height: getEmptySpaceHeightForCollection(
-                                          context, posts) <
-                                      56 + MediaQuery.of(context).padding.bottom
-                                  ? 56 + MediaQuery.of(context).padding.bottom
-                                  : getEmptySpaceHeightForCollection(
-                                      context, posts),
-                            );
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 6.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0,
-                                  ),
-                                  child: UserInfoTile(
-                                    type: InfoDialogType.listComment,
-                                    myEntity: posts?.author.id ==
-                                        ref
-                                            .watch(
-                                                myProfileInfoStateHolderProvider)
-                                            ?.id,
-                                    entityId: comments?[index - 1].id ?? -1,
-                                    showFollowButton: false,
-                                    user: comments?[index - 1].model,
-                                    time: comments?[index - 1].time,
-                                    behavior: HitTestBehavior.translucent,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    const SizedBox(
-                                      width: 68,
+                        )
+                      ],
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            if (index == 0) {
+                              return CollectionInfoWidget(
+                                shimmer: shimmer,
+                                post: posts,
+                              );
+                            }
+                            if (index == (comments?.length ?? 0) + 1) {
+                              return SizedBox(
+                                height: getEmptySpaceHeightForCollection(
+                                            context, posts) <
+                                        56 +
+                                            MediaQuery.of(context)
+                                                .padding
+                                                .bottom
+                                    ? 56 + MediaQuery.of(context).padding.bottom
+                                    : getEmptySpaceHeightForCollection(
+                                        context, posts),
+                              );
+                            }
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 6.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0,
                                     ),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 16.0),
-                                            child: Text(
-                                              comments![index - 1].text,
-                                              style: context
-                                                  .textStyles.subheadline!,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 12),
-                                          if (index - 1 != comments.length - 1)
-                                            Divider(
-                                              height: 0.5,
-                                              thickness: 0.5,
-                                              color:
-                                                  context.colors.fieldsDefault,
-                                            ),
-                                        ],
+                                    child: UserInfoTile(
+                                      type: InfoDialogType.listComment,
+                                      myEntity: posts?.author.id ==
+                                          ref
+                                              .watch(
+                                                  myProfileInfoStateHolderProvider)
+                                              ?.id,
+                                      entityId: comments?[index - 1].id ?? -1,
+                                      showFollowButton: false,
+                                      user: comments?[index - 1].model,
+                                      time: comments?[index - 1].time,
+                                      behavior: HitTestBehavior.translucent,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      const SizedBox(
+                                        width: 68,
                                       ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          );
-                        },
-                        childCount: 2 + (comments?.length ?? 0),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 16.0),
+                                              child: Text(
+                                                comments![index - 1].text,
+                                                style: context
+                                                    .textStyles.subheadline!,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            if (index - 1 !=
+                                                comments.length - 1)
+                                              Divider(
+                                                height: 0.5,
+                                                thickness: 0.5,
+                                                color: context
+                                                    .colors.fieldsDefault,
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                          childCount: 2 + (comments?.length ?? 0),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            SafeArea(
-              child: IgnorePointer(
-                ignoring: true,
-                child: AnimatedBuilder(
-                  animation: animationController,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(
-                          0,
-                          (animationController.value - 36) /
-                              (newHeight - 36) *
-                              42),
-                      child: Transform.scale(
-                        alignment: Alignment.topCenter,
-                        scale: animationController.value / newHeight > 1
-                            ? ((newHeight +
-                                    (animationController.value - newHeight) *
-                                        0.8) /
-                                newHeight)
-                            : animationController.value / newHeight,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular((1 -
-                                  (animationController.value - 36) /
-                                      (newHeight - 36)) *
-                              20),
-                          child: child,
+              SafeArea(
+                child: IgnorePointer(
+                  ignoring: true,
+                  child: AnimatedBuilder(
+                    animation: animationController,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset: Offset(
+                            0,
+                            (animationController.value - 36) /
+                                (newHeight - 36) *
+                                42),
+                        child: Transform.scale(
+                          alignment: Alignment.topCenter,
+                          scale: animationController.value / newHeight > 1
+                              ? ((newHeight +
+                                      (animationController.value - newHeight) *
+                                          0.8) /
+                                  newHeight)
+                              : animationController.value / newHeight,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular((1 -
+                                    (animationController.value - 36) /
+                                        (newHeight - 36)) *
+                                20),
+                            child: child,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  child: ShimmerLoader(
-                    loaded: posts != null,
-                    child: Container(
-                      color: context.colors.backgroundsSecondary,
-                      height: MediaQuery.of(context).size.width / 540 * 300,
-                      width: double.infinity,
-                      child: posts?.image != null
-                          ? CachedNetworkImage(
-                              imageUrl: posts!.image!,
-                              fit: BoxFit.cover,
-                              placeholderFadeInDuration:
-                                  CustomDurations.cachedDuration,
-                              fadeInDuration: CustomDurations.cachedDuration,
-                              fadeOutDuration: CustomDurations.cachedDuration,
-                              placeholder: (context, child) {
-                                return shimmer;
-                              },
-                              errorWidget: (context, obj, trace) {
-                                return shimmer;
-                              },
-                            )
-                          : Row(
-                              children: List.generate(
-                                posts?.posters.length ?? 0,
-                                (index) => Expanded(
-                                  child: Image.network(
-                                    posts?.posters[index].image ?? '',
-                                    height: MediaQuery.of(context).size.width /
-                                        540 *
-                                        300,
-                                    fit: BoxFit.cover,
+                      );
+                    },
+                    child: ShimmerLoader(
+                      loaded: posts != null,
+                      child: Container(
+                        color: context.colors.backgroundsSecondary,
+                        height: MediaQuery.of(context).size.width / 540 * 300,
+                        width: double.infinity,
+                        child: posts?.image != null
+                            ? CachedNetworkImage(
+                                imageUrl: posts!.image!,
+                                fit: BoxFit.cover,
+                                placeholderFadeInDuration:
+                                    CustomDurations.cachedDuration,
+                                fadeInDuration: CustomDurations.cachedDuration,
+                                fadeOutDuration: CustomDurations.cachedDuration,
+                                placeholder: (context, child) {
+                                  return shimmer;
+                                },
+                                errorWidget: (context, obj, trace) {
+                                  return shimmer;
+                                },
+                              )
+                            : Row(
+                                children: List.generate(
+                                  posts?.posters.length ?? 0,
+                                  (index) => Expanded(
+                                    child: Image.network(
+                                      posts?.posters[index].image ?? '',
+                                      height:
+                                          MediaQuery.of(context).size.width /
+                                              540 *
+                                              300,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: CommentTextField(
-                id: posts?.id ?? -1,
-                isList: true,
-              ),
-            )
-          ],
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: CommentTextField(
+                  id: posts?.id ?? -1,
+                  isList: true,
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

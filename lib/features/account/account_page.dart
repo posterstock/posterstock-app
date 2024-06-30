@@ -470,95 +470,101 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
     //       duration: const Duration(milliseconds: 300), curve: Curves.linear);
     //   // widget.animationController.value = 0;
     // }
-    return AnimatedBuilder(
-      animation: widget.animationController,
-      builder: (context, child) {
-        if (widget.animationController.value <= 0.5 &&
-            widget.searchTextController.text.isNotEmpty) {
-          Future(() {
-            ref.read(listSearchValueStateHolderProvider.notifier).clearState();
-            ref.read(listSearchPostsStateHolderProvider.notifier).clearState();
-            widget.searchTextController.clear();
-          });
-        }
-        return child!;
-      },
-      child: TabBarView(
-        controller: widget.controller,
-        children: [
-          NotificationListener<ScrollUpdateNotification>(
-            onNotification: (info) {
-              if (info.metrics.pixels >=
-                  info.metrics.maxScrollExtent -
-                      MediaQuery.of(context).size.height) {
-                ref.read(accountPostersStateNotifier.notifier).loadMore();
-              }
-              return true;
-            },
-            child: PostersCollectionView(
-              posters.posters,
-              name: widget.name,
-              callback: widget.callback,
+    return SafeArea(
+      child: AnimatedBuilder(
+        animation: widget.animationController,
+        builder: (context, child) {
+          if (widget.animationController.value <= 0.5 &&
+              widget.searchTextController.text.isNotEmpty) {
+            Future(() {
+              ref
+                  .read(listSearchValueStateHolderProvider.notifier)
+                  .clearState();
+              ref
+                  .read(listSearchPostsStateHolderProvider.notifier)
+                  .clearState();
+              widget.searchTextController.clear();
+            });
+          }
+          return child!;
+        },
+        child: TabBarView(
+          controller: widget.controller,
+          children: [
+            NotificationListener<ScrollUpdateNotification>(
+              onNotification: (info) {
+                if (info.metrics.pixels >=
+                    info.metrics.maxScrollExtent -
+                        MediaQuery.of(context).size.height) {
+                  ref.read(accountPostersStateNotifier.notifier).loadMore();
+                }
+                return true;
+              },
+              child: PostersCollectionView(
+                posters.posters,
+                name: widget.name,
+                callback: widget.callback,
+              ),
             ),
-          ),
-          NotificationListener<ScrollUpdateNotification>(
-            onNotification: (info) {
-              if (info.metrics.pixels >=
-                  info.metrics.maxScrollExtent -
-                      MediaQuery.of(context).size.height) {
-                ref.read(accountBookmarksStateNotifier.notifier).loadMore();
-              }
-              return true;
-            },
-            child: PostersCollectionView(
-              bookmarks.bookmarks,
-              callback: (bookmark, index) {
-                int id;
-                var list = bookmark.tmdbLink!.split('/');
-                list.removeLast();
-                id = int.parse(list.last);
-                ref.watch(router)!.push(
-                      BookmarksRoute(
-                        id: id,
-                        mediaId: bookmark.mediaId!,
-                        tmdbLink: bookmark.tmdbLink!,
-                      ),
-                    );
+            NotificationListener<ScrollUpdateNotification>(
+              onNotification: (info) {
+                if (info.metrics.pixels >=
+                    info.metrics.maxScrollExtent -
+                        MediaQuery.of(context).size.height) {
+                  ref.read(accountBookmarksStateNotifier.notifier).loadMore();
+                }
+                return true;
+              },
+              child: PostersCollectionView(
+                bookmarks.bookmarks,
+                callback: (bookmark, index) {
+                  int id;
+                  var list = bookmark.tmdbLink!.split('/');
+                  list.removeLast();
+                  id = int.parse(list.last);
+                  ref.watch(router)!.push(
+                        BookmarksRoute(
+                          id: id,
+                          mediaId: bookmark.mediaId!,
+                          tmdbLink: bookmark.tmdbLink!,
+                        ),
+                      );
+                },
+              ),
+            ),
+            GridView.builder(
+              padding: const EdgeInsets.all(16.0),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 13.0,
+                mainAxisSpacing: 16.0,
+                mainAxisExtent:
+                    ((MediaQuery.of(context).size.width - 16.0 * 3) / 2) /
+                            540 *
+                            300 +
+                        23,
+              ),
+              itemCount: lists.length + 1,
+              itemBuilder: (context, index) {
+                if (index == lists.length) {
+                  return const CreateListGridWidget();
+                } else {
+                  return ListGridWidget(
+                    (post) => ref.watch(router)!.push(
+                          ListRoute(
+                            id: post!.id,
+                            // type: index,
+                          ),
+                        ),
+                    post: lists[index],
+                  );
+                  //   index: index,
+                  // );
+                }
               },
             ),
-          ),
-          GridView.builder(
-            padding: const EdgeInsets.all(16.0),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 13.0,
-              mainAxisSpacing: 16.0,
-              mainAxisExtent:
-                  ((MediaQuery.of(context).size.width - 16.0 * 3) / 2) /
-                          540 *
-                          300 +
-                      23,
-            ),
-            itemCount: lists.length + 1,
-            itemBuilder: (context, index) {
-              if (index == lists.length) {
-                return const CreateListGridWidget();
-              } else {
-                return ListGridWidget(
-                  (post) => ref.watch(router)!.push(
-                        ListRoute(
-                          id: post!.id,
-                          // type: index,
-                        ),
-                      ),
-                  post: lists[index],
-                );
-                //   index: index,
-                // );
-              }
-            },
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
