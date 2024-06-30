@@ -648,6 +648,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                           Container(
                             color: context.colors.backgroundsPrimary,
                             child: DescriptionTextField(
+                              showDivider: true,
                               button: (widget.id != null)
                                   ? context.txt.poster_dialog_save
                                   : context.txt.listCreate_createNow,

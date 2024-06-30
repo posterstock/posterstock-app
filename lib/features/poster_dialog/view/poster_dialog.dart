@@ -336,74 +336,71 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
         ),
       );
 
-  Widget _descriptionTextField((int, String)? chosenCover) => Container(
-        color: context.colors.backgroundsPrimary,
-        child: DescriptionTextField(
-          focus: focusSec,
-          hint: context.txt.search_add_poster_hint,
-          showDivider: true,
-          button: widget.postMovieModel != null
-              ? context.txt.poster_dialog_save
-              : context.txt.poster_dialog_add_button,
-          buttonAddCheck: !(chosenCover == null),
-          disableWithoutText: widget.postMovieModel != null ? false : true,
-          buttonLoading: ref.watch(createPosterLoadingStateHolderProvider),
-          maxSymbols: 280,
-          controller: descController,
-          onTap: () async {
-            try {
-              ref
-                  .read(createPosterLoadingStateHolderProvider.notifier)
-                  .updateValue(true);
-              final currPost = ref.read(posterStateHolderProvider);
-              final createId =
-                  ref.read(createPosterChoseMovieStateHolderProvider);
-              if (currPost?.name == createId?.title &&
-                  currPost?.year ==
-                      '${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}') {
-                ref.read(posterStateHolderProvider.notifier).updateState(
-                      currPost!.copyWith(hasInCollection: true),
-                    );
-              }
-              if (widget.postMovieModel == null) {
-                await ref
-                    .read(createPosterControllerProvider)
-                    .createPoster(descController.text, context);
-              } else {
-                await ref.read(createPosterControllerProvider).editPoster(
-                    widget.postMovieModel!.id,
-                    widget.postMovieModel!.imagePath,
-                    descController.text,
-                    context);
-              }
-            } catch (_) {
-              Logger.e('Ошибка при создании постера $_');
-            }
+  Widget _descriptionTextField((int, String)? chosenCover) =>
+      DescriptionTextField(
+        focus: focusSec,
+        hint: context.txt.search_add_poster_hint,
+        showDivider: true,
+        button: widget.postMovieModel != null
+            ? context.txt.poster_dialog_save
+            : context.txt.poster_dialog_add_button,
+        buttonAddCheck: !(chosenCover == null),
+        disableWithoutText: widget.postMovieModel != null ? false : true,
+        buttonLoading: ref.watch(createPosterLoadingStateHolderProvider),
+        maxSymbols: 280,
+        controller: descController,
+        onTap: () async {
+          try {
             ref
                 .read(createPosterLoadingStateHolderProvider.notifier)
-                .updateValue(false);
-            ref.read(menuControllerProvider).hideMenu();
-            if (context.mounted) {
-              Navigator.pop(context);
-              final selectedImage =
-                  ref.read(createPosterChosenPosterStateHolderProvider);
-              PostMovieModel? updatedState =
-                  ref.read(posterStateHolderProvider);
-              if (selectedImage != null) {
-                updatedState =
-                    updatedState?.copyWith(imagePath: selectedImage.$2);
-              }
-              ref
-                  .read(createPosterControllerProvider)
-                  .createPosterChosenPosterStateHolder
-                  .updateValue(null);
-
-              ref
-                  .read(posterStateHolderProvider.notifier)
-                  .updateState(updatedState);
+                .updateValue(true);
+            final currPost = ref.read(posterStateHolderProvider);
+            final createId =
+                ref.read(createPosterChoseMovieStateHolderProvider);
+            if (currPost?.name == createId?.title &&
+                currPost?.year ==
+                    '${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}') {
+              ref.read(posterStateHolderProvider.notifier).updateState(
+                    currPost!.copyWith(hasInCollection: true),
+                  );
             }
-          },
-        ),
+            if (widget.postMovieModel == null) {
+              await ref
+                  .read(createPosterControllerProvider)
+                  .createPoster(descController.text, context);
+            } else {
+              await ref.read(createPosterControllerProvider).editPoster(
+                  widget.postMovieModel!.id,
+                  widget.postMovieModel!.imagePath,
+                  descController.text,
+                  context);
+            }
+          } catch (_) {
+            Logger.e('Ошибка при создании постера $_');
+          }
+          ref
+              .read(createPosterLoadingStateHolderProvider.notifier)
+              .updateValue(false);
+          ref.read(menuControllerProvider).hideMenu();
+          if (context.mounted) {
+            Navigator.pop(context);
+            final selectedImage =
+                ref.read(createPosterChosenPosterStateHolderProvider);
+            PostMovieModel? updatedState = ref.read(posterStateHolderProvider);
+            if (selectedImage != null) {
+              updatedState =
+                  updatedState?.copyWith(imagePath: selectedImage.$2);
+            }
+            ref
+                .read(createPosterControllerProvider)
+                .createPosterChosenPosterStateHolder
+                .updateValue(null);
+
+            ref
+                .read(posterStateHolderProvider.notifier)
+                .updateState(updatedState);
+          }
+        },
       );
 
   Widget _addButton((int, String)? chosenCover) => Container(
