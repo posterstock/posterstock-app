@@ -841,7 +841,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                 context: context,
                 // backgroundColor: Colors.transparent,
                 isScrollControlled: true,
-                useSafeArea: true,
+                useSafeArea: false,
                 builder: (context) => PosterDialog(
                   postMovieModel: post,
                 ),

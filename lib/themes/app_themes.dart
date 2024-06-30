@@ -12,7 +12,7 @@ class AppThemes {
   static final lightThemeData = ThemeData.light(useMaterial3: false).copyWith(
     scaffoldBackgroundColor: _appLightColors.backgroundsPrimary,
     bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: _appLightColors.backgroundsPrimary),
+        backgroundColor: _appLightColors.backgroundsPrimary, ),
     splashColor: Colors.transparent,
     highlightColor: _appLightColors.backgroundsSecondary,
     extensions: [

@@ -405,7 +405,7 @@ class _AccountState extends ConsumerState<_AccountScreen>
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      useSafeArea: true,
+      useSafeArea: false,
       builder: (context) => GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {

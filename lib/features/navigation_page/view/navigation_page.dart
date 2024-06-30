@@ -231,7 +231,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                   context: context,
                   // backgroundColor: Colors.transparent,
                   isScrollControlled: true,
-                  useSafeArea: true,
+                  useSafeArea: false,
                   // enableDrag: true,
                   builder: (context) => const PosterDialog(
                     bookmark: true,
@@ -264,7 +264,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                   context: context,
                   // backgroundColor: Colors.transparent,
                   isScrollControlled: true,
-                  useSafeArea: true,
+                  useSafeArea: false,
                   // enableDrag: true,
                   builder: (context) => const PosterDialog(),
                 ).whenComplete(() {
