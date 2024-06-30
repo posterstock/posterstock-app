@@ -179,6 +179,7 @@ class _ListPageState extends ConsumerState<ListPage>
         }
       },
       child: SafeArea(
+        bottom: false,
         child: Scaffold(
           body: Stack(
             children: [
