@@ -250,15 +250,14 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
         ref.read(pickCoverControllerProvider).clearAll();
         return exit;
       },
-      child: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: Container(
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          color: Colors.transparent,
-          // resizeToAvoidBottomInset: true,
+      child: Padding(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
           child: SafeArea(
             child: Stack(
               children: [
