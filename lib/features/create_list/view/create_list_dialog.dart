@@ -250,450 +250,440 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
         ref.read(pickCoverControllerProvider).clearAll();
         return exit;
       },
-      child: Padding(
-        padding:
-            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            FocusScope.of(context).unfocus();
-          },
-          child: SafeArea(
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  bottom: 0,
-                  right: 0,
-                  child: GestureDetector(
-                    onTap: () async {
-                      bool exit = await tryExit(ref);
-                      if (!exit) return;
-                      ref
-                          .read(listSearchValueStateHolderProvider.notifier)
-                          .clearState();
-                      ref.read(pickCoverControllerProvider).clearAll();
-                      // ignore: use_build_context_synchronously
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      color: Colors.transparent,
-                    ),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: SafeArea(
+          bottom: false,
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0,
+                child: GestureDetector(
+                  onTap: () async {
+                    bool exit = await tryExit(ref);
+                    if (!exit) return;
+                    ref
+                        .read(listSearchValueStateHolderProvider.notifier)
+                        .clearState();
+                    ref.read(pickCoverControllerProvider).clearAll();
+                    // ignore: use_build_context_synchronously
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    color: Colors.transparent,
                   ),
                 ),
-                DraggableScrollableSheet(
-                  controller: dragController,
-                  minChildSize: 0,
-                  initialChildSize: 0.7,
-                  maxChildSize: 1,
-                  shouldCloseOnMinExtent: false,
-                  snap: true,
-                  snapSizes: const [0.7, 1],
-                  builder: (context, controller) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(16.0),
-                          topLeft: Radius.circular(16.0),
-                        ),
-                        color: context.colors.backgroundsPrimary,
+              ),
+              DraggableScrollableSheet(
+                controller: dragController,
+                minChildSize: 0,
+                initialChildSize: 0.7,
+                maxChildSize: 1,
+                shouldCloseOnMinExtent: false,
+                snap: true,
+                snapSizes: const [0.7, 1],
+                builder: (context, controller) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                        topRight: Radius.circular(16.0),
+                        topLeft: Radius.circular(16.0),
                       ),
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child:
-                                NotificationListener<ScrollUpdateNotification>(
-                              onNotification: (info) {
-                                if (info.metrics.pixels >=
-                                    info.metrics.maxScrollExtent -
-                                        MediaQuery.of(context).size.height) {
-                                  ref
-                                      .read(
-                                          accountPostersStateNotifier.notifier)
-                                      .loadMore();
-                                }
-                                return true;
-                              },
-                              child: CustomScrollView(
-                                controller: controller,
-                                slivers: [
-                                  SliverPersistentHeader(
-                                    delegate: AppDialogHeaderDelegate(
-                                      extent: 150,
-                                      content: Column(
+                      color: context.colors.backgroundsPrimary,
+                    ),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: NotificationListener<ScrollUpdateNotification>(
+                            onNotification: (info) {
+                              if (info.metrics.pixels >=
+                                  info.metrics.maxScrollExtent -
+                                      MediaQuery.of(context).size.height) {
+                                ref
+                                    .read(accountPostersStateNotifier.notifier)
+                                    .loadMore();
+                              }
+                              return true;
+                            },
+                            child: CustomScrollView(
+                              controller: controller,
+                              slivers: [
+                                SliverPersistentHeader(
+                                  delegate: AppDialogHeaderDelegate(
+                                    extent: 150,
+                                    content: Column(
+                                      children: [
+                                        const SizedBox(height: 14),
+                                        Container(
+                                          height: 4,
+                                          width: 36,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(2.0),
+                                            color: context.colors.fieldsDefault,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 22),
+                                        Text(
+                                          (widget.id != null)
+                                              ? context.txt.list_edit
+                                              : context
+                                                  .txt.listCreate_createNow,
+                                          style: context.textStyles.bodyBold,
+                                        ),
+                                        const SizedBox(height: 0.5),
+                                        const SubTextCreateList(),
+                                        const SizedBox(height: 16.5),
+                                        SizedBox(
+                                          height: 36,
+                                          child: posters.isEmpty == true &&
+                                                  searchController.text.isEmpty
+                                              ? null
+                                              : AppTextField(
+                                                  searchField: true,
+                                                  focus: focus,
+                                                  hint: 'Search',
+                                                  removableWhenNotEmpty: true,
+                                                  crossPadding:
+                                                      const EdgeInsets.all(8.0),
+                                                  crossButton: SvgPicture.asset(
+                                                    'assets/icons/search_cross.svg',
+                                                  ),
+                                                  onRemoved: () {
+                                                    searchController.clear();
+                                                    ref
+                                                        .read(
+                                                            pickCoverControllerProvider)
+                                                        .updateSearch('');
+                                                    ref
+                                                        .read(
+                                                            listSearchValueStateHolderProvider
+                                                                .notifier)
+                                                        .clearState();
+                                                  },
+                                                  onChanged: (value) {
+                                                    ref
+                                                        .read(
+                                                            pickCoverControllerProvider)
+                                                        .updateSearch(value);
+                                                    ref
+                                                        .read(
+                                                            listSearchValueStateHolderProvider
+                                                                .notifier)
+                                                        .updateState(value);
+                                                  },
+                                                  controller: searchController,
+                                                ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                      ],
+                                    ),
+                                  ),
+                                  pinned: true,
+                                ),
+                                if (posters.isEmpty == true)
+                                  SliverFillRemaining(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 32.0,
+                                        vertical: 16.0,
+                                      ),
+                                      child: Column(
                                         children: [
-                                          const SizedBox(height: 14),
-                                          Container(
-                                            height: 4,
-                                            width: 36,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(2.0),
-                                              color:
-                                                  context.colors.fieldsDefault,
+                                          SvgPicture.asset(
+                                            'assets/icons/empty_collection.svg',
+                                            colorFilter: ColorFilter.mode(
+                                              context.colors.iconsDisabled!,
+                                              BlendMode.srcIn,
                                             ),
                                           ),
-                                          const SizedBox(height: 22),
+                                          const SizedBox(height: 12),
                                           Text(
-                                            (widget.id != null)
-                                                ? context.txt.list_edit
-                                                : context
-                                                    .txt.listCreate_createNow,
-                                            style: context.textStyles.bodyBold,
+                                            searchValue.isEmpty
+                                                ? 'To create a list, first add posters to your collection.'
+                                                : 'No posters found',
+                                            style: context
+                                                .textStyles.subheadlineBold!
+                                                .copyWith(
+                                              color:
+                                                  context.colors.textsDisabled,
+                                            ),
+                                            textAlign: TextAlign.center,
                                           ),
-                                          const SizedBox(height: 0.5),
-                                          const SubTextCreateList(),
-                                          const SizedBox(height: 16.5),
-                                          SizedBox(
-                                            height: 36,
-                                            child: posters.isEmpty == true &&
-                                                    searchController
-                                                        .text.isEmpty
-                                                ? null
-                                                : AppTextField(
-                                                    searchField: true,
-                                                    focus: focus,
-                                                    hint: 'Search',
-                                                    removableWhenNotEmpty: true,
-                                                    crossPadding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    crossButton:
-                                                        SvgPicture.asset(
-                                                      'assets/icons/search_cross.svg',
-                                                    ),
-                                                    onRemoved: () {
-                                                      searchController.clear();
-                                                      ref
-                                                          .read(
-                                                              pickCoverControllerProvider)
-                                                          .updateSearch('');
-                                                      ref
-                                                          .read(
-                                                              listSearchValueStateHolderProvider
-                                                                  .notifier)
-                                                          .clearState();
-                                                    },
-                                                    onChanged: (value) {
-                                                      ref
-                                                          .read(
-                                                              pickCoverControllerProvider)
-                                                          .updateSearch(value);
-                                                      ref
-                                                          .read(
-                                                              listSearchValueStateHolderProvider
-                                                                  .notifier)
-                                                          .updateState(value);
-                                                    },
-                                                    controller:
-                                                        searchController,
-                                                  ),
-                                          ),
-                                          const SizedBox(height: 16),
                                         ],
                                       ),
                                     ),
-                                    pinned: true,
                                   ),
-                                  if (posters.isEmpty == true)
-                                    SliverFillRemaining(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 32.0,
-                                          vertical: 16.0,
-                                        ),
-                                        child: Column(
+                                if (posters.isEmpty != true)
+                                  SliverPadding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        16, 0, 16, 24),
+                                    sliver: SliverGrid(
+                                      delegate: SliverChildBuilderDelegate(
+                                        childCount: posters.length,
+                                        (context, index) {
+                                          final poster = posters[index];
+                                          return poster == null
+                                              ? const AdaptivePosterPlaceholder()
+                                              : ChoosePosterTile(
+                                                  imagePath: poster.imagePath,
+                                                  name: poster.name,
+                                                  year: poster.year,
+                                                  id: poster.id,
+                                                  index: index,
+                                                );
+                                        },
+                                      ),
+                                      gridDelegate:
+                                          const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 3,
+                                        crossAxisSpacing: 12.5,
+                                        mainAxisSpacing: 15,
+                                        mainAxisExtent: 201,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (!focus.hasFocus && !popping && !disposed)
+                          const SizedBox(
+                            height: 146,
+                          ),
+                        if (!focus.hasFocus && !popping && !disposed)
+                          Container(
+                            color: context.colors.backgroundsPrimary,
+                            height: MediaQuery.of(context).padding.bottom,
+                          ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              if (!focus.hasFocus)
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: AnimatedBuilder(
+                    animation: dragController,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset: Offset(
+                            0,
+                            !dragController.isAttached
+                                ? 0
+                                : dragController.size >= 0.3
+                                    ? 0
+                                    : (0.3 - dragController.size) *
+                                        MediaQuery.of(context).size.height),
+                        child: child!,
+                      );
+                    },
+                    child: Column(
+                      children: [
+                        Divider(
+                          height: 0.5,
+                          thickness: 0.5,
+                          color: context.colors.fieldsDefault,
+                        ),
+                        Container(
+                          color: context.colors.backgroundsPrimary,
+                          height: 56,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  textCapitalization:
+                                      TextCapitalization.sentences,
+                                  controller: nameController,
+                                  decoration: InputDecoration(
+                                    hintText: 'List name',
+                                    hintStyle:
+                                        context.textStyles.callout!.copyWith(
+                                      color: context.colors.textsDisabled,
+                                    ),
+                                    filled: true,
+                                    fillColor:
+                                        context.colors.backgroundsPrimary,
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 20.0,
+                                      vertical: 12.0,
+                                    ),
+                                  ),
+                                  style: context.textStyles.callout!.copyWith(
+                                    color: context.colors.textsPrimary,
+                                  ),
+                                  onChanged: (value) {
+                                    if (nameController.text.length > 70) {
+                                      nameController.text =
+                                          nameController.text.substring(0, 70);
+                                    }
+                                    setState(() {});
+                                  },
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  dragController
+                                      .animateTo(
+                                    0.7,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.linear,
+                                  )
+                                      .then((value) async {
+                                    XFile? image;
+                                    try {
+                                      image = await ImagePicker().pickImage(
+                                        source: ImageSource.gallery,
+                                      );
+                                    } catch (e) {
+                                      scaffoldMessengerKey.currentState
+                                          ?.showSnackBar(
+                                        // ignore: use_build_context_synchronously
+                                        SnackBars.build(context, null,
+                                            "Could not pick image"),
+                                      );
+                                      return;
+                                    }
+                                    if (image == null) {
+                                      scaffoldMessengerKey.currentState
+                                          ?.showSnackBar(
+                                        // ignore: use_build_context_synchronously
+                                        SnackBars.build(context, null,
+                                            "Could not pick image"),
+                                      );
+                                      return;
+                                    }
+                                    ref
+                                        .read(pickCoverControllerProvider)
+                                        .setImage(image.path);
+                                  });
+                                },
+                                child: Container(
+                                  color: context.colors.backgroundsPrimary,
+                                  child: (image == null ||
+                                          (widget.id != null &&
+                                              image!.contains('http')))
+                                      ? Row(
                                           children: [
-                                            SvgPicture.asset(
-                                              'assets/icons/empty_collection.svg',
-                                              colorFilter: ColorFilter.mode(
-                                                context.colors.iconsDisabled!,
-                                                BlendMode.srcIn,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 12),
                                             Text(
-                                              searchValue.isEmpty
-                                                  ? 'To create a list, first add posters to your collection.'
-                                                  : 'No posters found',
+                                              'Upload cover',
                                               style: context
-                                                  .textStyles.subheadlineBold!
+                                                  .textStyles.caption2!
                                                   .copyWith(
                                                 color: context
                                                     .colors.textsDisabled,
                                               ),
-                                              textAlign: TextAlign.center,
                                             ),
+                                            const SizedBox(width: 10),
+                                            SvgPicture.asset(
+                                              'assets/icons/ic_pick_photo.svg',
+                                              width: 24,
+                                            ),
+                                            //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
+                                            const SizedBox(width: 16),
                                           ],
-                                        ),
-                                      ),
-                                    ),
-                                  if (posters.isEmpty != true)
-                                    SliverPadding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          16, 0, 16, 24),
-                                      sliver: SliverGrid(
-                                        delegate: SliverChildBuilderDelegate(
-                                          childCount: posters.length,
-                                          (context, index) {
-                                            final poster = posters[index];
-                                            return poster == null
-                                                ? const AdaptivePosterPlaceholder()
-                                                : ChoosePosterTile(
-                                                    imagePath: poster.imagePath,
-                                                    name: poster.name,
-                                                    year: poster.year,
-                                                    id: poster.id,
-                                                    index: index,
-                                                  );
-                                          },
-                                        ),
-                                        gridDelegate:
-                                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 3,
-                                          crossAxisSpacing: 12.5,
-                                          mainAxisSpacing: 15,
-                                          mainAxisExtent: 201,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          if (!focus.hasFocus && !popping && !disposed)
-                            const SizedBox(
-                              height: 146,
-                            ),
-                          if (!focus.hasFocus && !popping && !disposed)
-                            Container(
-                              color: context.colors.backgroundsPrimary,
-                              height: MediaQuery.of(context).padding.bottom,
-                            ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-                if (!focus.hasFocus)
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: AnimatedBuilder(
-                      animation: dragController,
-                      builder: (context, child) {
-                        return Transform.translate(
-                          offset: Offset(
-                              0,
-                              !dragController.isAttached
-                                  ? 0
-                                  : dragController.size >= 0.3
-                                      ? 0
-                                      : (0.3 - dragController.size) *
-                                          MediaQuery.of(context).size.height),
-                          child: child!,
-                        );
-                      },
-                      child: Column(
-                        children: [
-                          Divider(
-                            height: 0.5,
-                            thickness: 0.5,
-                            color: context.colors.fieldsDefault,
-                          ),
-                          Container(
-                            color: context.colors.backgroundsPrimary,
-                            height: 56,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    textCapitalization:
-                                        TextCapitalization.sentences,
-                                    controller: nameController,
-                                    decoration: InputDecoration(
-                                      hintText: 'List name',
-                                      hintStyle:
-                                          context.textStyles.callout!.copyWith(
-                                        color: context.colors.textsDisabled,
-                                      ),
-                                      filled: true,
-                                      fillColor:
-                                          context.colors.backgroundsPrimary,
-                                      border: InputBorder.none,
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                        horizontal: 20.0,
-                                        vertical: 12.0,
-                                      ),
-                                    ),
-                                    style: context.textStyles.callout!.copyWith(
-                                      color: context.colors.textsPrimary,
-                                    ),
-                                    onChanged: (value) {
-                                      if (nameController.text.length > 70) {
-                                        nameController.text = nameController
-                                            .text
-                                            .substring(0, 70);
-                                      }
-                                      setState(() {});
-                                    },
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    dragController
-                                        .animateTo(
-                                      0.7,
-                                      duration:
-                                          const Duration(milliseconds: 300),
-                                      curve: Curves.linear,
-                                    )
-                                        .then((value) async {
-                                      XFile? image;
-                                      try {
-                                        image = await ImagePicker().pickImage(
-                                          source: ImageSource.gallery,
-                                        );
-                                      } catch (e) {
-                                        scaffoldMessengerKey.currentState
-                                            ?.showSnackBar(
-                                          // ignore: use_build_context_synchronously
-                                          SnackBars.build(context, null,
-                                              "Could not pick image"),
-                                        );
-                                        return;
-                                      }
-                                      if (image == null) {
-                                        scaffoldMessengerKey.currentState
-                                            ?.showSnackBar(
-                                          // ignore: use_build_context_synchronously
-                                          SnackBars.build(context, null,
-                                              "Could not pick image"),
-                                        );
-                                        return;
-                                      }
-                                      ref
-                                          .read(pickCoverControllerProvider)
-                                          .setImage(image.path);
-                                    });
-                                  },
-                                  child: Container(
-                                    color: context.colors.backgroundsPrimary,
-                                    child: (image == null ||
-                                            (widget.id != null &&
-                                                image!.contains('http')))
-                                        ? Row(
-                                            children: [
-                                              Text(
-                                                'Upload cover',
-                                                style: context
-                                                    .textStyles.caption2!
-                                                    .copyWith(
-                                                  color: context
-                                                      .colors.textsDisabled,
-                                                ),
+                                        )
+                                      : Row(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(2.0),
+                                              child: SizedBox(
+                                                width: 36,
+                                                height: 24,
+                                                child: image!.contains('http')
+                                                    ? Image.network(image!)
+                                                    : Image.file(
+                                                        File(image!),
+                                                        fit: BoxFit.cover,
+                                                        cacheWidth: 24,
+                                                      ),
                                               ),
-                                              const SizedBox(width: 10),
-                                              SvgPicture.asset(
-                                                'assets/icons/ic_pick_photo.svg',
+                                            ),
+                                            const SizedBox(width: 8),
+                                            GestureDetector(
+                                              onTap: () {
+                                                ref
+                                                    .read(
+                                                        pickCoverControllerProvider)
+                                                    .removeImage();
+                                              },
+                                              child: SvgPicture.asset(
+                                                'assets/icons/ic_trash.svg',
                                                 width: 24,
                                               ),
-                                              //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
-                                              const SizedBox(width: 16),
-                                            ],
-                                          )
-                                        : Row(
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(2.0),
-                                                child: SizedBox(
-                                                  width: 36,
-                                                  height: 24,
-                                                  child: image!.contains('http')
-                                                      ? Image.network(image!)
-                                                      : Image.file(
-                                                          File(image!),
-                                                          fit: BoxFit.cover,
-                                                          cacheWidth: 24,
-                                                        ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  ref
-                                                      .read(
-                                                          pickCoverControllerProvider)
-                                                      .removeImage();
-                                                },
-                                                child: SvgPicture.asset(
-                                                  'assets/icons/ic_trash.svg',
-                                                  width: 24,
-                                                ),
-                                              ),
-                                              //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
-                                              const SizedBox(width: 16),
-                                            ],
-                                          ),
-                                  ),
-                                )
-                              ],
-                            ),
+                                            ),
+                                            //SizedBox(width: 36, height: 24, child: Image.memory(image, fit: BoxFit.cover, cacheWidth: 24,)),
+                                            const SizedBox(width: 16),
+                                          ],
+                                        ),
+                                ),
+                              )
+                            ],
                           ),
-                          Container(
-                            color: context.colors.backgroundsPrimary,
-                            child: DescriptionTextField(
-                              showDivider: true,
-                              button: (widget.id != null)
-                                  ? context.txt.poster_dialog_save
-                                  : context.txt.listCreate_createNow,
-                              buttonAddCheck: nameController.text.isNotEmpty &&
-                                  ref
-                                          .watch(
-                                              createListChosenPosterStateHolderProvider)
-                                          .length >
-                                      2 &&
-                                  ref
-                                          .watch(
-                                              createListChosenPosterStateHolderProvider)
-                                          .length <
-                                      31,
-                              controller: descriptionController,
-                              buttonLoading: loading,
-                              onTap: () async {
-                                loading = true;
-                                setState(() {});
-                                await ref
-                                    .read(pickCoverControllerProvider)
-                                    .createList(
-                                      title: nameController.text,
-                                      description: descriptionController.text,
-                                      context: context,
-                                      id: widget.id,
-                                      imagePath: image,
-                                    );
-                                loading = false;
-                                setState(() {});
-                                if (context.mounted) {
-                                  Navigator.pop(context);
-                                  if (widget.id != null) Navigator.pop(context);
-                                }
-                                await ref
-                                    .read(accountListsStateNotifier.notifier)
-                                    .reload();
-                              },
-                            ),
+                        ),
+                        Container(
+                          color: context.colors.backgroundsPrimary,
+                          child: DescriptionTextField(
+                            showDivider: true,
+                            button: (widget.id != null)
+                                ? context.txt.poster_dialog_save
+                                : context.txt.listCreate_createNow,
+                            buttonAddCheck: nameController.text.isNotEmpty &&
+                                ref
+                                        .watch(
+                                            createListChosenPosterStateHolderProvider)
+                                        .length >
+                                    2 &&
+                                ref
+                                        .watch(
+                                            createListChosenPosterStateHolderProvider)
+                                        .length <
+                                    31,
+                            controller: descriptionController,
+                            buttonLoading: loading,
+                            onTap: () async {
+                              loading = true;
+                              setState(() {});
+                              await ref
+                                  .read(pickCoverControllerProvider)
+                                  .createList(
+                                    title: nameController.text,
+                                    description: descriptionController.text,
+                                    context: context,
+                                    id: widget.id,
+                                    imagePath: image,
+                                  );
+                              loading = false;
+                              setState(() {});
+                              if (context.mounted) {
+                                Navigator.pop(context);
+                                if (widget.id != null) Navigator.pop(context);
+                              }
+                              await ref
+                                  .read(accountListsStateNotifier.notifier)
+                                  .reload();
+                            },
                           ),
-                        ],
-                      ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.only(bottom: 34),
+                        ),
+                      ],
                     ),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         ),
       ),
