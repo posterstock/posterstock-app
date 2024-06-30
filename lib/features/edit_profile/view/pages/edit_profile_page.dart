@@ -197,7 +197,7 @@ class EditProfilePage extends ConsumerWidget {
                         context: context,
                         backgroundColor: Colors.transparent,
                         isScrollControlled: true,
-                        useSafeArea: false,
+                        useSafeArea: true,
                         builder: (context) => GestureDetector(
                           onTap: () {
                             Navigator.pop(context);
@@ -240,7 +240,7 @@ class EditProfilePage extends ConsumerWidget {
                         context: context,
                         backgroundColor: Colors.transparent,
                         isScrollControlled: true,
-                        useSafeArea: false,
+                        useSafeArea: true,
                         builder: (context) => GestureDetector(
                           behavior: HitTestBehavior.opaque, // Добавьте это
                           onTap: () {

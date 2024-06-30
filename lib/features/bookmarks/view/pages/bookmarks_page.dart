@@ -219,7 +219,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
                 context: context,
                 backgroundColor: Colors.transparent,
                 isScrollControlled: true,
-                useSafeArea: false,
+                useSafeArea: true,
                 builder: (context) => const PosterDialog(),
               );
             }

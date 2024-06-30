@@ -99,7 +99,7 @@ class CreateListGridWidget extends StatelessWidget {
           isScrollControlled: true,
           enableDrag: false,
           isDismissible: false,
-          useSafeArea: false,
+          useSafeArea: true,
           builder: (context) => const CreateListDialog(),
         );
       },

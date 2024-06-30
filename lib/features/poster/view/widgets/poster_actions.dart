@@ -97,7 +97,7 @@ class PosterActions extends ConsumerWidget {
                   context: context,
                   backgroundColor: Colors.transparent,
                   isScrollControlled: true,
-                  useSafeArea: false,
+                  useSafeArea: true,
                   builder: (context) => const PosterDialog(),
                 );
               }

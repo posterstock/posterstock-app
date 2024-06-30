@@ -467,7 +467,7 @@ class _ListPageState extends ConsumerState<ListPage>
                 isScrollControlled: true,
                 enableDrag: false,
                 isDismissible: false,
-                useSafeArea: false,
+                useSafeArea: true,
                 builder: (context) => CreateListDialog(id: list.id),
               );
               await ref.read(listsControllerProvider).getPost(widget.id);
