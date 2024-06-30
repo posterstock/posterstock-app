@@ -661,9 +661,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                           .watch(
                                               createListChosenPosterStateHolderProvider)
                                           .length <
-                                      31 &&
-                                  (descriptionController.text.isNotEmpty ||
-                                      widget.id == null),
+                                      31,
                               controller: descriptionController,
                               buttonLoading: loading,
                               onTap: () async {
