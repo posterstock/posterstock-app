@@ -101,83 +101,81 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
           exiting = false;
           return true;
         },
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 38.0),
-            child: Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16.0),
-                child: Container(
-                  height: 132,
-                  decoration: BoxDecoration(
-                    color: context.colors.backgroundsPrimary,
-                    borderRadius: BorderRadius.circular(16.0),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x29000000),
-                        offset: Offset(0, 16),
-                        blurRadius: 24,
-                        spreadRadius: 0,
-                      )
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            'Do you want to discard\nthe list?',
-                            style: context.textStyles.bodyBold,
-                            textAlign: TextAlign.center,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 38.0),
+          child: Center(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16.0),
+              child: Container(
+                height: 132,
+                decoration: BoxDecoration(
+                  color: context.colors.backgroundsPrimary,
+                  borderRadius: BorderRadius.circular(16.0),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x29000000),
+                      offset: Offset(0, 16),
+                      blurRadius: 24,
+                      spreadRadius: 0,
+                    )
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          'Do you want to discard\nthe list?',
+                          style: context.textStyles.bodyBold,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                    Divider(
+                      height: 0.5,
+                      thickness: 0.5,
+                      color: context.colors.fieldsDefault,
+                    ),
+                    SizedBox(
+                      height: 52,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: CustomInkWell(
+                              onTap: () {
+                                exiting = false;
+                                ref.read(menuControllerProvider).switchMenu();
+                                Navigator.pop(context, true);
+                              },
+                              child: Center(
+                                child: Text(
+                                  'Discard',
+                                  style:
+                                      context.textStyles.bodyRegular!.copyWith(
+                                    color: context.colors.textsError,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      Divider(
-                        height: 0.5,
-                        thickness: 0.5,
-                        color: context.colors.fieldsDefault,
-                      ),
-                      SizedBox(
-                        height: 52,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: CustomInkWell(
-                                onTap: () {
-                                  exiting = false;
-                                  ref.read(menuControllerProvider).switchMenu();
-                                  Navigator.pop(context, true);
-                                },
-                                child: Center(
-                                  child: Text(
-                                    'Discard',
-                                    style: context.textStyles.bodyRegular!
-                                        .copyWith(
-                                      color: context.colors.textsError,
-                                    ),
-                                  ),
+                          Expanded(
+                            child: CustomInkWell(
+                              onTap: () {
+                                exiting = false;
+                                Navigator.pop(context, false);
+                              },
+                              child: Center(
+                                child: Text(
+                                  'Cancel',
+                                  style: context.textStyles.bodyRegular,
                                 ),
                               ),
                             ),
-                            Expanded(
-                              child: CustomInkWell(
-                                onTap: () {
-                                  exiting = false;
-                                  Navigator.pop(context, false);
-                                },
-                                child: Center(
-                                  child: Text(
-                                    'Cancel',
-                                    style: context.textStyles.bodyRegular,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -256,10 +254,12 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
         onTap: () {
           FocusScope.of(context).unfocus();
         },
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          resizeToAvoidBottomInset: true,
-          body: SafeArea(
+        child: Container(
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          color: Colors.transparent,
+          // resizeToAvoidBottomInset: true,
+          child: SafeArea(
             child: Stack(
               children: [
                 Positioned(
