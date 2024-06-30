@@ -39,10 +39,11 @@ class _CommentTextFieldState extends ConsumerState<CommentTextField> {
       onNotification: (not) {
         return true;
       },
-      child: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          color: context.colors.backgroundsPrimary,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        color: context.colors.backgroundsPrimary,
+        child: SafeArea(
+          top: false,
           child: Column(
             children: [
               Divider(
