@@ -255,9 +255,10 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
         onTap: () {
           FocusScope.of(context).unfocus();
         },
-        child: SafeArea(
-          bottom: false,
-          child: Stack(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          resizeToAvoidBottomInset: true,
+          body: Stack(
             children: [
               Positioned(
                 top: 0,
