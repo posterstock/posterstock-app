@@ -180,6 +180,7 @@ class _ListPageState extends ConsumerState<ListPage>
       },
       child: SafeArea(
         bottom: false,
+        top: false,
         child: Scaffold(
           body: Stack(
             children: [
