@@ -678,7 +678,11 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.only(bottom: 34),
+                          padding: EdgeInsets.only(
+                              bottom:
+                                  MediaQuery.of(context).viewInsets.bottom == 0
+                                      ? 34
+                                      : 0),
                         ),
                       ],
                     ),
