@@ -9,18 +9,19 @@ class AppThemes {
   static const _appDarkColors = AppDarkColors();
   static final _appDarkTextStyles = AppAllTextStyles(_appDarkColors);
 
-  static final lightThemeData = ThemeData.light().copyWith(
-      scaffoldBackgroundColor: _appLightColors.backgroundsPrimary,
-      bottomSheetTheme: BottomSheetThemeData(
-          backgroundColor: _appLightColors.backgroundsPrimary),
-      splashColor: Colors.transparent,
-      highlightColor: _appLightColors.backgroundsSecondary,
-      extensions: [
-        _appLightColors,
-        _appLightTextStyles,
-      ]);
+  static final lightThemeData = ThemeData.light(useMaterial3: false).copyWith(
+    scaffoldBackgroundColor: _appLightColors.backgroundsPrimary,
+    bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: _appLightColors.backgroundsPrimary, ),
+    splashColor: Colors.transparent,
+    highlightColor: _appLightColors.backgroundsSecondary,
+    extensions: [
+      _appLightColors,
+      _appLightTextStyles,
+    ],
+  );
 
-  static final darkThemeData = ThemeData.dark().copyWith(
+  static final darkThemeData = ThemeData.dark(useMaterial3: false).copyWith(
       scaffoldBackgroundColor: _appDarkColors.backgroundsPrimary,
       bottomSheetTheme: BottomSheetThemeData(
           backgroundColor: _appDarkColors.backgroundsPrimary),

@@ -22,7 +22,6 @@ class SearchUserTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print(user.id);
     return InkWell(
       onTap: () => context.pushRoute(
         UserRoute(args: UserArgs(user.id, user.username)),

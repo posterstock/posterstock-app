@@ -206,7 +206,7 @@ class _AccountState extends ConsumerState<_AccountScreen>
                                 onTap: () {
                                   ref.watch(router)!.push(EditProfileRoute());
                                 },
-                                text: context.txt.edit.capitalize(),
+                                text: context.txt.account_edit.capitalize(),
                                 backgroundColor: context.colors.fieldsDefault,
                                 textColor: context.colors.textsPrimary,
                               ),
@@ -237,11 +237,14 @@ class _AccountState extends ConsumerState<_AccountScreen>
                 toolbarHeight: 48,
                 pinned: true,
                 leading: const SizedBox(),
-                flexibleSpace: AppTabBar(tabController, [
-                  context.txt.profile_watched,
-                  context.txt.profile_watchlist,
-                  context.txt.lists,
-                ]),
+                flexibleSpace: AppTabBar(
+                  tabController,
+                  [
+                    context.txt.profile_watched,
+                    context.txt.profile_watchlist,
+                    context.txt.lists,
+                  ],
+                ),
               ),
               SliverToBoxAdapter(
                 child: AnimatedBuilder(
@@ -264,7 +267,8 @@ class _AccountState extends ConsumerState<_AccountScreen>
                                 child: AppTextField(
                                   controller: searchController,
                                   searchField: true,
-                                  hint: context.txt.search,
+                                  // autofocus: true,
+                                  hint: context.txt.search_page_search_hint,
                                   removableWhenNotEmpty: true,
                                   crossPadding: const EdgeInsets.all(8.0),
                                   crossButton: SvgPicture.asset(
@@ -380,7 +384,7 @@ class _AccountState extends ConsumerState<_AccountScreen>
         ),
         MenuItem(
           'assets/icons/search.svg',
-          context.txt.search,
+          context.txt.search_page_search_hint,
           () {
             context.router.push(const PageRouteInfo(SearchRoute.name));
             // animationController.animateTo(1);
@@ -403,11 +407,17 @@ class _AccountState extends ConsumerState<_AccountScreen>
       isScrollControlled: true,
       useSafeArea: true,
       builder: (context) => GestureDetector(
-        onTap: context.back,
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          Navigator.of(context).pop();
+        },
         child: Container(
           height: double.infinity,
           color: Colors.transparent,
-          child: const ProfilePhotoDialog(),
+          child: GestureDetector(
+            onTap: () {},
+            child: const ProfilePhotoDialog(),
+          ),
         ),
       ),
     );
@@ -442,9 +452,11 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
   Widget build(BuildContext context) {
     // final accountController = ref.read(accountControllerProvider);
     final lists = ref.watch(accountListsStateNotifier);
+    // ignore: unused_local_variable
     final searchValue = ref.watch(listSearchValueStateHolderProvider);
     final posters = ref.watch(accountPostersStateNotifier);
     // final posters = accountController.posters;
+    // ignore: unused_local_variable
     final postersSearch = ref.watch(listSearchPostsStateHolderProvider);
     final bookmarks = ref.watch(accountBookmarksStateNotifier);
     // final profile = ref.watch(profileInfoStateHolderProvider);
@@ -458,95 +470,101 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
     //       duration: const Duration(milliseconds: 300), curve: Curves.linear);
     //   // widget.animationController.value = 0;
     // }
-    return AnimatedBuilder(
-      animation: widget.animationController,
-      builder: (context, child) {
-        if (widget.animationController.value <= 0.5 &&
-            widget.searchTextController.text.isNotEmpty) {
-          Future(() {
-            ref.read(listSearchValueStateHolderProvider.notifier).clearState();
-            ref.read(listSearchPostsStateHolderProvider.notifier).clearState();
-            widget.searchTextController.clear();
-          });
-        }
-        return child!;
-      },
-      child: TabBarView(
-        controller: widget.controller,
-        children: [
-          NotificationListener<ScrollUpdateNotification>(
-            onNotification: (info) {
-              if (info.metrics.pixels >=
-                  info.metrics.maxScrollExtent -
-                      MediaQuery.of(context).size.height) {
-                ref.read(accountPostersStateNotifier.notifier).loadMore();
-              }
-              return true;
-            },
-            child: PostersCollectionView(
-              posters.posters,
-              name: widget.name,
-              callback: widget.callback,
+    return SafeArea(
+      child: AnimatedBuilder(
+        animation: widget.animationController,
+        builder: (context, child) {
+          if (widget.animationController.value <= 0.5 &&
+              widget.searchTextController.text.isNotEmpty) {
+            Future(() {
+              ref
+                  .read(listSearchValueStateHolderProvider.notifier)
+                  .clearState();
+              ref
+                  .read(listSearchPostsStateHolderProvider.notifier)
+                  .clearState();
+              widget.searchTextController.clear();
+            });
+          }
+          return child!;
+        },
+        child: TabBarView(
+          controller: widget.controller,
+          children: [
+            NotificationListener<ScrollUpdateNotification>(
+              onNotification: (info) {
+                if (info.metrics.pixels >=
+                    info.metrics.maxScrollExtent -
+                        MediaQuery.of(context).size.height) {
+                  ref.read(accountPostersStateNotifier.notifier).loadMore();
+                }
+                return true;
+              },
+              child: PostersCollectionView(
+                posters.posters,
+                name: widget.name,
+                callback: widget.callback,
+              ),
             ),
-          ),
-          NotificationListener<ScrollUpdateNotification>(
-            onNotification: (info) {
-              if (info.metrics.pixels >=
-                  info.metrics.maxScrollExtent -
-                      MediaQuery.of(context).size.height) {
-                ref.read(accountBookmarksStateNotifier.notifier).loadMore();
-              }
-              return true;
-            },
-            child: PostersCollectionView(
-              bookmarks.bookmarks,
-              callback: (bookmark, index) {
-                int id;
-                var list = bookmark.tmdbLink!.split('/');
-                list.removeLast();
-                id = int.parse(list.last);
-                ref.watch(router)!.push(
-                      BookmarksRoute(
-                        id: id,
-                        mediaId: bookmark.mediaId!,
-                        tmdbLink: bookmark.tmdbLink!,
-                      ),
-                    );
+            NotificationListener<ScrollUpdateNotification>(
+              onNotification: (info) {
+                if (info.metrics.pixels >=
+                    info.metrics.maxScrollExtent -
+                        MediaQuery.of(context).size.height) {
+                  ref.read(accountBookmarksStateNotifier.notifier).loadMore();
+                }
+                return true;
+              },
+              child: PostersCollectionView(
+                bookmarks.bookmarks,
+                callback: (bookmark, index) {
+                  int id;
+                  var list = bookmark.tmdbLink!.split('/');
+                  list.removeLast();
+                  id = int.parse(list.last);
+                  ref.watch(router)!.push(
+                        BookmarksRoute(
+                          id: id,
+                          mediaId: bookmark.mediaId!,
+                          tmdbLink: bookmark.tmdbLink!,
+                        ),
+                      );
+                },
+              ),
+            ),
+            GridView.builder(
+              padding: const EdgeInsets.all(16.0),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 13.0,
+                mainAxisSpacing: 16.0,
+                mainAxisExtent:
+                    ((MediaQuery.of(context).size.width - 16.0 * 3) / 2) /
+                            540 *
+                            300 +
+                        23,
+              ),
+              itemCount: lists.length + 1,
+              itemBuilder: (context, index) {
+                if (index == lists.length) {
+                  return const CreateListGridWidget();
+                } else {
+                  return ListGridWidget(
+                    (post) => ref.watch(router)!.push(
+                          ListRoute(
+                            id: post!.id,
+                            // type: index,
+                          ),
+                        ),
+                    post: lists[index],
+                  );
+                  //   index: index,
+                  // );
+                }
               },
             ),
-          ),
-          GridView.builder(
-            padding: const EdgeInsets.all(16.0),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 13.0,
-              mainAxisSpacing: 16.0,
-              mainAxisExtent:
-                  ((MediaQuery.of(context).size.width - 16.0 * 3) / 2) /
-                          540 *
-                          300 +
-                      23,
-            ),
-            itemCount: lists.length + 1,
-            itemBuilder: (context, index) {
-              if (index == lists.length) {
-                return const CreateListGridWidget();
-              } else {
-                return ListGridWidget(
-                  (post) => ref.watch(router)!.push(
-                        ListRoute(
-                          id: post!.id,
-                          // type: index,
-                        ),
-                      ),
-                  post: lists[index],
-                );
-                //   index: index,
-                // );
-              }
-            },
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

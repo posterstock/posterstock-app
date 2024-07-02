@@ -49,7 +49,6 @@ class _PeekAndPopDialogState extends State<PeekAndPopDialog> {
           }
         },
         builder: (context, state) {
-          print('rev');
           return Listener(
             onPointerUp: (details) {
               _timer?.cancel();

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
@@ -6,6 +8,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -25,11 +28,11 @@ import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_use
 import 'package:poster_stock/features/edit_profile/state_holder/edit_profile_username_state_holder.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
-import 'package:poster_stock/features/profile/state_holders/profile_info_state_holder.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 @RoutePage()
+// ignore: must_be_immutable
 class EditProfilePage extends ConsumerWidget {
   EditProfilePage({Key? key}) : super(key: key);
 
@@ -160,7 +163,7 @@ class EditProfilePage extends ConsumerWidget {
                                     .save();
                                 await ref
                                     .read(profileControllerApiProvider)
-                                    .getUserInfo(null);
+                                    .getUserInfo(null, context);
                                 ref
                                     .read(editProfileControllerProvider)
                                     .setLoading(false);
@@ -239,13 +242,17 @@ class EditProfilePage extends ConsumerWidget {
                         isScrollControlled: true,
                         useSafeArea: true,
                         builder: (context) => GestureDetector(
+                          behavior: HitTestBehavior.opaque, // Добавьте это
                           onTap: () {
                             Navigator.pop(context);
                           },
                           child: Container(
                             height: double.infinity,
                             color: Colors.transparent,
-                            child: const ProfilePhotoDialog(),
+                            child: GestureDetector(
+                              onTap: () {},
+                              child: const ProfilePhotoDialog(),
+                            ),
                           ),
                         ),
                       );
@@ -464,7 +471,6 @@ class _UsernameFieldProfileState extends ConsumerState<UsernameFieldProfile> {
       },
       onChanged: (value) {
         ref.read(editProfileUsernameStateHolder.notifier).updateValue(value);
-        print(value);
         if (value.length < 5) {
           ref.read(editProfileControllerProvider).setTooShortErrorUsername();
           return;
@@ -645,7 +651,7 @@ class ProfilePhotoDialog extends ConsumerWidget {
                                     .setImage(image.path);
                                 Navigator.pop(context);
                               } catch (e) {
-                                print(e);
+                                Logger.e('Ошибка при выборе из галереи $e');
                                 scaffoldMessengerKey.currentState?.showSnackBar(
                                   SnackBars.build(
                                       context, null, "Could not pick image"),
@@ -675,7 +681,6 @@ class ProfilePhotoDialog extends ConsumerWidget {
                                   .pickImage(source: ImageSource.camera);
                               final image = await xfile?.readAsBytes();
                               if (image != null) {
-                                print(image);
                                 ref
                                     .read(profileControllerProvider)
                                     .setPhoto(image);

@@ -20,9 +20,6 @@ class NotificationModel {
   });
 
   factory NotificationModel.fromJson(Map<String, Object?> json) {
-    print(json);
-    print(
-        '${json['text']} ${json['sent_at']} ${DateTime.fromMillisecondsSinceEpoch((json['sent_at'] as int) * 1000)} ${DateTime.now().toLocal()}');
     return NotificationModel(
       id: json.toString(),
       info: (json['text'] as String).replaceFirst(
@@ -41,7 +38,7 @@ class NotificationModel {
   }
 
   static String convertDeepLink(String value) {
-    var splittedUrl = value.split('/') ?? [];
+    var splittedUrl = value.split('/');
     String initLink = '';
     bool hasHttp = splittedUrl[0].startsWith('http');
     splittedUrl.removeAt(0);
@@ -51,7 +48,7 @@ class NotificationModel {
     }
     initLink = '/';
     for (var i = 0; i < splittedUrl.length; i++) {
-      initLink = '${initLink!}${splittedUrl[i]}/';
+      initLink = '$initLink${splittedUrl[i]}/';
     }
     return initLink;
   }

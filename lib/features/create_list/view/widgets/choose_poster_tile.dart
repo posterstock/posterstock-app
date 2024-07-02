@@ -23,14 +23,14 @@ class ChoosePosterTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(createListChosenPosterStateHolderProvider);
     final shimmer = ShimmerLoader(
       child: Container(
         color: Colors.white,
       ),
     );
     bool chosen = false;
-    for (var i in ref
-        .watch(createListChosenPosterStateHolderProvider)) {
+    for (var i in ref.watch(createListChosenPosterStateHolderProvider)) {
       if (i.$1 == id) chosen = true;
     }
     return Column(

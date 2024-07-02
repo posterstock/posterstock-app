@@ -44,9 +44,10 @@ class SearchPage extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: AppTextField(
+                      autofocus: true,
                       controller: textController,
                       searchField: true,
-                      hint: context.txt.search,
+                      hint: context.txt.search_page_search_hint,
                       removableWhenNotEmpty: true,
                       crossPadding: const EdgeInsets.all(8.0),
                       crossButton: SvgPicture.asset(
@@ -214,7 +215,7 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
                         ),
                       );
                     }
-                    return SearchUserTile(user: users![index]);
+                    return SearchUserTile(user: users[index]);
                   },
                   separatorBuilder: (BuildContext context, int index) {
                     return Padding(
@@ -280,7 +281,7 @@ class SearchTabViewState extends ConsumerState<SearchTabView>
                       );
                     }
                     return PostBase(
-                      key: Key(posters![index].id.toString()),
+                      key: Key(posters[index].id.toString()),
                       poster: posters[index],
                       showSuggestion: false,
                     );

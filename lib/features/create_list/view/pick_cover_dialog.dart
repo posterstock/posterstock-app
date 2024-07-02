@@ -1,12 +1,7 @@
 import 'dart:io';
-import 'dart:isolate';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:photo_manager/photo_manager.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
-import 'package:poster_stock/features/create_list/state_holders/gallery_index_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:transparent_image/transparent_image.dart';
 
@@ -109,19 +104,17 @@ class _PickCoverDialogState extends ConsumerState<PickCoverDialog> {
                       key: Key(index.toString()),
                       color: context.colors.backgroundsSecondary,
                       child: images.length <= index || images[index] == null
-                          ? SizedBox()
+                          ? const SizedBox()
                           : FutureBuilder(
-                            future: images[index]!.file,
-                            builder: (context, snapshot) {
-                              if (!snapshot.hasData) return SizedBox();
-                              print(snapshot.data);
-                              return GalleryCover(
+                              future: images[index]!.file,
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) return const SizedBox();
+                                return GalleryCover(
                                   key: Key("image${images[index]!.id}"),
                                   image: snapshot.data!.path,
                                   onTap: widget.onItemTap,
                                 );
-                            }
-                          ),
+                              }),
                     );
                   },
                 ),

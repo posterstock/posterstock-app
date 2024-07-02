@@ -1,9 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final chosenCoverStateHolderProvider =
-StateNotifierProvider<ChosenCoverStateHolder, String?>(
-      (ref) => ChosenCoverStateHolder(null),
+    StateNotifierProvider<ChosenCoverStateHolder, String?>(
+  (ref) => ChosenCoverStateHolder(null),
 );
 
 class ChosenCoverStateHolder extends StateNotifier<String?> {
@@ -17,4 +16,5 @@ class ChosenCoverStateHolder extends StateNotifier<String?> {
     state = null;
   }
 
+  String? get currentState => state;
 }

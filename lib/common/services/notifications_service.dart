@@ -5,6 +5,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
@@ -107,7 +108,6 @@ Future<void> initPushes(StackRouter? routerLocal, WidgetRef ref) async {
 /// поля notification, но можно всё поменять на data
 @pragma('vm:entry-point')
 void showPush(RemoteMessage message, {WidgetRef? ref}) async {
-  print(message.data);
   BigPictureStyleInformation? bigPictureStyleInformation;
   String filePath = "";
   try {
@@ -135,7 +135,7 @@ void showPush(RemoteMessage message, {WidgetRef? ref}) async {
           ByteArrayAndroidBitmap.fromBase64String(base64Encode(response.data)),
     );
   } catch (e) {
-    print(e);
+    Logger.e('Ошибка при удалении постера $e');
   }
   DarwinNotificationDetails iosNotificationDetails = DarwinNotificationDetails(
       categoryIdentifier: darwinNotificationCategoryPlain,

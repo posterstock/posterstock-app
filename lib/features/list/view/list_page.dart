@@ -1,15 +1,22 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/constants/durations.dart';
+import 'package:poster_stock/common/menu/menu_dialog.dart';
+import 'package:poster_stock/common/menu/menu_state.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/comment_text_field.dart';
+import 'package:poster_stock/features/account/notifiers/lists_notifier.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
+import 'package:poster_stock/features/create_list/view/create_list_dialog.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
@@ -68,15 +75,7 @@ class _ListPageState extends ConsumerState<ListPage>
     ),
   );
 
-  @override
-  void initState() {
-    super.initState();
-    animationController = AnimationController(
-      vsync: this,
-      lowerBound: 36,
-      upperBound: 1000,
-      duration: Duration.zero,
-    );
+  Future init() async {
     Future(() async {
       ref.read(listsControllerProvider).clear();
       if (widget.type != null) {
@@ -87,6 +86,18 @@ class _ListPageState extends ConsumerState<ListPage>
       animationController
           .animateTo(MediaQuery.of(context).size.width / 540 * 300);
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    animationController = AnimationController(
+      vsync: this,
+      lowerBound: 36,
+      upperBound: 1000,
+      duration: Duration.zero,
+    );
+    init();
   }
 
   double velocity = 0;
@@ -146,7 +157,9 @@ class _ListPageState extends ConsumerState<ListPage>
               .stackData
               .lastWhere((element) => element.route.path == '/list/:id');
           ref.read(listsControllerProvider).getPost(el.pathParams.getInt('id'));
-        } catch (e) {}
+        } catch (e) {
+          Logger.e('Ошибка при получении списка $e');
+        }
       });
     }
     final comments = ref.watch(commentsStateHolderProvider);
@@ -165,245 +178,356 @@ class _ListPageState extends ConsumerState<ListPage>
           jumpToEnd();
         }
       },
-      child: Scaffold(
-        body: Stack(
-          children: [
-            NotificationListener<ScrollNotification>(
-              onNotification: (notification) {
-                if (notification is ScrollUpdateNotification) {
-                  velocity = notification.dragDetails?.delta.dy ?? 0;
-                  if (notification.metrics.pixels < 0) {
-                    animationController
-                        .animateTo(newHeight - notification.metrics.pixels);
-                  } else {
-                    animationController
-                        .animateTo(newHeight - notification.metrics.pixels);
+      child: SafeArea(
+        bottom: false,
+        top: false,
+        child: Scaffold(
+          body: Stack(
+            children: [
+              NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  if (notification is ScrollUpdateNotification) {
+                    velocity = notification.dragDetails?.delta.dy ?? 0;
+                    if (notification.metrics.pixels < 0) {
+                      animationController
+                          .animateTo(newHeight - notification.metrics.pixels);
+                    } else {
+                      animationController
+                          .animateTo(newHeight - notification.metrics.pixels);
+                    }
                   }
-                }
-                if (notification is ScrollEndNotification) {
-                  if (notification.metrics.pixels > newHeight) return false;
-                  if (notification.metrics.pixels < 0) return false;
-                  jumpToEnd();
-                }
-                return true;
-              },
-              child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
-                controller: scrollController,
-                slivers: [
-                  SliverAppBar(
-                    backgroundColor: context.colors.backgroundsPrimary,
-                    elevation: 0,
-                    leadingWidth: 130,
-                    toolbarHeight: 42,
-                    expandedHeight: 292,
-                    collapsedHeight: 42,
-                    pinned: true,
-                    leading: const CustomBackButton(),
-                    actions: [
-                      GestureDetector(
-                        onTap: () {
-                          if (posts == null) return;
-                          showModalBottomSheet(
-                            context: context,
-                            backgroundColor: Colors.transparent,
-                            isScrollControlled: true,
-                            builder: (context) => GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                color: Colors.transparent,
-                                child: ListActionsDialog(widget.type),
+                  if (notification is ScrollEndNotification) {
+                    if (notification.metrics.pixels > newHeight) return false;
+                    if (notification.metrics.pixels < 0) return false;
+                    jumpToEnd();
+                  }
+                  return true;
+                },
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  controller: scrollController,
+                  slivers: [
+                    SliverAppBar(
+                      backgroundColor: context.colors.backgroundsPrimary,
+                      elevation: 0,
+                      leadingWidth: 130,
+                      toolbarHeight: 42,
+                      expandedHeight: 292,
+                      collapsedHeight: 42,
+                      pinned: true,
+                      leading: const CustomBackButton(),
+                      actions: [
+                        GestureDetector(
+                          onTap: () async {
+                            if (posts == null) return;
+                            await showMenuList();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: SvgPicture.asset(
+                              'assets/icons/ic_dots.svg',
+                              colorFilter: ColorFilter.mode(
+                                context.colors.iconsDefault!,
+                                BlendMode.srcIn,
                               ),
-                            ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 16),
-                          child: SvgPicture.asset(
-                            'assets/icons/ic_dots.svg',
-                            colorFilter: ColorFilter.mode(
-                              context.colors.iconsDefault!,
-                              BlendMode.srcIn,
                             ),
                           ),
-                        ),
-                      )
-                    ],
-                  ),
-                  SliverPadding(
-                    padding: EdgeInsets.only(bottom: 16.0),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          if (index == 0) {
-                            return CollectionInfoWidget(
-                              shimmer: shimmer,
-                              post: posts,
-                            );
-                          }
-                          if (index == (comments?.length ?? 0) + 1) {
-                            return SizedBox(
-                              height: getEmptySpaceHeightForCollection(
-                                          context, posts) <
-                                      56 + MediaQuery.of(context).padding.bottom
-                                  ? 56 + MediaQuery.of(context).padding.bottom
-                                  : getEmptySpaceHeightForCollection(
-                                      context, posts),
-                            );
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 6.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0,
-                                  ),
-                                  child: UserInfoTile(
-                                    type: InfoDialogType.listComment,
-                                    myEntity: posts?.author.id ==
-                                        ref
-                                            .watch(
-                                                myProfileInfoStateHolderProvider)
-                                            ?.id,
-                                    entityId: comments?[index - 1].id ?? -1,
-                                    showFollowButton: false,
-                                    user: comments?[index - 1].model,
-                                    time: comments?[index - 1].time,
-                                    behavior: HitTestBehavior.translucent,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    const SizedBox(
-                                      width: 68,
+                        )
+                      ],
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            if (index == 0) {
+                              return CollectionInfoWidget(
+                                shimmer: shimmer,
+                                post: posts,
+                              );
+                            }
+                            if (index == (comments?.length ?? 0) + 1) {
+                              return SizedBox(
+                                height: getEmptySpaceHeightForCollection(
+                                            context, posts) <
+                                        56 +
+                                            MediaQuery.of(context)
+                                                .padding
+                                                .bottom
+                                    ? 56 + MediaQuery.of(context).padding.bottom
+                                    : getEmptySpaceHeightForCollection(
+                                        context, posts),
+                              );
+                            }
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 6.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0,
                                     ),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 16.0),
-                                            child: Text(
-                                              comments![index - 1].text,
-                                              style: context
-                                                  .textStyles.subheadline!,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 12),
-                                          if (index - 1 != comments.length - 1)
-                                            Divider(
-                                              height: 0.5,
-                                              thickness: 0.5,
-                                              color:
-                                                  context.colors.fieldsDefault,
-                                            ),
-                                        ],
+                                    child: UserInfoTile(
+                                      type: InfoDialogType.listComment,
+                                      myEntity: posts?.author.id ==
+                                          ref
+                                              .watch(
+                                                  myProfileInfoStateHolderProvider)
+                                              ?.id,
+                                      entityId: comments?[index - 1].id ?? -1,
+                                      showFollowButton: false,
+                                      user: comments?[index - 1].model,
+                                      time: comments?[index - 1].time,
+                                      behavior: HitTestBehavior.translucent,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      const SizedBox(
+                                        width: 68,
                                       ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          );
-                        },
-                        childCount: 2 + (comments?.length ?? 0),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 16.0),
+                                              child: Text(
+                                                comments![index - 1].text,
+                                                style: context
+                                                    .textStyles.subheadline!,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            if (index - 1 !=
+                                                comments.length - 1)
+                                              Divider(
+                                                height: 0.5,
+                                                thickness: 0.5,
+                                                color: context
+                                                    .colors.fieldsDefault,
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                          childCount: 2 + (comments?.length ?? 0),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            SafeArea(
-              child: IgnorePointer(
-                ignoring: true,
-                child: AnimatedBuilder(
-                  animation: animationController,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(
-                          0,
-                          (animationController.value - 36) /
-                              (newHeight - 36) *
-                              42),
-                      child: Transform.scale(
-                        alignment: Alignment.topCenter,
-                        scale: animationController.value / newHeight > 1
-                            ? ((newHeight +
-                                    (animationController.value - newHeight) *
-                                        0.8) /
-                                newHeight)
-                            : animationController.value / newHeight,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular((1 -
-                                  (animationController.value - 36) /
-                                      (newHeight - 36)) *
-                              20),
-                          child: child,
+              SafeArea(
+                child: IgnorePointer(
+                  ignoring: true,
+                  child: AnimatedBuilder(
+                    animation: animationController,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset: Offset(
+                            0,
+                            (animationController.value - 36) /
+                                (newHeight - 36) *
+                                42),
+                        child: Transform.scale(
+                          alignment: Alignment.topCenter,
+                          scale: animationController.value / newHeight > 1
+                              ? ((newHeight +
+                                      (animationController.value - newHeight) *
+                                          0.8) /
+                                  newHeight)
+                              : animationController.value / newHeight,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular((1 -
+                                    (animationController.value - 36) /
+                                        (newHeight - 36)) *
+                                20),
+                            child: child,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  child: ShimmerLoader(
-                    loaded: posts != null,
-                    child: Container(
-                      color: context.colors.backgroundsSecondary,
-                      height: MediaQuery.of(context).size.width / 540 * 300,
-                      width: double.infinity,
-                      child: posts?.image != null
-                          ? CachedNetworkImage(
-                              imageUrl: posts!.image!,
-                              fit: BoxFit.cover,
-                              placeholderFadeInDuration:
-                                  CustomDurations.cachedDuration,
-                              fadeInDuration: CustomDurations.cachedDuration,
-                              fadeOutDuration: CustomDurations.cachedDuration,
-                              placeholder: (context, child) {
-                                return shimmer;
-                              },
-                              errorWidget: (context, obj, trace) {
-                                return shimmer;
-                              },
-                            )
-                          : Row(
-                              children: List.generate(
-                                posts?.posters.length ?? 0,
-                                (index) => Expanded(
-                                  child: Image.network(
-                                    posts?.posters[index].image ?? '',
-                                    height: MediaQuery.of(context).size.width /
-                                        540 *
-                                        300,
-                                    fit: BoxFit.cover,
+                      );
+                    },
+                    child: ShimmerLoader(
+                      loaded: posts != null,
+                      child: Container(
+                        color: context.colors.backgroundsSecondary,
+                        height: MediaQuery.of(context).size.width / 540 * 300,
+                        width: double.infinity,
+                        child: posts?.image != null
+                            ? CachedNetworkImage(
+                                imageUrl: posts!.image!,
+                                fit: BoxFit.cover,
+                                placeholderFadeInDuration:
+                                    CustomDurations.cachedDuration,
+                                fadeInDuration: CustomDurations.cachedDuration,
+                                fadeOutDuration: CustomDurations.cachedDuration,
+                                placeholder: (context, child) {
+                                  return shimmer;
+                                },
+                                errorWidget: (context, obj, trace) {
+                                  return shimmer;
+                                },
+                              )
+                            : Row(
+                                children: List.generate(
+                                  posts?.posters.length ?? 0,
+                                  (index) => Expanded(
+                                    child: Image.network(
+                                      posts?.posters[index].image ?? '',
+                                      height:
+                                          MediaQuery.of(context).size.width /
+                                              540 *
+                                              300,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: CommentTextField(
-                id: posts?.id ?? -1,
-                isList: true,
-              ),
-            )
-          ],
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: CommentTextField(
+                  id: posts?.id ?? -1,
+                  isList: true,
+                ),
+              )
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Future showMenuList() async {
+    final list = ref.watch(listsStateHolderProvider);
+    final myself = ref.watch(myProfileInfoStateHolderProvider);
+    MenuDialog.showBottom(
+      context,
+      MenuState(null, [
+        MenuTitle(context.txt.lists),
+        if (list!.author.id != myself?.id)
+          MenuItem(
+            list.author.followed
+                ? 'assets/icons/ic_unfollow.svg'
+                : 'assets/icons/ic_follow.svg',
+            '${list.author.followed ? AppLocalizations.of(context)!.unfollow : AppLocalizations.of(context)!.follow} ${list.author.name}',
+            () {
+              ref
+                  .read(homePagePostsControllerProvider)
+                  .setFollowId(list.author.id, !list.author.followed);
+              ref.read(listsStateHolderProvider.notifier).updateState(
+                    list.copyWith(
+                      author:
+                          list.author.copyWith(followed: !list.author.followed),
+                    ),
+                  );
+              ref.read(profileControllerApiProvider).follow(
+                    list.author.id,
+                    list.author.followed,
+                  );
+            },
+          ),
+        MenuItem(
+          'assets/icons/ic_share.svg',
+          context.txt.list_page_share,
+          () {
+            final profile = myself!.username;
+            String link;
+            switch (widget.type) {
+              case ListType.favorited:
+                link = 'https://posterstock.com/$profile/favorites';
+                break;
+              case ListType.recomends:
+                link = 'https://posterstock.com/$profile/recommends';
+                break;
+              default:
+                link = 'https://posterstock.com/list/${list.id}';
+            }
+            Share.share(link);
+          },
+        ),
+        if (list.author.id == myself?.id)
+          MenuItem(
+            'assets/icons/ic_edit.svg',
+            context.txt.list_edit,
+            () async {
+              await showModalBottomSheet(
+                context: context,
+                backgroundColor: Colors.transparent,
+                useRootNavigator: true,
+                isScrollControlled: true,
+                enableDrag: false,
+                isDismissible: false,
+                useSafeArea: true,
+                builder: (context) => CreateListDialog(id: list.id),
+              );
+              await ref.read(listsControllerProvider).getPost(widget.id);
+            },
+          ),
+        MenuItem.danger(
+          (list.author.id != myself?.id)
+              ? 'assets/icons/ic_danger.svg'
+              : 'assets/icons/ic_trash2.svg',
+          (list.author.id != myself?.id)
+              ? context.txt.report
+              : context.txt.delete,
+          () async {
+            if (list.author.id != myself?.id) {
+              scaffoldMessengerKey.currentState?.showSnackBar(
+                SnackBars.build(
+                  context,
+                  null,
+                  'Not available yet',
+                ),
+              );
+            } else {
+              try {
+                await ref.read(listsControllerProvider).deleteList(list.id);
+                ref
+                    .read(profileControllerApiProvider)
+                    .getUserInfo(null, context);
+                await ref.read(accountListsStateNotifier.notifier).reload();
+                ref.watch(router)!.pop();
+                scaffoldMessengerKey.currentState?.showSnackBar(
+                  SnackBars.build(
+                    context,
+                    null,
+                    "List deleted successfully",
+                  ),
+                );
+              } catch (_) {
+                Logger.e('Ошибка при удалении списка $_');
+                scaffoldMessengerKey.currentState?.showSnackBar(
+                  SnackBars.build(
+                    context,
+                    null,
+                    "Could not delete list",
+                  ),
+                );
+              }
+            }
+          },
+        )
+      ]),
     );
   }
 
@@ -483,7 +607,7 @@ class CollectionInfoWidget extends ConsumerWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              Spacer(),
+              const Spacer(),
               LikeButton(
                 amount: post?.likes ?? 0,
                 liked: post?.liked ?? false,
@@ -501,7 +625,7 @@ class CollectionInfoWidget extends ConsumerWidget {
                       );
                 },
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               ReactionButton(
                 iconPath: 'assets/icons/ic_comment2.svg',
                 iconColor: context.colors.iconsDisabled!,
@@ -520,7 +644,7 @@ class CollectionInfoWidget extends ConsumerWidget {
             height: ((post?.posters.length ?? 0) % 3 == 0
                     ? (post?.posters.length ?? 0) / 3
                     : (post?.posters.length ?? 0) ~/ 3 + 1) *
-                220,
+                225,
             child: GridView.builder(
               padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(
@@ -568,212 +692,6 @@ class CollectionInfoWidget extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
         ],
-      ),
-    );
-  }
-}
-
-class ListActionsDialog extends ConsumerWidget {
-  final ListType? type;
-
-  const ListActionsDialog(this.type, {super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final list = ref.watch(listsStateHolderProvider);
-    final myself = ref.watch(myProfileInfoStateHolderProvider);
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: SizedBox(
-        height: list!.author.id != myself?.id ? 310 : 255,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Column(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16.0),
-                  child: SizedBox(
-                    height: list.author.id != myself?.id ? 190 : 145,
-                    child: Material(
-                      color: context.colors.backgroundsPrimary,
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 36,
-                            child: Center(
-                              child: Text(
-                                'List',
-                                style: context.textStyles.footNote!.copyWith(
-                                  color: context.colors.textsSecondary,
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (list.author.id != myself?.id)
-                            Divider(
-                              height: 0.5,
-                              thickness: 0.5,
-                              color: context.colors.fieldsDefault,
-                            ),
-                          if (list.author.id != myself?.id)
-                            Expanded(
-                              child: InkWell(
-                                onTap: () {
-                                  ref
-                                      .read(homePagePostsControllerProvider)
-                                      .setFollowId(list.author.id,
-                                          !list.author.followed);
-                                  ref
-                                      .read(listsStateHolderProvider.notifier)
-                                      .updateState(
-                                        list.copyWith(
-                                          author: list.author.copyWith(
-                                              followed: !list.author.followed),
-                                        ),
-                                      );
-                                  ref.read(profileControllerApiProvider).follow(
-                                        list.author.id,
-                                        list.author.followed,
-                                      );
-                                },
-                                child: Center(
-                                  child: Text(
-                                    '${list.author.followed ? 'Un' : 'F'}ollow ${list.author.name}',
-                                    style: context.textStyles.bodyRegular!
-                                        .copyWith(
-                                      color: context.colors.textsPrimary,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          Divider(
-                            height: 0.5,
-                            thickness: 0.5,
-                            color: context.colors.fieldsDefault,
-                          ),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () {
-                                final profile = myself!.username;
-                                String link;
-                                switch (type) {
-                                  case ListType.favorited:
-                                    link =
-                                        'https://posterstock.com/$profile/favorites';
-                                    break;
-                                  case ListType.recomends:
-                                    link =
-                                        'https://posterstock.com/$profile/recommends';
-                                    break;
-                                  default:
-                                    link =
-                                        'https://posterstock.com/list/${list.id}';
-                                }
-                                Share.share(link);
-                              },
-                              child: Center(
-                                child: Text(
-                                  AppLocalizations.of(context)!.share,
-                                  style:
-                                      context.textStyles.bodyRegular!.copyWith(
-                                    color: context.colors.textsPrimary,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Divider(
-                            height: 0.5,
-                            thickness: 0.5,
-                            color: context.colors.fieldsDefault,
-                          ),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () async {
-                                if (list.author.id != myself?.id) {
-                                  scaffoldMessengerKey.currentState
-                                      ?.showSnackBar(
-                                    SnackBars.build(
-                                      context,
-                                      null,
-                                      'Not available yet',
-                                    ),
-                                  );
-                                } else {
-                                  try {
-                                    await ref
-                                        .read(listsControllerProvider)
-                                        .deleteList(list.id);
-                                    ref
-                                        .read(profileControllerApiProvider)
-                                        .getUserInfo(null);
-                                    Navigator.of(context).pop();
-                                    ref.watch(router)!.pop();
-                                    scaffoldMessengerKey.currentState
-                                        ?.showSnackBar(
-                                      SnackBars.build(
-                                        context,
-                                        null,
-                                        "List deleted successfully",
-                                      ),
-                                    );
-                                  } catch (_) {
-                                    print(_);
-                                    scaffoldMessengerKey.currentState
-                                        ?.showSnackBar(
-                                      SnackBars.build(
-                                        context,
-                                        null,
-                                        "Could not delete list",
-                                      ),
-                                    );
-                                  }
-                                }
-                              },
-                              child: Center(
-                                child: Text(
-                                  list.author.id != myself?.id
-                                      ? AppLocalizations.of(context)!.report
-                                      : AppLocalizations.of(context)!.delete,
-                                  style:
-                                      context.textStyles.bodyRegular!.copyWith(
-                                    color: context.colors.textsError,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16.0),
-                  child: SizedBox(
-                    height: 52,
-                    child: Material(
-                      color: context.colors.backgroundsPrimary,
-                      child: InkWell(
-                        onTap: () => Navigator.pop(context),
-                        child: Center(
-                          child: Text(
-                            AppLocalizations.of(context)!.cancel,
-                            style: context.textStyles.bodyRegular,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:poster_stock/common/data/dio_keeper.dart';
 import 'package:poster_stock/features/account/profile_mapper.dart';
 import 'package:poster_stock/features/home/models/list_base_model.dart';
@@ -18,8 +19,7 @@ class AccountNetwork {
       final response = await _dio.get('api/profiles/');
       return ProfileMapper.fromJson(response.data);
     } on DioError catch (e) {
-      print(e.response);
-      print(e.response?.headers);
+      Logger.e('Ошибка при получении профиля $e');
       rethrow;
     } catch (e) {
       rethrow;
@@ -55,13 +55,10 @@ class AccountNetwork {
           },
         ),
       );
-      print('$id ${response.data}');
       return response.data;
     } on DioError catch (e) {
-      print(18);
-      print(e.response);
-      print(e.response?.data);
-      print(e.response?.headers);
+      Logger.e('Ошибка при удалении постера $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -91,7 +88,7 @@ class AccountNetwork {
   Future<void> removeBookmark(int id) async {
     try {
       final path = '/api/posters/$id/unbookmark';
-      Response response = await _dio.post(
+      await _dio.post(
         path,
         options: Options(
           contentType: 'application/json',
@@ -101,9 +98,9 @@ class AccountNetwork {
           },
         ),
       );
-      print('request success');
     } on DioError catch (e) {
-      print(e);
+      Logger.e('Ошибка при удалении постера из закладок $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -119,8 +116,9 @@ class AccountNetwork {
       }
       return result.map(_listFromJson).toList();
     } on DioError catch (e) {
-      print(e.response?.headers);
-      print(e.response?.data);
+      Logger.e('Ошибка при получении списка $e');
+      Logger.e(e.response?.headers);
+      Logger.e(e.response?.data);
       return null;
     }
   }

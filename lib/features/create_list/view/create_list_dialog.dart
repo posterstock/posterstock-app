@@ -8,23 +8,27 @@ import 'package:poster_stock/common/helpers/custom_ink_well.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/common/widgets/description_textfield.dart';
+import 'package:poster_stock/features/account/notifiers/lists_notifier.dart';
 import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
 import 'package:poster_stock/features/create_list/controllers/pick_cover_controller.dart';
 import 'package:poster_stock/features/create_list/state_holders/chosen_cover_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/create_list_chosen_poster_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/list_search_posters_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/lists_search_value_state_holder.dart';
-import 'package:poster_stock/features/create_list/view/widgets/%D1%81hoose_poster_tile.dart';
+import 'package:poster_stock/features/create_list/view/widgets/choose_poster_tile.dart';
+import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
+import 'package:poster_stock/features/list/controller/list_controller.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/poster/view/widgets/poster_tile.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
-import 'package:poster_stock/features/profile/state_holders/profile_posts_state_holder.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class CreateListDialog extends ConsumerStatefulWidget {
+  final int? id;
   const CreateListDialog({
+    this.id,
     Key? key,
   }) : super(key: key);
 
@@ -38,17 +42,34 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
   final FocusNode focus = FocusNode();
+  String? image = '';
   bool disposed = false;
   bool loading = false;
   bool exiting = false;
+  MultiplePostModel? post;
 
   @override
   void initState() {
     super.initState();
-    Future(() {
+    Future(() async {
       ref.read(pickCoverControllerProvider).clearAll();
-      ref.read(listSearchValueStateHolderProvider.notifier).clearState();
-      ref.read(profilePostsStateHolderProvider.notifier).clearState();
+      await ref.read(listSearchValueStateHolderProvider.notifier).clearState();
+      ref.watch(createListChosenPosterStateHolderProvider);
+      if (widget.id != null) {
+        post = await ref.read(listsControllerProvider).getPostbyId(widget.id!);
+        nameController.text = post!.name;
+        image = post!.image ?? '';
+        descriptionController.text = post!.description ?? '';
+        descriptionController.addListener(() {
+          setState(() {});
+        });
+        await ref.read(pickCoverControllerProvider).setImage(image!);
+
+        List<MultiplePostSingleModel> thisPosters = post!.posters;
+        ref
+            .read(createListChosenPosterStateHolderProvider.notifier)
+            .setElements(thisPosters);
+      }
     });
   }
 
@@ -56,14 +77,18 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
   void dispose() {
     disposed = true;
     super.dispose();
+    dragController.dispose();
+    searchController.dispose();
+    nameController.dispose();
+    descriptionController.dispose();
   }
 
   Future<bool> tryExit(WidgetRef ref) async {
-    print(exiting);
     if (exiting) return false;
+
     exiting = true;
     var list = ref.read(listSearchValueStateHolderProvider);
-    print(list);
+
     if (list.isEmpty) {
       exiting = false;
       ref.read(menuControllerProvider).hideMenu();
@@ -158,7 +183,6 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
         ),
       ),
     );
-    print(exit);
     exiting = false;
     return exit ?? false;
   }
@@ -168,9 +192,11 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
   @override
   Widget build(BuildContext context) {
     // final account = ref.watch(accountNotifier);
-    final image = ref.watch(chosenCoverStateHolderProvider);
+
+    image = ref.watch(chosenCoverStateHolderProvider);
     final searchValue = ref.watch(listSearchValueStateHolderProvider);
     final posts = ref.watch(accountPostersStateNotifier);
+
     final postersSearch = ref.watch(listSearchPostsStateHolderProvider);
     ref.watch(myProfileInfoStateHolderProvider);
     List<PostMovieModel?> posters;
@@ -179,8 +205,8 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
     } else {
       posters = postersSearch ?? List.generate(12, (_) => null);
     }
+
     dragController.addListener(() async {
-      print(dragController.size);
       if (dragController.size < 0.1) {
         if (!disposed && !popping) {
           popping = true;
@@ -188,7 +214,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
           if (!exit) {
             await dragController.animateTo(
               0.7,
-              duration: Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 300),
               curve: Curves.linear,
             );
             popping = false;
@@ -199,6 +225,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
           ref.read(listSearchValueStateHolderProvider.notifier).clearState();
           popping = false;
           disposed = true;
+          // ignore: use_build_context_synchronously
           if (Navigator.of(context).canPop()) Navigator.of(context).pop();
         }
       }
@@ -213,6 +240,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
       }
       setState(() {});
     });
+
     return WillPopScope(
       onWillPop: () async {
         if (disposed) return false;
@@ -223,6 +251,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
         return exit;
       },
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () {
           FocusScope.of(context).unfocus();
         },
@@ -244,7 +273,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                         .read(listSearchValueStateHolderProvider.notifier)
                         .clearState();
                     ref.read(pickCoverControllerProvider).clearAll();
-                    print("POP BBB");
+                    // ignore: use_build_context_synchronously
                     Navigator.pop(context);
                   },
                   child: Container(
@@ -303,11 +332,14 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                         ),
                                         const SizedBox(height: 22),
                                         Text(
-                                          'Create a List',
+                                          (widget.id != null)
+                                              ? context.txt.list_edit
+                                              : context
+                                                  .txt.listCreate_createNow,
                                           style: context.textStyles.bodyBold,
                                         ),
                                         const SizedBox(height: 0.5),
-                                        SubTextCreateList(),
+                                        const SubTextCreateList(),
                                         const SizedBox(height: 16.5),
                                         SizedBox(
                                           height: 36,
@@ -517,6 +549,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                     } catch (e) {
                                       scaffoldMessengerKey.currentState
                                           ?.showSnackBar(
+                                        // ignore: use_build_context_synchronously
                                         SnackBars.build(context, null,
                                             "Could not pick image"),
                                       );
@@ -525,6 +558,7 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                     if (image == null) {
                                       scaffoldMessengerKey.currentState
                                           ?.showSnackBar(
+                                        // ignore: use_build_context_synchronously
                                         SnackBars.build(context, null,
                                             "Could not pick image"),
                                       );
@@ -532,12 +566,14 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                     }
                                     ref
                                         .read(pickCoverControllerProvider)
-                                        .setImage(image!.path);
+                                        .setImage(image.path);
                                   });
                                 },
                                 child: Container(
                                   color: context.colors.backgroundsPrimary,
-                                  child: image == null
+                                  child: (image == null ||
+                                          (widget.id != null &&
+                                              image!.contains('http')))
                                       ? Row(
                                           children: [
                                             Text(
@@ -566,11 +602,13 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                               child: SizedBox(
                                                 width: 36,
                                                 height: 24,
-                                                child: Image.file(
-                                                  File(image),
-                                                  fit: BoxFit.cover,
-                                                  cacheWidth: 24,
-                                                ),
+                                                child: image!.contains('http')
+                                                    ? Image.network(image!)
+                                                    : Image.file(
+                                                        File(image!),
+                                                        fit: BoxFit.cover,
+                                                        cacheWidth: 24,
+                                                      ),
                                               ),
                                             ),
                                             const SizedBox(width: 8),
@@ -598,6 +636,10 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                         Container(
                           color: context.colors.backgroundsPrimary,
                           child: DescriptionTextField(
+                            showDivider: true,
+                            button: (widget.id != null)
+                                ? context.txt.poster_dialog_save
+                                : context.txt.listCreate_createNow,
                             buttonAddCheck: nameController.text.isNotEmpty &&
                                 ref
                                         .watch(
@@ -620,16 +662,27 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
                                     title: nameController.text,
                                     description: descriptionController.text,
                                     context: context,
+                                    id: widget.id,
+                                    imagePath: image,
                                   );
-                              if (context.mounted) {
-                                print("POP CCC");
-                                Navigator.pop(context);
-                                ref.read(menuControllerProvider).switchMenu();
-                              }
                               loading = false;
                               setState(() {});
+                              if (context.mounted) {
+                                Navigator.pop(context);
+                                if (widget.id != null) Navigator.pop(context);
+                              }
+                              await ref
+                                  .read(accountListsStateNotifier.notifier)
+                                  .reload();
                             },
                           ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(
+                              bottom:
+                                  MediaQuery.of(context).viewInsets.bottom == 0
+                                      ? 34
+                                      : 0),
                         ),
                       ],
                     ),

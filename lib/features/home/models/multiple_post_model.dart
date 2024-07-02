@@ -82,11 +82,6 @@ class MultiplePostModel extends PostBaseModel {
     final image = img == 'https://api.posterstock.com/images/'
         ? 'https://api.posterstock.com/images/default_list_cover.png'
         : img;
-    print("GGGG");
-    print(json['title'] as String?);
-    print((json['title'] as String?)?.replaceAll('\n', "F"));
-    print(json['description'] as String?);
-    print((json['description'] as String?)?.replaceAll('\n', "F"));
     return MultiplePostModel(
       type: json['type'],
       id: json['id'] as int,

@@ -26,9 +26,6 @@ class UsersListController {
     loading = false;
     id = null;
     followers = null;
-    print(this.id);
-    print(this.followers);
-    print('end1');
   }
 
   Future<void> getUsers({

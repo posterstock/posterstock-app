@@ -24,7 +24,7 @@ class ListsNotifier extends StateNotifier<List<ListBaseModel?>> {
     load();
   }
 
-  void load() async {
+  Future load() async {
     final cachedResult = await cache.getLists(account!.id);
     if (!mounted) return;
     state = cachedResult ?? [];
@@ -33,5 +33,13 @@ class ListsNotifier extends StateNotifier<List<ListBaseModel?>> {
     cache.cacheLists(account!.id, result);
     if (!mounted) return;
     state = result ?? [];
+  }
+
+  Future<void> reload() async {
+    await load();
+  }
+
+  ListBaseModel? getListById(int id) {
+    return state[id];
   }
 }

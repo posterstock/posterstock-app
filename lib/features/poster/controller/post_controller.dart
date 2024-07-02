@@ -59,7 +59,6 @@ class PostController {
   }
 
   Future<void> updateComments(final int id) async {
-    print('comm$id');
     if (loadingComments) return;
     loadingComments = true;
 
@@ -76,10 +75,7 @@ class PostController {
   }
 
   Future<void> getPost(final int id) async {
-    print('comm$id');
-    print('aa $id');
     if (loadingPost) return;
-    print(11);
     //await Future.delayed(Duration(milliseconds: 500));
     loadingPost = true;
     var result = await cachedPostRepository.getPost(id);
@@ -119,8 +115,8 @@ class PostController {
   }
 
   Future<void> getMyLists() async {
-    final result =
-        await profileRepo.getProfileLists(myProfileInfoStateHolder.state!.id);
+    final result = await profileRepo
+        .getProfileLists(myProfileInfoStateHolder.currentState!.id);
     myListsStateHolder.updateLists(result);
   }
 

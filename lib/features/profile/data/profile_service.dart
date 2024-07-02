@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:poster_stock/common/data/dio_keeper.dart';
 
 class ProfileService {
@@ -10,7 +11,6 @@ class ProfileService {
 
   Future<(List<Map<String, dynamic>>?, bool)> getUserPosts(int? id,
       {bool restart = false}) async {
-    print(id != this.id);
     if (id != this.id) postsCursor = null;
     if (restart) postsCursor = null;
     this.id = id;
@@ -20,7 +20,6 @@ class ProfileService {
           'cursor': postsCursor,
         });
     final List<Map<String, dynamic>> result = [];
-    print(response);
     postsCursor = response.data['next_cursor'];
     for (var a in response.data['posters'] ?? []) {
       result.add(a);
@@ -34,16 +33,15 @@ class ProfileService {
         'api/lists/users/$id/',
         options: Options(headers: {}),
       );
-      print(response);
       final List<Map<String, dynamic>> result = [];
       for (var a in response.data) {
         result.add(a);
       }
       return result;
     } on DioError catch (e) {
-      print(e.response?.headers);
-      print(e.response?.data);
+      Logger.e('Ошибка при получении списков $e');
     }
+    return null;
   }
 
   Future<(List<dynamic>?, bool)> getMyBookmarks({bool restart = false}) async {
@@ -60,6 +58,18 @@ class ProfileService {
     );
   }
 
+  Future<Map<String, dynamic>> getProfileInfoByName(String name) async {
+    try {
+      final response = await _dio.get('/api/users/u/$name');
+
+      return response.data;
+    } on DioError catch (e) {
+      Logger.e('Ошибка при получении пользователя по имени $e');
+      Logger.e(e.response?.headers);
+      rethrow;
+    }
+  }
+
   Future<Map<String, dynamic>> getProfileInfo(dynamic id) async {
     try {
       if (id == null) {
@@ -67,8 +77,7 @@ class ProfileService {
           final response = await _dio.get('api/profiles/');
           return response.data;
         } on DioError catch (e) {
-          print(e.response);
-          print(e.response?.headers);
+          Logger.e('Ошибка при получении профиля $e');
         } catch (e) {
           rethrow;
         }
@@ -81,7 +90,6 @@ class ProfileService {
           options: Options(headers: {}),
         );
       } else {
-        print("INT");
         response = await _dio.get(
           'api/users/$id/',
           options: Options(headers: {}),
@@ -89,7 +97,8 @@ class ProfileService {
       }
       return response.data;
     } on DioError catch (e) {
-      print(e.response);
+      Logger.e('Ошибка при получении пользователя $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -99,72 +108,60 @@ class ProfileService {
       final response = await _dio.get('api/profiles/');
       return response.data;
     } on DioError catch (e) {
-      print(e.response);
-      print(e.response?.headers);
+      Logger.e('Ошибка при получении пользователя $e');
+      Logger.e(e.response?.headers);
       rethrow;
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при получении пользователя $e');
       rethrow;
     }
   }
 
   Future<bool?> getBlocked(int id) async {
     try {
-      final response = await _dio.post(
+      final response = await _dio.get(
         '/api/users/$id/blocked',
       );
       return response.data as bool;
     } on DioError catch (e) {
-      print(e.response?.headers);
+      Logger.e('Ошибка при получении блокировки $e');
     } catch (e) {
+      Logger.e('Ошибка при получении блокировки $e');
       rethrow;
     }
+    return null;
   }
 
   Future<void> follow(int? id, bool follow) async {
-    print(12);
-    print(follow);
-    print(id);
-    print(13);
     try {
       if (follow) {
-        print(1);
         try {
           final response = await _dio.post(
             '/api/users/$id/follow',
           );
-          print(12);
-          print(response.statusCode);
+
           return response.data;
         } on DioError catch (e) {
-          print(e.response?.headers);
+          Logger.e('Ошибка при подписке $e');
         } catch (e) {
           rethrow;
         }
       }
-      print(2);
       final response = await _dio.post(
         '/api/users/$id/unfollow',
       );
-      print(11);
-      print(response.statusCode);
       return response.data;
     } on DioError catch (e) {
-      print(e.response?.headers);
-      print(e.response);
+      Logger.e('Ошибка при отписке $e');
       rethrow;
     }
   }
 
-  @override
   Future<Map<String, dynamic>> getProfileLists(String token, int id) {
-    // TODO: implement getProfileLists
     throw UnimplementedError();
   }
 
-  @override
   Future<Map<String, dynamic>> getProfilePosts(String token, int id) {
-    // TODO: implement getProfilePosts
     throw UnimplementedError();
   }
 }

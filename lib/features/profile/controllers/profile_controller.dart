@@ -1,4 +1,5 @@
 import 'package:async/async.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/account/account_cache.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
@@ -73,72 +74,70 @@ class ProfileControllerApi {
     await repo.follow(id, !follow);
   }
 
-  // Future<void> updateBookmarks() async {
-  //   if (gttgUser) return;
-  //   if (gotAllBookmarks) return;
-  //   if (gettingBookmarks) return;
-  //   gettingBookmarks = true;
-  //   var result = await repo.getMyBookmarks();
-  //   final bookmarks = result.$1;
-  //   gotAllBookmarks = result.$2;
-  //   profileBookmarksStateHolder.updateState(bookmarks);
-  //   gettingBookmarks = false;
-  // }
+  Future<void> updateBookmarks() async {
+    if (gttgUser) return;
+    if (gotAllBookmarks) return;
+    if (gettingBookmarks) return;
+    gettingBookmarks = true;
+    var result = await repo.getMyBookmarks();
+    final bookmarks = result.$1;
+    gotAllBookmarks = result.$2;
+    profileBookmarksStateHolder.updateState(bookmarks);
+    gettingBookmarks = false;
+  }
 
-  // Future<void> updatePosts(int id) async {
-  //   if (gttgUser) return;
-  //   if (gotAllPosts) return;
-  //   if (gettingPosts) return;
-  //   print("GGGGGG");
-  //   gettingPosts = true;
-  //   var result = await repo.getProfilePosts(id);
-  //   final posts = result.$1;
-  //   gotAllPosts = result.$2;
-  //   print("UPDATING");
-  //   print(posts);
-  //   profilePostsStateHolder.updateState(posts);
-  //   gettingPosts = false;
-  // }
+  Future<void> updatePosts(int id) async {
+    if (gttgUser) return;
+    if (gotAllPosts) return;
+    if (gettingPosts) return;
+    gettingPosts = true;
+    var result = await repo.getProfilePosts(id);
+    final posts = result.$1;
+    gotAllPosts = result.$2;
+    profilePostsStateHolder.updateState(posts);
+    gettingPosts = false;
+  }
 
-  Future<void> getUserInfo(dynamic usernameOrId) async {
+  Future<void> getUserInfo(dynamic usernameOrId, BuildContext context) async {
     if (gettingUser == usernameOrId) return;
     gttgUser = true;
-    try {
-      completer.completeOperation(
-        CancelableOperation.fromFuture(
-          Future(() async {
-            try {
-              gotAllBookmarks = false;
+    completer.completeOperation(
+      CancelableOperation.fromFuture(
+        Future(() async {
+          try {
+            gotAllBookmarks = false;
+            if (usernameOrId != null) {
               gettingUser = usernameOrId;
+            }
 
-              if (usernameOrId == null) {
-                final user = await cache.getProfileInfo();
-                myProfileInfoStateHolder.updateState(user);
-              }
+            if (usernameOrId == null) {
+              final user = await cache.getProfileInfo();
+              myProfileInfoStateHolder.updateState(user);
+            }
 
-              final user = await repo.getProfileInfo(usernameOrId);
-              if (usernameOrId == null) {
-                myProfileInfoStateHolder.updateState(user);
-                cache.cacheProfileInfo(user);
-              } else {
-                profileBookmarksStateHolder.updateState(null);
-                gotAllBookmarks = false;
-              }
-              var postsResponse =
-                  await repo.getProfilePosts(user.id, restart: true);
-              var posts = postsResponse.$1;
-              gotAllPosts = postsResponse.$2;
-              var lists = await repo.getProfileLists(user.id);
-              List<PostMovieModel>? bookmarks;
-              if (usernameOrId == null) {
-                var result = await repo.getMyBookmarks(restart: true);
-                bookmarks = result.$1;
-                gotAllBookmarks = result.$2;
-              }
-              if (gettingUser != usernameOrId) return;
-              lists = lists
-                  ?.map(
-                    (e) => e = e.copyWith(
+            final user = await repo.getProfileInfo(usernameOrId);
+            if (usernameOrId == null) {
+              myProfileInfoStateHolder.updateState(user);
+              cache.cacheProfileInfo(user);
+            } else {
+              profileBookmarksStateHolder.updateState(null);
+              gotAllBookmarks = false;
+            }
+            var postsResponse =
+                await repo.getProfilePosts(user.id, restart: true);
+            var posts = postsResponse.$1;
+            gotAllPosts = postsResponse.$2;
+            var lists = await repo.getProfileLists(user.id);
+
+            List<PostMovieModel>? bookmarks;
+            if (usernameOrId == null) {
+              var result = await repo.getMyBookmarks(restart: true);
+              bookmarks = result.$1;
+              gotAllBookmarks = result.$2;
+            }
+
+            lists = lists
+                ?.map((e) => e.copyWith(
                       user: UserModel(
                         id: user.id,
                         name: user.name,
@@ -146,12 +145,10 @@ class ProfileControllerApi {
                         imagePath: user.imagePath,
                         followed: user.followed,
                       ),
-                    ),
-                  )
-                  .toList();
-              posts = posts
-                  ?.map(
-                    (e) => e = e.copyWith(
+                    ))
+                .toList();
+            posts = posts
+                ?.map((e) => e.copyWith(
                       author: UserModel(
                         id: user.id,
                         name: user.name,
@@ -159,27 +156,26 @@ class ProfileControllerApi {
                         imagePath: user.imagePath,
                         followed: user.followed,
                       ),
-                    ),
-                  )
-                  .toList();
-              profileInfoStateHolder.updateState(user);
-              print("SETTING");
-              profilePostsStateHolder.setState(posts);
-              profileListsStateHolder.setState(lists);
-              profileBookmarksStateHolder.setState(bookmarks);
-              if (gettingUser != usernameOrId) {
-                clearUser();
-              }
-              //print(profilePostsStateHolder.state);
-              gettingUser = 'profile';
-              gttgUser = false;
-            } catch (e) {
-              gettingUser = 'profile';
-              gttgUser = false;
+                    ))
+                .toList();
+
+            profileInfoStateHolder.updateState(user);
+            profilePostsStateHolder.setState(posts);
+            profileListsStateHolder.setState(lists);
+            profileBookmarksStateHolder.setState(bookmarks);
+            if (gettingUser != usernameOrId) {
+              clearUser();
             }
-          }),
-        ),
-      );
-    } catch (e) {}
+            gettingUser = 'profile';
+            gttgUser = false;
+          } catch (e) {
+            // Logger.e('Ошибка при получении пользователя1 $e');
+            print('Ошибка при получении пользователя1 $e');
+            gettingUser = 'profile';
+            gttgUser = false;
+          }
+        }),
+      ),
+    );
   }
 }

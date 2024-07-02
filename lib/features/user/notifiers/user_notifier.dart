@@ -18,12 +18,21 @@ class UserNotifier extends StateNotifier<UserDetailsModel?> {
   UserDetailsModel get user => state!;
 
   Future<void> load() async {
-    final cachedResult = await cache.getProfileInfo(id);
+    int curId = 0;
+
+    if (id is String) {
+      final json = await network.getProfileInfo(id);
+      curId = json['id'];
+    } else if (id is int) {
+      curId = id;
+    }
+
+    final cachedResult = await cache.getProfileInfo(curId);
     if (cachedResult != null) {
       state = cachedResult;
     }
     final json = await network.getProfileInfo(id);
-    state = UserDetailsModel.fromJson(json);
+    state = UserDetailsModel.fromJson(json.cast<String, dynamic>());
     if (state != null) {
       cache.cacheUserInfo(id, state!);
     }

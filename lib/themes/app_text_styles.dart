@@ -90,7 +90,7 @@ class AppAllTextStyles extends AppTextStyles {
             height: 20 / 15,
             letterSpacing: -0.5,
             color: colors.textsPrimary,
-            fontFamilyFallback: ['SF-Pro-Display'],
+            fontFamilyFallback: const ['SF-Pro-Display'],
           ),
           subheadline: TextStyle(
             fontFamily: 'SF-Pro-Text',
@@ -165,7 +165,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
       caption2: caption2 ?? this.caption2,
       caption1: caption1 ?? this.caption1,
       bodyRegular: bodyRegular ?? this.bodyRegular,
-      bodyMedium: bodyMedium ?? this.bodyMedium,
+      bodyMedium: bodyMedium ?? bodyMedium,
       bodyBold: bodyBold ?? this.bodyBold,
       footNote: footNote ?? this.footNote,
       subheadlineBold: subheadlineBold ?? this.subheadlineBold,

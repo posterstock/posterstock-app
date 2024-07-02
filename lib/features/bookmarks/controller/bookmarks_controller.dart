@@ -28,7 +28,7 @@ class BookmarksController {
   });
 
   Future<void> getBookmarks({bool restart = false}) async {
-    int? id = bookmarksIdStateHolder.state;
+    int? id = bookmarksIdStateHolder.currentState;
     if (gettingBookmarks) return;
     gettingBookmarks = true;
     if (id == null) {

@@ -1,3 +1,4 @@
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:poster_stock/features/home/data/home_page_api.dart';
 import 'package:poster_stock/features/home/data/i_home_page_api.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
@@ -25,8 +26,9 @@ class HomePagePostsRepository implements IHomePagePostsRepository {
       }
       return (result, apiResult.$2);
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при получении постов $e');
     }
+    return null;
   }
 
   @override
@@ -35,7 +37,7 @@ class HomePagePostsRepository implements IHomePagePostsRepository {
     try {
       await api.setLike(id, like);
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при установке лайка $e');
     }
   }
 
@@ -45,7 +47,7 @@ class HomePagePostsRepository implements IHomePagePostsRepository {
     try {
       await api.setLikeList(id, like);
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при установке лайка на список $e');
     }
   }
 }

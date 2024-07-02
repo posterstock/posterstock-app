@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
@@ -27,7 +30,9 @@ class AddToListDialog extends ConsumerWidget {
       Future(() {
         try {
           ref.read(postControllerProvider).getMyLists();
-        } catch (e) {}
+        } catch (e) {
+          Logger.e('Ошибка при получении списков $e');
+        }
       });
     }
     final allSizes = lists?.map(
@@ -137,7 +142,7 @@ class AddToListDialog extends ConsumerWidget {
                                   ),
                                 if (lists != null)
                                   ...List.generate(
-                                    lists?.length ?? 0,
+                                    lists.length,
                                     (index) => CustomInkWell(
                                       child: Column(
                                         children: [
@@ -154,14 +159,14 @@ class AddToListDialog extends ConsumerWidget {
                                                 const SizedBox(width: 19),
                                                 Expanded(
                                                   child: Text(
-                                                    lists![index].title,
+                                                    lists[index].title,
                                                     style: context
                                                         .textStyles.bodyRegular,
                                                   ),
                                                 ),
                                                 const SizedBox(width: 16),
                                                 Text(
-                                                  '${lists![index].postersCount} ${context.txt.posters.toLowerCase()}',
+                                                  '${lists[index].postersCount} ${context.txt.posters.toLowerCase()}',
                                                   style: context
                                                       .textStyles.footNote!
                                                       .copyWith(
@@ -191,7 +196,7 @@ class AddToListDialog extends ConsumerWidget {
                                           await ref
                                               .read(postControllerProvider)
                                               .addPosterToList(
-                                                lists![index].id,
+                                                lists[index].id,
                                                 post!.id,
                                               );
                                           await ref

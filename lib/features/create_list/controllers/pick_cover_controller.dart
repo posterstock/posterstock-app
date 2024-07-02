@@ -1,14 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
-import 'package:davinci/core/davinci_capture.dart';
-import 'package:image/image.dart' as img;
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/features/create_list/repository/create_list_repository.dart';
@@ -17,13 +15,10 @@ import 'package:poster_stock/features/create_list/state_holders/create_list_chos
 import 'package:poster_stock/features/create_list/state_holders/gallery_index_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/list_search_posters_state_holder.dart';
 import 'package:poster_stock/features/create_list/state_holders/pick_cover_gallery_state_holder.dart';
-import 'package:poster_stock/features/home/models/post_movie_model.dart';
-import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
-import 'package:poster_stock/features/profile/state_holders/profile_posts_state_holder.dart';
 import 'package:poster_stock/main.dart';
-import 'package:poster_stock/themes/build_context_extension.dart';
+import 'package:screenshot/screenshot.dart';
 
 final pickCoverControllerProvider = Provider.autoDispose<PickCoverController>(
   (ref) => PickCoverController(
@@ -56,7 +51,7 @@ class PickCoverController {
   final MyProfileInfoStateHolder myProfileInfoStateHolder;
   final repository = CreateListRepository();
   bool gotAllPosts = false;
-  String? searchValue = null;
+  String? searchValue;
   List<int> loadingPages = [];
   int page = 0;
   int? max;
@@ -80,22 +75,29 @@ class PickCoverController {
     createListChosenPosterStateHolder.clear();
   }
 
-  Future<void> createList({
-    required String title,
-    required String description,
-    required BuildContext context,
-  }) async {
+  Future<void> createList(
+      {required String title,
+      required String description,
+      required BuildContext context,
+      int? id,
+      String? imagePath}) async {
     try {
-      bool generated = chosenCoverStateHolder.state == null;
-      Uint8List? image = await showScreenshot(context);
+      bool generated = chosenCoverStateHolder.currentState == null;
+      Uint8List? image;
+
+      if (imagePath == null) {
+        image = await showScreenshot(context);
+      }
       bool? value = await repository.createList(
         title: title,
         description: description,
         posters: createListChosenPosterState.map((e) => e.$1).toList(),
         image: image,
         generated: generated,
+        id: id,
+        imagePath: imagePath,
       );
-      profileControllerApi.getUserInfo(null);
+      profileControllerApi.getUserInfo(null, context);
       if (value == false) {
         scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBars.build(
@@ -126,14 +128,14 @@ class PickCoverController {
   }
 
   Future<Uint8List?> showScreenshot(BuildContext context) async {
-    if (chosenCoverStateHolder.state != null) {
-      return File(chosenCoverStateHolder.state!).readAsBytesSync();
+    if (chosenCoverStateHolder.currentState != null) {
+      return File(chosenCoverStateHolder.currentState!).readAsBytesSync();
     }
     int width = MediaQuery.of(context).size.width.toInt();
     Widget widget;
     List<String> images = createListChosenPosterState.map((e) => e.$2).toList();
     List<Uint8List> data = [];
-    for (int i = 0; i < (images.length > 7 ? 7 : images.length); i++) {
+    for (int i = 0; i < (images.length > 6 ? 6 : images.length); i++) {
       try {
         var wid = await Dio().get(
           images[i],
@@ -144,6 +146,7 @@ class PickCoverController {
         await precacheImage(MemoryImage(wid.data as Uint8List), context);
         data.add(wid.data as Uint8List);
       } catch (e) {
+        Logger.e('ошибка при создания обложки $e');
         scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBars.build(
             context,
@@ -175,26 +178,30 @@ class PickCoverController {
         ),
       ),
     );
+    Uint8List? im = Uint8List(0);
     if (context.mounted) {
-      Uint8List im = await DavinciCapture.offStage(
+      ScreenshotController screenshotController = ScreenshotController();
+      await screenshotController
+          .captureFromWidget(
         widget,
-        context: context,
-        saveToDevice: false,
-        openFilePreview: false,
-        returnImageUint8List: true,
-        wait: const Duration(milliseconds: 500),
-      );
-      for (int i = 0; i < (images.length > 7 ? 7 : images.length); i++) {
+      )
+          .then((capturedImage) {
+        im = capturedImage;
+        return capturedImage;
+      });
+      for (int i = 0; i < (images.length > 6 ? 6 : images.length); i++) {
         try {
           await MemoryImage(data[i]).evict();
         } catch (e) {
-          rethrow;
+          Logger.e('ошибка MemoryImag === $e');
         }
       }
+
       return im;
     } else {
-      throw Exception();
+      Logger.e('ошибка capturedImage ');
     }
+    return null;
   }
 
   Future<void> loadPage() async {
@@ -227,8 +234,10 @@ class PickCoverController {
     });
     if (loadedAll) return;
     if (stop) return;
-    final list =
-        await repository.searchPosts(value, myProfileInfoStateHolder.state!.id);
+    final list = await repository.searchPosts(
+      value,
+      myProfileInfoStateHolder.currentState!.id,
+    );
     loadedAll = list.$2;
     if (searchValue == value) {
       searchPostsStateHolder.updateState(list.$1);

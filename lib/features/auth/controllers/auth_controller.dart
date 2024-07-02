@@ -1,5 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/data/exceptions.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
@@ -107,13 +107,13 @@ class AuthController {
     try {
       //await removeFCMToken();
     } catch (e) {
-      debugPrint(e.toString());
+      Logger.e('Ошибка registerNotification $e ');
     }
     try {
       await repository.registerNotification(
           (await FirebaseMessaging.instance.getToken())!, userToken);
     } catch (e) {
-      debugPrint(e.toString());
+      Logger.e('Ошибка FirebaseMessaging $e ');
     }
   }
 
@@ -137,11 +137,10 @@ class AuthController {
     instance.setBool('apple', true);
     main.apple = true;
     TokenKeeper.token = await SuperTokens.getAccessToken();
-    print(TokenKeeper.token);
     try {
       await registerNotification();
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при регистрации Apple $e');
     }
     return true;
   }
@@ -168,11 +167,10 @@ class AuthController {
     instance.setBool('google', true);
     main.google = true;
     TokenKeeper.token = await SuperTokens.getAccessToken();
-    print(TokenKeeper.token);
     try {
       await registerNotification();
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при регистрации Google $e');
     }
     return true;
   }

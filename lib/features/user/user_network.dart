@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:poster_stock/common/data/dio_keeper.dart';
 import 'package:poster_stock/features/account/profile_mapper.dart';
 import 'package:poster_stock/features/home/models/list_base_model.dart';
@@ -15,8 +16,8 @@ class UserNetwork {
       final response = await _dio.get('api/users/$id/');
       return ProfileMapper.fromJson(response.data);
     } on DioError catch (e) {
-      print(e.response);
-      print(e.response?.headers);
+      Logger.e('Ошибка при получении пользователя $e');
+      Logger.e(e.response?.headers);
       rethrow;
     } catch (e) {
       rethrow;
@@ -55,8 +56,8 @@ class UserNetwork {
       }
       return result.map(_listFromJson).toList();
     } on DioError catch (e) {
-      print(e.response?.headers);
-      print(e.response?.data);
+      Logger.e('Ошибка при получении списков $e');
+      Logger.e(e.response?.headers);
       return null;
     }
   }

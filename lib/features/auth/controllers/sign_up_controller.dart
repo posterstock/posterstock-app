@@ -1,5 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
@@ -124,10 +124,9 @@ class SignUpController {
   }
 
   Future<bool> processSignIn() async {
-    print("SN");
     codeErrorStateHolder.setValue(null);
     signUpLoadingStateHolder.setValue(true);
-    String? token;
+    // String? token;
     try {
       await repository.confirmCode(
           code: code, sessionId: sessionId, deviceId: deviceId, email: email);
@@ -142,13 +141,12 @@ class SignUpController {
     signUpLoadingStateHolder.setValue(false);
     instance.setString('email', email);
     TokenKeeper.token = await SuperTokens.getAccessToken();
-    print("TRUE");
     return true;
   }
 
   Future<bool> processAuth() async {
     signUpLoadingStateHolder.setValue(true);
-    String? token;
+    // String? token;
     try {
       await repository.confirmCode(
         code: code,
@@ -186,14 +184,12 @@ class SignUpController {
 
   Future<void> registerNotification() async {
     final userToken = await SuperTokens.getAccessToken();
-    print(userToken == null);
     if (userToken == null) throw Exception();
     try {
       await repository.registerNotification(
           (await FirebaseMessaging.instance.getToken())!, userToken);
     } catch (e) {
-      print("ERRRRR");
-      debugPrint(e.toString());
+      Logger.e('Ошибка при регистрации FCM $e');
     }
   }
 }

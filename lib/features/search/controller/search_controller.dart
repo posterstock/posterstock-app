@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/search/repository/search_repository.dart';
 import 'package:poster_stock/features/search/state_holders/search_lists_state_holder.dart';
@@ -48,7 +49,6 @@ class SearchController {
       if (searchValue != value) stop = true;
     });
     if (stop) return;
-    print(value);
     searchValueState.updateState(value);
     searchUsersState.setState(null);
     searchPostsState.setState(null);
@@ -60,7 +60,7 @@ class SearchController {
         users.$1,
       );
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при поиске пользователей $e');
     }
     try {
       var posts = await searchRepository.searchPosts(value);
@@ -69,7 +69,7 @@ class SearchController {
         posts.$1,
       );
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при поиске постов $e');
     }
     try {
       var lists = await searchRepository.searchLists(value);
@@ -78,7 +78,7 @@ class SearchController {
         lists.$1,
       );
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при поиске списков $e');
     }
   }
 
@@ -92,7 +92,7 @@ class SearchController {
         users.$1,
       );
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при поиске пользователей $e');
     }
     loadingUpdateUsers = false;
   }
@@ -107,7 +107,7 @@ class SearchController {
         posts.$1,
       );
     } catch (e) {
-      print(e);
+      Logger.e('Ошибка при поиске постов $e');
     }
     loadingUpdatePosts = false;
   }
@@ -122,8 +122,7 @@ class SearchController {
         lists.$1,
       );
     } catch (e) {
-      print(18);
-      print(e);
+      Logger.e('Ошибка при поиске списков $e');
     }
     loadingUpdateLists = false;
   }

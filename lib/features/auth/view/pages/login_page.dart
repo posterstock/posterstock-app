@@ -118,7 +118,6 @@ class LoginPage extends ConsumerWidget {
                       ref
                           .read(codeErrorStateHolderProvider.notifier)
                           .setValue(null);
-                      print("SIGNING");
                       bool success = await ref
                           .read(signUpControllerProvider)
                           .processSignIn();

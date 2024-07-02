@@ -29,9 +29,10 @@ class NavigationPage extends ConsumerWidget {
   NavigationPage({Key? key}) : super(key: navigationKey);
 
   @override
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     Future(() async {
-      ref.read(profileControllerApiProvider).getUserInfo(null);
+      ref.read(profileControllerApiProvider).getUserInfo(null, context);
       final prefs = await SharedPreferences.getInstance();
       int count = prefs.getInt('notification_count') ?? 0;
       ref
@@ -49,8 +50,6 @@ class NavigationPage extends ConsumerWidget {
       }
     });
     Future(() {
-      print(TokenKeeper.token);
-      print(18881);
       if (TokenKeeper.token == null) {
         rtr?.replaceNamed(
           '/auth',
@@ -60,7 +59,12 @@ class NavigationPage extends ConsumerWidget {
       }
     });
     final pageTransitionController =
-        ref.watch(pageTransitionControllerStateHolder)!;
+        ref.watch(pageTransitionControllerStateHolder);
+
+    if (pageTransitionController == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+
     return AnimatedBuilder(
       animation: pageTransitionController,
       builder: (context, child) {
@@ -77,12 +81,9 @@ class NavigationPage extends ConsumerWidget {
       },
       child: AutoTabsRouter.pageView(
         physics: const NeverScrollableScrollPhysics(),
-        routes: [
-          const PageRouteInfo(HomeRoute.name),
-          // const PageRouteInfo(SearchRoute.name),
-          // const NotificationsRoute(),
-          const AccountRoute(),
-          // ProfileRoute()
+        routes: const [
+          PageRouteInfo(HomeRoute.name),
+          AccountRoute(),
         ],
         builder: (context, child, _) {
           return WillPopScope(
@@ -116,7 +117,7 @@ class NavigationPage extends ConsumerWidget {
                   bottom: 0,
                   child: Padding(
                     padding: EdgeInsets.only(
-                      bottom: 57 + MediaQuery.of(context).padding.bottom,
+                      bottom: 55 + MediaQuery.of(context).padding.bottom,
                     ),
                     child: const Material(
                       color: Colors.transparent,
@@ -252,7 +253,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                 color: context.colors.fieldsHover!,
               ),
               picturePath: 'assets/icons/ic_collection.svg',
-              label: AppLocalizations.of(context)!.home_add_poster,
+              label: AppLocalizations.of(context)!.search_add_poster_title,
               animationValue: controller.value,
               onTap: () {
                 showModalBottomSheet(

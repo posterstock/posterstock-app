@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:supertokens_flutter/dio.dart';
 import 'package:supertokens_flutter/supertokens.dart';
 
@@ -41,12 +42,12 @@ class SearchService {
             'query': searchValue,
             if (nextCursorUsers != null) 'cursor': nextCursorUsers,
           });
-      print(response.data);
       gotAllUsers = !response.data['has_more'];
       nextCursorUsers = response.data['next_cursor'];
       return (response.data['users'] as List<dynamic>?, gotAllUsers);
     } on DioError catch (e) {
-      print(e.response);
+      Logger.e('Ошибка при поиске пользователей $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -71,10 +72,10 @@ class SearchService {
           });
       gotAllPosts = !response.data['has_more'];
       nextCursorPosts = response.data['next_cursor'];
-      print(response.data);
       return (response.data['posters'] as List<dynamic>?, gotAllPosts);
     } on DioError catch (e) {
-      print(e.response);
+      Logger.e('Ошибка при поиске постов $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }
@@ -101,7 +102,8 @@ class SearchService {
       nextCursorLists = response.data['next_cursor'];
       return (response.data['lists'] as List<dynamic>?, gotAllLists);
     } on DioError catch (e) {
-      print(e.response);
+      Logger.e('Ошибка при поиске списков $e');
+      Logger.e(e.response?.headers);
       rethrow;
     }
   }

@@ -21,7 +21,6 @@ class ListRepository {
   }
 
   Future<MultiplePostModel> getPost(int id) async {
-    print(18);
     return MultiplePostModel.fromJson(await service.getPost(id));
   }
 

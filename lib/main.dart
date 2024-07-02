@@ -6,6 +6,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -36,7 +37,7 @@ final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  debugPrint(
+  Logger.i(
       "Handling a background message: ${message.messageId}${message.data}");
   showPush(message);
 }
@@ -56,7 +57,7 @@ void main() async {
   try {
     PhotoManager.clearFileCache();
   } catch (e) {
-    debugPrint(e.toString());
+    Logger.e('Ошибка очистки кэша $e');
   }
   try {
     await flutterLocalNotificationsPlugin
@@ -69,14 +70,13 @@ void main() async {
     );
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    // print('Token: ' + (await FirebaseMessaging.instance.getToken()).toString());
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     PlatformDispatcher.instance.onError = (error, stack) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
   } catch (e) {
-    debugPrint(e.toString());
+    Logger.e('Ошибка FirebaseCrashlytics $e');
   }
   try {
     final prefs = await SharedPreferences.getInstance();
@@ -88,7 +88,7 @@ void main() async {
     email = prefs.getString('email');
     storedLocale = prefs.getString('locale');
   } catch (e) {
-    debugPrint(e.toString());
+    Logger.e('Ошибка SharedPreferences $e ');
   }
   await Hive.initFlutter();
 
@@ -166,6 +166,7 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
           .updateState(pageTransitionController);
     });
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       routerConfig: App._appRouter!.config(deepLinkBuilder: (deepLink) {
         if (initLink != null) {
           var route =
@@ -196,14 +197,15 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
       locale: appLocale?.locale,
       builder: (context, child) {
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: const TextScaler.linear(1.0)),
           child: ScrollConfiguration(
             behavior: CustomScrollBehavior(),
             child: child ?? const SizedBox(),
           ),
         );
       },
-      theme: theme.copyWith(useMaterial3: false),
+      theme: theme.copyWith(),
     );
   }
 }

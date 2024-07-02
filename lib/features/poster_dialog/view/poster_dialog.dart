@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
@@ -133,7 +136,7 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                               },
                               child: Center(
                                 child: Text(
-                                  context.txt.discart,
+                                  context.txt.discard,
                                   style:
                                       context.textStyles.bodyRegular!.copyWith(
                                     color: context.colors.textsError,
@@ -333,77 +336,71 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
         ),
       );
 
-  Widget _descriptionTextField((int, String)? chosenCover) => Container(
-        color: context.colors.backgroundsPrimary,
-        child: DescriptionTextField(
-          focus: focusSec,
-          hint: context.txt.search_add_poster_hint,
-          showDivider: true,
-          button: widget.postMovieModel != null
-              ? context.txt.save
-              : context.txt.add,
-          buttonAddCheck: !(chosenCover == null),
-          disableWithoutText: widget.postMovieModel != null ? false : true,
-          buttonLoading: ref.watch(createPosterLoadingStateHolderProvider),
-          maxSymbols: 280,
-          controller: descController,
-          onTap: () async {
-            try {
-              ref
-                  .read(createPosterLoadingStateHolderProvider.notifier)
-                  .updateValue(true);
-              final currPost = ref.read(posterStateHolderProvider);
-              final createId =
-                  ref.read(createPosterChoseMovieStateHolderProvider);
-              if (currPost?.name == createId?.title &&
-                  currPost?.year ==
-                      '${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}') {
-                ref.read(posterStateHolderProvider.notifier).updateState(
-                      currPost!.copyWith(hasInCollection: true),
-                    );
-              }
-              if (widget.postMovieModel == null) {
-                await ref
-                    .read(createPosterControllerProvider)
-                    .createPoster(descController.text);
-              } else {
-                await ref.read(createPosterControllerProvider).editPoster(
-                    widget.postMovieModel!.id,
-                    widget.postMovieModel!.imagePath,
-                    descController.text);
-              }
-            } catch (_) {
-              print(_);
-            }
+  Widget _descriptionTextField((int, String)? chosenCover) =>
+      DescriptionTextField(
+        focus: focusSec,
+        hint: context.txt.search_add_poster_hint,
+        showDivider: true,
+        button: widget.postMovieModel != null
+            ? context.txt.poster_dialog_save
+            : context.txt.poster_dialog_add_button,
+        buttonAddCheck: !(chosenCover == null),
+        disableWithoutText: widget.postMovieModel != null ? false : true,
+        buttonLoading: ref.watch(createPosterLoadingStateHolderProvider),
+        maxSymbols: 280,
+        controller: descController,
+        onTap: () async {
+          try {
             ref
                 .read(createPosterLoadingStateHolderProvider.notifier)
-                .updateValue(false);
-            ref.read(menuControllerProvider).hideMenu();
-            if (context.mounted) {
-              Navigator.pop(context);
-              final selectedImage = ref
-                  .read(createPosterControllerProvider)
-                  .createPosterChosenPosterStateHolder
-                  .state;
-              PostMovieModel? updatedState = ref
-                  .read(posterStateHolderProvider.notifier)
-                  .state
-                  ?.copyWith(description: descController.text);
-              if (selectedImage != null) {
-                updatedState =
-                    updatedState?.copyWith(imagePath: selectedImage.$2);
-              }
-              ref
-                  .read(createPosterControllerProvider)
-                  .createPosterChosenPosterStateHolder
-                  .updateValue(null);
-
-              ref
-                  .read(posterStateHolderProvider.notifier)
-                  .updateState(updatedState);
+                .updateValue(true);
+            final currPost = ref.read(posterStateHolderProvider);
+            final createId =
+                ref.read(createPosterChoseMovieStateHolderProvider);
+            if (currPost?.name == createId?.title &&
+                currPost?.year ==
+                    '${createId?.startYear}${createId?.endYear == null ? '' : ' - ${createId?.endYear}'}') {
+              ref.read(posterStateHolderProvider.notifier).updateState(
+                    currPost!.copyWith(hasInCollection: true),
+                  );
             }
-          },
-        ),
+            if (widget.postMovieModel == null) {
+              await ref
+                  .read(createPosterControllerProvider)
+                  .createPoster(descController.text, context);
+            } else {
+              await ref.read(createPosterControllerProvider).editPoster(
+                  widget.postMovieModel!.id,
+                  widget.postMovieModel!.imagePath,
+                  descController.text,
+                  context);
+            }
+          } catch (_) {
+            Logger.e('Ошибка при создании постера $_');
+          }
+          ref
+              .read(createPosterLoadingStateHolderProvider.notifier)
+              .updateValue(false);
+          ref.read(menuControllerProvider).hideMenu();
+          if (context.mounted) {
+            Navigator.pop(context);
+            final selectedImage =
+                ref.read(createPosterChosenPosterStateHolderProvider);
+            PostMovieModel? updatedState = ref.read(posterStateHolderProvider);
+            if (selectedImage != null) {
+              updatedState =
+                  updatedState?.copyWith(imagePath: selectedImage.$2);
+            }
+            ref
+                .read(createPosterControllerProvider)
+                .createPosterChosenPosterStateHolder
+                .updateValue(null);
+
+            ref
+                .read(posterStateHolderProvider.notifier)
+                .updateState(updatedState);
+          }
+        },
       );
 
   Widget _addButton((int, String)? chosenCover) => Container(
@@ -452,9 +449,9 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                         .updateValue(true);
                     await ref
                         .read(createPosterControllerProvider)
-                        .createBookmark();
+                        .createBookmark(context);
                   } catch (_) {
-                    print(_);
+                    Logger.e('Ошибка при создании закладки $_');
                   }
                   ref
                       .read(createPosterLoadingStateHolderProvider.notifier)
@@ -523,8 +520,8 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                     widget.postMovieModel != null
                         ? context.txt.posterEdit_editPoster
                         : widget.bookmark
-                            ? context.txt.home_add_watchlist
-                            : context.txt.home_add_poster,
+                            ? context.txt.poster_dialog_watchlistAdd_header
+                            : context.txt.poster_dialog_add_header,
                     style: context.textStyles.bodyBold,
                   ),
                   SizedBox(height: widget.postMovieModel == null ? 24.0 : 12.0),

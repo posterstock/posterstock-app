@@ -227,73 +227,78 @@ class UserInfoTile extends ConsumerWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    height: 40,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width:
-                              (showFollowButton) && (!(user?.followed ?? true))
-                                  ? MediaQuery.of(context).size.width -
-                                      70 -
-                                      179 +
-                                      42
-                                  : null,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              ExpandChecker(
-                                expand: (showFollowButton) &&
-                                    (!(user?.followed ?? true)),
-                                child: TextOrContainer(
-                                  text: user?.name,
-                                  style: context.textStyles.calloutBold!
-                                      .copyWith(
-                                          color: darkBackground
-                                              ? context.colors.textsBackground!
-                                              : context.colors.textsPrimary),
-                                  emptyWidth: 146,
-                                  emptyHeight: 17,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 12,
-                              ),
-                              if (!((showFollowButton) &&
-                                  (!(user?.followed ?? true))))
-                                Text(
-                                  time ?? '',
-                                  style: context.textStyles.footNote!.copyWith(
-                                    color: darkBackground
-                                        ? context.colors.textsBackground!
-                                            .withOpacity(0.8)
-                                        : context.colors.textsDisabled,
+                  Expanded(
+                    child: SizedBox(
+                      height: 40,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            // width:
+                            //     (showFollowButton) && (!(user?.followed ?? true))
+                            //         ? MediaQuery.of(context).size.width -
+                            //             70 -
+                            //             179 +
+                            //             42 -
+                            //             56
+                            //         : null,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                ExpandChecker(
+                                  expand: (showFollowButton) &&
+                                      (!(user?.followed ?? true)),
+                                  child: TextOrContainer(
+                                    text: user?.name,
+                                    style: context.textStyles.calloutBold!
+                                        .copyWith(
+                                            color: darkBackground
+                                                ? context
+                                                    .colors.textsBackground!
+                                                : context.colors.textsPrimary),
+                                    emptyWidth: 146,
+                                    emptyHeight: 17,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                            ],
+                                const SizedBox(
+                                  width: 12,
+                                ),
+                                if (!((showFollowButton) &&
+                                    (!(user?.followed ?? true))))
+                                  Text(
+                                    time ?? '',
+                                    style:
+                                        context.textStyles.footNote!.copyWith(
+                                      color: darkBackground
+                                          ? context.colors.textsBackground!
+                                              .withOpacity(0.8)
+                                          : context.colors.textsDisabled,
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
-                        ),
-                        if (loading)
-                          SizedBox(
-                            height: 3,
+                          if (loading)
+                            const SizedBox(
+                              height: 3,
+                            ),
+                          if (!loading) const Spacer(),
+                          TextOrContainer(
+                            text: user?.username == null
+                                ? null
+                                : '@${user!.username}',
+                            style: context.textStyles.caption1!.copyWith(
+                              color: darkBackground
+                                  ? context.colors.textsBackground!
+                                      .withOpacity(0.8)
+                                  : context.colors.textsSecondary,
+                            ),
+                            emptyWidth: 120,
+                            emptyHeight: 12,
                           ),
-                        if (!loading) Spacer(),
-                        TextOrContainer(
-                          text: user?.username == null
-                              ? null
-                              : '@${user!.username}',
-                          style: context.textStyles.caption1!.copyWith(
-                            color: darkBackground
-                                ? context.colors.textsBackground!
-                                    .withOpacity(0.8)
-                                : context.colors.textsSecondary,
-                          ),
-                          emptyWidth: 120,
-                          emptyHeight: 12,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],

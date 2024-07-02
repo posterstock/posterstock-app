@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import 'entity/dialog_action.dart';
 import 'entity/dialog_style.dart';
@@ -52,7 +51,7 @@ class _MaterialDialogFactory implements DialogFactory {
 
   @override
   Widget progress() {
-    return Center(
+    return const Center(
       child: CircularProgressIndicator(),
     );
   }
@@ -84,7 +83,7 @@ class _CupertinoDialogFactory implements DialogFactory {
 
   @override
   Widget progress() {
-    return Center(
+    return const Center(
       child: CupertinoActivityIndicator(animating: true),
     );
   }

@@ -48,4 +48,6 @@ class ChosenLanguageStateHolder extends StateNotifier<Languages?> {
     state = language;
     prefs.setString(_key, language.languageName);
   }
+
+  Languages? get currentState => state;
 }

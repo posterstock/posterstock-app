@@ -106,7 +106,6 @@ class _UserPage extends ConsumerStatefulWidget {
 
   const _UserPage({
     required this.args,
-    super.key,
   });
 
   @override
@@ -369,6 +368,16 @@ class _State extends ConsumerState<_UserPage> with TickerProviderStateMixin {
   }
 
   double toolbarHeight(UserDetailsModel user) {
+    int st = 0;
+    switch (st) {
+      case 0:
+        st++;
+        break;
+      case 1:
+        st--;
+        break;
+    }
+
     return 225 +
         ((user.description != null)
             ? TextInfoService.textSizeConstWidth(
@@ -386,14 +395,14 @@ class _State extends ConsumerState<_UserPage> with TickerProviderStateMixin {
       MenuState(user.name, [
         MenuItem(
           'assets/icons/ic_share.svg',
-          context.txt.share,
+          context.txt.profile_menu_share,
           () async {
             await Share.share('https://posterstock.com/${user.username}');
           },
         ),
         MenuItem(
           'assets/icons/search.svg',
-          context.txt.search,
+          context.txt.search_page_search_hint,
           () {
             context.router.push(const PageRouteInfo(SearchRoute.name));
             // animationController.animateTo(1);
@@ -437,7 +446,7 @@ class SearchField extends ConsumerWidget {
     return AppTextField(
       controller: searchController,
       searchField: true,
-      hint: context.txt.search,
+      hint: context.txt.search_page_search_hint,
       removableWhenNotEmpty: true,
       crossPadding: const EdgeInsets.all(8),
       crossButton: SvgPicture.asset(

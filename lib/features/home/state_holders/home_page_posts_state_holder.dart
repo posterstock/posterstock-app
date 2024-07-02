@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
 import 'package:poster_stock/features/home/models/post_base_model.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
-import 'package:poster_stock/features/home/state_holders/home_page_likes_state_holder.dart';
 
 final homePagePostsStateHolderProvider =
     StateNotifierProvider<HomePagePostsStateHolder, List<List<PostBaseModel>>?>(
@@ -42,8 +41,7 @@ class HomePagePostsStateHolder
       }
     }
     for (int i = 0; i < newState.length; i++) {
-      newState[i].sort((first,
-          second) {
+      newState[i].sort((first, second) {
         return first.timeDate.isAfter(second.timeDate) ? 0 : 1;
       });
     }
@@ -170,10 +168,10 @@ class HomePagePostsStateHolder
         if (posts[j] is MultiplePostModel) continue;
         if (posts[i].author.username == posts[j].author.username) {
           if (newState[i][0]
-              .timeDate
-              .difference(posts[j].timeDate)
-              .inHours
-              .abs() <
+                  .timeDate
+                  .difference(posts[j].timeDate)
+                  .inHours
+                  .abs() <
               25) {
             newState[i].add(posts[j]);
             posts.removeAt(j);

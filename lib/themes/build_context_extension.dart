@@ -8,7 +8,5 @@ extension ThemePicker on BuildContext {
   AppColors get colors => Theme.of(this).extension<AppColors>()!;
 
   AppTextStyles get textStyles => Theme.of(this).extension<AppTextStyles>()!;
-
-  //TODO: replace by whole app code AppLocalizations.of(context)!
   AppLocalizations get txt => AppLocalizations.of(this)!;
 }

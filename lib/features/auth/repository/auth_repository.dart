@@ -1,5 +1,4 @@
 import 'package:poster_stock/features/auth/data/auth_service.dart';
-import 'package:poster_stock/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthRepository {

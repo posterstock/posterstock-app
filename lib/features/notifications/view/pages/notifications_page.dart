@@ -199,13 +199,10 @@ class NotificationTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print(
-        '${notification.info} ${DateTime.now().difference(notification.time).inMinutes}');
     return Material(
       color: context.colors.backgroundsPrimary,
       child: CustomInkWell(
         onTap: () {
-          print(notification.deepLink);
           ref.watch(router)!.pushNamed(
                 notification.deepLink,
               );
