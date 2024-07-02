@@ -166,6 +166,7 @@ class _AppState extends ConsumerState<App> with TickerProviderStateMixin {
           .updateState(pageTransitionController);
     });
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       routerConfig: App._appRouter!.config(deepLinkBuilder: (deepLink) {
         if (initLink != null) {
           var route =
