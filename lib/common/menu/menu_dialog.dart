@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:gap/gap.dart';
 import 'package:poster_stock/common/menu/menu_state.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -50,10 +51,13 @@ class MenuDialog extends StatelessWidget {
               color: Color(0xFF212121),
             ),
           ),
+        const Gap(15),
         ...state.items
             .map(
               (it) => it is MenuItem
                   ? InkWell(
+                      radius: 0,
+                      borderRadius: BorderRadius.circular(0),
                       splashColor: context.colors.iconsActive,
                       onTap: () {
                         Navigator.of(context).pop();
@@ -84,8 +88,10 @@ class _MenuItemWidget extends StatelessWidget {
     return SizedBox(
       height: 52,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Divider(thickness: 0.5, color: context.colors.fieldsDefault),
+          Divider(
+              height: 0, thickness: 0.5, color: context.colors.fieldsDefault),
           const Spacer(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),

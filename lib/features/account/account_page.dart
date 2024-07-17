@@ -387,13 +387,6 @@ class _AccountState extends ConsumerState<_AccountScreen>
           context.txt.search_page_search_hint,
           () {
             context.router.push(const PageRouteInfo(SearchRoute.name));
-            // animationController.animateTo(1);
-            // scrollController.animateTo(
-            //   245,
-            //   duration: const Duration(milliseconds: 300),
-            //   curve: Curves.linear,
-            // );
-            // focusNode.requestFocus();
           },
         ),
       ]),
