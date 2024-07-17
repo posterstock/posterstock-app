@@ -61,7 +61,7 @@ class ProfileAppbar extends StatelessWidget {
             width: 65,
             color: Colors.transparent,
             child: Padding(
-              padding: const EdgeInsets.only(right: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Align(
                 alignment: Alignment.centerRight,
                 child: SvgPicture.asset(

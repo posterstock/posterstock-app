@@ -115,7 +115,6 @@ class _AccountState extends ConsumerState<_AccountScreen>
                 flexibleSpace: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 12),
                     ProfileAppbar(
                       account.username,
                       onMenuClick: _openContextMenu,
@@ -125,7 +124,7 @@ class _AccountState extends ConsumerState<_AccountScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 18),
+                          const SizedBox(height: 6),
                           Row(
                             children: [
                               GestureDetector(
