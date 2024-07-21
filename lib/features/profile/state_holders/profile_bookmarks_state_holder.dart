@@ -21,6 +21,10 @@ class ProfileBookmarksStateHolder extends StateNotifier<List<PostMovieModel>?> {
     state = [...(state ?? []), ...?list];
   }
 
+  List<PostMovieModel> getList() {
+    return state ?? [];
+  }
+
   void setState(List<PostMovieModel>? list) {
     state = [...?list];
   }

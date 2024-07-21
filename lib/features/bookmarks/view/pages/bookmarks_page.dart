@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/menu/menu_dialog.dart';
@@ -194,34 +195,38 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
           'assets/icons/ic_collection_semibold.svg',
           context.txt.watchlist_menu_addToWatched,
           () {
+            Logger.i('bookmark ${widget.mediaId}');
             final bookmark = ref.read(
               bookmarkDetailsStateHolderProvider(widget.mediaId),
             );
 
-            ref.read(createPosterControllerProvider).chooseMovie(
-                  MediaModel(
-                    id: bookmark.mediaId!,
-                    title: bookmark.name,
-                    type: bookmark.mediaType == 'movie'
-                        ? MediaType.movie
-                        : MediaType.tv,
-                    startYear: int.parse(bookmark.year.split(" - ")[0]),
-                    endYear: bookmark.year.split(" - ").length == 1 ||
-                            bookmark.year.split(" - ")[1].isEmpty
-                        ? null
-                        : int.parse(
-                            bookmark.year.split(" - ")[1],
-                          ),
-                  ),
+            if (bookmark != null) {
+              ref.read(createPosterControllerProvider).chooseMovie(
+                    MediaModel(
+                      id: bookmark.mediaId!,
+                      title: bookmark.name,
+                      type: bookmark.mediaType == 'movie'
+                          ? MediaType.movie
+                          : MediaType.tv,
+                      startYear: int.parse(bookmark.year.split(" - ")[0]),
+                      endYear: bookmark.year.split(" - ").length == 1 ||
+                              bookmark.year.split(" - ")[1].isEmpty
+                          ? null
+                          : int.parse(
+                              bookmark.year.split(" - ")[1],
+                            ),
+                    ),
+                  );
+
+              if (bookmark.hasInCollection == false) {
+                showModalBottomSheet(
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  builder: (context) => const PosterDialog(),
                 );
-            if (bookmark.hasInCollection == false) {
-              showModalBottomSheet(
-                context: context,
-                backgroundColor: Colors.transparent,
-                isScrollControlled: true,
-                useSafeArea: true,
-                builder: (context) => const PosterDialog(),
-              );
+              }
             }
           },
         ),

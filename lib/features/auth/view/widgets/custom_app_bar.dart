@@ -16,7 +16,7 @@ class CustomAppBar extends ConsumerWidget {
       child: Row(
         children: [
           const Expanded(
-            child: CustomBackButton(),
+            child: CustomBackButtonWithWord(),
           ),
           Expanded(
             child: Center(
@@ -35,8 +35,9 @@ class CustomAppBar extends ConsumerWidget {
   }
 }
 
-class CustomBackButton extends ConsumerWidget {
-  const CustomBackButton({
+/// кнопка назад с надписью назад
+class CustomBackButtonWithWord extends ConsumerWidget {
+  const CustomBackButtonWithWord({
     this.color,
     this.addOnTap,
     super.key,
@@ -76,6 +77,48 @@ class CustomBackButton extends ConsumerWidget {
               style: context.textStyles.bodyRegular!.copyWith(color: color),
             )
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// кнопка назад без надписи
+class CustomBackButton extends ConsumerWidget {
+  const CustomBackButton({
+    this.color,
+    this.addOnTap,
+    super.key,
+  });
+
+  final Color? color;
+  final Future<void> Function()? addOnTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: InkWell(
+        highlightColor: Colors.transparent,
+        onTap: () async {
+          if (addOnTap != null) {
+            await addOnTap!();
+          }
+          if (context.mounted) {
+            ref.watch(router)!.pop();
+          }
+        },
+        child: Container(
+          color: Colors.transparent,
+          padding: const EdgeInsets.only(left: 16.0, right: 20.0),
+          child: SvgPicture.asset(
+            'assets/icons/back_icon.svg',
+            width: 18,
+            colorFilter: ColorFilter.mode(
+              color ?? context.colors.iconsDefault!,
+              BlendMode.srcIn,
+            ),
+          ),
         ),
       ),
     );

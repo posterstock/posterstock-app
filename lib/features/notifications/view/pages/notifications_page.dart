@@ -10,6 +10,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
+import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
 import 'package:poster_stock/features/notifications/controllers/notifications_controller.dart';
 import 'package:poster_stock/features/notifications/models/notification_model.dart';
 import 'package:poster_stock/features/notifications/state_holders/notifications_state_holder.dart';
@@ -93,11 +94,11 @@ class NotificationsPage extends ConsumerWidget {
               controller: controller,
               slivers: [
                 SliverAppBar(
-                  leading: const SizedBox(),
+                  leading: const CustomBackButton(),
                   backgroundColor: context.colors.backgroundsPrimary,
                   centerTitle: true,
                   title: Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
+                    padding: const EdgeInsets.only(bottom: 8.0),
                     child: Text(
                       AppLocalizations.of(context)!.notification_notifications,
                       style: context.textStyles.bodyBold,

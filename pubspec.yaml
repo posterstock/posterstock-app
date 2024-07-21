@@ -61,6 +61,7 @@ dependencies:
   gap: ^3.0.1 #https://pub.dev/packages/gap
   flutter_easylogger: ^2.3.3 #https://pub.dev/packages/flutter_easylogger
   screenshot: ^3.0.0 #https://pub.dev/packages/screenshot
+  collection: ^1.18.0
 
 dev_dependencies:
   flutter_test:

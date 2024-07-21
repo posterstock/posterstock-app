@@ -160,9 +160,9 @@ class _State extends ConsumerState<_UserPage> with TickerProviderStateMixin {
               pinned: false,
               floating: true,
               elevation: 0,
-              expandedHeight: toolbarHeight(user),
-              toolbarHeight: toolbarHeight(user),
-              collapsedHeight: toolbarHeight(user),
+              expandedHeight: toolbarHeight(user) + 10,
+              toolbarHeight: toolbarHeight(user) + 10,
+              collapsedHeight: toolbarHeight(user) + 10,
               backgroundColor: context.colors.backgroundsPrimary,
               leading: const SizedBox(),
               centerTitle: true,
@@ -170,7 +170,7 @@ class _State extends ConsumerState<_UserPage> with TickerProviderStateMixin {
               flexibleSpace: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 12.0),
+                  // const SizedBox(height: 12.0),
                   ProfileAppbar(
                     user.username,
                     onBack: ref.watch(router)!.pop,
@@ -282,7 +282,7 @@ class _State extends ConsumerState<_UserPage> with TickerProviderStateMixin {
                           ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

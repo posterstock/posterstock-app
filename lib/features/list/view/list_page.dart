@@ -217,7 +217,7 @@ class _ListPageState extends ConsumerState<ListPage>
                       expandedHeight: 292,
                       collapsedHeight: 42,
                       pinned: true,
-                      leading: const CustomBackButton(),
+                      leading: const CustomBackButtonWithWord(),
                       actions: [
                         GestureDetector(
                           onTap: () async {

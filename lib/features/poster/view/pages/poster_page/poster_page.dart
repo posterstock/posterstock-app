@@ -625,7 +625,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                           builder: (context, child) {
                             return Row(
                               children: [
-                                CustomBackButton(
+                                CustomBackButtonWithWord(
                                   color: Color.lerp(
                                     context.colors.iconsDefault,
                                     context.colors.iconsBackground,
