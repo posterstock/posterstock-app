@@ -49,6 +49,11 @@ class BookmarksNotifier extends StateNotifier<BookmarksState> {
     _hasMore = more;
   }
 
+  PostMovieModel? getBookmarkById(int bookmarkId) {
+    return state.bookmarks
+        .firstWhere((element) => element?.mediaId == bookmarkId);
+  }
+
   Future<void> deleteBookmark(int bookmarkId) async {
     await network.removeBookmark(bookmarkId);
     final (list, more) = await network.getBookmarks(restart: true);

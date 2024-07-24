@@ -12,7 +12,6 @@ import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/account/notifiers/bookmarks_notifier.dart';
 import 'package:poster_stock/features/bookmarks/controller/bookmarks_controller.dart';
-import 'package:poster_stock/features/bookmarks/state_holders/bookmark_details_state_holder.dart';
 import 'package:poster_stock/features/bookmarks/state_holders/bookmark_list_state_holder.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/poster_dialog/controller/create_poster_controller.dart';
@@ -194,12 +193,10 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
         MenuItem(
           'assets/icons/ic_collection_semibold.svg',
           context.txt.watchlist_menu_addToWatched,
-          () {
-            Logger.i('bookmark ${widget.mediaId}');
-            final bookmark = ref.read(
-              bookmarkDetailsStateHolderProvider(widget.mediaId),
-            );
-
+          () async {
+            final bookmark = ref
+                .read(accountBookmarksStateNotifier.notifier)
+                .getBookmarkById(widget.mediaId);
             if (bookmark != null) {
               ref.read(createPosterControllerProvider).chooseMovie(
                     MediaModel(
@@ -219,13 +216,19 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
                   );
 
               if (bookmark.hasInCollection == false) {
-                showModalBottomSheet(
+                bool isShow = await showModalBottomSheet(
                   context: context,
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: Colors.white,
                   isScrollControlled: true,
                   useSafeArea: true,
                   builder: (context) => const PosterDialog(),
                 );
+                Logger.i('isShow $isShow');
+                // if (isShow) {
+                await ref.read(accountBookmarksStateNotifier.notifier).reload();
+                // .deleteBookmark(widget.mediaId);
+                // }
+                await ref.read(router)!.pop();
               }
             }
           },
@@ -234,12 +237,6 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
           'assets/icons/ic_trash2.svg',
           context.txt.delete,
           () async {
-            // await ref
-            //     .read(commentsControllerProvider)
-            //     .setBookmarked(widget.mediaId, false);
-            // await ref
-            //     .read(profileBookmarksStateHolderProvider.notifier)
-            //     .remove(widget.mediaId);
             await ref
                 .read(accountBookmarksStateNotifier.notifier)
                 .deleteBookmark(widget.mediaId);

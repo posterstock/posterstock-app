@@ -132,7 +132,7 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                               onTap: () async {
                                 ref.read(menuControllerProvider).hideMenu();
                                 Navigator.pop(context);
-                                Navigator.pop(context, true);
+                                Navigator.pop(context, false);
                               },
                               child: Center(
                                 child: Text(
@@ -383,7 +383,7 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
               .updateValue(false);
           ref.read(menuControllerProvider).hideMenu();
           if (context.mounted) {
-            Navigator.pop(context);
+            Navigator.pop(context, true);
             final selectedImage =
                 ref.read(createPosterChosenPosterStateHolderProvider);
             PostMovieModel? updatedState = ref.read(posterStateHolderProvider);
@@ -457,7 +457,7 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                       .read(createPosterLoadingStateHolderProvider.notifier)
                       .updateValue(false);
                   if (context.mounted) {
-                    Navigator.pop(context);
+                    Navigator.pop(context, true);
                     ref.read(menuControllerProvider).hideMenu();
                   }
                 },
