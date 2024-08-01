@@ -253,7 +253,7 @@ class _MenuWidgetState extends ConsumerState<MenuWidget>
                 color: context.colors.fieldsHover!,
               ),
               picturePath: 'assets/icons/ic_collection.svg',
-              label: AppLocalizations.of(context)!.search_add_poster_title,
+              label: context.txt.search_add_poster_title,
               animationValue: controller.value,
               onTap: () {
                 showModalBottomSheet(

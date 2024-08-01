@@ -53,6 +53,9 @@ class PostMovieModel extends PostBaseModel {
       Color(0xfff3d376),
       Color(0xff92bdf4),
     ];
+    final imagePath = previewPrimary
+        ? (json['preview_image'] as String? ?? json['image'] as String?)
+        : (json['image'] as String? ?? json['preview_image'] as String?);
     return PostMovieModel(
       type: json['type'],
       id: json['id'] as int? ?? -1,
@@ -61,11 +64,7 @@ class PostMovieModel extends PostBaseModel {
       hasInCollection: false,
       startYear: json['start_year'],
       endYear: json['end_year'],
-      imagePath: (previewPrimary
-              ? (json['preview_image'] as String? ?? json['image'] as String?)
-              : (json['image'] as String? ??
-                  json['preview_image'] as String?)) ??
-          '',
+      imagePath: imagePath ?? '',
       name: json['title'] as String,
       author: json['user'] == null
           ? UserModel(
@@ -107,7 +106,7 @@ class PostMovieModel extends PostBaseModel {
         'likes_count': likes,
         'created_at': creationTime,
         'comments_count': comments,
-        'user': author.toJson()
+        'user': author.toJson(),
       };
 
   @override

@@ -7,11 +7,13 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:gap/gap.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:poster_stock/common/data/token_keeper.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
+import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/auth/controllers/auth_controller.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
@@ -34,6 +36,16 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    bool isWallet = false;
+    setWallet() async {
+      if (isWallet) return;
+      isWallet = true;
+      ref.watch(themeValueStateHolderProvider);
+      await Future.delayed(const Duration(seconds: 1));
+      isWallet = false;
+      ref.watch(themeValueStateHolderProvider);
+    }
+
     final theme = ref.watch(themeValueStateHolderProvider);
     return CustomScaffold(
       backgroundColor: context.colors.backgroundsSecondary,
@@ -78,9 +90,7 @@ class SettingsPage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const Gap(16),
                   SettingsButton(
                     onTap: () {
                       ref.watch(router)!.push(
@@ -111,9 +121,7 @@ class SettingsPage extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          width: 16,
-                        ),
+                        const Gap(16),
                         Icon(
                           Icons.arrow_forward_ios_rounded,
                           size: 14,
@@ -161,9 +169,7 @@ class SettingsPage extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            width: 16,
-                          ),
+                          const Gap(16),
                           Icon(
                             Icons.arrow_forward_ios_rounded,
                             size: 14,
@@ -172,10 +178,35 @@ class SettingsPage extends ConsumerWidget {
                         ],
                       ),
                     ),
-                  if (email == null)
-                    const SizedBox(
-                      height: 24,
+                  const Gap(16),
+                  SettingsButton(
+                    onTap: () {
+                      if (!isWallet) {
+                        isWallet = true;
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        Text(
+                          'Ton Wallet',
+                          style: context.textStyles.bodyRegular,
+                        ),
+                        const Spacer(),
+                        Container(
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: context.colors.backgroundsPrimary,
+                            borderRadius: BorderRadius.circular(33),
+                          ),
+                          child: AppTextButton(
+                            onTap: () {},
+                            text: context.txt.connect,
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
+                  if (email == null) const Gap(16),
                   if (email == null)
                     DoubleButton(
                       onTap1: () {
@@ -233,10 +264,7 @@ class SettingsPage extends ConsumerWidget {
                         ],
                       ),
                     ),
-                  if (email == null)
-                    const SizedBox(
-                      height: 8,
-                    ),
+                  if (email == null) const Gap(8),
                   if (email == null)
                     Padding(
                       padding: const EdgeInsets.only(left: 16.0),
@@ -247,9 +275,7 @@ class SettingsPage extends ConsumerWidget {
                         ),
                       ),
                     ),
-                  const SizedBox(
-                    height: 24,
-                  ),
+                  const Gap(24),
                   MultipleSettingsButton(
                     onTaps: [
                       () {
@@ -267,7 +293,7 @@ class SettingsPage extends ConsumerWidget {
                         children: [
                           Text(
                             //TODO: localize
-                            "System theme",
+                            context.txt.system_theme,
                             style: context.textStyles.bodyRegular,
                           ),
                           const Spacer(),
@@ -284,8 +310,7 @@ class SettingsPage extends ConsumerWidget {
                       Row(
                         children: [
                           Text(
-                            //TODO: localize
-                            "Light theme",
+                            context.txt.system_theme_light,
                             style: context.textStyles.bodyRegular,
                           ),
                           const Spacer(),
@@ -302,8 +327,7 @@ class SettingsPage extends ConsumerWidget {
                       Row(
                         children: [
                           Text(
-                            //TODO: localize
-                            "Dark theme",
+                            context.txt.system_theme_dark,
                             style: context.textStyles.bodyRegular,
                           ),
                           const Spacer(),
@@ -319,9 +343,7 @@ class SettingsPage extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 24,
-                  ),
+                  const Gap(24),
                   MultipleSettingsButton(
                     onTaps: [
                       () {

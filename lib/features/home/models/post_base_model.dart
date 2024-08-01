@@ -19,7 +19,7 @@ abstract class PostBaseModel {
     required this.creationTime,
     required this.description,
     required this.likes,
-    required this.comments,
+    required this.comments, 
     required this.liked,
   });
 

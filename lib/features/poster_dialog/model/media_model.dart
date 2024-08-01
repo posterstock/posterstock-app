@@ -10,7 +10,6 @@ class MediaModel {
   String title;
   MediaType type;
 
-
   MediaModel({
     required this.id,
     required this.title,
@@ -27,5 +26,14 @@ class MediaModel {
       startYear: json['start_year'] as int,
       endYear: json['end_year'] as int?,
     );
+  }
+  toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'type': type,
+      'start_year': startYear,
+      'end_year': endYear,
+    };
   }
 }
