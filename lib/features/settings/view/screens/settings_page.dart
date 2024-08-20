@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:auto_route/auto_route.dart';
+import 'package:darttonconnect/models/wallet_app.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -19,7 +20,9 @@ import 'package:poster_stock/features/auth/controllers/auth_controller.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
 import 'package:poster_stock/features/edit_profile/api/edit_profile_api.dart';
 import 'package:poster_stock/features/notifications/state_holders/notifications_count_state_holder.dart';
+import 'package:poster_stock/features/settings/state_holders/change_wallet_state_holder.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
+import 'package:poster_stock/features/settings/view/add_address.dart';
 import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_value_state_holder.dart';
 import 'package:poster_stock/main.dart';
@@ -29,6 +32,7 @@ import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supertokens_flutter/supertokens.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+// import 'package:darttonconnect/ton_connect.dart';
 
 @RoutePage()
 class SettingsPage extends ConsumerWidget {
@@ -36,17 +40,82 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    bool isWallet = false;
-    setWallet() async {
-      if (isWallet) return;
-      isWallet = true;
-      ref.watch(themeValueStateHolderProvider);
-      await Future.delayed(const Duration(seconds: 1));
-      isWallet = false;
-      ref.watch(themeValueStateHolderProvider);
-    }
-
     final theme = ref.watch(themeValueStateHolderProvider);
+    final wallet = ref.watch(changeWalletStateHolderProvider);
+    Logger.i('wallet: ${wallet.wallet}');
+    bool isWallet = wallet.wallet.isNotEmpty;
+    Logger.i('wallet: ${wallet.wallet} == $isWallet');
+
+    /// Подключение к сети TON
+    void connectToTonNetwork() async {
+      String? address = await showModalBottomSheet(
+        context: context,
+        isScrollControlled: false,
+        useSafeArea: true,
+        backgroundColor: context.colors.backgroundsPrimary,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(12),
+            topRight: Radius.circular(12),
+          ),
+        ),
+        builder: (context) => SingleChildScrollView(
+          // Используем SingleChildScrollView напрямую
+          child: AddAddress(address: wallet.wallet),
+        ),
+      );
+      if (address != null && address.isNotEmpty) {
+        ref.read(changeWalletStateHolderProvider.notifier).setWallet(address);
+      }
+    }
+    // WalletApp walletApp = const WalletApp(
+    //   name: 'Tonkeeper',
+    //   image: 'https://tonkeeper.com/assets/tonconnect-icon.png',
+    //   aboutUrl: 'https://tonkeeper.com',
+    //   universalUrl: 'https://app.tonkeeper.com/ton-connect',
+    //   bridgeUrl: 'https://bridge.tonapi.io/bridge',
+    // );
+    // // final walletAddress = await scanQRCode();
+    // // String walletAddress = '0QAgDXvGgB0WK6a_tIyrnf2qh2usk_YKXg6ECsugSS4dYtaV';
+    // // walletAddress = '0QCSYezT1kpNHllxxsuSxf9R43FXoseNVP8LNZTqO3idQdNE';
+
+    // final TonConnect connector = TonConnect(
+    //     'https://gist.githubusercontent.com/romanovichim/e81d599a6f3798bb9f74ab1970a8b376/raw/43e00b0abc824ef272ac6d0f8083d21456602adf/gistfiletest.txt');
+
+    // try {
+    //   final List<WalletApp> wallets = await connector.getWallets();
+    //   for (var wallet in wallets) {
+    //     Logger.i('Wallets: ${wallet.name}');
+    //   }
+
+    //   // Создание подключения к кошельку
+    //   final universalLink = await connector.connect(
+    //     const WalletApp(
+    //       name: 'Tonkeeper',
+    //       image: 'https://tonkeeper.com/assets/tonconnect-icon.png',
+    //       aboutUrl: 'https://tonkeeper.com',
+    //       universalUrl: 'https://app.tonkeeper.com/ton-connect',
+    //       bridgeUrl: 'https://bridge.tonapi.io/bridge',
+    //     ),
+    //   );
+
+    //   Logger.i(
+    //       'Подключение к сети TON успешно. Universal Link: $universalLink');
+    //   Logger.i('wallet ${connector.connected} ${connector.provider}');
+    //   final List<WalletApp> wallets2 = await connector.getWallets();
+    //   for (var wallet in wallets2) {
+    //     Logger.i('Wallets>>>>>>: ${wallet.name}');
+    //   }
+
+    //   // Обработка статуса подключения
+    //   connector.onStatusChange((walletInfo) {
+    //     Logger.i('Статус подключения изменился: $walletInfo');
+    //   });
+    // } catch (e) {
+    //   Logger.e('Ошибка подключения к сети TON: $e');
+    // }
+    // }
+
     return CustomScaffold(
       backgroundColor: context.colors.backgroundsSecondary,
       child: SingleChildScrollView(
@@ -192,15 +261,27 @@ class SettingsPage extends ConsumerWidget {
                           style: context.textStyles.bodyRegular,
                         ),
                         const Spacer(),
-                        Container(
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: context.colors.backgroundsPrimary,
-                            borderRadius: BorderRadius.circular(33),
-                          ),
-                          child: AppTextButton(
-                            onTap: () {},
-                            text: context.txt.connect,
+                        GestureDetector(
+                          onTap: () {
+                            connectToTonNetwork();
+                          },
+                          child: Container(
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: context.colors.backgroundsPrimary,
+                              borderRadius: BorderRadius.circular(33),
+                            ),
+                            child: isWallet
+                                ? Text(
+                                    wallet.wallet.length > 12
+                                        ? '${wallet.wallet.substring(0, 6)}...${wallet.wallet.substring(wallet.wallet.length - 6)}'
+                                        : wallet.wallet,
+                                    style: context.textStyles.bodyRegular,
+                                  )
+                                : AppTextButton(
+                                    onTap: connectToTonNetwork,
+                                    text: context.txt.connect,
+                                  ),
                           ),
                         ),
                       ],

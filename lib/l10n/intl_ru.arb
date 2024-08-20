@@ -303,12 +303,14 @@
   "yes": "Да",
   "@yes": {},
   "new_comments": "Дальше идут новые комментарии",
-  "system_theme": "Системная тема",
+  "system_theme": "Светлая тема",
   "@system_theme": {},
   "system_theme_dark": "Темная тема",
   "@system_theme_dark": {},
   "system_theme_light": "Светлая тема",
   "@system_theme_light": {},
   "connect": "Подключить",
-  "@connect": {}
+  "@connect": {},
+  "add": "Добавить",
+  "@add": {}
 }

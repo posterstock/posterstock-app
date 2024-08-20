@@ -74,4 +74,16 @@ class UserModel {
       color: color ?? this.color,
     );
   }
+
+  factory UserModel.init() {
+    return UserModel(
+      id: 0,
+      name: '',
+      username: '',
+      imagePath: '',
+      followed: false,
+      description: '',
+      color: Colors.white,
+    );
+  }
 }

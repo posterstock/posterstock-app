@@ -32,7 +32,7 @@ import 'navigation/app_router.dart';
 import 'navigation/app_router.gr.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-// TODO: add exchange rate
+// add exchange rate
 double exchangeRate = 0.0;
 
 /// Тут логика по получению пушей в бэкграугнде
@@ -65,7 +65,7 @@ void main() async {
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestPermission();
+        ?.requestNotificationsPermission();
     await Firebase.initializeApp(
       name: "Posterstock",
       options: DefaultFirebaseOptions.currentPlatform,

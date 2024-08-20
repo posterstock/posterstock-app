@@ -1,0 +1,7 @@
+{
+    "url": "<app-url>",                        
+    "name": "<app-name>",                      
+    "iconUrl": "<app-icon-url>",               
+    "termsOfUseUrl": "<terms-of-use-url>",     
+    "privacyPolicyUrl": "<privacy-policy-url>" 
+  }

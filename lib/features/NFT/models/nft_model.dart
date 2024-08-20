@@ -1,4 +1,4 @@
-import 'package:poster_stock/features/home/models/nft_model.dart';
+import 'package:poster_stock/features/NFT/models/wallet_state.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 
 class NFTModel {
@@ -9,7 +9,7 @@ class NFTModel {
   int item;
   double priceInTON;
   double priceInUSD;
-  BlockchainNetwork network;
+  WalletState wallet;
   double fee;
   bool isSell;
   UserModel owner;
@@ -22,10 +22,10 @@ class NFTModel {
     required this.item,
     required this.priceInTON,
     required this.priceInUSD,
-    required this.network,
     required this.fee,
     required this.isSell,
     required this.owner,
+    required this.wallet,
   });
 
   factory NFTModel.fromJson(Map<String, dynamic> json) {
@@ -37,10 +37,10 @@ class NFTModel {
       item: json['item'],
       priceInTON: json['priceInTON'],
       priceInUSD: json['priceInUSD'],
-      network: json['network'],
       fee: json['fee'],
       isSell: json['isSell'],
       owner: json['owner'],
+      wallet: json['wallet'],
     );
   }
 
@@ -53,10 +53,26 @@ class NFTModel {
       'item': item,
       'priceInTON': priceInTON,
       'priceInUSD': priceInUSD,
-      'network': network,
       'fee': fee,
       'isSell': isSell,
       'owner': owner,
+      'wallet': wallet.toJson(),
     };
+  }
+
+  factory NFTModel.init() {
+    return NFTModel(
+      idNft: 0,
+      relatedPosterId: '',
+      imagePath: '',
+      allCount: 0,
+      item: 0,
+      priceInTON: 0,
+      priceInUSD: 0,
+      fee: 0,
+      isSell: false,
+      owner: UserModel.init(),
+      wallet: WalletState.init(),
+    );
   }
 }

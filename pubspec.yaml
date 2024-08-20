@@ -44,10 +44,10 @@ dependencies:
   pretty_dio_logger: ^1.1.1
   sign_in_with_apple: ^5.0.0
   firebase_core: ^3.1.1
-  logger: ^2.0.0
+  logger: ^1.4.0
   shared_preferences: ^2.2.0
   firebase_messaging: ^15.0.2
-  flutter_local_notifications: ^15.1.0+1
+  flutter_local_notifications: ^17.2.1+2
 
   transparent_image: ^2.0.1
   async: ^2.11.0
@@ -61,7 +61,13 @@ dependencies:
   gap: ^3.0.1 #https://pub.dev/packages/gap
   flutter_easylogger: ^2.3.3 #https://pub.dev/packages/flutter_easylogger
   screenshot: ^3.0.0 #https://pub.dev/packages/screenshot
-  collection: ^1.18.0
+  collection: ^1.18.0 
+  qr_flutter: ^4.1.0 #https://pub.dev/packages/qr_flutter 
+  darttonconnect: ^1.0.3 #https://pub.dev/packages/darttonconnect
+  qr_code_scanner: ^1.0.1 #https://pub.dev/packages/qr_code_scanner  
+  tonutils: ^0.5.6 #https://pub.dev/packages/tonutils
+
+  
 
 dev_dependencies:
   flutter_test:
@@ -74,8 +80,12 @@ dev_dependencies:
   build_runner:
 
 dependency_overrides:
+  http: ^1.1.0
   intl: ^0.18.1
-
+  win32: ^5.5.3
+  archive: ^3.6.1
+  pinenacl: ^0.6.0
+  
 flutter_native_splash:
   background_image: "assets/background.png"
   android_12:

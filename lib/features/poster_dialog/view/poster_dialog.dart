@@ -15,6 +15,8 @@ import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/common/widgets/description_textfield.dart';
 import 'package:poster_stock/features/NFT/models/nft_model.dart';
+import 'package:poster_stock/features/NFT/models/nft_poster.dart';
+import 'package:poster_stock/features/NFT/models/wallet_state.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
@@ -499,14 +501,19 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
       final randomValue = Random().nextInt(28) + 3;
       for (var i = 0; i < images.length - 3; i++) {
         nftPosters.add(NFTPoster.fromBaseModel(
-          updatedState,
-          imagePath: images[i],
-          priceInTON: randomValue.toDouble(),
-          network: BlockchainNetwork.ton,
-          allCount: 30,
-          item: 10,
-          fee: 0.3,
-          isSell: false,
+          model: updatedState,
+          nft: NFTModel(
+              idNft: randomValue,
+              relatedPosterId: updatedState.id.toString(),
+              imagePath: images[i],
+              allCount: 100,
+              item: 1,
+              priceInTON: 0,
+              priceInUSD: 0,
+              wallet: WalletState.init(),
+              fee: 0,
+              isSell: false,
+              owner: updatedState.author),
         ));
       }
     }
@@ -568,14 +575,14 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                   if (searchText.isEmpty || chosenMovie != null) const Gap(16),
                   if (searchText.isEmpty && chosenMovie == null) _searchEmpty(),
                   if (chosenMovie != null) _imagesList(images, chosenMovie),
-                  if (nftPosters.isNotEmpty) ...[
-                    const Gap(40),
-                    Text('NFT >>>>>>>>>>>>>>>>',
-                        style: context.textStyles.headline),
-                    const Gap(13),
-                    // for (var i = 0; i < nftPosters.length; i++)
-                    //   NFTPosterWidget(nftPosters[i]),
-                  ],
+                  // if (nftPosters.isNotEmpty) ...[
+                  //   const Gap(40),
+                  //   Text('NFT >>>>>>>>>>>>>>>>',
+                  //       style: context.textStyles.headline),
+                  //   const Gap(13),
+                  //   // for (var i = 0; i < nftPosters.length; i++)
+                  //   //   NFTPosterWidget(nftPosters[i]),
+                  // ],
                   if (searchText.isNotEmpty && results == null)
                     Expanded(
                       child: Center(

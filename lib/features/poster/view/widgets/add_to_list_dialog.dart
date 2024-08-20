@@ -35,18 +35,18 @@ class AddToListDialog extends ConsumerWidget {
         }
       });
     }
-    final allSizes = lists?.map(
-      (e) => TextInfoService.textSizeConstWidth(
-              e.title,
-              context.textStyles.bodyRegular!,
-              MediaQuery.of(context).size.width - 32 - 19 - 200)
-          .height,
-    );
-    double size = 0;
-    for (var a in (allSizes ?? const Iterable.empty())) {
-      size += a;
-      size += 80;
-    }
+    // final allSizes = lists?.map(
+    //   (e) => TextInfoService.textSizeConstWidth(
+    //           e.title,
+    //           context.textStyles.bodyRegular!,
+    //           MediaQuery.of(context).size.width - 32 - 19 - 200)
+    //       .height,
+    // );
+    // double size = 0;
+    // for (var a in (allSizes ?? const Iterable.empty())) {
+    //   size += a;
+    //   size += 80;
+    // }
     return WillPopScope(
       onWillPop: () async {
         ref.watch(myListsStateHolderProvider.notifier).clear();
