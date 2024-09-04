@@ -6,7 +6,7 @@ import 'package:poster_stock/common/constants/languages.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
-import 'package:poster_stock/features/settings/view/screens/settings_page.dart';
+import 'package:poster_stock/features/settings/view/screens/widgets.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 @RoutePage()
