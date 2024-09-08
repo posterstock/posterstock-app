@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poster_stock/features/home/models/nft.dart';
 import 'package:poster_stock/features/home/models/post_base_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 
@@ -9,6 +10,8 @@ class MultiplePostSingleModel {
   final String image;
   final String title;
   final String? description;
+  final NftForPoster nft;
+  final bool isNft;
 
   MultiplePostSingleModel({
     required this.id,
@@ -17,9 +20,15 @@ class MultiplePostSingleModel {
     required this.image,
     required this.title,
     this.description,
+    required this.nft,
+    required this.isNft,
   });
 
   factory MultiplePostSingleModel.fromJson(Map<String, dynamic> json) {
+    NftForPoster nft = NftForPoster.init();
+    if (json['nft'] != null) {
+      nft = NftForPoster.fromJson(json['nft'] as Map<String, dynamic>);
+    }
     return MultiplePostSingleModel(
       id: json['id'] as int,
       startYear: json['start_year'],
@@ -27,6 +36,8 @@ class MultiplePostSingleModel {
       image: json['preview_image'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
+      nft: nft,
+      isNft: nft.isNft,
     );
   }
 
@@ -37,6 +48,8 @@ class MultiplePostSingleModel {
         'description': description,
         'preview_image': image,
         'title': title,
+        'nft': nft.toJson(),
+        'isNft': isNft,
       };
 }
 
@@ -49,6 +62,8 @@ class MultiplePostModel extends PostBaseModel {
     this.image,
     required String name,
     required bool isArtist,
+    required bool isNft,
+    required NftForPoster nft,
     required UserModel author,
     required int? creationTime,
     required int id,
@@ -67,11 +82,17 @@ class MultiplePostModel extends PostBaseModel {
           liked: liked,
           comments: comments,
           description: description,
-          isArtist: author.isArtist,
+          isArtist: isArtist,
+          isNft: isNft,
+          nft: nft,
         );
 
   factory MultiplePostModel.fromJson(Map<String, dynamic> json,
       {bool previewPrimary = false}) {
+    NftForPoster nft = NftForPoster.init();
+    if (json['nft'] != null) {
+      nft = NftForPoster.fromJson(json['nft'] as Map<String, dynamic>);
+    }
     const List<Color> avatar = [
       Color(0xfff09a90),
       Color(0xfff3d376),
@@ -113,7 +134,9 @@ class MultiplePostModel extends PostBaseModel {
               .toList() ??
           [],
       image: image,
-      isArtist: json['isArtist'] as bool,
+      nft: nft,
+      isNft: nft.isNft,
+      isArtist: json['isArtist'] ?? false,
     );
   }
 
@@ -130,6 +153,8 @@ class MultiplePostModel extends PostBaseModel {
         'created_at': creationTime,
         'posters': posters.map((i) => i.toJson()).toList(),
         'isArtist': isArtist,
+        'nft': nft.toJson(),
+        'isNft': isNft,
       };
 
   @override
@@ -145,9 +170,12 @@ class MultiplePostModel extends PostBaseModel {
     bool? liked,
     String? image,
     bool? isArtist,
+    NftForPoster? nft,
+    bool? isNft,
+    List<MultiplePostSingleModel>? posters,
   }) {
     return MultiplePostModel(
-      posters: posters,
+      posters: posters ?? this.posters,
       id: id ?? this.id,
       type: type ?? this.type,
       name: name ?? this.name,
@@ -159,6 +187,8 @@ class MultiplePostModel extends PostBaseModel {
       liked: liked ?? this.liked,
       image: image ?? this.image,
       isArtist: isArtist ?? this.isArtist,
+      nft: nft ?? this.nft,
+      isNft: isNft ?? this.isNft,
     );
   }
 }

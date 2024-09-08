@@ -1,7 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +12,6 @@ import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/common/widgets/description_textfield.dart';
-import 'package:poster_stock/features/NFT/models/nft_model.dart';
-import 'package:poster_stock/features/NFT/models/nft_poster.dart';
-import 'package:poster_stock/features/NFT/models/wallet_state.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
@@ -492,34 +487,8 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
         extentOffset: searchController.text.length,
       );
     }
-    PostMovieModel? updatedState = ref.read(posterStateHolderProvider);
 
     /// создаем список nft постеров
-    List<NFTPoster> nftPosters = [];
-
-    if (updatedState != null) {
-      final randomValue = Random().nextInt(28) + 3;
-      for (var i = 0; i < images.length - 3; i++) {
-        nftPosters.add(NFTPoster.fromBaseModel(
-          model: updatedState,
-          nft: NFTModel(
-              idNft: randomValue,
-              relatedPosterId: updatedState.id.toString(),
-              imagePath: images[i],
-              allCount: 100,
-              item: 1,
-              priceInTON: 0,
-              priceInUSD: 0,
-              wallet: WalletState.init(),
-              fee: 0,
-              isSell: false,
-              owner: updatedState.author),
-        ));
-      }
-    }
-    print('chosenMovie ${chosenMovie?.toJson()}');
-    print('images.length ${images.length}');
-    print('nftPosters.length ${nftPosters.length}');
 
     return Padding(
       padding:

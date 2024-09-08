@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/profile/models/user_details_model.dart';
 import 'package:poster_stock/features/user/user_page.dart';
 import 'package:poster_stock/navigation/app_router.gr.dart';
@@ -56,9 +57,9 @@ class SearchUserTile extends ConsumerWidget {
                     const Spacer(
                       flex: 3,
                     ),
-                    Text(
-                      user.name,
-                      style: context.textStyles.subheadline,
+                    NameWithArtist(
+                      name: user.name,
+                      isArtist: user.isArtist,
                     ),
                     const Spacer(),
                     Text(

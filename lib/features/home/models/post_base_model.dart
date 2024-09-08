@@ -1,3 +1,4 @@
+import 'package:poster_stock/features/home/models/nft.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 
 abstract class PostBaseModel {
@@ -11,6 +12,8 @@ abstract class PostBaseModel {
   final int comments;
   final bool liked;
   final bool isArtist;
+  final NftForPoster nft;
+  final bool isNft;
 
   PostBaseModel({
     required this.type,
@@ -23,6 +26,8 @@ abstract class PostBaseModel {
     required this.comments,
     required this.liked,
     required this.isArtist,
+    required this.nft,
+    required this.isNft,
   });
 
   get time => creationTime == null
@@ -45,6 +50,8 @@ abstract class PostBaseModel {
     int? comments,
     bool? liked,
     bool? isArtist,
+    NftForPoster? nft,
+    bool? isNft,
   });
 
   static String _getTimeString(DateTime date) {

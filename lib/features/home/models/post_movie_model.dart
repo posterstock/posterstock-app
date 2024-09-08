@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poster_stock/features/home/models/nft.dart';
 import 'package:poster_stock/features/home/models/post_base_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 
@@ -31,6 +32,8 @@ class PostMovieModel extends PostBaseModel {
     int comments = 0,
     String? description,
     required bool isArtist,
+    required NftForPoster nft,
+    required bool isNft,
   }) : super(
           type: type,
           id: id,
@@ -42,6 +45,8 @@ class PostMovieModel extends PostBaseModel {
           description: description,
           liked: liked,
           isArtist: isArtist,
+          nft: nft,
+          isNft: isNft,
         );
 
   get year => endYear == null
@@ -50,6 +55,11 @@ class PostMovieModel extends PostBaseModel {
 
   factory PostMovieModel.fromJson(Map<String, dynamic> json,
       {bool previewPrimary = false}) {
+    NftForPoster nft = NftForPoster.init();
+    if (json['nft'] != null) {
+      nft = NftForPoster.fromJson(json['nft'] as Map<String, dynamic>);
+    }
+
     const List<Color> avatar = [
       Color(0xfff09a90),
       Color(0xfff3d376),
@@ -91,6 +101,8 @@ class PostMovieModel extends PostBaseModel {
       mediaId: json['media_id'] as int?,
       mediaType: json['media_type'] as String?,
       isArtist: json['isArtist'] ?? false,
+      nft: nft,
+      isNft: nft.isNft,
     );
   }
 
@@ -112,6 +124,8 @@ class PostMovieModel extends PostBaseModel {
         'comments_count': comments,
         'user': author.toJson(),
         'isArtist': isArtist,
+        'nft': nft.toJson(),
+        'isNft': isNft,
       };
 
   @override
@@ -131,6 +145,8 @@ class PostMovieModel extends PostBaseModel {
     bool? hasBookmarked,
     bool? hasInCollection,
     bool? isArtist,
+    NftForPoster? nft,
+    bool? isNft,
   }) {
     return PostMovieModel(
       type: type ?? this.type,
@@ -151,6 +167,8 @@ class PostMovieModel extends PostBaseModel {
       mediaType: mediaType,
       tmdbLink: tmdbLink,
       isArtist: isArtist ?? this.isArtist,
+      isNft: isNft ?? this.isNft,
+      nft: nft ?? this.nft,
     );
   }
 }
