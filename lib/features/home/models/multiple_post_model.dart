@@ -48,6 +48,7 @@ class MultiplePostModel extends PostBaseModel {
     required this.posters,
     this.image,
     required String name,
+    required bool isArtist,
     required UserModel author,
     required int? creationTime,
     required int id,
@@ -66,6 +67,7 @@ class MultiplePostModel extends PostBaseModel {
           liked: liked,
           comments: comments,
           description: description,
+          isArtist: author.isArtist,
         );
 
   factory MultiplePostModel.fromJson(Map<String, dynamic> json,
@@ -111,6 +113,7 @@ class MultiplePostModel extends PostBaseModel {
               .toList() ??
           [],
       image: image,
+      isArtist: json['isArtist'] as bool,
     );
   }
 
@@ -126,6 +129,7 @@ class MultiplePostModel extends PostBaseModel {
         'image': image,
         'created_at': creationTime,
         'posters': posters.map((i) => i.toJson()).toList(),
+        'isArtist': isArtist,
       };
 
   @override
@@ -140,6 +144,7 @@ class MultiplePostModel extends PostBaseModel {
     int? comments,
     bool? liked,
     String? image,
+    bool? isArtist,
   }) {
     return MultiplePostModel(
       posters: posters,
@@ -153,6 +158,7 @@ class MultiplePostModel extends PostBaseModel {
       comments: comments ?? this.comments,
       liked: liked ?? this.liked,
       image: image ?? this.image,
+      isArtist: isArtist ?? this.isArtist,
     );
   }
 }

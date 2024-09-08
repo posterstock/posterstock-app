@@ -10,6 +10,7 @@ abstract class PostBaseModel {
   final int likes;
   final int comments;
   final bool liked;
+  final bool isArtist;
 
   PostBaseModel({
     required this.type,
@@ -19,8 +20,9 @@ abstract class PostBaseModel {
     required this.creationTime,
     required this.description,
     required this.likes,
-    required this.comments, 
+    required this.comments,
     required this.liked,
+    required this.isArtist,
   });
 
   get time => creationTime == null
@@ -42,6 +44,7 @@ abstract class PostBaseModel {
     int? likes,
     int? comments,
     bool? liked,
+    bool? isArtist,
   });
 
   static String _getTimeString(DateTime date) {

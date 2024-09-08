@@ -19,7 +19,9 @@ import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
+import 'package:poster_stock/features/user/notifiers/user_notifier.dart';
 import 'package:poster_stock/features/user/user_page.dart';
+
 import 'package:poster_stock/navigation/app_router.gr.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -60,6 +62,14 @@ class PostBase extends ConsumerWidget {
     } else if (multPost != null) {
       user = multPost.author;
     }
+
+    if (user != null) {
+      final userSearch = ref.watch(userNotifier(user.id));
+      if (userSearch != null) {
+        user = user.copyWith(isArtist: userSearch.isArtist);
+      }
+    }
+
     return Material(
       color: context.colors.backgroundsPrimary,
       child: CustomInkWell(
@@ -94,7 +104,7 @@ class PostBase extends ConsumerWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: 68.0),
                         child: Text(
-                          AppLocalizations.of(context)!.home_feed_suggestions,
+                          context.txt.home_feed_suggestions,
                           style: context.textStyles.caption1!.copyWith(
                             color: context.colors.textsDisabled,
                           ),
@@ -229,7 +239,7 @@ class UserInfoTile extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: SizedBox(
-                      height: 40,
+                      height: 41,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -248,14 +258,10 @@ class UserInfoTile extends ConsumerWidget {
                                 ExpandChecker(
                                   expand: (showFollowButton) &&
                                       (!(user?.followed ?? true)),
-                                  child: TextOrContainer(
-                                    text: user?.name,
-                                    style: context.textStyles.calloutBold!
-                                        .copyWith(
-                                            color: darkBackground
-                                                ? context
-                                                    .colors.textsBackground!
-                                                : context.colors.textsPrimary),
+                                  child: NameWithArtistPoster(
+                                    name: user?.name ?? '',
+                                    isArtist: user?.isArtist ?? false,
+                                    darkBackground: darkBackground,
                                     emptyWidth: 146,
                                     emptyHeight: 17,
                                     overflow: TextOverflow.ellipsis,
@@ -307,12 +313,11 @@ class UserInfoTile extends ConsumerWidget {
             if (!(user?.followed ?? true) && (!loading) && showFollowButton)
               SizedBox(
                 width: TextInfoService.textSize(
-                            AppLocalizations.of(context)!.follow,
-                            context.textStyles.calloutBold!)
+                            context.txt.follow, context.textStyles.calloutBold!)
                         .width +
                     32,
                 child: AppTextButton(
-                  text: AppLocalizations.of(context)!.follow,
+                  text: context.txt.follow,
                   onTap: () async {
                     ref.read(homePagePostsControllerProvider).setFollowId(
                           user!.id,

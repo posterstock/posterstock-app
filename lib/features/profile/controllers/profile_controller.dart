@@ -144,6 +144,7 @@ class ProfileControllerApi {
                         username: user.username,
                         imagePath: user.imagePath,
                         followed: user.followed,
+                        isArtist: user.isArtist,
                       ),
                     ))
                 .toList();

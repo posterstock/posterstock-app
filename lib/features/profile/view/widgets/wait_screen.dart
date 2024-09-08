@@ -62,7 +62,7 @@ class WaitScreen extends StatelessWidget {
             ? const CupertinoActivityIndicator(radius: 10)
             : SizedBox(
                 width: 20,
-                height: 20,
+                height: 30,
                 child: CircularProgressIndicator(
                   color: context.colors.iconsDisabled!,
                   strokeWidth: 2,

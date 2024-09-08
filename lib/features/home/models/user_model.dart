@@ -8,6 +8,7 @@ class UserModel {
   final bool followed;
   final String? description;
   final Color? color;
+  final bool isArtist;
 
   UserModel({
     required this.id,
@@ -17,6 +18,7 @@ class UserModel {
     this.followed = false,
     this.description,
     this.color,
+    this.isArtist = false,
   });
 
   factory UserModel.fromJson(Map<String, Object?> json) {
@@ -38,6 +40,7 @@ class UserModel {
           false,
       description: json['description'] as String?,
       color: avatar[(json['id'] as int) % 3],
+      isArtist: json['is_artist'] as bool? ?? false,
     );
   }
 
@@ -48,6 +51,7 @@ class UserModel {
         'image': imagePath,
         'followed': followed,
         'description': description,
+        'is_artist': isArtist,
       };
 
   @override
@@ -63,6 +67,7 @@ class UserModel {
     bool? followed,
     String? description,
     Color? color,
+    bool? isArtist,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -72,6 +77,7 @@ class UserModel {
       followed: followed ?? this.followed,
       description: description ?? this.description,
       color: color ?? this.color,
+      isArtist: isArtist ?? this.isArtist,
     );
   }
 
@@ -84,6 +90,7 @@ class UserModel {
       followed: false,
       description: '',
       color: Colors.white,
+      isArtist: false,
     );
   }
 }

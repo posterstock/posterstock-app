@@ -14,6 +14,7 @@ class UserDetailsModel {
   final int posters;
   final int lists;
   final bool? blocked;
+  final bool isArtist;
 
   UserDetailsModel({
     required this.id,
@@ -29,6 +30,7 @@ class UserDetailsModel {
     this.description,
     this.imagePath,
     this.blocked,
+    this.isArtist = false,
   });
 
   factory UserDetailsModel.fromJson(Map<String, Object?> json) {
@@ -53,6 +55,7 @@ class UserDetailsModel {
       posters: json['posters'] as int? ?? 0,
       lists: json['lists'] as int? ?? 0,
       color: avatar[(json['id'] as int) % 3],
+      isArtist: json['is_artist'] as bool? ?? false,
     );
   }
 
@@ -68,6 +71,7 @@ class UserDetailsModel {
         'myself': mySelf,
         'posters': posters,
         'lists': lists,
+        'is_artist': isArtist,
       };
 
   UserDetailsModel copyWith({
@@ -83,6 +87,7 @@ class UserDetailsModel {
     int? posters,
     int? lists,
     bool? blocked,
+    bool? isArtist,
   }) {
     return UserDetailsModel(
       id: id ?? this.id,
@@ -98,6 +103,7 @@ class UserDetailsModel {
       lists: lists ?? this.lists,
       color: color,
       blocked: blocked ?? this.blocked,
+      isArtist: isArtist ?? this.isArtist,
     );
   }
 }

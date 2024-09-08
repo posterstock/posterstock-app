@@ -219,11 +219,9 @@ class _State extends ConsumerState<_UserPage> with TickerProviderStateMixin {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                TextOrContainer(
-                                  text: user.name,
-                                  style: context.textStyles.headline,
-                                  emptyWidth: 150,
-                                  emptyHeight: 20,
+                                NameWithArtist(
+                                  name: user.name,
+                                  isArtist: user.isArtist,
                                 ),
                                 Row(
                                   children: [

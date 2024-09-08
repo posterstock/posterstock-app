@@ -15,6 +15,7 @@ class NFTPoster extends PostBaseModel {
     required super.author,
     required super.type,
     required this.nft,
+    required super.isArtist,
   });
 
   Map<String, dynamic> toJson() => {
@@ -26,6 +27,7 @@ class NFTPoster extends PostBaseModel {
         'name': name,
         'type': type,
         'nft': nft.toJson(),
+        'isArtist': isArtist,
       };
 
   factory NFTPoster.fromJson(Map<String, dynamic> json) {
@@ -40,6 +42,7 @@ class NFTPoster extends PostBaseModel {
       type: json['type'],
       nft: NFTModel.fromJson(json['nft']),
       author: UserModel.fromJson(json['author']),
+      isArtist: json['isArtist'],
     );
   }
   @override
@@ -58,6 +61,7 @@ class NFTPoster extends PostBaseModel {
     UserModel? owner,
     UserModel? author,
     NFTModel? nft,
+    bool? isArtist,
   }) =>
       NFTPoster(
         id: id ?? this.id,
@@ -70,6 +74,7 @@ class NFTPoster extends PostBaseModel {
         type: type ?? this.type,
         author: author ?? this.author,
         nft: nft ?? this.nft,
+        isArtist: isArtist ?? this.isArtist,
       );
   // конструктор для создания NFTPoster из PostBaseModel
   factory NFTPoster.fromBaseModel({
@@ -87,5 +92,6 @@ class NFTPoster extends PostBaseModel {
         name: model.name,
         author: model.author,
         type: model.type,
+        isArtist: model.isArtist,
       );
 }

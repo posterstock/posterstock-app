@@ -30,6 +30,7 @@ class PostMovieModel extends PostBaseModel {
     int likes = 0,
     int comments = 0,
     String? description,
+    required bool isArtist,
   }) : super(
           type: type,
           id: id,
@@ -40,6 +41,7 @@ class PostMovieModel extends PostBaseModel {
           comments: comments,
           description: description,
           liked: liked,
+          isArtist: isArtist,
         );
 
   get year => endYear == null
@@ -78,6 +80,7 @@ class PostMovieModel extends PostBaseModel {
               followed: !(json['is_suggested'] as bool? ??
                   !(json['is_following'] as bool? ?? false)),
               color: avatar[(json['user_id'] as int? ?? 0) % 3],
+              isArtist: json['isArtist'] ?? false,
             )
           : UserModel.fromJson(json['user'] as Map<String, dynamic>),
       creationTime: json['created_at'],
@@ -87,6 +90,7 @@ class PostMovieModel extends PostBaseModel {
       tmdbLink: json['tmdb_link'] as String?,
       mediaId: json['media_id'] as int?,
       mediaType: json['media_type'] as String?,
+      isArtist: json['isArtist'] ?? false,
     );
   }
 
@@ -107,6 +111,7 @@ class PostMovieModel extends PostBaseModel {
         'created_at': creationTime,
         'comments_count': comments,
         'user': author.toJson(),
+        'isArtist': isArtist,
       };
 
   @override
@@ -125,6 +130,7 @@ class PostMovieModel extends PostBaseModel {
     String? description,
     bool? hasBookmarked,
     bool? hasInCollection,
+    bool? isArtist,
   }) {
     return PostMovieModel(
       type: type ?? this.type,
@@ -144,6 +150,7 @@ class PostMovieModel extends PostBaseModel {
       mediaId: mediaId,
       mediaType: mediaType,
       tmdbLink: tmdbLink,
+      isArtist: isArtist ?? this.isArtist,
     );
   }
 }

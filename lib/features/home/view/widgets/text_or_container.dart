@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:gap/gap.dart';
+import 'package:poster_stock/themes/build_context_extension.dart';
 
 class TextOrContainer extends StatelessWidget {
   const TextOrContainer({
@@ -37,6 +40,88 @@ class TextOrContainer extends StatelessWidget {
         color: Colors.grey,
         borderRadius: BorderRadius.circular(50.0),
       ),
+    );
+  }
+}
+
+class NameWithArtistPoster extends StatelessWidget {
+  final String name;
+  final bool isArtist;
+  final bool isPoster;
+  final bool darkBackground;
+  final double? emptyWidth;
+  final double? emptyHeight;
+  final TextOverflow? overflow;
+
+  const NameWithArtistPoster({
+    super.key,
+    required this.name,
+    required this.isArtist,
+    this.isPoster = false,
+    this.darkBackground = false,
+    this.emptyWidth,
+    this.emptyHeight,
+    this.overflow,
+  });
+  @override
+  Widget build(BuildContext context) {
+    final style = isPoster
+        ? context.textStyles.calloutBold!.copyWith(
+            color: darkBackground
+                ? context.colors.textsBackground!
+                : context.colors.textsPrimary)
+        : context.textStyles.headline;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Flexible(
+          child: TextOrContainer(
+            text: name,
+            style: style,
+            emptyWidth: emptyWidth,
+            emptyHeight: emptyHeight,
+            overflow: TextOverflow
+                .ellipsis, // Обеспечивает обрезку текста с многоточием
+          ),
+        ),
+        const Gap(5),
+        if (isArtist)
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: SvgPicture.asset('assets/icons/art.svg'),
+          ),
+      ],
+    );
+  }
+}
+
+class NameWithArtist extends StatelessWidget {
+  final String name;
+  final bool isArtist;
+
+  const NameWithArtist({
+    super.key,
+    required this.name,
+    required this.isArtist,
+  });
+  @override
+  Widget build(BuildContext context) {
+    final style = context.textStyles.calloutBold!
+        .copyWith(color: context.colors.textsPrimary);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        TextOrContainer(
+          text: name,
+          style: style,
+        ),
+        const Gap(5),
+        if (isArtist)
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: SvgPicture.asset('assets/icons/art.svg'),
+          ),
+      ],
     );
   }
 }

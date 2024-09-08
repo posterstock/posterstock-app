@@ -677,7 +677,8 @@ class CollectionInfoWidget extends ConsumerWidget {
                       creationTime: post!.creationTime,
                       liked: false,
                       description: post!.posters[index].description,
-                      hasBookmarked: false),
+                      hasBookmarked: false,
+                      isArtist: post!.isArtist),
                   customOnItemTap: (post, index) {
                     AutoRouter.of(context).push(
                       PosterRoute(

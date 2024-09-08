@@ -25,6 +25,7 @@ class ProfileMapper {
       posters: json['posters'] as int? ?? 0,
       lists: json['lists'] as int? ?? 0,
       color: avatar[(json['id'] as int) % 3],
+      isArtist: json['is_artist'] as bool? ?? false,
     );
   }
 }
