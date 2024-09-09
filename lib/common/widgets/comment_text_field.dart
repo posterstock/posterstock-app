@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
@@ -60,8 +59,7 @@ class _CommentTextFieldState extends ConsumerState<CommentTextField> {
                 cursorColor: context.colors.textsAction,
                 decoration: InputDecoration(
                   border: InputBorder.none,
-                  hintText:
-                      AppLocalizations.of(context)!.poster_reply_field_hint,
+                  hintText: context.txt.poster_reply_field_hint,
                   hintStyle: context.textStyles.bodyRegular!.copyWith(
                     color: context.colors.textsDisabled,
                   ),
@@ -95,12 +93,12 @@ class _CommentTextFieldState extends ConsumerState<CommentTextField> {
                       SizedBox(
                         height: 32,
                         width: TextInfoService.textSize(
-                                    AppLocalizations.of(context)!.poster_reply,
+                                    context.txt.poster_reply,
                                     context.textStyles.calloutBold!)
                                 .width +
                             32,
                         child: AppTextButton(
-                          text: AppLocalizations.of(context)!.poster_reply,
+                          text: context.txt.poster_reply,
                           disabled: controller.text.isEmpty ||
                               controller.text.length > 140,
                           child: loading

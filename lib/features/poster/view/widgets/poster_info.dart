@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gap/gap.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/view/widgets/movie_card.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
@@ -8,6 +9,7 @@ import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
+import 'package:poster_stock/features/poster/view/widgets/row_with_toninfo.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class PosterPageAppBar extends StatelessWidget {
@@ -120,9 +122,7 @@ class PosterInfo extends ConsumerWidget {
             ),
           ),
         ),
-        const SizedBox(
-          height: 16,
-        ),
+        const Gap(16),
         Text(
           (post?.description ?? '').length > 280
               ? post!.description!.substring(0, 280)
@@ -131,11 +131,11 @@ class PosterInfo extends ConsumerWidget {
             color: context.colors.textsPrimary,
           ),
         ),
-        const SizedBox(
-          height: 16,
-        ),
+        const Gap(16),
         Row(
           children: [
+            if (post?.isNft ?? false)
+              const TonInfo(currentValue: 12, maxValue: 100),
             const Spacer(),
             LikeButton(
               liked: (post?.liked ?? liked),
@@ -152,7 +152,7 @@ class PosterInfo extends ConsumerWidget {
                     );
               },
             ),
-            const SizedBox(width: 12),
+            const Gap(12),
             ReactionButton(
               iconPath: 'assets/icons/ic_comment2.svg',
               iconColor: context.colors.iconsDisabled!,
