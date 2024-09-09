@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
@@ -42,25 +43,49 @@ class _PosterTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
-          child: Container(
-            color: context.colors.backgroundsSecondary,
-            width: double.infinity,
-            height:
-                ((MediaQuery.of(context).size.width - 15 * 2 - 16 * 2) / 3) /
+        Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Container(
+                color: context.colors.backgroundsSecondary,
+                width: double.infinity,
+                height: ((MediaQuery.of(context).size.width - 15 * 2 - 16 * 2) /
+                        3) /
                     2 *
                     3,
-            child: CachedNetworkImage(
-              imageUrl: poster.imagePath,
-              fit: BoxFit.cover,
-              placeholderFadeInDuration: CustomDurations.cachedDuration,
-              fadeInDuration: CustomDurations.cachedDuration,
-              fadeOutDuration: CustomDurations.cachedDuration,
-              placeholder: (_, __) => _shimmer,
-              errorWidget: (_, __, ___) => _shimmer,
+                child: CachedNetworkImage(
+                  imageUrl: poster.imagePath,
+                  fit: BoxFit.cover,
+                  placeholderFadeInDuration: CustomDurations.cachedDuration,
+                  fadeInDuration: CustomDurations.cachedDuration,
+                  fadeOutDuration: CustomDurations.cachedDuration,
+                  placeholder: (_, __) => _shimmer,
+                  errorWidget: (_, __, ___) => _shimmer,
+                ),
+              ),
             ),
-          ),
+            if (poster.isNft)
+              Positioned(
+                bottom: 5,
+                left: 5,
+                child: SvgPicture.asset(
+                  'assets/icons/ton.svg',
+                  width: 16,
+                  height: 16,
+                ),
+              ),
+            if (poster.isSale)
+              Positioned(
+                top: 5,
+                right: 5,
+                child: SvgPicture.asset(
+                  'assets/icons/sale.svg',
+                  width: 16,
+                  height: 16,
+                ),
+              ),
+          ],
         ),
         const SizedBox(height: 8),
         Text(

@@ -62,7 +62,7 @@ class NavigationPage extends ConsumerWidget {
         ref.watch(pageTransitionControllerStateHolder);
 
     if (pageTransitionController == null) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
 
     return AnimatedBuilder(

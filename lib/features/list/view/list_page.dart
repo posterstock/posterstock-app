@@ -681,6 +681,7 @@ class CollectionInfoWidget extends ConsumerWidget {
                     isArtist: post!.isArtist,
                     nft: post!.nft,
                     isNft: post!.isNft,
+                    isSale: post!.isSale,
                   ),
                   customOnItemTap: (post, index) {
                     AutoRouter.of(context).push(
