@@ -27,8 +27,8 @@ class EmptyCollectionWidget extends StatelessWidget {
         Text(
           !bookmark
               ? (profileName != null
-                  ? "$profileName ${context.txt.profile_noWatched} "
-                  : context.txt.watchlist_empty)
+                  ? "$profileName ${context.txt.profile_noWatched}"
+                  : context.txt.profile_lists_add_hint)
               //TODO: localize
               : "Press 􀁍 to add\na bookmark",
           style: context.textStyles.subheadlineBold!.copyWith(

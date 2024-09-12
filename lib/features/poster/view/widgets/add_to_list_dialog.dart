@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/helpers/custom_ink_well.dart';
-import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/features/poster/controller/post_controller.dart';
 import 'package:poster_stock/features/poster/state_holder/my_lists_state_holder.dart';

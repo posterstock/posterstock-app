@@ -28,7 +28,7 @@ class PostersCollectionView extends ConsumerWidget {
             child: SimpleEmptyCollectionWidget(
               name != null
                   ? "$name ${context.txt.profile_noWatched} "
-                  : context.txt.watchlist_empty,
+                  : context.txt.profile_lists_add_hint,
             ),
           ),
         ],
