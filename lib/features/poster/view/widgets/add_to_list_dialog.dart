@@ -35,18 +35,7 @@ class AddToListDialog extends ConsumerWidget {
         }
       });
     }
-    // final allSizes = lists?.map(
-    //   (e) => TextInfoService.textSizeConstWidth(
-    //           e.title,
-    //           context.textStyles.bodyRegular!,
-    //           MediaQuery.of(context).size.width - 32 - 19 - 200)
-    //       .height,
-    // );
-    // double size = 0;
-    // for (var a in (allSizes ?? const Iterable.empty())) {
-    //   size += a;
-    //   size += 80;
-    // }
+
     return WillPopScope(
       onWillPop: () async {
         ref.watch(myListsStateHolderProvider.notifier).clear();
@@ -77,7 +66,7 @@ class AddToListDialog extends ConsumerWidget {
                   double initialChildSize =
                       contentHeight / constraints.maxHeight;
                   if (initialChildSize > 1) initialChildSize = 1;
-
+                  if (initialChildSize < 0.25) initialChildSize = 0.25;
                   return DraggableScrollableSheet(
                     //shouldCloseOnMinExtent: true,
                     controller: _controller,
@@ -265,20 +254,29 @@ class AddToListDialog extends ConsumerWidget {
 
   double calculateContentHeight(BuildContext context, WidgetRef ref) {
     final lists = ref.watch(myListsStateHolderProvider);
-    final allSizes = lists?.map(
-      (e) => TextInfoService.textSizeConstWidth(
-              e.title,
-              context.textStyles.bodyRegular!,
-              MediaQuery.of(context).size.width - 32 - 19 - 200)
-          .height,
-    );
-    Logger.i('allSizes ${allSizes?.length} ==== $allSizes ');
-    double size = 0;
-    for (var a in (allSizes ?? const Iterable.empty())) {
-      size += a;
-      size += 42;
+    if (lists == null || lists.isEmpty) {
+      return 0; // Возвращаем 0, если нет данных для расчета
     }
-    Logger.i('size $size');
+
+    double size = 0;
+    final textStyle = context.textStyles.bodyRegular!;
+    final baseWidth = MediaQuery.of(context).size.width;
+    const padding = 120; // Общий отступ слева и справа
+    final maxWidth =
+        baseWidth - padding; // Рассчитываем доступную ширину для текста
+
+    for (var e in lists) {
+      final textSpan = TextSpan(text: e.title, style: textStyle);
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: TextDirection.ltr,
+        maxLines: null, // Убираем ограничение на количество строк
+        ellipsis: null, // Убираем многоточие, чтобы текст полностью отображался
+      );
+      textPainter.layout(maxWidth: maxWidth);
+      double textHeight = textPainter.size.height;
+      size += textHeight + 55; // Добавляем высоту текста и отступ
+    }
     return size;
   }
 }
