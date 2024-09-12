@@ -242,47 +242,37 @@ class UserInfoTile extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            // width:
-                            //     (showFollowButton) && (!(user?.followed ?? true))
-                            //         ? MediaQuery.of(context).size.width -
-                            //             70 -
-                            //             179 +
-                            //             42 -
-                            //             56
-                            //         : null,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                ExpandChecker(
-                                  expand: (showFollowButton) &&
-                                      (!(user?.followed ?? true)),
-                                  child: NameWithArtistPoster(
-                                    name: user?.name ?? '',
-                                    isArtist: user?.isArtist ?? false,
-                                    darkBackground: darkBackground,
-                                    emptyWidth: 146,
-                                    emptyHeight: 17,
-                                    overflow: TextOverflow.ellipsis,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              ExpandChecker(
+                                expand: (showFollowButton) &&
+                                    (!(user?.followed ?? true)),
+                                child: NameWithArtistPoster(
+                                  name: user?.name ?? '',
+                                  isArtist: user?.isArtist ?? false,
+                                  darkBackground: darkBackground,
+                                  emptyWidth: 146,
+                                  emptyHeight: 17,
+                                  overflow: TextOverflow.ellipsis,
+                                  isFlexible: false,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 12,
+                              ),
+                              if (!((showFollowButton) &&
+                                  (!(user?.followed ?? true))))
+                                Text(
+                                  time ?? '',
+                                  style: context.textStyles.footNote!.copyWith(
+                                    color: darkBackground
+                                        ? context.colors.textsBackground!
+                                            .withOpacity(0.8)
+                                        : context.colors.textsDisabled,
                                   ),
                                 ),
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                if (!((showFollowButton) &&
-                                    (!(user?.followed ?? true))))
-                                  Text(
-                                    time ?? '',
-                                    style:
-                                        context.textStyles.footNote!.copyWith(
-                                      color: darkBackground
-                                          ? context.colors.textsBackground!
-                                              .withOpacity(0.8)
-                                          : context.colors.textsDisabled,
-                                    ),
-                                  ),
-                              ],
-                            ),
+                            ],
                           ),
                           if (loading)
                             const SizedBox(

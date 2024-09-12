@@ -162,10 +162,11 @@ class _ListPageState extends ConsumerState<ListPage>
         }
       });
     }
-    final comments = ref.watch(commentsStateHolderProvider);
-    if (comments == null) {
+    final commentsBegin = ref.watch(commentsStateHolderProvider);
+    if (commentsBegin == null) {
       ref.read(listsControllerProvider).updateComments(widget.id);
     }
+    final comments = commentsBegin ?? [];
     return Listener(
       onPointerUp: (details) {
         if (scrollController.offset > newHeight) return;
@@ -248,7 +249,7 @@ class _ListPageState extends ConsumerState<ListPage>
                                 post: posts,
                               );
                             }
-                            if (index == (comments?.length ?? 0) + 1) {
+                            if (index == (comments.length) + 1) {
                               return SizedBox(
                                 height: getEmptySpaceHeightForCollection(
                                             context, posts) <
@@ -278,10 +279,10 @@ class _ListPageState extends ConsumerState<ListPage>
                                               .watch(
                                                   myProfileInfoStateHolderProvider)
                                               ?.id,
-                                      entityId: comments?[index - 1].id ?? -1,
+                                      entityId: comments[index - 1].id,
                                       showFollowButton: false,
-                                      user: comments?[index - 1].model,
-                                      time: comments?[index - 1].time,
+                                      user: comments[index - 1].model,
+                                      time: comments[index - 1].time,
                                       behavior: HitTestBehavior.translucent,
                                     ),
                                   ),
@@ -300,7 +301,7 @@ class _ListPageState extends ConsumerState<ListPage>
                                               padding: const EdgeInsets.only(
                                                   right: 16.0),
                                               child: Text(
-                                                comments![index - 1].text,
+                                                comments[index - 1].text,
                                                 style: context
                                                     .textStyles.subheadline!,
                                               ),
@@ -323,7 +324,7 @@ class _ListPageState extends ConsumerState<ListPage>
                               ),
                             );
                           },
-                          childCount: 2 + (comments?.length ?? 0),
+                          childCount: 2 + comments.length,
                         ),
                       ),
                     ),
@@ -533,8 +534,9 @@ class _ListPageState extends ConsumerState<ListPage>
 
   double getEmptySpaceHeightForCollection(
       BuildContext context, MultiplePostModel? posts) {
-    final comments = ref.watch(commentsStateHolderProvider);
-    double result = (comments?.length ?? 0) * 80 + 200;
+    final commentsBegin = ref.watch(commentsStateHolderProvider);
+    final comments = commentsBegin ?? [];
+    double result = (comments.length) * 80 + 200;
     result += TextInfoService.textSizeConstWidth(
       posts?.name ?? '',
       context.textStyles.title3!,
@@ -552,7 +554,7 @@ class _ListPageState extends ConsumerState<ListPage>
             : (posts?.posters.length ?? 0) ~/ 3 + 1) *
         212;
     result += 32;
-    for (var comment in comments ?? []) {
+    for (var comment in comments) {
       result += TextInfoService.textSizeConstWidth(
         comment.text,
         context.textStyles.subheadline!,
@@ -577,7 +579,8 @@ class CollectionInfoWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final comments = ref.watch(commentsStateHolderProvider);
+    final commentsBegin = ref.watch(commentsStateHolderProvider);
+    final comments = commentsBegin ?? [];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -629,7 +632,7 @@ class CollectionInfoWidget extends ConsumerWidget {
               ReactionButton(
                 iconPath: 'assets/icons/ic_comment2.svg',
                 iconColor: context.colors.iconsDisabled!,
-                amount: comments?.length ?? post?.comments,
+                amount: comments.length,
               ),
             ],
           ),
@@ -668,7 +671,7 @@ class CollectionInfoWidget extends ConsumerWidget {
                   index: index,
                   post: PostMovieModel(
                     startYear: post!.posters[index].startYear,
-                    endYear: post!.posters[index].endYear,
+                    endYear: post!.posters[index].endYear ?? 0,
                     imagePath: post!.posters[index].image,
                     id: post!.posters[index].id,
                     type: 'list',

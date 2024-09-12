@@ -51,9 +51,9 @@ class PostMovieModel extends PostBaseModel {
           isSale: isSale,
         );
 
-  get year => endYear == null
+  get year => endYear == null || endYear == 0
       ? startYear.toString()
-      : '${startYear.toString()} - ${endYear.toString()}';
+      : '${startYear.toString()}  - ${endYear.toString()}';
 
   factory PostMovieModel.fromJson(Map<String, dynamic> json,
       {bool previewPrimary = false}) {

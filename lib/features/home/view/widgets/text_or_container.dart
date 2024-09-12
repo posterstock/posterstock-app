@@ -52,6 +52,7 @@ class NameWithArtistPoster extends StatelessWidget {
   final double? emptyWidth;
   final double? emptyHeight;
   final TextOverflow? overflow;
+  final bool isFlexible;
 
   const NameWithArtistPoster({
     super.key,
@@ -62,6 +63,7 @@ class NameWithArtistPoster extends StatelessWidget {
     this.emptyWidth,
     this.emptyHeight,
     this.overflow,
+    this.isFlexible = true,
   });
   @override
   Widget build(BuildContext context) {
@@ -71,25 +73,26 @@ class NameWithArtistPoster extends StatelessWidget {
                 ? context.colors.textsBackground!
                 : context.colors.textsPrimary)
         : context.textStyles.headline;
+    Widget textOrContainerWidget = TextOrContainer(
+      text: name,
+      style: style,
+      emptyWidth: emptyWidth,
+      emptyHeight: emptyHeight,
+      overflow: TextOverflow.ellipsis,
+    );
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Flexible(
-          child: TextOrContainer(
-            text: name,
-            style: style,
-            emptyWidth: emptyWidth,
-            emptyHeight: emptyHeight,
-            overflow: TextOverflow
-                .ellipsis, // Обеспечивает обрезку текста с многоточием
-          ),
-        ),
-        const Gap(5),
-        if (isArtist)
+        isFlexible
+            ? Flexible(child: textOrContainerWidget)
+            : textOrContainerWidget,
+        if (isArtist) ...[
+          const Gap(5),
           Padding(
             padding: const EdgeInsets.only(top: 2),
             child: SvgPicture.asset('assets/icons/art.svg'),
           ),
+        ]
       ],
     );
   }
