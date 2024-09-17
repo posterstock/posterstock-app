@@ -255,7 +255,7 @@ class UserInfoTile extends ConsumerWidget {
                                   emptyWidth: 146,
                                   emptyHeight: 17,
                                   overflow: TextOverflow.ellipsis,
-                                  isFlexible: false,
+                                  isFlexible: true,
                                 ),
                               ),
                               const SizedBox(
