@@ -16,18 +16,6 @@ class ChangeWalletStateHolder extends StateNotifier<WalletState> {
     loadFromLocal(); // Загрузка из локалки при инициализации
   }
 
-  Future<void> loadFromLocal() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonString = prefs.getString('walletState');
-    if (jsonString != null) {
-      final jsonMap = json.decode(jsonString);
-      state = WalletState.fromJson(jsonMap); // Конвертация из JSON
-    } else {
-      state = WalletState.init();
-      saveToLocal();
-    }
-  }
-
   void setWallet(String wallet) {
     state = state.copyWith(original: state, wallet: wallet);
     saveToLocal();
@@ -47,5 +35,17 @@ class ChangeWalletStateHolder extends StateNotifier<WalletState> {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = json.encode(state.toJson());
     await prefs.setString('walletState', jsonString);
+  }
+
+  Future<void> loadFromLocal() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString('walletState');
+    if (jsonString != null) {
+      final jsonMap = json.decode(jsonString);
+      state = WalletState.fromJson(jsonMap); // Конвертация из JSON
+    } else {
+      state = WalletState.init();
+      saveToLocal();
+    }
   }
 }

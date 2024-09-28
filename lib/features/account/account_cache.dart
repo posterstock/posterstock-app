@@ -19,7 +19,7 @@ class AccountCache {
     box.put('/', json.encode(userDetailsModel));
   }
 
-  Future<List<PostMovieModel>?> getPosters(int id) async {
+  Future<List<PostMovieModel>?> getPosters(int id, {required bool restart}) async {
     var box = await Hive.openBox('posterBox');
     var result = box.get(id);
     if (result == null) {

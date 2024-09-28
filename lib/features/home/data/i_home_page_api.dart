@@ -1,3 +1,6 @@
+
+
+
 abstract class IHomePageApi {
   Future<(Map<String, dynamic>?, bool)?> getPosts({bool getNewPosts = false});
 

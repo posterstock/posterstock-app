@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:poster_stock/common/helpers/string_extension.dart';
 import 'package:poster_stock/common/menu/menu_dialog.dart';
 import 'package:poster_stock/common/menu/menu_state.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
@@ -256,7 +256,7 @@ class _State extends ConsumerState<_UserPage> with TickerProviderStateMixin {
                             AppTextButton(
                               onTap: controller.toggleFollow,
                               text: user.followed
-                                  ? context.txt.profile_following.capitalize()
+                                  ? context.txt.unfollow
                                   : context.txt.follow,
                               backgroundColor: user.followed
                                   ? context.colors.fieldsDefault
@@ -499,6 +499,7 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
   Widget build(BuildContext context) {
     final id = widget.id;
     final posters = ref.watch(userPostersNotifier(id));
+    Logger.i('posters ${posters.first?.toJson()}');
     final searchValue = ref.watch(listSearchValueStateHolderProvider);
     final lists = ref.watch(userListsStateNotifier(id));
     final controller = ref.read(userControllerProvider(id));

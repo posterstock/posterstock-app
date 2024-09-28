@@ -165,11 +165,10 @@ class _AccountState extends ConsumerState<_AccountScreen>
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  TextOrContainer(
-                                    text: account.name,
+                                  NameWithArtist(
+                                    name: account.name,
+                                    isArtist: account.isArtist,
                                     style: context.textStyles.headline,
-                                    emptyWidth: 150,
-                                    emptyHeight: 20,
                                   ),
                                   Row(
                                     children: [

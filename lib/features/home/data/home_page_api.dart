@@ -47,6 +47,7 @@ class HomePageApi implements IHomePageApi {
           queryParameters: {
             'cursor': getNewPosts ? null : postsCursor,
           });
+      Logger.i('getPosts  ${response.data}');
       if (!getNewPosts && !(response.data['has_more'] as bool)) {
         loadedAll = true;
       } else if (!getNewPosts) {

@@ -123,7 +123,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
             ref.read(postControllerProvider).clear();
             return;
           }
-          final post = ref.watch(posterStateHolderProvider);
+          PostMovieModel? post = ref.watch(posterStateHolderProvider);
           if (post?.id == el.pathParams.getInt('id')) return;
           ref.read(postControllerProvider).clear();
           ref.read(postControllerProvider).getPost(el.pathParams.getInt('id'));

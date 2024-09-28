@@ -368,19 +368,45 @@ class _ListPageState extends ConsumerState<ListPage>
                         height: MediaQuery.of(context).size.width / 540 * 300,
                         width: double.infinity,
                         child: posts?.image != null
-                            ? CachedNetworkImage(
-                                imageUrl: posts!.image!,
-                                fit: BoxFit.cover,
-                                placeholderFadeInDuration:
-                                    CustomDurations.cachedDuration,
-                                fadeInDuration: CustomDurations.cachedDuration,
-                                fadeOutDuration: CustomDurations.cachedDuration,
-                                placeholder: (context, child) {
-                                  return shimmer;
-                                },
-                                errorWidget: (context, obj, trace) {
-                                  return shimmer;
-                                },
+                            ? Stack(
+                                children: [
+                                  CachedNetworkImage(
+                                    imageUrl: posts!.image!,
+                                    fit: BoxFit.cover,
+                                    placeholderFadeInDuration:
+                                        CustomDurations.cachedDuration,
+                                    fadeInDuration:
+                                        CustomDurations.cachedDuration,
+                                    fadeOutDuration:
+                                        CustomDurations.cachedDuration,
+                                    placeholder: (context, child) {
+                                      return shimmer;
+                                    },
+                                    errorWidget: (context, obj, trace) {
+                                      return shimmer;
+                                    },
+                                  ),
+                                  if (posts.isNft)
+                                    Positioned(
+                                      bottom: 5,
+                                      left: 5,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/ton.svg',
+                                        width: 16,
+                                        height: 16,
+                                      ),
+                                    ),
+                                  if (posts.isSale)
+                                    Positioned(
+                                      top: 5,
+                                      right: 5,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/sale.svg',
+                                        width: 16,
+                                        height: 16,
+                                      ),
+                                    ),
+                                ],
                               )
                             : Row(
                                 children: List.generate(

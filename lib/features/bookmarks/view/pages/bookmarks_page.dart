@@ -212,6 +212,8 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
                           : int.parse(
                               bookmark.year.split(" - ")[1],
                             ),
+                      isNft: bookmark.isNft,
+                      nft: bookmark.nft,
                     ),
                   );
 

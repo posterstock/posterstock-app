@@ -92,8 +92,14 @@ class MultiplePostModel extends PostBaseModel {
   factory MultiplePostModel.fromJson(Map<String, dynamic> json,
       {bool previewPrimary = false}) {
     NftForPoster nft = NftForPoster.init();
+    bool isNft = false;
     if (json['nft'] != null) {
       nft = NftForPoster.fromJson(json['nft'] as Map<String, dynamic>);
+      isNft = true;
+    }
+    if (json['chain'] != null) {
+      nft = NftForPoster.fromChain(json['chain']);
+      isNft = true;
     }
     const List<Color> avatar = [
       Color(0xfff09a90),
@@ -137,7 +143,7 @@ class MultiplePostModel extends PostBaseModel {
           [],
       image: image,
       nft: nft,
-      isNft: nft.isNft,
+      isNft: isNft,
       isSale: json['isSale'] ?? false,
       isArtist: json['isArtist'] ?? false,
     );

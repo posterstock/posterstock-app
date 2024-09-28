@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:poster_stock/features/home/models/post_movie_model.dart';
+import 'package:poster_stock/themes/build_context_extension.dart';
 
 /// выводит инофрмацию о TON если постер NFT
 class TonInfo extends StatelessWidget {
-  final int currentValue;
-  final int maxValue;
+  final PostMovieModel post;
 
   const TonInfo({
     Key? key,
-    required this.currentValue,
-    required this.maxValue,
+    required this.post,
   }) : super(key: key);
 
   @override
@@ -21,7 +21,7 @@ class TonInfo extends StatelessWidget {
           height: 26,
           padding: const EdgeInsets.only(right: 12),
           decoration: BoxDecoration(
-            color: const Color(0xFFF9F9F9),
+            color: context.colors.backgroundsSecondary,
             borderRadius: BorderRadius.circular(16),
           ),
           alignment: Alignment.centerRight,
@@ -29,16 +29,16 @@ class TonInfo extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                "$currentValue",
-                style: const TextStyle(
-                  color: Colors.black,
+                "${post.nft.number}",
+                style: TextStyle(
+                  color: context.colors.textsPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                "/$maxValue",
-                style: const TextStyle(
-                  color: Color(0xFFBDBDBD),
+                " / ${post.nft.allCount}",
+                style: TextStyle(
+                  color: context.colors.iconsDisabled,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -57,17 +57,4 @@ class TonInfo extends StatelessWidget {
       ],
     );
   }
-}
-
-void main() {
-  runApp(
-    const MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(
-          child: TonInfo(currentValue: 12, maxValue: 100),
-        ),
-      ),
-    ),
-  );
 }

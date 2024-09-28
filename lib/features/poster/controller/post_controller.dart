@@ -27,7 +27,6 @@ class PostController {
   final profileRepo = ProfileRepository();
   final postRepository = PostRepository();
   final cachedPostRepository = CachedPostRepository();
-
   bool loadingComments = false;
   bool loadingPost = false;
 
@@ -76,7 +75,6 @@ class PostController {
 
   Future<void> getPost(final int id) async {
     if (loadingPost) return;
-    //await Future.delayed(Duration(milliseconds: 500));
     loadingPost = true;
     var result = await cachedPostRepository.getPost(id);
     if (result != null) {
@@ -86,6 +84,19 @@ class PostController {
     }
 
     result = await postRepository.getPost(id);
+    final List<Map<String, dynamic>> resultNFT =
+        await postRepository.getNFT(result.nft.collection);
+    int index = 1;
+    int allCount = 1;
+
+    if (resultNFT.isNotEmpty) {
+      allCount = resultNFT.length;
+      index = resultNFT.first['index'];
+    }
+    result = result.copyWith(
+        nft: result.nft.copyWith(allCount: allCount, number: ++index));
+
+    cachedPostRepository.cachePost(id, result);
     cachedPostRepository.cachePost(id, result);
     result = await _prepareData(result);
     await posterStateHolder.updateState(result);
@@ -102,6 +113,7 @@ class PostController {
       hasInCollection = await postRepository.getInCollection(tmdbId);
       cachedPostRepository.cacheCollection(tmdbId, hasInCollection);
     }
+
     return result.copyWith(hasInCollection: hasInCollection);
   }
 

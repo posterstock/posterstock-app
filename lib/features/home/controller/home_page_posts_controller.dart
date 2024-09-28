@@ -1,5 +1,6 @@
 import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/repository/cached_home_repository.dart';
 import 'package:poster_stock/features/home/repository/home_page_posts_repository.dart';
 import 'package:poster_stock/features/home/repository/i_home_page_posts_repository.dart';
@@ -38,6 +39,8 @@ class HomePagePostsController {
     }
 
     final result = await repository.getPosts(getNesPosts: getNewPosts);
+    PostMovieModel a = result?.$1?.first as PostMovieModel;
+    Logger.i('result>>> ${a.toJson()}');
     if (!gotFirst &&
         !getNewPosts &&
         result?.$1 != null &&

@@ -34,11 +34,13 @@ class UserNetwork {
         queryParameters: {
           'cursor': _postCursor,
         });
+    
     final List<Map<String, dynamic>> result = [];
     _postCursor = response.data['next_cursor'];
     for (var a in response.data['posters'] ?? []) {
       result.add(a);
     }
+
     return (result.map(_fromJson).toList(), response.data['has_more'] as bool);
   }
 

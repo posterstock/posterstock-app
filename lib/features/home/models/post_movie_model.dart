@@ -58,8 +58,14 @@ class PostMovieModel extends PostBaseModel {
   factory PostMovieModel.fromJson(Map<String, dynamic> json,
       {bool previewPrimary = false}) {
     NftForPoster nft = NftForPoster.init();
+    bool isNft = false;
     if (json['nft'] != null) {
       nft = NftForPoster.fromJson(json['nft'] as Map<String, dynamic>);
+      isNft = true;
+    }
+    if (json['chain'] != null) {
+      nft = NftForPoster.fromChain(json['chain']);
+      isNft = true;
     }
 
     const List<Color> avatar = [
@@ -104,7 +110,7 @@ class PostMovieModel extends PostBaseModel {
       mediaType: json['media_type'] as String?,
       isArtist: json['isArtist'] ?? false,
       nft: nft,
-      isNft: nft.isNft,
+      isNft: isNft,
       isSale: json['isSale'] ?? false,
     );
   }

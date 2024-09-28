@@ -52,6 +52,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   void initState() {
     super.initState();
+    ref.read(changeWalletStateHolderProvider.notifier).loadFromLocal();
   }
 
   @override
@@ -667,9 +668,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             setState(() {
               _controller = null;
             });
-
             Logger.i('Received hex address: ${message.message}');
-
             if (message.message.isNotEmpty) {
               final addressTon = getAddressTon(message.message);
               ref

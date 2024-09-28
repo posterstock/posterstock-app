@@ -12,6 +12,8 @@ import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/app_text_field.dart';
 import 'package:poster_stock/common/widgets/description_textfield.dart';
+import 'package:poster_stock/features/home/models/multiple_post_model.dart';
+import 'package:poster_stock/features/home/models/nft.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/navigation_page/controller/menu_controller.dart';
 import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
@@ -54,15 +56,33 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
         final years = widget.postMovieModel!.year.split('-');
         int? startYear = int.parse(years.first);
         int? endYear = years.length >= 2 ? int.tryParse(years.last) : null;
-
-        ref.read(createPosterControllerProvider).chooseMovie(MediaModel(
-            id: widget.postMovieModel!.mediaId!,
-            title: widget.postMovieModel!.name,
-            type: widget.postMovieModel!.mediaType == 'movie'
-                ? MediaType.movie
-                : MediaType.tv,
-            startYear: startYear,
-            endYear: endYear));
+        Logger.i(
+            'widget.postMovieModel!.isNft ${widget.postMovieModel!.toJson()}');
+        if (widget.postMovieModel!.isNft) {
+          ref.read(createPosterControllerProvider).chooseMovie(MediaModel(
+                id: widget.postMovieModel!.mediaId!,
+                title: widget.postMovieModel!.name,
+                type: widget.postMovieModel!.mediaType == 'movie'
+                    ? MediaType.movie
+                    : MediaType.tv,
+                startYear: startYear,
+                endYear: endYear,
+                isNft: widget.postMovieModel!.isNft,
+                nft: widget.postMovieModel!.nft,
+              ));
+        } else {
+          ref.read(createPosterControllerProvider).chooseMovie(MediaModel(
+                id: widget.postMovieModel!.mediaId!,
+                title: widget.postMovieModel!.name,
+                type: widget.postMovieModel!.mediaType == 'movie'
+                    ? MediaType.movie
+                    : MediaType.tv,
+                startYear: startYear,
+                endYear: endYear,
+                isNft: false,
+                nft: NftForPoster.init(),
+              ));
+        }
         if (widget.postMovieModel!.description != null) {
           descController.text = widget.postMovieModel!.description!;
         }
@@ -469,11 +489,15 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
         ),
       );
 
+  MultiplePostModel? reserchPost;
+
   @override
   Widget build(BuildContext context) {
     final String searchText = ref.watch(createPosterSearchStateHolderNotifier);
+
     final List<MediaModel>? results =
         ref.watch(createPosterSearchListStateHolderProvider);
+
     final MediaModel? chosenMovie =
         ref.watch(createPosterChoseMovieStateHolderProvider);
 
@@ -543,6 +567,11 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                   if (widget.postMovieModel == null) _textField(chosenMovie),
                   if (searchText.isEmpty || chosenMovie != null) const Gap(16),
                   if (searchText.isEmpty && chosenMovie == null) _searchEmpty(),
+                  if (chosenMovie != null) _imagesList(images, chosenMovie),
+                  // Container(
+                  //   padding: EdgeInsets.symmetric(vertical: 10),
+                  //   child: Text('тут НФТ'),
+                  // ),
                   if (chosenMovie != null) _imagesList(images, chosenMovie),
                   // if (nftPosters.isNotEmpty) ...[
                   //   const Gap(40),

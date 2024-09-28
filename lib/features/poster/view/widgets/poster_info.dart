@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
+import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/view/widgets/movie_card.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
@@ -84,7 +86,7 @@ class PosterInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final post = ref.watch(posterStateHolderProvider);
+    final PostMovieModel? post = ref.watch(posterStateHolderProvider);
     final comments = ref.watch(commentsStateHolderProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,8 +136,7 @@ class PosterInfo extends ConsumerWidget {
         const Gap(16),
         Row(
           children: [
-            if (post?.isNft ?? false)
-              const TonInfo(currentValue: 12, maxValue: 100),
+            if (post?.isNft ?? false) TonInfo(post: post!),
             const Spacer(),
             LikeButton(
               liked: (post?.liked ?? liked),

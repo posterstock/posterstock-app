@@ -67,12 +67,10 @@ class NameWithArtistPoster extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    final style = isPoster
-        ? context.textStyles.calloutBold!.copyWith(
-            color: darkBackground
-                ? context.colors.textsBackground!
-                : context.colors.textsPrimary)
-        : context.textStyles.headline;
+    final style = context.textStyles.calloutBold!.copyWith(
+        color: darkBackground
+            ? context.colors.textsBackground!
+            : context.colors.textsPrimary);
     Widget textOrContainerWidget = TextOrContainer(
       text: name,
       style: style,
@@ -81,10 +79,13 @@ class NameWithArtistPoster extends StatelessWidget {
       overflow: TextOverflow.ellipsis,
     );
     return Row(
+      mainAxisSize: MainAxisSize.min, // Изменено здесь
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         isFlexible
-            ? Flexible(child: textOrContainerWidget)
+            ? Flexible(
+                fit: FlexFit.loose, // Изменено здесь
+                child: textOrContainerWidget)
             : textOrContainerWidget,
         if (isArtist) ...[
           const Gap(5),
@@ -101,16 +102,19 @@ class NameWithArtistPoster extends StatelessWidget {
 class NameWithArtist extends StatelessWidget {
   final String name;
   final bool isArtist;
+  final TextStyle? style;
 
   const NameWithArtist({
     super.key,
     required this.name,
     required this.isArtist,
+    this.style,
   });
   @override
   Widget build(BuildContext context) {
-    final style = context.textStyles.calloutBold!
-        .copyWith(color: context.colors.textsPrimary);
+    final style = this.style ??
+        context.textStyles.calloutBold!
+            .copyWith(color: context.colors.textsPrimary);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [

@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:poster_stock/common/data/dio_keeper.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
+import 'package:http/http.dart' as http;
 
 class PostService {
   final Dio _dio = DioKeeper.getDio();
@@ -165,6 +166,7 @@ class PostService {
           },
         ),
       );
+      Logger.i('getPost $response');
       return response.data;
     } on DioError catch (e) {
       Logger.e('Ошибка при получении постера $e');
@@ -218,5 +220,30 @@ class PostService {
       Logger.e(e.response?.headers);
       rethrow;
     }
+  }
+
+  Future<List<Map<String, dynamic>>> getNFT(String address) async {
+    try {
+      // Формирование URL для запроса
+      final url = Uri.parse(
+          'https://testnet.tonapi.io/v2/nfts/collections/$address/items');
+
+      // Отправка HTTP GET запроса
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['nft_items'] != null) {
+          return List<Map<String, dynamic>>.from(data['nft_items']);
+        }
+      } else {
+        throw Exception(
+            'Failed to load address information: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching address information: $e');
+      return [];
+    }
+    return [];
   }
 }

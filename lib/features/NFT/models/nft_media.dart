@@ -1,16 +1,16 @@
 import 'package:poster_stock/features/NFT/models/nft_model.dart';
+import 'package:poster_stock/features/home/models/nft.dart';
 import 'package:poster_stock/features/poster_dialog/model/media_model.dart';
 
 class NFTMedia extends MediaModel {
-  final NFTModel nft;
-
   NFTMedia({
     required super.id,
     required super.title,
     required super.type,
     required super.startYear,
     required super.endYear,
-    required this.nft,
+    required super.isNft,
+    required super.nft,
   });
 
   Map<String, dynamic> toJson() => {
@@ -29,7 +29,10 @@ class NFTMedia extends MediaModel {
       type: json['type'] == 'tv' ? MediaType.tv : MediaType.movie,
       startYear: json['start_year'] as int,
       endYear: json['end_year'] as int?,
-      nft: NFTModel.fromJson(json['nft']),
+      isNft: json['is_nft'] == null ? false : json['is_nft'] as bool,
+      nft: json['nft'] == null
+          ? NftForPoster.init()
+          : json['nft'] as NftForPoster,
     );
   }
 
@@ -44,6 +47,7 @@ class NFTMedia extends MediaModel {
         type: model.type,
         startYear: model.startYear,
         endYear: model.endYear,
-        nft: nft,
+        isNft: model.isNft,
+        nft: model.nft,
       );
 }

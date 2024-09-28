@@ -31,6 +31,10 @@ class PostRepository {
     return PostMovieModel.fromJson(await service.getPost(id));
   }
 
+  Future<List<Map<String, dynamic>>> getNFT(String address) async {
+    return await service.getNFT(address);
+  }
+
   Future<bool> getInCollection(int id) async {
     return await service.getInCollection(id);
   }

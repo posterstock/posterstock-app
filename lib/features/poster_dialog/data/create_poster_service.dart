@@ -70,7 +70,7 @@ class CreatePosterService {
           },
         ),
       );
-
+    
       return response.data;
     } on DioError catch (e) {
       Logger.e('Ошибка при создании постера $e');
@@ -134,7 +134,15 @@ class CreatePosterService {
           headers: {'Authorization': 'Bearer $token'},
         ),
       );
-      return response.data;
+      response.data.forEach((key, value) {
+        print('Ключ first: $key, =====  $value');
+      });
+      Map<String, dynamic> myMap = response.data['posters'];
+      myMap.forEach((key, value) {
+        print('Ключ second: $key, ===== : $value');
+      });
+      Logger.i('getMediaPosters >>> ${myMap}');
+      return myMap;
     } on DioError catch (e) {
       Logger.e('Ошибка при получении постеров $e');
       Logger.e(e.response);

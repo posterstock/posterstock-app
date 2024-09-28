@@ -86,18 +86,43 @@ class PostsCollectionTile extends ConsumerWidget {
                   ((MediaQuery.of(context).size.width - 15 * 2 - 16 * 2) / 3) /
                       2 *
                       3,
-              child: CachedNetworkImage(
-                imageUrl: (post == null ? imagePath : post?.imagePath) ?? '',
-                fit: BoxFit.cover,
-                placeholderFadeInDuration: CustomDurations.cachedDuration,
-                fadeInDuration: CustomDurations.cachedDuration,
-                fadeOutDuration: CustomDurations.cachedDuration,
-                placeholder: (context, child) {
-                  return shimmer;
-                },
-                errorWidget: (context, obj, trace) {
-                  return shimmer;
-                },
+              child: Stack(
+                children: [
+                  CachedNetworkImage(
+                    imageUrl:
+                        (post == null ? imagePath : post?.imagePath) ?? '',
+                    fit: BoxFit.cover,
+                    placeholderFadeInDuration: CustomDurations.cachedDuration,
+                    fadeInDuration: CustomDurations.cachedDuration,
+                    fadeOutDuration: CustomDurations.cachedDuration,
+                    placeholder: (context, child) {
+                      return shimmer;
+                    },
+                    errorWidget: (context, obj, trace) {
+                      return shimmer;
+                    },
+                  ),
+                  if (post!.isNft)
+                    Positioned(
+                      bottom: 5,
+                      left: 5,
+                      child: SvgPicture.asset(
+                        'assets/icons/ton.svg',
+                        width: 16,
+                        height: 16,
+                      ),
+                    ),
+                  if (post!.isSale)
+                    Positioned(
+                      top: 5,
+                      right: 5,
+                      child: SvgPicture.asset(
+                        'assets/icons/sale.svg',
+                        width: 16,
+                        height: 16,
+                      ),
+                    ),
+                ],
               ),
             ),
           ),

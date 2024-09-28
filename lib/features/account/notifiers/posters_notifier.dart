@@ -31,7 +31,7 @@ class PostersNotifier extends StateNotifier<PostersState> {
   Future<void> load() async {
     if (!_hasMore || _loading) return;
     _loading = true;
-    var cachedList = await cache.getPosters(_id);
+    var cachedList = await cache.getPosters(_id, restart: true);
     if (cachedList != null) {
       state = PostersState.list(cachedList);
       _loading = false;

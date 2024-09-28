@@ -15,9 +15,11 @@ class WalletState {
       networkType: json['networkType'] == null
           ? NetworkType.testnet
           : NetworkType.values.byName(json['networkType']),
-      blockchain: json['blockchain'] == null
-          ? Blockchain.ton
-          : Blockchain.values.byName(json['blockchain']),
+      blockchain: Blockchain.values.firstWhere(
+          (b) => b.name == json['blockchain'],
+          orElse: () => Blockchain
+              .ton // Значение по умолчанию, если не найдено соответствие
+          ),
     );
   }
 
@@ -52,12 +54,20 @@ class WalletState {
 }
 
 enum Blockchain {
-  ton; // The Open Network (TON)
-
+  ton, // The Open Network (TON)
   // Добавьте другие блокчейны по мере необходимости
-  String get name => switch (this) {
-        Blockchain.ton => 'TON',
-      };
+}
+
+extension BlockchainExtension on Blockchain {
+  String get name {
+    switch (this) {
+      case Blockchain.ton:
+        return 'TON';
+      // Добавьте другие кейсы для новых блокчейнов
+      default:
+        return 'TON';
+    }
+  }
 }
 
 enum NetworkType {

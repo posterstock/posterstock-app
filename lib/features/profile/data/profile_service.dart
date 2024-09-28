@@ -19,6 +19,7 @@ class ProfileService {
         queryParameters: {
           'cursor': postsCursor,
         });
+    Logger.i('response ${response.data}');
     final List<Map<String, dynamic>> result = [];
     postsCursor = response.data['next_cursor'];
     for (var a in response.data['posters'] ?? []) {

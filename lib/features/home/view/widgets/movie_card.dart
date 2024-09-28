@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
@@ -273,6 +274,11 @@ class _MovieCardPageViewContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (movie != null && movie!.name.contains('Terminator')) {
+      print('imaget: ${movie!.nft.toJson()}');
+      print('imaget: ${movie!.isNft}');
+    }
+
     final shimmer = ShimmerLoader(
       loaded: false,
       child: Container(
@@ -288,18 +294,43 @@ class _MovieCardPageViewContent extends ConsumerWidget {
             width: 128,
             height: 193,
             child: movie?.imagePath != null
-                ? CachedNetworkImage(
-                    imageUrl: movie!.imagePath,
-                    fit: BoxFit.cover,
-                    placeholderFadeInDuration: CustomDurations.cachedDuration,
-                    fadeInDuration: CustomDurations.cachedDuration,
-                    fadeOutDuration: CustomDurations.cachedDuration,
-                    placeholder: (context, child) {
-                      return shimmer;
-                    },
-                    errorWidget: (context, obj, trace) {
-                      return shimmer;
-                    },
+                ? Stack(
+                    children: [
+                      CachedNetworkImage(
+                        imageUrl: movie!.imagePath,
+                        fit: BoxFit.cover,
+                        placeholderFadeInDuration:
+                            CustomDurations.cachedDuration,
+                        fadeInDuration: CustomDurations.cachedDuration,
+                        fadeOutDuration: CustomDurations.cachedDuration,
+                        placeholder: (context, child) {
+                          return shimmer;
+                        },
+                        errorWidget: (context, obj, trace) {
+                          return shimmer;
+                        },
+                      ),
+                      if (movie!.isNft)
+                        Positioned(
+                          bottom: 5,
+                          left: 5,
+                          child: SvgPicture.asset(
+                            'assets/icons/ton.svg',
+                            width: 16,
+                            height: 16,
+                          ),
+                        ),
+                      if (movie!.isSale)
+                        Positioned(
+                          top: 5,
+                          right: 5,
+                          child: SvgPicture.asset(
+                            'assets/icons/sale.svg',
+                            width: 16,
+                            height: 16,
+                          ),
+                        ),
+                    ],
                   )
                 : shimmer,
           ),
