@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class TextOrContainer extends StatelessWidget {
@@ -53,6 +56,7 @@ class NameWithArtistPoster extends StatelessWidget {
   final double? emptyHeight;
   final TextOverflow? overflow;
   final bool isFlexible;
+  final bool isArtistWb;
 
   const NameWithArtistPoster({
     super.key,
@@ -64,6 +68,7 @@ class NameWithArtistPoster extends StatelessWidget {
     this.emptyHeight,
     this.overflow,
     this.isFlexible = true,
+    this.isArtistWb = false,
   });
   @override
   Widget build(BuildContext context) {
@@ -91,7 +96,9 @@ class NameWithArtistPoster extends StatelessWidget {
           const Gap(5),
           Padding(
             padding: const EdgeInsets.only(top: 2),
-            child: SvgPicture.asset('assets/icons/art.svg'),
+            child: SvgPicture.asset(isArtistWb
+                ? 'assets/icons/art_wb.svg'
+                : 'assets/icons/art.svg'),
           ),
         ]
       ],
@@ -131,4 +138,39 @@ class NameWithArtist extends StatelessWidget {
       ],
     );
   }
+}
+
+GradientBoxBorder nftGradientBoxBorder() {
+  double gradient = 180 - 10.88;
+  return GradientBoxBorder(
+    width: 1.5,
+    gradient: LinearGradient(
+      colors: const [
+        Color(0xFF3390EC), // 0%
+        Color(0xFF6E9BF4), // 23%
+        Color(0xFF949EEE), // 37%
+        Color(0xFFD3A2E4), // 58%
+        Color(0xFFF8BAC0), // 87%
+        Color(0xFFFAC3B5), // 92%
+        Color(0xFFFFD69C), // 100%
+      ],
+      stops: const [
+        0.0,
+        0.23,
+        0.37,
+        0.58,
+        0.87,
+        0.92,
+        1.0,
+      ],
+      begin: Alignment(
+        cos(gradient * pi / 180), // x = cos(угол)
+        sin(gradient * pi / 180), // y = sin(угол)
+      ),
+      end: Alignment(
+        cos(gradient * pi / 180) * -1, // x = -cos(угол)
+        sin(gradient * pi / 180) * -1, // y = -sin(угол)
+      ),
+    ),
+  );
 }

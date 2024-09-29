@@ -118,6 +118,8 @@ class PostBase extends ConsumerWidget {
                         time: post?[0].time ?? multPost?.time,
                         user: user,
                         showFollowButton: poster == null,
+                        isArtist: user!.isArtist,
+                        isArtistWb: false,
                         type: post == null
                             ? InfoDialogType.list
                             : InfoDialogType.post,
@@ -164,6 +166,8 @@ class UserInfoTile extends ConsumerWidget {
     this.behavior,
     this.controller,
     this.onInfoTap,
+    required this.isArtist,
+    required this.isArtistWb,
     required this.type,
     required this.entityId,
     this.myEntity,
@@ -181,6 +185,8 @@ class UserInfoTile extends ConsumerWidget {
   final InfoDialogType type;
   final int entityId;
   final bool? myEntity;
+  final bool isArtist;
+  final bool isArtistWb;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -250,12 +256,13 @@ class UserInfoTile extends ConsumerWidget {
                                     (!(user?.followed ?? true)),
                                 child: NameWithArtistPoster(
                                   name: user?.name ?? '',
-                                  isArtist: user?.isArtist ?? false,
+                                  isArtist: isArtist,
                                   darkBackground: darkBackground,
                                   emptyWidth: 146,
                                   emptyHeight: 17,
                                   overflow: TextOverflow.ellipsis,
                                   isFlexible: true,
+                                  isArtistWb: isArtistWb,
                                 ),
                               ),
                               const SizedBox(

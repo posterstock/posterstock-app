@@ -341,6 +341,8 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                               showFollowButton: false,
                                               user: comments[index].model,
                                               controller: scrollController,
+                                              isArtist: true,
+                                              isArtistWb: false,
                                               time: comments[index].time,
                                               behavior:
                                                   HitTestBehavior.translucent,
@@ -615,6 +617,8 @@ class _PosterPageState extends ConsumerState<PosterPage>
                               darkBackground: true,
                               showSettings: false,
                               showFollowButton: false,
+                              isArtist: true,
+                              isArtistWb: true,
                             ),
                     ),
                     SafeArea(

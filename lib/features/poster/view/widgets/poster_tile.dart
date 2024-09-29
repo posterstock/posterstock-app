@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
+import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/peek_pop/peek_and_pop_dialog.dart';
 import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -45,23 +46,31 @@ class _PosterTile extends StatelessWidget {
       children: [
         Stack(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Container(
-                color: context.colors.backgroundsSecondary,
-                width: double.infinity,
-                height: ((MediaQuery.of(context).size.width - 15 * 2 - 16 * 2) /
-                        3) /
-                    2 *
-                    3,
-                child: CachedNetworkImage(
-                  imageUrl: poster.imagePath,
-                  fit: BoxFit.cover,
-                  placeholderFadeInDuration: CustomDurations.cachedDuration,
-                  fadeInDuration: CustomDurations.cachedDuration,
-                  fadeOutDuration: CustomDurations.cachedDuration,
-                  placeholder: (_, __) => _shimmer,
-                  errorWidget: (_, __, ___) => _shimmer,
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                border: poster.isNft ? nftGradientBoxBorder() : null,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(7),
+                child: Container(
+                  color: context.colors.backgroundsSecondary,
+                  width: double.infinity,
+                  height:
+                      ((MediaQuery.of(context).size.width - 15 * 2 - 16 * 2) /
+                              3) /
+                          2 *
+                          3,
+                  child: CachedNetworkImage(
+                    imageUrl: poster.imagePath,
+                    fit: BoxFit.cover,
+                    placeholderFadeInDuration: CustomDurations.cachedDuration,
+                    fadeInDuration: CustomDurations.cachedDuration,
+                    fadeOutDuration: CustomDurations.cachedDuration,
+                    placeholder: (_, __) => _shimmer,
+                    errorWidget: (_, __, ___) => _shimmer,
+                  ),
                 ),
               ),
             ),

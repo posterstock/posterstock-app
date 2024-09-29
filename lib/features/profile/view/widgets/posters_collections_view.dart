@@ -34,6 +34,9 @@ class PostersCollectionView extends ConsumerWidget {
         ],
       );
     }
+    double height =
+        (((MediaQuery.of(context).size.width - 15 * 2 - 16 * 2) / 3) / 2 * 3 +
+            41);
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
@@ -42,11 +45,7 @@ class PostersCollectionView extends ConsumerWidget {
         crossAxisCount: 3,
         crossAxisSpacing: 12.5,
         mainAxisSpacing: 15,
-        mainAxisExtent:
-            ((MediaQuery.of(context).size.width - 15 * 2 - 16 * 2) / 3) /
-                    2 *
-                    3 +
-                41,
+        mainAxisExtent: height + 3,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       itemCount: movies.length,

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+
 import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
@@ -289,26 +290,36 @@ class _MovieCardPageViewContent extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(8),
           child: SizedBox(
             width: 128,
             height: 193,
             child: movie?.imagePath != null
                 ? Stack(
                     children: [
-                      CachedNetworkImage(
-                        imageUrl: movie!.imagePath,
-                        fit: BoxFit.cover,
-                        placeholderFadeInDuration:
-                            CustomDurations.cachedDuration,
-                        fadeInDuration: CustomDurations.cachedDuration,
-                        fadeOutDuration: CustomDurations.cachedDuration,
-                        placeholder: (context, child) {
-                          return shimmer;
-                        },
-                        errorWidget: (context, obj, trace) {
-                          return shimmer;
-                        },
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          border: movie!.isNft ? nftGradientBoxBorder() : null,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: CachedNetworkImage(
+                            imageUrl: movie!.imagePath,
+                            fit: BoxFit.cover,
+                            placeholderFadeInDuration:
+                                CustomDurations.cachedDuration,
+                            fadeInDuration: CustomDurations.cachedDuration,
+                            fadeOutDuration: CustomDurations.cachedDuration,
+                            placeholder: (context, child) {
+                              return shimmer;
+                            },
+                            errorWidget: (context, obj, trace) {
+                              return shimmer;
+                            },
+                          ),
+                        ),
                       ),
                       if (movie!.isNft)
                         Positioned(

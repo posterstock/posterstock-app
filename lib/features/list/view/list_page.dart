@@ -284,6 +284,11 @@ class _ListPageState extends ConsumerState<ListPage>
                                       user: comments[index - 1].model,
                                       time: comments[index - 1].time,
                                       behavior: HitTestBehavior.translucent,
+                                      isArtist: ref
+                                          .watch(
+                                              myProfileInfoStateHolderProvider)!
+                                          .isArtist,
+                                      isArtistWb: false,
                                     ),
                                   ),
                                   const SizedBox(height: 12),
@@ -620,6 +625,8 @@ class CollectionInfoWidget extends ConsumerWidget {
             showSettings: false,
             showFollowButton: false,
             time: post?.time,
+            isArtist: false,
+            isArtistWb: false,
           ),
           const SizedBox(height: 16),
           Text(
