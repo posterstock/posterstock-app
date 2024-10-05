@@ -452,6 +452,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                 secondAction: 'Delete account with all data',
                                 onTapSecond: () async {
                                   bool delete = await treDelete(context);
+                                  ref
+                                      .read(changeWalletStateHolderProvider
+                                          .notifier)
+                                      .setWallet('');
                                   if (!delete) return;
                                   final prefs =
                                       await SharedPreferences.getInstance();
