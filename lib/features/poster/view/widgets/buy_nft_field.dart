@@ -58,7 +58,7 @@ class BuyNftField extends StatelessWidget {
             ),
           ],
         ),
-        const CustomDivider(),
+        // const CustomDivider(),
       ],
     );
   }
