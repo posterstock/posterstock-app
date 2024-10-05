@@ -102,7 +102,7 @@ class PostsCollectionTile extends ConsumerWidget {
                       return shimmer;
                     },
                   ),
-                  if (post!.isNft)
+                  if (post != null && post!.isNft)
                     Positioned(
                       bottom: 5,
                       left: 5,
@@ -112,7 +112,7 @@ class PostsCollectionTile extends ConsumerWidget {
                         height: 16,
                       ),
                     ),
-                  if (post!.isSale)
+                  if (post != null && post!.nft.isSale)
                     Positioned(
                       top: 5,
                       right: 5,

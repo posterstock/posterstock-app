@@ -118,7 +118,7 @@ class PostBase extends ConsumerWidget {
                         time: post?[0].time ?? multPost?.time,
                         user: user,
                         showFollowButton: poster == null,
-                        isArtist: user!.isArtist,
+                        isArtist: user?.isArtist ?? false,
                         isArtistWb: false,
                         type: post == null
                             ? InfoDialogType.list

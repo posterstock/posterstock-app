@@ -72,7 +72,6 @@ class MultiplePostModel extends PostBaseModel {
     int likes = 0,
     int comments = 0,
     String? description,
-    bool isSale = false,
   }) : super(
           type: type,
           id: id,
@@ -86,7 +85,6 @@ class MultiplePostModel extends PostBaseModel {
           isArtist: isArtist,
           isNft: isNft,
           nft: nft,
-          isSale: isSale,
         );
 
   factory MultiplePostModel.fromJson(Map<String, dynamic> json,
@@ -144,7 +142,6 @@ class MultiplePostModel extends PostBaseModel {
       image: image,
       nft: nft,
       isNft: isNft,
-      isSale: json['isSale'] ?? false,
       isArtist: json['isArtist'] ?? false,
     );
   }
@@ -164,7 +161,6 @@ class MultiplePostModel extends PostBaseModel {
         'isArtist': isArtist,
         'nft': nft.toJson(),
         'isNft': isNft,
-        'isSale': isSale,
       };
 
   @override
@@ -183,7 +179,6 @@ class MultiplePostModel extends PostBaseModel {
     NftForPoster? nft,
     bool? isNft,
     List<MultiplePostSingleModel>? posters,
-    bool? isSale,
   }) {
     return MultiplePostModel(
       posters: posters ?? this.posters,
@@ -200,7 +195,6 @@ class MultiplePostModel extends PostBaseModel {
       isArtist: isArtist ?? this.isArtist,
       nft: nft ?? this.nft,
       isNft: isNft ?? this.isNft,
-      isSale: isSale ?? this.isSale,
     );
   }
 }

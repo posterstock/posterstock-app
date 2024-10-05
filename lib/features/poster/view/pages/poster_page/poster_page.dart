@@ -299,7 +299,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                     child: AnimatedBuilder(
                                       animation: posterController!,
                                       builder: (context, child) {
-                                        return PosterInfo(
+                                        return  PosterInfo(
                                           likes: widget.likes,
                                           comments: widget.comments,
                                           liked: widget.liked,

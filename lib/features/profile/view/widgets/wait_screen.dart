@@ -36,7 +36,7 @@ class WaitProfile extends StatelessWidget {
                 flexibleSpace: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 2),
                     ProfileAppbar(title),
                   ],
                 ),
@@ -62,7 +62,7 @@ class WaitScreen extends StatelessWidget {
             ? const CupertinoActivityIndicator(radius: 10)
             : SizedBox(
                 width: 20,
-                height: 30,
+                height: 20,
                 child: CircularProgressIndicator(
                   color: context.colors.iconsDisabled!,
                   strokeWidth: 2,

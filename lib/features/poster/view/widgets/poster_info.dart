@@ -10,6 +10,7 @@ import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
+import 'package:poster_stock/features/poster/view/widgets/buy_nft_field.dart';
 import 'package:poster_stock/features/poster/view/widgets/row_with_toninfo.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -101,7 +102,7 @@ class PosterInfo extends ConsumerWidget {
                 child: TextOrContainer(
                   emptyWidth: 160,
                   emptyHeight: 20,
-                  text: post?.name,
+                  text: post?.name ?? '',
                   style: context.textStyles.title3,
                 ),
               ),
@@ -161,6 +162,7 @@ class PosterInfo extends ConsumerWidget {
             ),
           ],
         ),
+        if (post != null && post.nft.isSale) BuyNftField(post: post),
       ],
     );
   }

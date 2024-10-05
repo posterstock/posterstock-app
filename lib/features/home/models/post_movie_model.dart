@@ -34,7 +34,6 @@ class PostMovieModel extends PostBaseModel {
     required bool isArtist,
     required NftForPoster nft,
     required bool isNft,
-    required bool isSale,
   }) : super(
           type: type,
           id: id,
@@ -48,7 +47,6 @@ class PostMovieModel extends PostBaseModel {
           isArtist: isArtist,
           nft: nft,
           isNft: isNft,
-          isSale: isSale,
         );
 
   get year => endYear == null || endYear == 0
@@ -111,7 +109,6 @@ class PostMovieModel extends PostBaseModel {
       isArtist: json['isArtist'] ?? false,
       nft: nft,
       isNft: isNft,
-      isSale: json['isSale'] ?? false,
     );
   }
 
@@ -135,7 +132,6 @@ class PostMovieModel extends PostBaseModel {
         'isArtist': isArtist,
         'nft': nft.toJson(),
         'isNft': isNft,
-        'isSale': isSale,
       };
 
   @override
@@ -157,7 +153,6 @@ class PostMovieModel extends PostBaseModel {
     bool? isArtist,
     NftForPoster? nft,
     bool? isNft,
-    bool? isSale,
   }) {
     return PostMovieModel(
       type: type ?? this.type,
@@ -180,7 +175,6 @@ class PostMovieModel extends PostBaseModel {
       isArtist: isArtist ?? this.isArtist,
       isNft: isNft ?? this.isNft,
       nft: nft ?? this.nft,
-      isSale: isSale ?? this.isSale,
     );
   }
 }

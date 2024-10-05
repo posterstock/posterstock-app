@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/list/repository/list_repository.dart';
@@ -7,6 +11,7 @@ import 'package:poster_stock/features/poster/state_holder/my_lists_state_holder.
 import 'package:poster_stock/features/poster/state_holder/poster_state_holder.dart';
 import 'package:poster_stock/features/profile/repository/profile_repository.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
+import 'package:http/http.dart' as http;
 
 final postControllerProvider = Provider<PostController>(
   (ref) => PostController(
@@ -88,14 +93,43 @@ class PostController {
         await postRepository.getNFT(result.nft.collection);
     int index = 1;
     int allCount = 1;
+    bool isSale = false;
+    double price = 0;
+    double priceReal = 0;
+    String blocChain = 'Ton';
 
     if (resultNFT.isNotEmpty) {
+      Map<String, dynamic> result = resultNFT.first;
       allCount = resultNFT.length;
-      index = resultNFT.first['index'];
+      index = result['index'];
+      Map<String, dynamic>? sale = result['sale'];
+      if (sale != null) {
+        isSale = true;
+        int temp = int.parse(sale['price']['value']);
+        price = temp / pow(10, 9);
+        blocChain = sale['price']['token_name'];
+        final response = await http.get(
+            Uri.parse('https://tonapi.io/v2/rates?tokens=ton&currencies=usd'));
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          double usdRate = data['rates']['TON']['prices']['USD'];
+          priceReal = price * usdRate; // Применяем курс к цене
+        } else {
+          Logger.e('Ошибка при получении курса: ${response.statusCode}');
+        }
+      }
     }
-    result = result.copyWith(
-        nft: result.nft.copyWith(allCount: allCount, number: ++index));
 
+    result = result.copyWith(
+        nft: result.nft.copyWith(
+      allCount: allCount,
+      number: ++index,
+      isSale: isSale,
+      price: price,
+      blocChain: blocChain,
+      priceReal: priceReal,
+    ));
+    Logger.i('result >>>>>>>>> ${result.toJson()}');
     cachedPostRepository.cachePost(id, result);
     cachedPostRepository.cachePost(id, result);
     result = await _prepareData(result);

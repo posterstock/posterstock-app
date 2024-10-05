@@ -124,7 +124,7 @@ class AuthPage extends ConsumerWidget {
                         ),
                         const SizedBox(height: 9),
                         Text(
-                          AppLocalizations.of(context)!.login_welcome_title,
+                          context.txt.login_welcome_title,
                           style: context.textStyles.title2!,
                           textAlign: TextAlign.center,
                         ),
@@ -159,14 +159,14 @@ class AuthPage extends ConsumerWidget {
                                 ref, textEditingController.text, context);
                           },
                           child: Text(
-                            AppLocalizations.of(context)!.login_welcome_otp,
+                            context.txt.login_welcome_otp,
                             style: context.textStyles.calloutBold,
                           ),
                         ),
                         const SizedBox(height: 20),
                         Center(
                           child: Text(
-                            AppLocalizations.of(context)!.login_welcome_or,
+                            context.txt.login_welcome_or,
                             style: context.textStyles.callout,
                           ),
                         ),

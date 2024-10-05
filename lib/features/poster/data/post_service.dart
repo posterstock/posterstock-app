@@ -227,7 +227,6 @@ class PostService {
       // Формирование URL для запроса
       final url = Uri.parse(
           'https://testnet.tonapi.io/v2/nfts/collections/$address/items');
-
       // Отправка HTTP GET запроса
       final response = await http.get(url);
 

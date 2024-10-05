@@ -128,6 +128,7 @@ class NameWithArtist extends StatelessWidget {
         TextOrContainer(
           text: name,
           style: style,
+          overflow: TextOverflow.ellipsis,
         ),
         const Gap(5),
         if (isArtist)

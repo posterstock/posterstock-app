@@ -14,7 +14,6 @@ abstract class PostBaseModel {
   final bool isArtist;
   final NftForPoster nft;
   final bool isNft;
-  final bool isSale;
 
   PostBaseModel({
     required this.type,
@@ -29,7 +28,6 @@ abstract class PostBaseModel {
     required this.isArtist,
     required this.nft,
     required this.isNft,
-    required this.isSale,
   });
 
   get time => creationTime == null
@@ -54,7 +52,6 @@ abstract class PostBaseModel {
     bool? isArtist,
     NftForPoster? nft,
     bool? isNft,
-    bool? isSale,
   });
 
   static String _getTimeString(DateTime date) {

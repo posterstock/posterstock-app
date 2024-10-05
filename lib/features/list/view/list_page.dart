@@ -401,7 +401,7 @@ class _ListPageState extends ConsumerState<ListPage>
                                         height: 16,
                                       ),
                                     ),
-                                  if (posts.isSale)
+                                  if (posts.nft.isSale)
                                     Positioned(
                                       top: 5,
                                       right: 5,
@@ -717,7 +717,6 @@ class CollectionInfoWidget extends ConsumerWidget {
                     isArtist: post!.isArtist,
                     nft: post!.nft,
                     isNft: post!.isNft,
-                    isSale: post!.isSale,
                   ),
                   customOnItemTap: (post, index) {
                     AutoRouter.of(context).push(

@@ -499,7 +499,9 @@ class _ProfileTabsState extends ConsumerState<ProfileTabs> {
   Widget build(BuildContext context) {
     final id = widget.id;
     final posters = ref.watch(userPostersNotifier(id));
-    Logger.i('posters ${posters.first?.toJson()}');
+    if (posters.isNotEmpty) {
+      Logger.i('posters ${posters.first?.toJson()}');
+    }
     final searchValue = ref.watch(listSearchValueStateHolderProvider);
     final lists = ref.watch(userListsStateNotifier(id));
     final controller = ref.read(userControllerProvider(id));
