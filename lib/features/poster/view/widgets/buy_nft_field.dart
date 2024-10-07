@@ -17,8 +17,9 @@ class BuyNftField extends StatelessWidget {
     Logger.i('post ${post.nft.toJson()}');
     return Column(
       children: [
+        const Gap(15),
         const CustomDivider(),
-        const Gap(5),
+        const Gap(17),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -30,25 +31,38 @@ class BuyNftField extends StatelessWidget {
                   children: [
                     Text(
                       post.nft.price.toStringAsFixed(3),
-                      style: context.textStyles.title2,
+                      style: context.textStyles.title2!.copyWith(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: context.colors.buttonsSecondary,
+                      ),
                     ),
                     const Gap(5),
                     Text(
                       post.nft.blocChain,
-                      style: context.textStyles.subheadlineBold,
+                      style: context.textStyles.subheadlineBold!.copyWith(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: context.colors.buttonsSecondary,
+                      ),
                     ),
                     const Gap(5),
                     Text(
                       '\$${post.nft.priceReal.toStringAsFixed(2)}',
-                      style: context.textStyles.subheadline!
-                          .copyWith(color: context.colors.textsDisabled),
+                      style: context.textStyles.subheadline!.copyWith(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                          color: context.colors.textsDisabled),
                     ),
                   ],
                 ),
                 Text(
                   '+  ${post.nft.fee} ${post.nft.blocChain} network fee',
-                  style: context.textStyles.subheadline!
-                      .copyWith(color: context.colors.textsSecondary),
+                  style: context.textStyles.subheadline!.copyWith(
+                    color: context.colors.textsSecondary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ],
             ),
@@ -58,7 +72,6 @@ class BuyNftField extends StatelessWidget {
             ),
           ],
         ),
-        // const CustomDivider(),
       ],
     );
   }
@@ -71,13 +84,11 @@ class CustomDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Gap(15),
         Divider(
           height: 0.5,
           thickness: 0.5,
           color: context.colors.fieldsDefault,
         ),
-        const Gap(15),
       ],
     );
   }

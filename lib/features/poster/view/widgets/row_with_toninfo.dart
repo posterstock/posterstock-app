@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:gap/gap.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -17,29 +18,31 @@ class TonInfo extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          width: 105,
-          height: 26,
-          padding: const EdgeInsets.only(right: 12),
+          width: 94,
+          height: 28,
           decoration: BoxDecoration(
             color: context.colors.backgroundsSecondary,
             borderRadius: BorderRadius.circular(16),
           ),
           alignment: Alignment.centerRight,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              const Gap(35),
               Text(
                 "${post.nft.number}",
                 style: TextStyle(
-                  color: context.colors.textsPrimary,
-                  fontWeight: FontWeight.bold,
+                  color: context.colors.buttonsSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
               Text(
                 " / ${post.nft.allCount}",
                 style: TextStyle(
-                  color: context.colors.iconsDisabled,
-                  fontWeight: FontWeight.bold,
+                  color: context.colors.textsSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ],
@@ -50,8 +53,8 @@ class TonInfo extends StatelessWidget {
           left: -1,
           child: SvgPicture.asset(
             'assets/icons/ton.svg',
-            width: 26,
-            height: 26,
+            width: 28,
+            height: 28,
           ),
         ),
       ],

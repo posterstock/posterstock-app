@@ -90,7 +90,6 @@ class PosterActions extends ConsumerWidget {
                           : int.parse(
                               post.year.split(" - ")[1],
                             ),
-                      isNft: post.isNft,
                       nft: post.nft,
                     ),
                   );

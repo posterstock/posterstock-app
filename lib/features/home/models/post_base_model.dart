@@ -13,7 +13,6 @@ abstract class PostBaseModel {
   final bool liked;
   final bool isArtist;
   final NftForPoster nft;
-  final bool isNft;
 
   PostBaseModel({
     required this.type,
@@ -27,8 +26,10 @@ abstract class PostBaseModel {
     required this.liked,
     required this.isArtist,
     required this.nft,
-    required this.isNft,
   });
+
+  bool get isNft => nft.chain.isNotEmpty;
+  bool get isSale => nft.price != 0.0;
 
   get time => creationTime == null
       ? ''
@@ -51,7 +52,6 @@ abstract class PostBaseModel {
     bool? liked,
     bool? isArtist,
     NftForPoster? nft,
-    bool? isNft,
   });
 
   static String _getTimeString(DateTime date) {

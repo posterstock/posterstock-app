@@ -93,7 +93,6 @@ class PostController {
         await postRepository.getNFT(result.nft.collection);
     int index = 1;
     int allCount = 1;
-    bool isSale = false;
     double price = 0;
     double priceReal = 0;
     String blocChain = 'Ton';
@@ -104,7 +103,6 @@ class PostController {
       index = result['index'];
       Map<String, dynamic>? sale = result['sale'];
       if (sale != null) {
-        isSale = true;
         int temp = int.parse(sale['price']['value']);
         price = temp / pow(10, 9);
         blocChain = sale['price']['token_name'];
@@ -124,7 +122,6 @@ class PostController {
         nft: result.nft.copyWith(
       allCount: allCount,
       number: ++index,
-      isSale: isSale,
       price: price,
       blocChain: blocChain,
       priceReal: priceReal,

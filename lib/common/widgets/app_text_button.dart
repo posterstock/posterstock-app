@@ -31,17 +31,20 @@ class AppTextButton extends StatelessWidget {
           highlightColor: context.colors.textsPrimary!.withOpacity(0.2),
           onTap: disabled ? null : (onTap ?? () {}),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 5.5,
+            padding: const EdgeInsets.only(
+              right: 16.0,
+              left: 16,
+              top: 4,
+              bottom: 9,
             ),
-            child: child ?? Text(
-              text,
-              style: context.textStyles.calloutBold!.copyWith(
-                color: textColor ?? context.colors.textsBackground,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
+            child: child ??
+                Text(
+                  text,
+                  style: context.textStyles.calloutBold!.copyWith(
+                    color: textColor ?? context.colors.textsBackground,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
           ),
         ),
       ),

@@ -11,7 +11,6 @@ class MultiplePostSingleModel {
   final String title;
   final String? description;
   final NftForPoster nft;
-  final bool isNft;
 
   MultiplePostSingleModel({
     required this.id,
@@ -21,7 +20,6 @@ class MultiplePostSingleModel {
     required this.title,
     this.description,
     required this.nft,
-    required this.isNft,
   });
 
   factory MultiplePostSingleModel.fromJson(Map<String, dynamic> json) {
@@ -37,7 +35,6 @@ class MultiplePostSingleModel {
       title: json['title'] as String,
       description: json['description'] as String,
       nft: nft,
-      isNft: nft.isNft,
     );
   }
 
@@ -49,7 +46,6 @@ class MultiplePostSingleModel {
         'preview_image': image,
         'title': title,
         'nft': nft.toJson(),
-        'isNft': isNft,
       };
 }
 
@@ -62,7 +58,6 @@ class MultiplePostModel extends PostBaseModel {
     this.image,
     required String name,
     required bool isArtist,
-    required bool isNft,
     required NftForPoster nft,
     required UserModel author,
     required int? creationTime,
@@ -83,21 +78,17 @@ class MultiplePostModel extends PostBaseModel {
           comments: comments,
           description: description,
           isArtist: isArtist,
-          isNft: isNft,
           nft: nft,
         );
 
   factory MultiplePostModel.fromJson(Map<String, dynamic> json,
       {bool previewPrimary = false}) {
     NftForPoster nft = NftForPoster.init();
-    bool isNft = false;
     if (json['nft'] != null) {
       nft = NftForPoster.fromJson(json['nft'] as Map<String, dynamic>);
-      isNft = true;
     }
     if (json['chain'] != null) {
       nft = NftForPoster.fromChain(json['chain']);
-      isNft = true;
     }
     const List<Color> avatar = [
       Color(0xfff09a90),
@@ -141,7 +132,6 @@ class MultiplePostModel extends PostBaseModel {
           [],
       image: image,
       nft: nft,
-      isNft: isNft,
       isArtist: json['isArtist'] ?? false,
     );
   }
@@ -160,7 +150,6 @@ class MultiplePostModel extends PostBaseModel {
         'posters': posters.map((i) => i.toJson()).toList(),
         'isArtist': isArtist,
         'nft': nft.toJson(),
-        'isNft': isNft,
       };
 
   @override
@@ -177,7 +166,6 @@ class MultiplePostModel extends PostBaseModel {
     String? image,
     bool? isArtist,
     NftForPoster? nft,
-    bool? isNft,
     List<MultiplePostSingleModel>? posters,
   }) {
     return MultiplePostModel(
@@ -194,7 +182,6 @@ class MultiplePostModel extends PostBaseModel {
       image: image ?? this.image,
       isArtist: isArtist ?? this.isArtist,
       nft: nft ?? this.nft,
-      isNft: isNft ?? this.isNft,
     );
   }
 }

@@ -9,7 +9,6 @@ class NFTMedia extends MediaModel {
     required super.type,
     required super.startYear,
     required super.endYear,
-    required super.isNft,
     required super.nft,
   });
 
@@ -29,7 +28,6 @@ class NFTMedia extends MediaModel {
       type: json['type'] == 'tv' ? MediaType.tv : MediaType.movie,
       startYear: json['start_year'] as int,
       endYear: json['end_year'] as int?,
-      isNft: json['is_nft'] == null ? false : json['is_nft'] as bool,
       nft: json['nft'] == null
           ? NftForPoster.init()
           : json['nft'] as NftForPoster,
@@ -47,7 +45,6 @@ class NFTMedia extends MediaModel {
         type: model.type,
         startYear: model.startYear,
         endYear: model.endYear,
-        isNft: model.isNft,
         nft: model.nft,
       );
 }

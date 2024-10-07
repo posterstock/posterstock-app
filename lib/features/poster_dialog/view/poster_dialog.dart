@@ -67,7 +67,6 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                     : MediaType.tv,
                 startYear: startYear,
                 endYear: endYear,
-                isNft: widget.postMovieModel!.isNft,
                 nft: widget.postMovieModel!.nft,
               ));
         } else {
@@ -79,7 +78,6 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                     : MediaType.tv,
                 startYear: startYear,
                 endYear: endYear,
-                isNft: false,
                 nft: NftForPoster.init(),
               ));
         }

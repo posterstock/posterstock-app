@@ -112,7 +112,7 @@ class PostsCollectionTile extends ConsumerWidget {
                         height: 16,
                       ),
                     ),
-                  if (post != null && post!.nft.isSale)
+                  if (post != null && post!.isSale)
                     Positioned(
                       top: 5,
                       right: 5,

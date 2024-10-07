@@ -33,7 +33,6 @@ class PostMovieModel extends PostBaseModel {
     String? description,
     required bool isArtist,
     required NftForPoster nft,
-    required bool isNft,
   }) : super(
           type: type,
           id: id,
@@ -46,7 +45,6 @@ class PostMovieModel extends PostBaseModel {
           liked: liked,
           isArtist: isArtist,
           nft: nft,
-          isNft: isNft,
         );
 
   get year => endYear == null || endYear == 0
@@ -56,15 +54,15 @@ class PostMovieModel extends PostBaseModel {
   factory PostMovieModel.fromJson(Map<String, dynamic> json,
       {bool previewPrimary = false}) {
     NftForPoster nft = NftForPoster.init();
-    bool isNft = false;
+
     if (json['nft'] != null) {
       nft = NftForPoster.fromJson(json['nft'] as Map<String, dynamic>);
-      isNft = true;
     }
     if (json['chain'] != null) {
       nft = NftForPoster.fromChain(json['chain']);
-      isNft = true;
     }
+
+
 
     const List<Color> avatar = [
       Color(0xfff09a90),
@@ -108,7 +106,6 @@ class PostMovieModel extends PostBaseModel {
       mediaType: json['media_type'] as String?,
       isArtist: json['isArtist'] ?? false,
       nft: nft,
-      isNft: isNft,
     );
   }
 
@@ -131,7 +128,6 @@ class PostMovieModel extends PostBaseModel {
         'user': author.toJson(),
         'isArtist': isArtist,
         'nft': nft.toJson(),
-        'isNft': isNft,
       };
 
   @override
@@ -152,7 +148,6 @@ class PostMovieModel extends PostBaseModel {
     bool? hasInCollection,
     bool? isArtist,
     NftForPoster? nft,
-    bool? isNft,
   }) {
     return PostMovieModel(
       type: type ?? this.type,
@@ -173,7 +168,6 @@ class PostMovieModel extends PostBaseModel {
       mediaType: mediaType,
       tmdbLink: tmdbLink,
       isArtist: isArtist ?? this.isArtist,
-      isNft: isNft ?? this.isNft,
       nft: nft ?? this.nft,
     );
   }

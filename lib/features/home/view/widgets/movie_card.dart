@@ -331,7 +331,7 @@ class _MovieCardPageViewContent extends ConsumerWidget {
                             height: 16,
                           ),
                         ),
-                      if (movie != null && movie!.nft.isSale)
+                      if (movie != null && movie!.isSale)
                         Positioned(
                           top: 5,
                           right: 5,

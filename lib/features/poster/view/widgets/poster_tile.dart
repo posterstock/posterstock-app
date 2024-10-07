@@ -84,7 +84,7 @@ class _PosterTile extends StatelessWidget {
                   height: 16,
                 ),
               ),
-            if (poster.nft.isSale)
+            if (poster.isSale)
               Positioned(
                 top: 5,
                 right: 5,

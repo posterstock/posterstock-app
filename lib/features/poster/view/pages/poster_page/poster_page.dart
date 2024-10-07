@@ -299,7 +299,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                     child: AnimatedBuilder(
                                       animation: posterController!,
                                       builder: (context, child) {
-                                        return  PosterInfo(
+                                        return PosterInfo(
                                           likes: widget.likes,
                                           comments: widget.comments,
                                           liked: widget.liked,
@@ -307,7 +307,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                       },
                                     ),
                                   ),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: 5),
                                   Divider(
                                     height: 0.5,
                                     thickness: 0.5,

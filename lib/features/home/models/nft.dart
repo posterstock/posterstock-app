@@ -23,9 +23,6 @@ class NftForPoster {
   ///  коммиссия
   final double fee;
 
-  ///  на продажу или нет
-  final bool isSale;
-
   /// в чем прайс
   final String blocChain;
 
@@ -38,7 +35,6 @@ class NftForPoster {
     required this.price,
     required this.priceReal,
     required this.fee,
-    required this.isSale,
     required this.blocChain,
   });
 
@@ -60,7 +56,6 @@ class NftForPoster {
       price: json['price'] ?? 0,
       priceReal: json['priceReal'] ?? 0,
       fee: json['fee'] ?? 0.3,
-      isSale: json['isSale'] != null,
       blocChain: json['blocChain'] ?? '',
     );
   }
@@ -74,7 +69,6 @@ class NftForPoster {
       price: 0,
       priceReal: 0,
       fee: 0.3,
-      isSale: false,
       blocChain: 'TON',
     );
   }
@@ -89,7 +83,6 @@ class NftForPoster {
       'price': price,
       'priceReal': priceReal,
       'fee': fee,
-      'isSale': isSale,
       'blocChain': blocChain,
     };
   }
@@ -103,7 +96,6 @@ class NftForPoster {
     double? price,
     double? priceReal,
     double? fee,
-    bool? isSale,
     String? blocChain,
   }) {
     return NftForPoster(
@@ -115,7 +107,6 @@ class NftForPoster {
       price: price ?? this.price,
       priceReal: priceReal ?? this.priceReal,
       fee: fee ?? this.fee,
-      isSale: isSale ?? this.isSale,
       blocChain: blocChain ?? this.blocChain,
     );
   }
@@ -130,9 +121,6 @@ class NftForPoster {
         price: 0,
         priceReal: 0,
         fee: 0.3,
-        isSale: false,
         blocChain: 'TON');
   }
-
-  get isNft => chain.isNotEmpty;
 }
