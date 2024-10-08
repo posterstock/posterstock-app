@@ -24,6 +24,7 @@ import 'package:poster_stock/features/home/view/widgets/movie_card.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
+import 'package:poster_stock/features/home/view/widgets/ton_view.dart';
 import 'package:poster_stock/features/list/controller/list_controller.dart';
 import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
@@ -391,26 +392,8 @@ class _ListPageState extends ConsumerState<ListPage>
                                       return shimmer;
                                     },
                                   ),
-                                  if (posts.isNft)
-                                    Positioned(
-                                      bottom: 5,
-                                      left: 5,
-                                      child: SvgPicture.asset(
-                                        'assets/icons/ton.svg',
-                                        width: 16,
-                                        height: 16,
-                                      ),
-                                    ),
-                                  if (posts.isSale)
-                                    Positioned(
-                                      top: 5,
-                                      right: 5,
-                                      child: SvgPicture.asset(
-                                        'assets/icons/sale.svg',
-                                        width: 16,
-                                        height: 16,
-                                      ),
-                                    ),
+                                  if (posts.isNft) const NftIcon(),
+                                  if (posts.isSale) const SaleIcon(),
                                 ],
                               )
                             : Row(

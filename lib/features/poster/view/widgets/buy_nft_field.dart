@@ -29,12 +29,16 @@ class BuyNftField extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      post.nft.price.toStringAsFixed(3),
-                      style: context.textStyles.title2!.copyWith(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: context.colors.buttonsSecondary,
+                    Transform.translate(
+                      offset: const Offset(0, 1),
+                      child: Text(
+                        post.nft.price.toStringAsFixed(3),
+                        style: context.textStyles.title2!.copyWith(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: context.colors.buttonsSecondary,
+                          height: 1,
+                        ),
                       ),
                     ),
                     const Gap(5),

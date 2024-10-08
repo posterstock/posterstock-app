@@ -13,6 +13,7 @@ import 'package:poster_stock/features/edit_profile/api/edit_profile_api.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
+import 'package:poster_stock/features/home/view/widgets/ton_view.dart';
 import 'package:poster_stock/features/list/controller/list_controller.dart';
 import 'package:poster_stock/features/list/state_holder/list_state_holder.dart';
 import 'package:poster_stock/features/peek_pop/peek_and_pop_dialog.dart';
@@ -102,26 +103,8 @@ class PostsCollectionTile extends ConsumerWidget {
                       return shimmer;
                     },
                   ),
-                  if (post != null && post!.isNft)
-                    Positioned(
-                      bottom: 5,
-                      left: 5,
-                      child: SvgPicture.asset(
-                        'assets/icons/ton.svg',
-                        width: 16,
-                        height: 16,
-                      ),
-                    ),
-                  if (post != null && post!.isSale)
-                    Positioned(
-                      top: 5,
-                      right: 5,
-                      child: SvgPicture.asset(
-                        'assets/icons/sale.svg',
-                        width: 16,
-                        height: 16,
-                      ),
-                    ),
+                  if (post != null && post!.isNft) const NftIcon(),
+                  if (post != null && post!.isSale) const SaleIcon(),
                 ],
               ),
             ),

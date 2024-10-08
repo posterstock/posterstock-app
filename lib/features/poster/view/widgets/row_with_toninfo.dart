@@ -50,7 +50,7 @@ class TonInfo extends StatelessWidget {
         ),
         Positioned(
           top: 0,
-          left: -1,
+          left: 0,
           child: SvgPicture.asset(
             'assets/icons/ton.svg',
             width: 28,

@@ -341,7 +341,8 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                               showFollowButton: false,
                                               user: comments[index].model,
                                               controller: scrollController,
-                                              isArtist: true,
+                                              isArtist: post?.author.isArtist ??
+                                                  false,
                                               isArtistWb: false,
                                               time: comments[index].time,
                                               behavior:

@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 
 import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/common/services/text_info_service.dart';
@@ -10,6 +9,7 @@ import 'package:poster_stock/features/home/state_holders/home_page_posts_state_h
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
+import 'package:poster_stock/features/home/view/widgets/ton_view.dart';
 import 'package:poster_stock/features/search/state_holders/search_posts_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
@@ -321,26 +321,8 @@ class _MovieCardPageViewContent extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      if (movie != null && movie!.isNft)
-                        Positioned(
-                          bottom: 5,
-                          left: 5,
-                          child: SvgPicture.asset(
-                            'assets/icons/ton.svg',
-                            width: 16,
-                            height: 16,
-                          ),
-                        ),
-                      if (movie != null && movie!.isSale)
-                        Positioned(
-                          top: 5,
-                          right: 5,
-                          child: SvgPicture.asset(
-                            'assets/icons/sale.svg',
-                            width: 16,
-                            height: 16,
-                          ),
-                        ),
+                      if (movie != null && movie!.isNft) const NftIcon(),
+                      if (movie != null && movie!.isSale) const SaleIcon()
                     ],
                   )
                 : shimmer,

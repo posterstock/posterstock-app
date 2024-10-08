@@ -5,6 +5,7 @@ import 'package:poster_stock/common/constants/durations.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
+import 'package:poster_stock/features/home/view/widgets/ton_view.dart';
 import 'package:poster_stock/features/peek_pop/peek_and_pop_dialog.dart';
 import 'package:poster_stock/features/profile/view/pages/profile_page.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -74,26 +75,8 @@ class _PosterTile extends StatelessWidget {
                 ),
               ),
             ),
-            if (poster.isNft)
-              Positioned(
-                bottom: 5,
-                left: 5,
-                child: SvgPicture.asset(
-                  'assets/icons/ton.svg',
-                  width: 16,
-                  height: 16,
-                ),
-              ),
-            if (poster.isSale)
-              Positioned(
-                top: 5,
-                right: 5,
-                child: SvgPicture.asset(
-                  'assets/icons/sale.svg',
-                  width: 16,
-                  height: 16,
-                ),
-              ),
+            if (poster.isNft) const NftIcon(),
+            if (poster.isSale) const SaleIcon(),
           ],
         ),
         const SizedBox(height: 8),
