@@ -343,7 +343,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                               controller: scrollController,
                                               isArtist: post?.author.isArtist ??
                                                   false,
-                                              isArtistWb: false,
+                                              isArtistWb: true,
                                               time: comments[index].time,
                                               behavior:
                                                   HitTestBehavior.translucent,

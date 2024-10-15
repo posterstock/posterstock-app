@@ -18,7 +18,7 @@ class TonInfo extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          width: 94,
+          // width: 94,
           height: 28,
           decoration: BoxDecoration(
             color: context.colors.backgroundsSecondary,
@@ -45,6 +45,7 @@ class TonInfo extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                 ),
               ),
+              const Gap(13),
             ],
           ),
         ),

@@ -256,13 +256,13 @@ class UserInfoTile extends ConsumerWidget {
                                     (!(user?.followed ?? true)),
                                 child: NameWithArtistPoster(
                                   name: user?.name ?? '',
-                                  isArtist: isArtist,
+                                  isArtist: user?.isArtist ?? false,
                                   darkBackground: darkBackground,
                                   emptyWidth: 146,
                                   emptyHeight: 17,
                                   overflow: TextOverflow.ellipsis,
                                   isFlexible: true,
-                                  isArtistWb: isArtistWb,
+                                  isArtistWb: true,
                                 ),
                               ),
                               const SizedBox(
