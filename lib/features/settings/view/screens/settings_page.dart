@@ -23,6 +23,7 @@ import 'package:poster_stock/features/notifications/state_holders/notifications_
 import 'package:poster_stock/features/settings/state_holders/change_wallet_state_holder.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 import 'package:poster_stock/features/settings/view/screens/functions_adress_ton.dart';
+import 'package:poster_stock/features/settings/view/screens/html.dart';
 import 'package:poster_stock/features/settings/view/screens/widgets.dart';
 import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_value_state_holder.dart';
@@ -37,7 +38,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 // ignore: depend_on_referenced_packages
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
-import 'html.dart';
 
 @RoutePage()
 class SettingsPage extends ConsumerStatefulWidget {
@@ -63,7 +63,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
     void executeWebView() async {
       final String contentBase64 =
-          base64Encode(const Utf8Encoder().convert(html));
+          base64Encode(const Utf8Encoder().convert(htmlAddess));
       if (_controller == null) {
         await initWebView();
 

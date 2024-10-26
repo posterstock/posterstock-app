@@ -26,6 +26,9 @@ class NftForPoster {
   /// в чем прайс
   final String blocChain;
 
+  /// адрес коллекции
+  final String address;
+
   NftForPoster({
     required this.chain,
     required this.collection,
@@ -36,6 +39,7 @@ class NftForPoster {
     required this.priceReal,
     required this.fee,
     required this.blocChain,
+    required this.address,
   });
 
   factory NftForPoster.fromJson(Map<String, dynamic> json) {
@@ -57,6 +61,7 @@ class NftForPoster {
       priceReal: json['priceReal'] ?? 0,
       fee: json['fee'] ?? 0.3,
       blocChain: json['blocChain'] ?? '',
+      address: json['address'] ?? '',
     );
   }
   factory NftForPoster.fromChain(String chain) {
@@ -70,6 +75,7 @@ class NftForPoster {
       priceReal: 0,
       fee: 0.3,
       blocChain: 'TON',
+      address: '',
     );
   }
 
@@ -84,6 +90,7 @@ class NftForPoster {
       'priceReal': priceReal,
       'fee': fee,
       'blocChain': blocChain,
+      'address': address,
     };
   }
 
@@ -97,6 +104,7 @@ class NftForPoster {
     double? priceReal,
     double? fee,
     String? blocChain,
+    String? address,
   }) {
     return NftForPoster(
       chain: chain ?? this.chain,
@@ -108,6 +116,7 @@ class NftForPoster {
       priceReal: priceReal ?? this.priceReal,
       fee: fee ?? this.fee,
       blocChain: blocChain ?? this.blocChain,
+      address: address ?? this.address,
     );
   }
 
@@ -121,6 +130,7 @@ class NftForPoster {
         price: 0,
         priceReal: 0,
         fee: 0.3,
-        blocChain: 'TON');
+        blocChain: 'TON',
+        address: '');
   }
 }

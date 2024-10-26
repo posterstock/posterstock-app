@@ -63,12 +63,12 @@ dependencies:
   screenshot: ^3.0.0 #https://pub.dev/packages/screenshot
   collection: ^1.18.0 
   qr_flutter: ^4.1.0 #https://pub.dev/packages/qr_flutter 
-  darttonconnect: ^1.0.3 #https://pub.dev/packages/darttonconnect
   qr_code_scanner: ^1.0.1 #https://pub.dev/packages/qr_code_scanner  
   tonutils: ^0.5.6 #https://pub.dev/packages/tonutils
   js: ^0.6.3  #https://pub.dev/packages/js
   webview_flutter: ^4.9.0 #https://pub.dev/packages/webview_flutter
   gradient_borders: ^1.0.1 #https://pub.dev/packages/gradient_borders
+  darttonconnect: ^1.0.3 #https://pub.dev/packages/darttonconnect
   
 
 dev_dependencies:

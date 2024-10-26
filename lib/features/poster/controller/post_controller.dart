@@ -96,13 +96,14 @@ class PostController {
     double price = 0;
     double priceReal = 0;
     String blocChain = 'Ton';
-
+    String address = '';
     if (resultNFT.isNotEmpty) {
       Map<String, dynamic> result = resultNFT.first;
       allCount = resultNFT.length;
       index = result['index'];
       Map<String, dynamic>? sale = result['sale'];
       if (sale != null) {
+        address = sale['address'];
         int temp = int.parse(sale['price']['value']);
         price = temp / pow(10, 9);
         blocChain = sale['price']['token_name'];
@@ -125,6 +126,7 @@ class PostController {
       price: price,
       blocChain: blocChain,
       priceReal: priceReal,
+      address: address,
     ));
     Logger.i('result >>>>>>>>> ${result.toJson()}');
     cachedPostRepository.cachePost(id, result);

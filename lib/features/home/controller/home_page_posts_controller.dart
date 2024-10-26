@@ -31,16 +31,14 @@ class HomePagePostsController {
     if (gettingPosts) return;
     if (!getNewPosts && gotAll) return;
     gettingPosts = true;
+    Logger.i('getNewPosts $getNewPosts');
     if (!gotFirst) {
       final cachedResult = await cachedHomeRepository.getPosts();
       if (cachedResult != null) {
         homePagePostsState.updateStateEnd(cachedResult);
       }
     }
-
     final result = await repository.getPosts(getNesPosts: getNewPosts);
-    PostMovieModel a = result?.$1?.first as PostMovieModel;
-    Logger.i('result>>> ${a.toJson()}');
     if (!gotFirst &&
         !getNewPosts &&
         result?.$1 != null &&

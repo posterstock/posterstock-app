@@ -34,7 +34,7 @@ class TonConnectWidgetState extends State<TonConnectWidget> {
     }
 
     final String contentBase64 =
-        base64Encode(const Utf8Encoder().convert(html));
+        base64Encode(const Utf8Encoder().convert(htmlAddess));
     final WebViewController controller =
         WebViewController.fromPlatformCreationParams(params);
     controller
@@ -80,5 +80,3 @@ class TonConnectWidgetState extends State<TonConnectWidget> {
     return WebViewWidget(controller: _controller);
   }
 }
-
-

@@ -33,7 +33,7 @@ class TonConnectPageState extends State<TonConnectPage> {
       params = const PlatformWebViewControllerCreationParams();
     }
     final String contentBase64 = base64Encode(
-      const Utf8Encoder().convert(html),
+      const Utf8Encoder().convert(htmlAddess),
     );
     final WebViewController controller =
         WebViewController.fromPlatformCreationParams(params);
