@@ -1,7 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:convert';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -16,14 +14,13 @@ import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/common/widgets/custom_scaffold.dart';
+import 'package:poster_stock/features/NFT/models/ton_wallet_service.dart';
 import 'package:poster_stock/features/auth/controllers/auth_controller.dart';
 import 'package:poster_stock/features/auth/controllers/sign_up_controller.dart';
 import 'package:poster_stock/features/edit_profile/api/edit_profile_api.dart';
 import 'package:poster_stock/features/notifications/state_holders/notifications_count_state_holder.dart';
 import 'package:poster_stock/features/settings/state_holders/change_wallet_state_holder.dart';
 import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
-import 'package:poster_stock/features/settings/view/screens/functions_adress_ton.dart';
-import 'package:poster_stock/features/settings/view/screens/html.dart';
 import 'package:poster_stock/features/settings/view/screens/widgets.dart';
 import 'package:poster_stock/features/theme_switcher/controller/theme_controller.dart';
 import 'package:poster_stock/features/theme_switcher/state_holder/theme_value_state_holder.dart';
@@ -34,10 +31,6 @@ import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supertokens_flutter/supertokens.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-// ignore: depend_on_referenced_packages
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 @RoutePage()
 class SettingsPage extends ConsumerStatefulWidget {
@@ -48,32 +41,37 @@ class SettingsPage extends ConsumerStatefulWidget {
 }
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
-  WebViewController? _controller;
+  final tonWallet = TonWalletService();
+  String connectedWallet = '';
+  bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
     ref.read(changeWalletStateHolderProvider.notifier).loadFromLocal();
+    connectedWallet = tonWallet.getWalletAddress();
+    setState(() {});
+  }
+
+  Future<void> handleWalletConnection() async {
+    await tonWallet.init();
+    try {
+      // Подключаем кошелек
+      final isConnected = await tonWallet.connect();
+      if (isConnected) {
+        connectedWallet = tonWallet.getWalletAddress();
+        setState(() {});
+      }
+    } catch (e) {
+      Logger.e('Error connecting wallet: $e');
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = ref.watch(themeValueStateHolderProvider);
-    final wallet = ref.watch(changeWalletStateHolderProvider);
-    bool isWallet = wallet.wallet.isNotEmpty;
-
-    void executeWebView() async {
-      final String contentBase64 =
-          base64Encode(const Utf8Encoder().convert(htmlAddess));
-      if (_controller == null) {
-        await initWebView();
-
-        setState(() {});
-      }
-      if (_controller != null) {
-        _controller!
-            .loadRequest(Uri.parse('data:text/html;base64,$contentBase64'));
-      }
-    }
 
     return CustomScaffold(
       backgroundColor: context.colors.backgroundsSecondary,
@@ -175,9 +173,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                 "Сhanging the email is currently not possible. Please contact support.",
                               ),
                             );
-                            /*ref.watch(router)!.push(
-                        ChangeEmailRoute(),
-                      );*/
                           },
                           child: Row(
                             children: [
@@ -211,11 +206,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         ),
                       const Gap(16),
                       SettingsButton(
-                        onTap: () {
-                          if (!isWallet) {
-                            isWallet = true;
-                          }
-                        },
+                        onTap: () {},
                         child: Row(
                           children: [
                             Text(
@@ -224,28 +215,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                             ),
                             const Spacer(),
                             GestureDetector(
-                              onTap: () {
-                                executeWebView();
-                              },
+                              onTap: isLoading ? null : handleWalletConnection,
                               child: Container(
                                 height: 32,
                                 decoration: BoxDecoration(
                                   color: context.colors.backgroundsPrimary,
                                   borderRadius: BorderRadius.circular(33),
                                 ),
-                                child: isWallet
-                                    ? Text(
-                                        wallet.wallet.length > 12
-                                            ? '${wallet.wallet.substring(0, 6)}...${wallet.wallet.substring(wallet.wallet.length - 6)}'
-                                            : wallet.wallet,
-                                        style: context.textStyles.bodyRegular,
-                                      )
-                                    : AppTextButton(
-                                        onTap: () {
-                                          executeWebView();
-                                        },
-                                        text: context.txt.connect,
-                                      ),
+                                child: AppTextButton(
+                                  onTap:
+                                      isLoading ? null : handleWalletConnection,
+                                  text: connectedWallet.isNotEmpty
+                                      ? '${connectedWallet.substring(0, 6)}...${connectedWallet!.substring(connectedWallet!.length - 4)}'
+                                      : context.txt.connect,
+                                ),
                               ),
                             ),
                           ],
@@ -591,20 +574,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               ],
             ),
           ),
-          if (_controller != null)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                color: Colors.black,
-                width: MediaQuery.of(context).size.width,
-                height: 500,
-                child: WebViewWidget(
-                    controller:
-                        _controller!), // Используем WebView только если _controller инициализирован
-              ),
-            ),
+          isLoading
+              ? Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : const SizedBox(),
         ],
       ),
     );
@@ -639,62 +616,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               theme,
             );
       }
-    }
-  }
-
-  Future<void> initWebView() async {
-    PlatformWebViewControllerCreationParams params;
-    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
-      params = WebKitWebViewControllerCreationParams(
-        allowsInlineMediaPlayback: true,
-        mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
-      );
-    } else {
-      params = const PlatformWebViewControllerCreationParams();
-    }
-
-    try {
-      _controller = WebViewController.fromPlatformCreationParams(params);
-      _controller!
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setNavigationDelegate(
-          NavigationDelegate(
-            onNavigationRequest: (NavigationRequest request) {
-              launchURL(request.url);
-              return NavigationDecision
-                  .prevent; // Предотвращаем загрузку в WebView
-            },
-          ),
-        )
-        ..addJavaScriptChannel(
-          'MessageHandler',
-          onMessageReceived: (JavaScriptMessage message) {
-            setState(() {
-              _controller = null;
-            });
-            Logger.i('Received hex address: ${message.message}');
-            if (message.message.isNotEmpty) {
-              final addressTon = getAddressTon(message.message);
-              ref
-                  .read(changeWalletStateHolderProvider.notifier)
-                  .setWallet(addressTon);
-            }
-            setState(() {
-              _controller = null;
-            });
-          },
-        );
-    } catch (e) {
-      Logger.e('Ошибка при инициализации WebView: $e');
-    }
-  }
-
-  void launchURL(String url) async {
-    try {
-      url = '$url?redirect_uri=https://posterstock.io';
-      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-    } catch (e) {
-      Logger.e('Could not launch URL: $url');
     }
   }
 }
