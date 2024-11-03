@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:darttonconnect/parsers/connect_event.dart';
 import 'package:darttonconnect/provider/bridge_provider.dart';
 import 'package:darttonconnect/ton_connect.dart';
@@ -10,6 +12,8 @@ import 'dart:convert';
 class TonWalletService {
   static final TonWalletService _instance = TonWalletService._internal();
   factory TonWalletService() => _instance;
+  final _connectionStreamController = StreamController<String>.broadcast();
+  Stream<String> get connectionStream => _connectionStreamController.stream;
 
   late TonConnect _connector;
   bool get isConnected => _connector.connected;
@@ -94,8 +98,6 @@ class TonWalletService {
   String getWalletAddress() {
     try {
       if (!isConnected || _connector.account == null) {
-        Logger.e(
-            'TonWalletService: Кошелек не подключен или аккаунт отсутствует');
         return '';
       }
 
@@ -117,6 +119,7 @@ class TonWalletService {
   Future<bool> connect() async {
     try {
       if (isConnected) {
+        _connectionStreamController.add(getWalletAddress());
         return true;
       }
 
@@ -125,20 +128,46 @@ class TonWalletService {
 
       final Uri uri = Uri.parse(universalLink);
       if (await canLaunchUrl(uri)) {
-        bool launched = await launchUrl(uri);
+        bool launched = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
         if (!launched) {
           Logger.e('Не удалось запустить $universalLink');
+          _connectionStreamController.add('');
           return false;
+        }
+        // Добавляем слушатель событий перед подключением
+        final provider = _connector.provider;
+        if (provider is BridgeProvider) {
+          provider.listen((message) {
+            if (message['event'] == 'connect') {
+              // Успешное подключение
+              final address = _connector.account?.address ?? '';
+              _connectionStreamController.add(address);
+            } else if (message['event'] == 'connect_error') {
+              // Ошибка подключения
+              final errorMessage = message['payload']['message'] as String?;
+              Logger.e('Ошибка подключения: $errorMessage');
+              _connectionStreamController.add('');
+            }
+          });
         }
         return true;
       } else {
         Logger.e('Не удалось запустить $universalLink');
+        _connectionStreamController.add('');
         return false;
       }
     } catch (e) {
       Logger.e('Ошибка подключения к кошельку: $e');
+      _connectionStreamController.add('');
       return false;
     }
+  }
+
+  void dispose() {
+    _connectionStreamController.close();
   }
 
   Future<void> disconnect() async {
@@ -158,45 +187,29 @@ class TonWalletService {
         return false;
       }
 
-      final provider = _connector.provider;
-      if (provider is BridgeProvider) {
-        // Сначала закроем текущее подключение
-        provider.closeConnection();
-
-        // Затем восстановим его заново
-        await provider.restoreConnection();
-      }
       // Конвертируем сумму в наноТоны и преобразуем в целое число
       final amountInNano = (amount * 1e9).toInt().toString();
 
-      // Получаем текущее время в секундах и добавляем час для validUntil
-      final int validUntil =
-          (DateTime.now().millisecondsSinceEpoch ~/ 1000) + 3600;
-      final networkId =
-          _connector.account?.chain == CHAIN.testnet ? '-3' : '-239';
+      // Формируем URL для Tonkeeper веб-версии
+      final tonkeeperUrl =
+          'https://app.tonkeeper.com/transfer/$contractAddress?amount=$amountInNano';
+      Logger.i('Tonkeeper URL для транзакции: $tonkeeperUrl');
 
-      final Map<String, dynamic> transaction = {
-        'validUntil': validUntil,
-        'network': CHAIN.mainnet.value,
-        'messages': [
-          {
-            'type': 'transfer',
-            'address': contractAddress,
-            'amount': amountInNano,
-          }
-        ]
-      };
-
-      Logger.i('Подготовленная транзакция: $transaction');
-
-      final result = await _connector.sendTransaction(transaction);
-      Logger.i('Результат NFT транзакции: $result');
-
-      if (result == null || result['boc'] == null) {
-        Logger.e('Ошибка: пустой результат транзакции');
-        return false;
+      final uri = Uri.parse(tonkeeperUrl);
+      if (await canLaunchUrl(uri)) {
+        bool launched = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+        if (!launched) {
+          Logger.e('Не удалось запустить $tonkeeperUrl');
+          return false;
+        }
+        return true;
       }
-      return true;
+
+      Logger.e('Не удалось обработать URL: $tonkeeperUrl');
+      return false;
     } catch (e, stackTrace) {
       Logger.e('Ошибка при отправке NFT транзакции: $e');
       Logger.e('Стек ошибки: $stackTrace');

@@ -1,13 +1,18 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/features/NFT/models/ton_wallet_service.dart';
 import 'package:poster_stock/features/home/models/nft.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
+import 'package:poster_stock/features/poster/view/widgets/button_wide.dart';
+import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class BuyNftDialog extends ConsumerStatefulWidget {
@@ -26,6 +31,8 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
   double paymentAmount = 0;
   int percentCreator = 10;
   int percentService = 5;
+  StreamSubscription? walletSubscription;
+  bool isConnected = true;
 
   @override
   void initState() {
@@ -39,27 +46,59 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
 
   @override
   void dispose() {
+    walletSubscription?.cancel();
     super.dispose();
   }
 
   Future<void> restoreWalletConnection() async {
     await tonWallet.restoreConnection();
+    if (!tonWallet.isConnected) {
+      subscribeToWallet();
+    }
+    isConnected = tonWallet.isConnected;
+    setState(() {});
+  }
+
+  void subscribeToWallet() {
+    walletSubscription = tonWallet.connectionStream.listen((address) {
+      setState(() {
+        isLoading = false;
+      });
+      if (address.isNotEmpty) {
+        isConnected = true;
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBars.build(
+            context,
+            null,
+            "Ошибка подключения кошелька",
+          ),
+        );
+      } else {
+        isConnected = false;
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBars.build(
+            context,
+            null,
+            "Ошибка подключения кошелька",
+          ),
+        );
+      }
+      setState(() {});
+    });
+  }
+
+  Future<void> handleWalletConnection() async {
+    setState(() => isLoading = true);
+    await tonWallet.connect();
   }
 
   Future<void> handleBuyNft() async {
     try {
       setState(() => isLoading = true);
-      Logger.i('isConnected: ${tonWallet.isConnected}');
-      if (!tonWallet.isConnected) {
-        final isConnected = await tonWallet.connect();
-
-        return;
-      } else {
-        await tonWallet.sendNftTransaction(
-          contractAddress: widget.nft.address,
-          amount: paymentAmount,
-        );
-      }
+      await tonWallet.sendNftTransaction(
+        contractAddress: widget.nft.address,
+        amount: paymentAmount,
+      );
     } catch (e) {
       // Добавьте обработку ошибок
       Logger.e('Error handleBuyNft: $e');
@@ -76,7 +115,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16.0),
         child: Container(
-          height: 430,
+          height: isConnected ? 430 : 500,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16.0),
@@ -120,39 +159,22 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
                 ),
               ),
               const Gap(18),
-              GestureDetector(
-                onTap: isLoading ? null : handleBuyNft,
-                child: Container(
-                  height: 51,
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: isLoading
-                        ? context.colors.buttonsPrimary?.withOpacity(0.5)
-                        : context.colors.buttonsPrimary,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: isLoading
-                      ? CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              context.colors.textsBackground!),
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Pay ${paymentAmount.toStringAsFixed(2)}',
-                              style: context.textStyles.calloutBold!.copyWith(
-                                color: context.colors.textsBackground,
-                              ),
-                            ),
-                            const Gap(4),
-                            SvgPicture.asset(
-                              'assets/icons/ton_white.svg',
-                            ),
-                          ],
-                        ),
+              if (!isConnected)
+                PaymentButton(
+                  text: context.txt.connect,
+                  isLoading: isLoading,
+                  paymentAmount: paymentAmount,
+                  onTap: handleWalletConnection,
+                  isTon: false,
                 ),
+              if (!isConnected) const Gap(18),
+              PaymentButton(
+                text: 'Pay ${paymentAmount.toStringAsFixed(2)}',
+                isLoading: isLoading,
+                paymentAmount: paymentAmount,
+                onTap: (isLoading || !isConnected) ? null : handleBuyNft,
+                isTon: true,
+                isTonConnect: !isConnected,
               ),
             ],
           ),

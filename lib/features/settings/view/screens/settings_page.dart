@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +46,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   final tonWallet = TonWalletService();
   String connectedWallet = '';
   bool isLoading = false;
+  StreamSubscription? walletSubscription;
 
   @override
   void initState() {
@@ -51,9 +54,49 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     ref.read(changeWalletStateHolderProvider.notifier).loadFromLocal();
     connectedWallet = tonWallet.getWalletAddress();
     setState(() {});
+    subscribeToWallet();
+  }
+
+  void subscribeToWallet() {
+    walletSubscription = tonWallet.connectionStream.listen((address) {
+      setState(() {
+        isLoading = false;
+      });
+      if (address.isNotEmpty) {
+        Logger.i('Кошелек успешно подключен: $address');
+        connectedWallet = address;
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBars.build(
+            context,
+            null,
+            "Кошелек успешно подключен",
+          ),
+        );
+      } else {
+        Logger.i('Ошибка подключения кошелька');
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBars.build(
+            context,
+            null,
+            "Ошибка подключения кошелька",
+          ),
+        );
+      }
+      Logger.e('Кошелек: $address');
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    if (walletSubscription != null) {
+      walletSubscription?.cancel();
+    }
+    super.dispose();
   }
 
   Future<void> handleWalletConnection() async {
+    setState(() => isLoading = true);
     await tonWallet.init();
     try {
       // Подключаем кошелек
@@ -226,7 +269,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                   onTap:
                                       isLoading ? null : handleWalletConnection,
                                   text: connectedWallet.isNotEmpty
-                                      ? '${connectedWallet.substring(0, 6)}...${connectedWallet!.substring(connectedWallet!.length - 4)}'
+                                      ? '${connectedWallet.substring(2, 8)}...${connectedWallet.substring(connectedWallet.length - 4)}'
                                       : context.txt.connect,
                                 ),
                               ),

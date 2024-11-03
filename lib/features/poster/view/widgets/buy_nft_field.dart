@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:darttonconnect/exceptions.dart';
-import 'package:darttonconnect/models/wallet_app.dart';
 import 'package:darttonconnect/parsers/connect_event.dart';
-import 'package:darttonconnect/parsers/send_transaction.dart';
 import 'package:darttonconnect/provider/bridge_provider.dart';
 import 'package:darttonconnect/storage/default_storage.dart';
 import 'package:darttonconnect/storage/interface.dart';
@@ -13,12 +11,10 @@ import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
-import 'package:poster_stock/features/home/models/nft.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/poster/view/widgets/buynft_dialog.dart';
 import 'package:poster_stock/features/settings/state_holders/change_wallet_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class BuyNftField extends ConsumerStatefulWidget {
   final PostMovieModel post;
@@ -190,7 +186,7 @@ class BuyNftFieldState extends ConsumerState<BuyNftField> {
             ),
             AppTextButton(
               onTap: () async {
-                bool isShow = await showModalBottomSheet(
+                await showModalBottomSheet(
                   context: context,
                   backgroundColor: Colors.transparent,
                   isScrollControlled: true,
@@ -198,93 +194,6 @@ class BuyNftFieldState extends ConsumerState<BuyNftField> {
                   builder: (context) => BuyNftDialog(nft: widget.post.nft),
                 );
                 return;
-                // final TonConnect connector =
-                //     TonConnect('https://posterstock.com/tonconnect_ps.json');
-                NftForPoster nft = widget.post.nft;
-                int amount = ((nft.price + 0.1) * 1e9).toInt();
-                final transaction = {
-                  // "valid_until": 0,
-                  "messages": [
-                    {
-                      "type": "transfer",
-                      "address": nft.address,
-                      "amount": amount.toString(),
-                    }
-                  ]
-                };
-                try {
-                  const Map<String, dynamic> walletConnectionSource = {
-                    "app_name": "tonkeeper",
-                    "name": "Tonkeeper",
-                    "image": "https://tonkeeper.com/assets/tonconnect-icon.png",
-                    "tondns": "tonkeeper.ton",
-                    "about_url": "https://tonkeeper.com",
-                    "universal_url": "https://app.tonkeeper.com/ton-connect",
-                    "deepLink": "tonkeeper-tc://",
-                    "bridge": [
-                      {"type": "sse", "url": "https://bridge.tonapi.io/bridge"},
-                      {"type": "js", "key": "tonkeeper"}
-                    ],
-                    "platforms": [
-                      "ios",
-                      "android",
-                      "chrome",
-                      "firefox",
-                      "macos"
-                    ]
-                  };
-                  WalletApp walletApp = WalletApp(
-                    aboutUrl: walletConnectionSource['about_url'],
-                    bridgeUrl: walletConnectionSource['bridge'][0]['url'],
-                    image: walletConnectionSource['image'],
-                    name: walletConnectionSource['name'],
-                    universalUrl: walletConnectionSource['universal_url'],
-                  );
-
-                  if (connector != null && !connector!.connected) {
-                    final universalLink = await connector!.connect(walletApp);
-                    Logger.i('universalLink >>>>>>>>>>>> $universalLink}');
-                    final Uri uri = Uri.parse(universalLink);
-                    if (await canLaunchUrl(uri)) {
-                      bool launched = await launchUrl(uri);
-                      if (!launched) {
-                        Logger.e('Не удалось запустить $universalLink');
-                      }
-                    } else {
-                      Logger.e('Не удалось запустить $universalLink');
-                    }
-                    // bool isConnected = await waitForConnection(60);
-                    // if (isConnected) {
-                    //   Logger.i('sendTransaction1 $provider');
-                    //   // await connector!.sendTransaction(transaction);
-                    //   Map<String, dynamic> response = await provider!
-                    //       .sendRequest(SendTransactionParser()
-                    //           .convertToRpcRequest(transaction));
-                    //   Logger.e('response >>>>>>>>>>>> $response');
-                    // } else {
-                    //   Logger.e(
-                    //       'Не удалось установить соединение в течение 60 секунд');
-                    // }
-                  } else {
-                    final st = await connector!.sendTransaction(transaction);
-                    Logger.e('connector sendTransaction >>>>>>>>>>>> $st}');
-                    // provider = BridgeProvider(storage,
-                    //     wallet: walletInfo as WalletApp?);
-                    // provider!.listen(walletEventsListener);
-                    // Logger.i('sendTransaction2 $provider');
-                    // Map<String, dynamic> response = await provider!.sendRequest(
-                    //     SendTransactionParser()
-                    //         .convertToRpcRequest(transaction));
-                    // Logger.e('response >>>>>>>>>>>> $response');
-                  }
-                } catch (e) {
-                  if (e is UserRejectsError) {
-                    Logger.i(
-                        'You rejected the transaction. Please confirm it to send to the blockchain');
-                  } else {
-                    Logger.e('Ошибка при отправке транзакции2 $e');
-                  }
-                }
               },
               text: context.txt.buy,
             ),
