@@ -29,13 +29,13 @@ class ChosenLanguageStateHolder extends StateNotifier<Languages?> {
         state = Languages.russian();
         break;
       case 'Deutsch' || 'de_DE':
-        state = Languages.russian();
+        state = Languages.german();
         break;
       case 'Français' || 'fr_FR':
-        state = Languages.russian();
+        state = Languages.french();
         break;
       case 'Türkçe' || 'tr_TR':
-        state = Languages.russian();
+        state = Languages.turkish();
         break;
     }
 

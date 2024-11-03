@@ -38,7 +38,7 @@ class HomePageApi implements IHomePageApi {
   }
 
   @override
-  Future<(Map<String, dynamic>?, bool)?> getPosts(
+  Future<(Map<String, dynamic>?, bool)?> getPosts(String lang,
       {bool getNewPosts = false}) async {
     if (loadedAll && !getNewPosts) return null;
     try {
@@ -46,6 +46,7 @@ class HomePageApi implements IHomePageApi {
           options: Options(headers: {'Authorization': 'Bearer $token'}),
           queryParameters: {
             'cursor': getNewPosts ? null : postsCursor,
+            'lang': lang,
           });
       Logger.i('getPosts  ${response.data}');
       if (!getNewPosts && !(response.data['has_more'] as bool)) {

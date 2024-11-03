@@ -10,10 +10,10 @@ class HomePagePostsRepository implements IHomePagePostsRepository {
   final IHomePageApi api = HomePageApi();
 
   @override
-  Future<(List<PostBaseModel>?, bool)?> getPosts(
+  Future<(List<PostBaseModel>?, bool)?> getPosts(String lang,
       {bool getNesPosts = false}) async {
     try {
-      final apiResult = await api.getPosts(getNewPosts: getNesPosts);
+      final apiResult = await api.getPosts(lang, getNewPosts: getNesPosts);
       if (apiResult == null) return null;
       List<PostBaseModel> result = [];
       final list = apiResult.$1?['entries'] ?? [];

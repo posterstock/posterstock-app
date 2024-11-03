@@ -4,11 +4,13 @@ import 'package:poster_stock/features/home/repository/cached_home_repository.dar
 import 'package:poster_stock/features/home/repository/home_page_posts_repository.dart';
 import 'package:poster_stock/features/home/repository/i_home_page_posts_repository.dart';
 import 'package:poster_stock/features/home/state_holders/home_page_posts_state_holder.dart';
+import 'package:poster_stock/features/settings/state_holders/chosen_language_state_holder.dart';
 
 final homePagePostsControllerProvider = Provider<HomePagePostsController>(
   (ref) => HomePagePostsController(
     homePagePostsState: ref.watch(homePagePostsStateHolderProvider.notifier),
     repository: HomePagePostsRepository(),
+    ref: ref,
   ),
 );
 
@@ -16,6 +18,7 @@ class HomePagePostsController {
   final HomePagePostsStateHolder homePagePostsState;
   final IHomePagePostsRepository repository;
   final CachedHomeRepository cachedHomeRepository = CachedHomeRepository();
+  final Ref ref;
 
   bool gettingPosts = false;
   bool gotAll = false;
@@ -24,9 +27,11 @@ class HomePagePostsController {
   HomePagePostsController({
     required this.homePagePostsState,
     required this.repository,
+    required this.ref,
   });
 
   Future<void> getPosts({bool getNewPosts = false}) async {
+    final appLocale = ref.watch(chosenLanguageStateHolder);
     if (gettingPosts) return;
     if (!getNewPosts && gotAll) return;
     gettingPosts = true;
@@ -36,7 +41,12 @@ class HomePagePostsController {
         homePagePostsState.updateStateEnd(cachedResult);
       }
     }
-    final result = await repository.getPosts(getNesPosts: getNewPosts);
+    String lang =
+        (appLocale?.locale.toString() ?? 'ru_RU').replaceAll('_', '-');
+    //TODO: remove after testing
+    if (lang != 'ru-RU') lang = 'en-US';
+    Logger.e('lang  $lang ');
+    final result = await repository.getPosts(lang, getNesPosts: getNewPosts);
     if (!gotFirst &&
         !getNewPosts &&
         result?.$1 != null &&
