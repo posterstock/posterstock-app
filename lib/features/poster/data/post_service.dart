@@ -222,6 +222,31 @@ class PostService {
     }
   }
 
+  Future nftSell(String id) async {
+    try {
+      final response = await _dio.post(
+        '/api/posters/onchain/sell',
+        options: Options(
+          contentType: 'application/json',
+          headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+        ),
+        data: jsonEncode({
+          'tx_id': id,
+          'lang': 'en-US',
+        }),
+      );
+      Logger.i('nftSell ${response.data}');
+    } on DioError catch (e) {
+      Logger.e('Ошибка при отправке транзакции для нфт $e');
+      Logger.e(e.response?.headers);
+      rethrow;
+    }
+  }
+
+  /// получение nft по адресу
   Future<List<Map<String, dynamic>>> getNFT(String address) async {
     try {
       // Формирование URL для запроса

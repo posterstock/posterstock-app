@@ -19,7 +19,7 @@ class AccountNetwork {
       final response = await _dio.get('api/profiles/');
       return ProfileMapper.fromJson(response.data);
     } on DioError catch (e) {
-      Logger.e('Ошибка при получении профиля $e');
+      Logger.e('AccountNetwork getProfileInfo Ошибка при получении профиля $e');
       rethrow;
     } catch (e) {
       rethrow;

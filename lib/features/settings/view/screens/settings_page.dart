@@ -47,14 +47,30 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   String connectedWallet = '';
   bool isLoading = false;
   StreamSubscription? walletSubscription;
+  bool isTonWalletConnected = false;
 
   @override
   void initState() {
     super.initState();
     ref.read(changeWalletStateHolderProvider.notifier).loadFromLocal();
-    connectedWallet = tonWallet.getWalletAddress();
+    isTonWalletConnected = tonWallet.isConnected;
+    if (!isTonWalletConnected) {
+      restoreTonWalletConnection();
+    }
+
     setState(() {});
     subscribeToWallet();
+  }
+
+  Future<void> restoreTonWalletConnection() async {
+    bool restored = await tonWallet.restoreConnection();
+    double balance = await tonWallet.getWalletBalance();
+    if (restored) {
+      connectedWallet = tonWallet.getWalletAddress();
+    }
+    Logger.e(
+        'connectedWallet >>>>>>>>> $balance $isTonWalletConnected $connectedWallet ');
+    setState(() {});
   }
 
   void subscribeToWallet() {

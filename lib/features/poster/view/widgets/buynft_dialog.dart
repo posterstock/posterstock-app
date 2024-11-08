@@ -27,20 +27,30 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
   final tonWallet = TonWalletService();
   bool isLoading = false;
   double price = 0;
-  double fee = 0.3;
+  double fee = 0.1;
   double paymentAmount = 0;
-  int percentCreator = 10;
-  int percentService = 5;
+  int percentCreator = 0;
+  int percentService = 0;
   StreamSubscription? walletSubscription;
   bool isConnected = true;
+  double balance = 0;
+  bool isBalanceEnough = false;
 
   @override
   void initState() {
     super.initState();
     price = widget.nft.price;
-    fee = widget.nft.fee;
-    double creatorRoyalty = (price * percentCreator) / 100;
-    paymentAmount = price + fee + creatorRoyalty;
+
+    // TODO: добавить fee из nft
+    // fee = widget.nft.fee;
+    percentCreator = (widget.nft.royalty * 100).toInt();
+    percentService = (widget.nft.serviceFee * 100).toInt();
+    paymentAmount = price +
+        (price * widget.nft.royalty) +
+        (price * widget.nft.serviceFee) +
+        fee;
+    balance = tonWallet.getBalance;
+    isBalanceEnough = balance < paymentAmount;
     restoreWalletConnection();
   }
 
@@ -96,8 +106,9 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
     try {
       setState(() => isLoading = true);
       await tonWallet.sendNftTransaction(
-        contractAddress: widget.nft.address,
+        nftAddress: widget.nft.nftAddress,
         amount: paymentAmount,
+        contractAddress: widget.nft.contractAdress,
       );
     } catch (e) {
       // Добавьте обработку ошибок
@@ -109,13 +120,15 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
 
   @override
   Widget build(BuildContext context) {
+    double height = isConnected ? 480 : 500;
+
     return Padding(
       padding:
           EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16.0),
         child: Container(
-          height: isConnected ? 430 : 500,
+          height: height,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16.0),
@@ -158,8 +171,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
                   ],
                 ),
               ),
-              const Gap(18),
-              if (!isConnected)
+              if (!isConnected) ...[
                 PaymentButton(
                   text: context.txt.connect,
                   isLoading: isLoading,
@@ -167,7 +179,19 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
                   onTap: handleWalletConnection,
                   isTon: false,
                 ),
-              if (!isConnected) const Gap(18),
+                const Gap(18),
+              ],
+              const Gap(10),
+              Text(
+                isBalanceEnough
+                    ? 'Не хватает средств на вашем счету, ваш баланс: ${balance.toStringAsFixed(2)}'
+                    : 'Ваш баланс: ${balance.toStringAsFixed(2)}',
+                style: context.textStyles.caption1!.copyWith(
+                    color: isBalanceEnough
+                        ? context.colors.textsError
+                        : context.colors.textsPrimary),
+              ),
+              const Gap(10),
               PaymentButton(
                 text: 'Pay ${paymentAmount.toStringAsFixed(2)}',
                 isLoading: isLoading,

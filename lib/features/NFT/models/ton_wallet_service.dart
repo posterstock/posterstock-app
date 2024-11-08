@@ -4,6 +4,7 @@ import 'package:darttonconnect/parsers/connect_event.dart';
 import 'package:darttonconnect/provider/bridge_provider.dart';
 import 'package:darttonconnect/ton_connect.dart';
 import 'package:darttonconnect/models/wallet_app.dart';
+import 'package:poster_stock/features/poster/data/post_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:http/http.dart' as http;
@@ -17,6 +18,8 @@ class TonWalletService {
 
   late TonConnect _connector;
   bool get isConnected => _connector.connected;
+  double get getBalance => balance;
+  double balance = 0;
 
   // Конфигурация Tonkeeper
   static const Map<String, dynamic> tonkeeperConfig = {
@@ -82,7 +85,7 @@ class TonWalletService {
         Logger.i('Адрес кошелька: ${_connector.account?.address}');
 
         // Получаем баланс
-        final balance = await getWalletBalance();
+        balance = await getWalletBalance();
         Logger.i('Баланс кошелька: $balance TON');
       }
 
@@ -180,6 +183,7 @@ class TonWalletService {
   Future<bool> sendNftTransaction({
     required String contractAddress,
     required double amount,
+    required String nftAddress,
   }) async {
     try {
       if (!isConnected) {
@@ -205,7 +209,16 @@ class TonWalletService {
           Logger.e('Не удалось запустить $tonkeeperUrl');
           return false;
         }
-        return true;
+        // После успешной отправки транзакции вызываем nftSell
+        try {
+          final postService = PostService();
+          await postService.nftSell(nftAddress);
+          Logger.i('NFT успешно помечен как проданный');
+          return true;
+        } catch (e) {
+          Logger.e('Ошибка при вызове nftSell: $e');
+          return false;
+        }
       }
 
       Logger.e('Не удалось обработать URL: $tonkeeperUrl');

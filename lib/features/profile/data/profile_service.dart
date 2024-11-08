@@ -78,7 +78,8 @@ class ProfileService {
           final response = await _dio.get('api/profiles/');
           return response.data;
         } on DioError catch (e) {
-          Logger.e('Ошибка при получении профиля $e');
+          Logger.e(
+              'ProfileService getProfileInfo Ошибка при получении профиля $e');
         } catch (e) {
           rethrow;
         }

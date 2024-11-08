@@ -12,6 +12,7 @@ import 'package:poster_stock/features/poster/state_holder/poster_state_holder.da
 import 'package:poster_stock/features/profile/repository/profile_repository.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:http/http.dart' as http;
+import 'package:tonutils/tonutils.dart' as ton;
 
 final postControllerProvider = Provider<PostController>(
   (ref) => PostController(
@@ -81,28 +82,44 @@ class PostController {
   Future<void> getPost(final int id) async {
     if (loadingPost) return;
     loadingPost = true;
-    var result = await cachedPostRepository.getPost(id);
-    if (result != null) {
-      result = await _prepareData(result, cached: true);
-      await posterStateHolder.updateState(result);
+    var resultNft = await cachedPostRepository.getPost(id);
+    if (resultNft != null) {
+      resultNft = await _prepareData(resultNft, cached: true);
+      await posterStateHolder.updateState(resultNft);
       loadingPost = false;
     }
 
-    result = await postRepository.getPost(id);
-    final List<Map<String, dynamic>> resultNFT =
-        await postRepository.getNFT(result.nft.collection);
+    resultNft = await postRepository.getPost(id);
+    final List<Map<String, dynamic>> resultNFTs =
+        await postRepository.getNFT(resultNft.nft.collection);
+
     int index = 1;
     int allCount = 1;
     double price = 0;
     double priceReal = 0;
     String blocChain = 'Ton';
     String address = '';
-    if (resultNFT.isNotEmpty) {
-      Map<String, dynamic> result = resultNFT.first;
-      allCount = resultNFT.length;
+    double serviceFee = 0;
+    double royalty = 0;
+    String nftAddress = '';
+
+    if (resultNFTs.isNotEmpty) {
+      Map<String, dynamic> result = resultNFTs.first;
+
+      for (var item in resultNFTs) {
+        Logger.i('item >>>>>>>>> $item');
+        Logger.i('sale >>>>>>>>> ${item['sale']}');
+        if (item['sale'] != null) {
+          result = item;
+          nftAddress = item['address'];
+          break;
+        }
+      }
+      allCount = resultNFTs.length;
       index = result['index'];
       Map<String, dynamic>? sale = result['sale'];
       if (sale != null) {
+        Logger.i('sale >>>>>>>>> $sale');
         address = sale['address'];
         int temp = int.parse(sale['price']['value']);
         price = temp / pow(10, 9);
@@ -116,23 +133,74 @@ class PostController {
         } else {
           Logger.e('Ошибка при получении курса: ${response.statusCode}');
         }
+
+        try {
+          // Получаем serviceFee и royalty через GraphQL запрос
+          var graphqlEndpoint = Uri.parse('https://api.getgems.io/graphql');
+          graphqlEndpoint = Uri.parse('https://api.testnet.getgems.io/graphql');
+
+          final formattedAddress = ton
+              .address(address)
+              .toString(isTestOnly: true, isUrlSafe: true, isBounceable: true);
+
+          Logger.e('Formatted address: $formattedAddress');
+
+          const query = '''
+    query NftFixPriceSaleCalculateFee(\$nftAddress: String!) {
+      nftFixPriceSaleCalculateFee(nftAddress: \$nftAddress) {
+        marketplaceFee
+        royaltyPercent
       }
     }
-
-    result = result.copyWith(
-        nft: result.nft.copyWith(
+  ''';
+          Logger.i('query >>>>>>>>> $query');
+          final response = await http.post(
+            graphqlEndpoint,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'query': query,
+              'variables': {
+                'nftAddress': resultNft.nft.collection,
+                'first': null,
+              },
+            }),
+          );
+          Logger.e('response >>>>>>>>> ${response.body}');
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            serviceFee = data['data']['nftFixPriceSaleCalculateFee']
+                    ['marketplaceFee'] ??
+                0.0;
+            royalty = data['data']['nftFixPriceSaleCalculateFee']
+                    ['royaltyPercent'] ??
+                0.0;
+          } else {
+            Logger.e(
+                'Ошибка при получении serviceFee и royalty: ${response.statusCode}');
+          }
+        } catch (e) {
+          Logger.e('Ошибка при получении serviceFee и royalty: $e');
+        }
+      }
+    }
+    Logger.i('serviceFee >>>>>>>>> $serviceFee');
+    Logger.i('royalty >>>>>>>>> $royalty');
+    resultNft = resultNft.copyWith(
+        nft: resultNft.nft.copyWith(
       allCount: allCount,
       number: ++index,
       price: price,
       blocChain: blocChain,
       priceReal: priceReal,
       address: address,
+      serviceFee: serviceFee,
+      royalty: royalty,
+      nftAddress: nftAddress,
     ));
-    Logger.i('result >>>>>>>>> ${result.toJson()}');
-    cachedPostRepository.cachePost(id, result);
-    cachedPostRepository.cachePost(id, result);
-    result = await _prepareData(result);
-    await posterStateHolder.updateState(result);
+    cachedPostRepository.cachePost(id, resultNft);
+    cachedPostRepository.cachePost(id, resultNft);
+    resultNft = await _prepareData(resultNft);
+    await posterStateHolder.updateState(resultNft);
     loadingPost = false;
   }
 
@@ -146,7 +214,6 @@ class PostController {
       hasInCollection = await postRepository.getInCollection(tmdbId);
       cachedPostRepository.cacheCollection(tmdbId, hasInCollection);
     }
-
     return result.copyWith(hasInCollection: hasInCollection);
   }
 

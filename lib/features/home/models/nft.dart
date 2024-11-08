@@ -27,7 +27,16 @@ class NftForPoster {
   final String blocChain;
 
   /// адрес коллекции
-  final String address;
+  final String contractAdress;
+
+  /// адрес нфт
+  final String nftAddress;
+
+  /// комиссия сервиса
+  final double serviceFee;
+
+  /// роялти
+  final double royalty;
 
   NftForPoster({
     required this.chain,
@@ -39,7 +48,10 @@ class NftForPoster {
     required this.priceReal,
     required this.fee,
     required this.blocChain,
-    required this.address,
+    required this.contractAdress,
+    required this.serviceFee,
+    required this.royalty,
+    required this.nftAddress,
   });
 
   factory NftForPoster.fromJson(Map<String, dynamic> json) {
@@ -61,7 +73,10 @@ class NftForPoster {
       priceReal: json['priceReal'] ?? 0,
       fee: json['fee'] ?? 0.3,
       blocChain: json['blocChain'] ?? '',
-      address: json['address'] ?? '',
+      contractAdress: json['address'] ?? '',
+      serviceFee: json['serviceFee'] ?? 0,
+      royalty: json['royalty'] ?? 0,
+      nftAddress: json['nft_address'] ?? '',
     );
   }
   factory NftForPoster.fromChain(String chain) {
@@ -75,7 +90,10 @@ class NftForPoster {
       priceReal: 0,
       fee: 0.3,
       blocChain: 'TON',
-      address: '',
+      contractAdress: '',
+      serviceFee: 0,
+      royalty: 0,
+      nftAddress: '',
     );
   }
 
@@ -90,7 +108,10 @@ class NftForPoster {
       'priceReal': priceReal,
       'fee': fee,
       'blocChain': blocChain,
-      'address': address,
+      'address': contractAdress,
+      'serviceFee': serviceFee,
+      'royalty': royalty,
+      'nft_address': nftAddress,
     };
   }
 
@@ -105,6 +126,9 @@ class NftForPoster {
     double? fee,
     String? blocChain,
     String? address,
+    double? serviceFee,
+    double? royalty,
+    String? nftAddress,
   }) {
     return NftForPoster(
       chain: chain ?? this.chain,
@@ -116,21 +140,28 @@ class NftForPoster {
       priceReal: priceReal ?? this.priceReal,
       fee: fee ?? this.fee,
       blocChain: blocChain ?? this.blocChain,
-      address: address ?? this.address,
+      contractAdress: address ?? this.contractAdress,
+      serviceFee: serviceFee ?? this.serviceFee,
+      royalty: royalty ?? this.royalty,
+      nftAddress: nftAddress ?? this.nftAddress,
     );
   }
 
   factory NftForPoster.init() {
     return NftForPoster(
-        chain: '',
-        collection: '',
-        nft: '',
-        number: 0,
-        allCount: 0,
-        price: 0,
-        priceReal: 0,
-        fee: 0.3,
-        blocChain: 'TON',
-        address: '');
+      chain: '',
+      collection: '',
+      nft: '',
+      number: 0,
+      allCount: 0,
+      price: 0,
+      priceReal: 0,
+      fee: 0.3,
+      blocChain: 'TON',
+      contractAdress: '',
+      serviceFee: 0,
+      royalty: 0,
+      nftAddress: '',
+    );
   }
 }

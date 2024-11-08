@@ -130,7 +130,6 @@ class ListService {
   }
 
   Future<void> changeDefaultLang(String lang) async {
-    Logger.e('changeDefaultLang $lang');
     //TODO: remove after testing
     if (lang != 'ru-RU') lang = 'en-US';
     try {
