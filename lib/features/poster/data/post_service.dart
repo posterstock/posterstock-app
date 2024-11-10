@@ -223,9 +223,10 @@ class PostService {
   }
 
   Future nftSell(String id) async {
+    Logger.i('id >>>>>>>>> $id');
     try {
       final response = await _dio.post(
-        '/api/posters/onchain/sell',
+        'api/posters/onchain/sell',
         options: Options(
           contentType: 'application/json',
           headers: {
@@ -241,6 +242,9 @@ class PostService {
       Logger.i('nftSell ${response.data}');
     } on DioError catch (e) {
       Logger.e('Ошибка при отправке транзакции для нфт $e');
+      Logger.e(
+          'Тело ответа: ${e.response?.data}'); // Добавляем логирование тела ответа
+      Logger.e('Статус ответа: ${e.response?.statusCode}');
       Logger.e(e.response?.headers);
       rethrow;
     }

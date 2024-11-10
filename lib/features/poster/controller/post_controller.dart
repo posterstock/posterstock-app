@@ -165,7 +165,6 @@ class PostController {
               },
             }),
           );
-          Logger.e('response >>>>>>>>> ${response.body}');
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
             serviceFee = data['data']['nftFixPriceSaleCalculateFee']
@@ -183,8 +182,6 @@ class PostController {
         }
       }
     }
-    Logger.i('serviceFee >>>>>>>>> $serviceFee');
-    Logger.i('royalty >>>>>>>>> $royalty');
     resultNft = resultNft.copyWith(
         nft: resultNft.nft.copyWith(
       allCount: allCount,

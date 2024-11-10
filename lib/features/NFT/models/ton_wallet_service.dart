@@ -20,6 +20,10 @@ class TonWalletService {
   bool get isConnected => _connector.connected;
   double get getBalance => balance;
   double balance = 0;
+  final _transactionStreamController =
+      StreamController<TransactionStatus>.broadcast();
+  Stream<TransactionStatus> get transactionStream =>
+      _transactionStreamController.stream;
 
   // Конфигурация Tonkeeper
   static const Map<String, dynamic> tonkeeperConfig = {
@@ -144,6 +148,7 @@ class TonWalletService {
         final provider = _connector.provider;
         if (provider is BridgeProvider) {
           provider.listen((message) {
+            Logger.i('message >>>>>>>>> $message');
             if (message['event'] == 'connect') {
               // Успешное подключение
               final address = _connector.account?.address ?? '';
@@ -187,17 +192,16 @@ class TonWalletService {
   }) async {
     try {
       if (!isConnected) {
+        _transactionStreamController.add(TransactionStatus.failed);
         Logger.e('Кошелек не подключен');
         return false;
       }
 
-      // Конвертируем сумму в наноТоны и преобразуем в целое число
       final amountInNano = (amount * 1e9).toInt().toString();
-
-      // Формируем URL для Tonkeeper веб-версии
       final tonkeeperUrl =
           'https://app.tonkeeper.com/transfer/$contractAddress?amount=$amountInNano';
-      Logger.i('Tonkeeper URL для транзакции: $tonkeeperUrl');
+
+      _transactionStreamController.add(TransactionStatus.pending);
 
       final uri = Uri.parse(tonkeeperUrl);
       if (await canLaunchUrl(uri)) {
@@ -205,27 +209,39 @@ class TonWalletService {
           uri,
           mode: LaunchMode.externalApplication,
         );
+
         if (!launched) {
-          Logger.e('Не удалось запустить $tonkeeperUrl');
+          _transactionStreamController.add(TransactionStatus.failed);
           return false;
         }
-        // После успешной отправки транзакции вызываем nftSell
-        try {
-          final postService = PostService();
-          await postService.nftSell(nftAddress);
-          Logger.i('NFT успешно помечен как проданный');
-          return true;
-        } catch (e) {
-          Logger.e('Ошибка при вызове nftSell: $e');
-          return false;
+
+        // Добавляем слушатель событий для транзакции
+        final provider = _connector.provider;
+        if (provider is BridgeProvider) {
+          provider.listen((message) {
+            Logger.i('Transaction message >>>>>>>>> $message');
+            if (message['event'] == 'transaction') {
+              try {
+                _transactionStreamController.add(TransactionStatus.success);
+              } catch (e) {
+                Logger.e('Ошибка при вызове nftSell: $e');
+                _transactionStreamController.add(TransactionStatus.failed);
+              }
+            } else if (message['event'] == 'transaction_error') {
+              final errorMessage = message['payload']['message'] as String?;
+              Logger.e('Ошибка транзакции: $errorMessage');
+              _transactionStreamController.add(TransactionStatus.failed);
+            }
+          });
         }
+        return true;
       }
 
-      Logger.e('Не удалось обработать URL: $tonkeeperUrl');
+      _transactionStreamController.add(TransactionStatus.failed);
       return false;
-    } catch (e, stackTrace) {
+    } catch (e) {
+      _transactionStreamController.add(TransactionStatus.failed);
       Logger.e('Ошибка при отправке NFT транзакции: $e');
-      Logger.e('Стек ошибки: $stackTrace');
       return false;
     }
   }
@@ -275,3 +291,6 @@ class TonWalletService {
     }
   }
 }
+
+// Добавьте enum для статусов транзакции
+enum TransactionStatus { success, failed, pending }

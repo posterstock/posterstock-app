@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:poster_stock/common/widgets/app_text_button.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
+import 'package:poster_stock/features/poster/controller/post_controller.dart';
 import 'package:poster_stock/features/poster/view/widgets/buynft_dialog.dart';
 import 'package:poster_stock/features/settings/state_holders/change_wallet_state_holder.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -191,7 +192,12 @@ class BuyNftFieldState extends ConsumerState<BuyNftField> {
                   backgroundColor: Colors.transparent,
                   isScrollControlled: true,
                   useSafeArea: true,
-                  builder: (context) => BuyNftDialog(nft: widget.post.nft),
+                  builder: (context) => BuyNftDialog(
+                    nft: widget.post.nft,
+                    onClose: () => ref
+                        .read(postControllerProvider)
+                        .getPost(widget.post.id),
+                  ),
                 );
                 return;
               },

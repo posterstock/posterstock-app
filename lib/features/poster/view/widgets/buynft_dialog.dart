@@ -11,13 +11,19 @@ import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/features/NFT/models/ton_wallet_service.dart';
 import 'package:poster_stock/features/home/models/nft.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
+import 'package:poster_stock/features/poster/data/post_service.dart';
 import 'package:poster_stock/features/poster/view/widgets/button_wide.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
 
 class BuyNftDialog extends ConsumerStatefulWidget {
   final NftForPoster nft;
-  const BuyNftDialog({Key? key, required this.nft}) : super(key: key);
+  final VoidCallback onClose;
+  const BuyNftDialog({
+    Key? key,
+    required this.nft,
+    required this.onClose,
+  }) : super(key: key);
 
   @override
   ConsumerState<BuyNftDialog> createState() => _CreatePosterDialogState();
@@ -32,15 +38,30 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
   int percentCreator = 0;
   int percentService = 0;
   StreamSubscription? walletSubscription;
-  bool isConnected = true;
+  bool isTonWalletConnected = true;
   double balance = 0;
   bool isBalanceEnough = false;
 
   @override
   void initState() {
     super.initState();
-    price = widget.nft.price;
+    start();
+  }
 
+  @override
+  void dispose() {
+    walletSubscription?.cancel();
+    super.dispose();
+  }
+
+  Future start() async {
+    setState(() => isLoading = true);
+    await tonWallet.restoreConnection();
+    isTonWalletConnected = tonWallet.isConnected;
+    if (!isTonWalletConnected) {
+      return;
+    }
+    price = widget.nft.price;
     // TODO: добавить fee из nft
     // fee = widget.nft.fee;
     percentCreator = (widget.nft.royalty * 100).toInt();
@@ -51,22 +72,31 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
         fee;
     balance = tonWallet.getBalance;
     isBalanceEnough = balance < paymentAmount;
-    restoreWalletConnection();
-  }
-
-  @override
-  void dispose() {
-    walletSubscription?.cancel();
-    super.dispose();
-  }
-
-  Future<void> restoreWalletConnection() async {
-    await tonWallet.restoreConnection();
-    if (!tonWallet.isConnected) {
-      subscribeToWallet();
-    }
-    isConnected = tonWallet.isConnected;
-    setState(() {});
+    isTonWalletConnected = tonWallet.isConnected;
+    setState(() => isLoading = false);
+    // Подписываемся на статус транзакции
+    walletSubscription = tonWallet.transactionStream.listen((status) {
+      if (!mounted) return; // Проверяем, что виджет все еще в дереве
+      setState(() {
+        switch (status) {
+          case TransactionStatus.success:
+            scaffoldMessengerKey.currentState?.showSnackBar(
+              SnackBars.build(context, null, "Транзакция успешно выполнена"),
+            );
+            Navigator.pop(context);
+            break;
+          case TransactionStatus.failed:
+            scaffoldMessengerKey.currentState?.showSnackBar(
+              SnackBars.build(
+                  context, null, "Ошибка при выполнении транзакции"),
+            );
+            break;
+          case TransactionStatus.pending:
+            // Показать индикатор загрузки
+            break;
+        }
+      });
+    });
   }
 
   void subscribeToWallet() {
@@ -75,7 +105,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
         isLoading = false;
       });
       if (address.isNotEmpty) {
-        isConnected = true;
+        isTonWalletConnected = true;
         scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBars.build(
             context,
@@ -84,7 +114,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
           ),
         );
       } else {
-        isConnected = false;
+        isTonWalletConnected = false;
         scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBars.build(
             context,
@@ -103,24 +133,70 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
   }
 
   Future<void> handleBuyNft() async {
+    // try {
+    //   final postService = PostService();
+    //   await postService.nftSell(widget.nft.nftAddress);
+    // } catch (e) {
+    //   Logger.e('Error handleBuyNft: $e');
+    // }
     try {
       setState(() => isLoading = true);
+      // Отменяем предыдущую подписку, если она существует
+      walletSubscription?.cancel();
+
+      // Создаем новую подписку перед отправкой транзакции
+      walletSubscription = tonWallet.transactionStream.listen((status) {
+        if (!mounted) return;
+        setState(() {
+          switch (status) {
+            case TransactionStatus.success:
+              scaffoldMessengerKey.currentState?.showSnackBar(
+                SnackBars.build(context, null, "Транзакция успешно выполнена"),
+              );
+              Navigator.pop(context);
+              break;
+            case TransactionStatus.failed:
+              scaffoldMessengerKey.currentState?.showSnackBar(
+                SnackBars.build(
+                    context, null, "Ошибка при выполнении транзакции"),
+              );
+              break;
+            case TransactionStatus.pending:
+              // Показать индикатор загрузки
+              break;
+          }
+        });
+      });
+
+      // Отправляем транзакцию
       await tonWallet.sendNftTransaction(
         nftAddress: widget.nft.nftAddress,
         amount: paymentAmount,
         contractAddress: widget.nft.contractAdress,
       );
-    } catch (e) {
-      // Добавьте обработку ошибок
-      Logger.e('Error handleBuyNft: $e');
-    } finally {
+      await Future.delayed(const Duration(seconds: 20), () async {
+        try {
+          final postService = PostService();
+          await postService.nftSell(widget.nft.nftAddress);
+        } catch (e) {
+          Logger.e('Error postService.nftSell: $e');
+        }
+      });
+
       setState(() => isLoading = false);
+      widget.onClose(); // Вызываем callback
+      Navigator.pop(context);
+    } catch (e) {
+      Logger.e('Error handleBuyNft: $e');
+      setState(() => isLoading = false);
+      widget.onClose(); // Вызываем callback
+      Navigator.pop(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    double height = isConnected ? 480 : 500;
+    double height = isTonWalletConnected ? 480 : 500;
 
     return Padding(
       padding:
@@ -171,7 +247,8 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
                   ],
                 ),
               ),
-              if (!isConnected) ...[
+              if (!isTonWalletConnected) ...[
+                const Gap(18),
                 PaymentButton(
                   text: context.txt.connect,
                   isLoading: isLoading,
@@ -179,26 +256,29 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
                   onTap: handleWalletConnection,
                   isTon: false,
                 ),
-                const Gap(18),
               ],
-              const Gap(10),
-              Text(
-                isBalanceEnough
-                    ? 'Не хватает средств на вашем счету, ваш баланс: ${balance.toStringAsFixed(2)}'
-                    : 'Ваш баланс: ${balance.toStringAsFixed(2)}',
-                style: context.textStyles.caption1!.copyWith(
-                    color: isBalanceEnough
-                        ? context.colors.textsError
-                        : context.colors.textsPrimary),
-              ),
-              const Gap(10),
+              const Gap(18),
+              if (isTonWalletConnected) ...[
+                const Gap(10),
+                Text(
+                  isBalanceEnough
+                      ? 'Не хватает средств на вашем счету, ваш баланс: ${balance.toStringAsFixed(2)}'
+                      : 'Ваш баланс: ${balance.toStringAsFixed(2)}',
+                  style: context.textStyles.caption1!.copyWith(
+                      color: isBalanceEnough
+                          ? context.colors.textsError
+                          : context.colors.textsPrimary),
+                ),
+                const Gap(10),
+              ],
               PaymentButton(
                 text: 'Pay ${paymentAmount.toStringAsFixed(2)}',
                 isLoading: isLoading,
                 paymentAmount: paymentAmount,
-                onTap: (isLoading || !isConnected) ? null : handleBuyNft,
+                onTap:
+                    (isLoading || !isTonWalletConnected) ? null : handleBuyNft,
                 isTon: true,
-                isTonConnect: !isConnected,
+                isTonConnect: !isTonWalletConnected || isBalanceEnough,
               ),
             ],
           ),

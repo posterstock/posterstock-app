@@ -64,12 +64,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   Future<void> restoreTonWalletConnection() async {
     bool restored = await tonWallet.restoreConnection();
-    double balance = await tonWallet.getWalletBalance();
     if (restored) {
       connectedWallet = tonWallet.getWalletAddress();
     }
-    Logger.e(
-        'connectedWallet >>>>>>>>> $balance $isTonWalletConnected $connectedWallet ');
     setState(() {});
   }
 
