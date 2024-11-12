@@ -11,7 +11,7 @@ class MenuDialog extends StatelessWidget {
   ) async {
     return showModalBottomSheet(
       context: context,
-      isScrollControlled: false,
+      isScrollControlled: true,
       backgroundColor: context.colors.backgroundsPrimary,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(

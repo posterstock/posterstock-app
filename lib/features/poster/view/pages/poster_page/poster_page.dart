@@ -29,6 +29,7 @@ import 'package:poster_stock/features/poster/view/widgets/add_to_list_dialog.dar
 import 'package:poster_stock/features/poster/view/widgets/image_dialog.dart';
 import 'package:poster_stock/features/poster/view/widgets/poster_actions.dart';
 import 'package:poster_stock/features/poster/view/widgets/poster_info.dart';
+import 'package:poster_stock/features/poster/view/widgets/sellnft_dialog.dart';
 import 'package:poster_stock/features/poster_dialog/controller/create_poster_controller.dart';
 import 'package:poster_stock/features/poster_dialog/view/poster_dialog.dart';
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
@@ -63,6 +64,8 @@ class PosterPage extends ConsumerStatefulWidget {
 
 class _PosterPageState extends ConsumerState<PosterPage>
     with TickerProviderStateMixin {
+  final isSell = true;
+
   AnimationController? posterController;
   late final AnimationController iconsController = AnimationController(
     vsync: this,
@@ -652,7 +655,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                 GestureDetector(
                                   onTap: () {
                                     if (post == null) return;
-                                    _showMenu(context);
+                                    _showMenu(context, isSell);
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -762,6 +765,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
 
   void _showMenu(
     BuildContext context,
+    bool isSell,
   ) {
     final myPoster = ref.watch(myProfileInfoStateHolderProvider);
     final post = ref.watch(posterStateHolderProvider)!;
@@ -807,6 +811,25 @@ class _PosterPageState extends ConsumerState<PosterPage>
           },
         ),
         MenuTitle(context.txt.poster),
+        if (isSell)
+          MenuItem(
+            'assets/icons/ic_price.svg',
+            'Sell NFT',
+            () async {
+              await showModalBottomSheet(
+                context: context,
+                backgroundColor: Colors.transparent,
+                isScrollControlled: true,
+                useSafeArea: true,
+                builder: (context) => SellNftDialog(
+                  nft: post.nft,
+                  onClose: () =>
+                      ref.read(postControllerProvider).getPost(post.id),
+                ),
+              );
+              return;
+            },
+          ),
         if (myPoster?.id != post.author.id)
           MenuItem(
             'assets/icons/ic_follow.svg',

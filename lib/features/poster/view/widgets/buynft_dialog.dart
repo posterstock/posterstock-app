@@ -92,7 +92,6 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
             );
             break;
           case TransactionStatus.pending:
-            // Показать индикатор загрузки
             break;
         }
       });
@@ -196,7 +195,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
 
   @override
   Widget build(BuildContext context) {
-    double height = isTonWalletConnected ? 480 : 500;
+    double height = isTonWalletConnected ? 500 : 440;
 
     return Padding(
       padding:
@@ -247,37 +246,50 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
                   ],
                 ),
               ),
-              if (!isTonWalletConnected) ...[
-                const Gap(18),
-                PaymentButton(
-                  text: context.txt.connect,
-                  isLoading: isLoading,
-                  paymentAmount: paymentAmount,
-                  onTap: handleWalletConnection,
-                  isTon: false,
-                ),
-              ],
-              const Gap(18),
+              const Gap(20),
               if (isTonWalletConnected) ...[
-                const Gap(10),
-                Text(
-                  isBalanceEnough
-                      ? 'Не хватает средств на вашем счету, ваш баланс: ${balance.toStringAsFixed(2)}'
-                      : 'Ваш баланс: ${balance.toStringAsFixed(2)}',
-                  style: context.textStyles.caption1!.copyWith(
-                      color: isBalanceEnough
-                          ? context.colors.textsError
-                          : context.colors.textsPrimary),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      isBalanceEnough
+                          ? 'Не хватает средств на вашем счету'
+                          : 'Ваш баланс',
+                      style: context.textStyles.caption1!
+                          .copyWith(color: context.colors.textsPrimary),
+                    ),
+                    Text(
+                      ' ${balance.toStringAsFixed(2)}',
+                      style: context.textStyles.caption1!.copyWith(
+                          color: isBalanceEnough
+                              ? context.colors.textsError
+                              : context.colors.textsAction),
+                    ),
+                    const Gap(1),
+                    SvgPicture.asset(
+                      'assets/icons/ton_bw.svg',
+                      width: 8,
+                      colorFilter: ColorFilter.mode(
+                        isBalanceEnough
+                            ? context.colors.textsError!
+                            : context.colors.textsAction!,
+                        BlendMode.srcIn,
+                      ),
+                    )
+                  ],
                 ),
-                const Gap(10),
+                const Gap(20),
               ],
               PaymentButton(
-                text: 'Pay ${paymentAmount.toStringAsFixed(2)}',
+                text: isTonWalletConnected
+                    ? 'Pay ${paymentAmount.toStringAsFixed(2)}'
+                    : context.txt.connect,
                 isLoading: isLoading,
                 paymentAmount: paymentAmount,
-                onTap:
-                    (isLoading || !isTonWalletConnected) ? null : handleBuyNft,
-                isTon: true,
+                onTap: (isLoading || !isTonWalletConnected)
+                    ? handleWalletConnection
+                    : handleBuyNft,
+                isTon: isTonWalletConnected,
                 isTonConnect: !isTonWalletConnected || isBalanceEnough,
               ),
             ],

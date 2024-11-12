@@ -4,7 +4,6 @@ import 'package:darttonconnect/parsers/connect_event.dart';
 import 'package:darttonconnect/provider/bridge_provider.dart';
 import 'package:darttonconnect/ton_connect.dart';
 import 'package:darttonconnect/models/wallet_app.dart';
-import 'package:poster_stock/features/poster/data/post_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:http/http.dart' as http;

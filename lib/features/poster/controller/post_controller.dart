@@ -107,17 +107,16 @@ class PostController {
       Map<String, dynamic> result = resultNFTs.first;
 
       for (var item in resultNFTs) {
-        Logger.i('item >>>>>>>>> $item');
-        Logger.i('sale >>>>>>>>> ${item['sale']}');
         if (item['sale'] != null) {
           result = item;
-          nftAddress = item['address'];
           break;
         }
       }
       allCount = resultNFTs.length;
       index = result['index'];
+      Logger.e('result >>>>>>>>> $result');
       Map<String, dynamic>? sale = result['sale'];
+      nftAddress = result['address'];
       if (sale != null) {
         Logger.i('sale >>>>>>>>> $sale');
         address = sale['address'];
@@ -140,10 +139,10 @@ class PostController {
           graphqlEndpoint = Uri.parse('https://api.testnet.getgems.io/graphql');
 
           final formattedAddress = ton
-              .address(address)
+              .address(nftAddress)
               .toString(isTestOnly: true, isUrlSafe: true, isBounceable: true);
 
-          Logger.e('Formatted address: $formattedAddress');
+          Logger.e('Formatted address:$nftAddress  $formattedAddress');
 
           const query = '''
     query NftFixPriceSaleCalculateFee(\$nftAddress: String!) {
@@ -160,13 +159,14 @@ class PostController {
             body: jsonEncode({
               'query': query,
               'variables': {
-                'nftAddress': resultNft.nft.collection,
+                'nftAddress': nftAddress,
                 'first': null,
               },
             }),
           );
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
+            Logger.e('adress: $nftAddress >>>>>>>>> $data');
             serviceFee = data['data']['nftFixPriceSaleCalculateFee']
                     ['marketplaceFee'] ??
                 0.0;
