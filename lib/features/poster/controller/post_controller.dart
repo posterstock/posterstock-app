@@ -135,47 +135,26 @@ class PostController {
 
         try {
           // Получаем serviceFee и royalty через GraphQL запрос
-          var graphqlEndpoint = Uri.parse('https://api.getgems.io/graphql');
-          graphqlEndpoint = Uri.parse('https://api.testnet.getgems.io/graphql');
+          final tonApiEndpoint = Uri.parse(
+              'https://testnet.tonapi.io/v2/blockchain/accounts/$address/methods/get_sale_data');
 
-          final formattedAddress = ton
-              .address(nftAddress)
-              .toString(isTestOnly: true, isUrlSafe: true, isBounceable: true);
-
-          Logger.e('Formatted address:$nftAddress  $formattedAddress');
-
-          const query = '''
-    query NftFixPriceSaleCalculateFee(\$nftAddress: String!) {
-      nftFixPriceSaleCalculateFee(nftAddress: \$nftAddress) {
-        marketplaceFee
-        royaltyPercent
-      }
-    }
-  ''';
-          Logger.i('query >>>>>>>>> $query');
-          final response = await http.post(
-            graphqlEndpoint,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'query': query,
-              'variables': {
-                'nftAddress': nftAddress,
-                'first': null,
-              },
-            }),
+          final response = await http.get(
+            tonApiEndpoint,
+            headers: {
+              'Accept': 'application/json',
+            },
           );
+
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
-            Logger.e('adress: $nftAddress >>>>>>>>> $data');
-            serviceFee = data['data']['nftFixPriceSaleCalculateFee']
-                    ['marketplaceFee'] ??
-                0.0;
-            royalty = data['data']['nftFixPriceSaleCalculateFee']
-                    ['royaltyPercent'] ??
-                0.0;
+            final marketFee = data['decoded']['market_fee'];
+            final digits = marketFee.toString().length;
+            serviceFee = marketFee / pow(10, digits + 1);
+            royalty = data['decoded']['royalty_amount'] / pow(10, 11);
+            Logger.e('serviceFee >>>>>>>>> $serviceFee $royalty');
           } else {
             Logger.e(
-                'Ошибка при получении serviceFee и royalty: ${response.statusCode}');
+                'Ошибка при получении данных из TON API: ${response.statusCode}');
           }
         } catch (e) {
           Logger.e('Ошибка при получении serviceFee и royalty: $e');
