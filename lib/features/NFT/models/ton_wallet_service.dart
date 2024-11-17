@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:darttonconnect/parsers/connect_event.dart';
 import 'package:darttonconnect/provider/bridge_provider.dart';
-import 'package:darttonconnect/storage/interface.dart';
 import 'package:darttonconnect/ton_connect.dart';
 import 'package:darttonconnect/models/wallet_app.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -12,7 +11,6 @@ import 'dart:convert';
 import 'package:tonutils/tonutils.dart';
 
 class TonWalletService {
-  int _lastEventId = 0;
   static final TonWalletService _instance = TonWalletService._internal();
   factory TonWalletService() => _instance;
   final _connectionStreamController = StreamController<String>.broadcast();
@@ -56,11 +54,7 @@ class TonWalletService {
         if (message.containsKey('error')) {
           final error = message['error'];
           Logger.e('Transaction error: ${error['message']}');
-          if (error['message'].toString().contains('user rejects')) {
-            _transactionStreamController.add(TransactionStatus.cancelled);
-          } else {
-            _transactionStreamController.add(TransactionStatus.failed);
-          }
+          _transactionStreamController.add(TransactionStatus.failed);
           return;
         }
 
@@ -73,11 +67,7 @@ class TonWalletService {
             case 'transaction_error':
               final payload = message['payload'];
               Logger.e('Transaction error: ${payload?['message']}');
-              if (payload!['message'].toString().contains('user rejects')) {
-                _transactionStreamController.add(TransactionStatus.cancelled);
-              } else {
-                _transactionStreamController.add(TransactionStatus.failed);
-              }
+              _transactionStreamController.add(TransactionStatus.failed);
               break;
             default:
               Logger.i('Other event: ${message['event']}');
@@ -96,7 +86,6 @@ class TonWalletService {
       );
 
   Future<void> init() async {
-    Logger.i('init >>>>>>>>>');
     try {
       // Если есть активное подключение, сначала отключаемся
       if (isConnected) {
@@ -135,24 +124,6 @@ class TonWalletService {
         // Получаем баланс
         balance = await getWalletBalance();
         Logger.i('Баланс кошелька: $balance TON');
-      }
-      try {
-        final connectionJson = await _connector.storage.getItem(
-          key: IStorage.keyConnection,
-          defaultValue: '{}',
-        );
-        final connection = json.decode(connectionJson!) as Map<String, dynamic>;
-
-        if (connection.containsKey('last_wallet_event_id')) {
-          _lastEventId = connection['last_wallet_event_id'] as int;
-          Logger.e('Получен last_event_id из storage: $_lastEventId');
-        } else {
-          Logger.w('last_wallet_event_id не найден в storage');
-          _lastEventId = 0;
-        }
-      } catch (e) {
-        Logger.e('Ошибка при получении ID события: $e');
-        _lastEventId = 0;
       }
 
       return restored;
@@ -365,28 +336,19 @@ class TonWalletService {
     required double percentMarketplace,
     required double percentRoyalty,
   }) async {
-    var tonkeeperUrl = 'https://app.tonkeeper.com/';
+    const tonkeeperUrl = 'https://app.tonkeeper.com/';
+    int lastEventId = 0;
 
     try {
-      try {
-        InternalAddress.parse(nftAddress);
-        InternalAddress.parse(ownerAddress);
-        InternalAddress.parse(marketplaceAddress);
-        InternalAddress.parse(marketplaceFeeAddress);
-        InternalAddress.parse(royaltyAddress);
-      } catch (e) {
-        Logger.e('Ошибка валидации адресов: $e');
-        return false;
-      }
       final payload = beginCell()
-          .storeUint(BigInt.parse('0x5fcc3d14'), 32)
-          .storeUint(BigInt.zero, 64)
-          .storeAddress(InternalAddress.parse(marketplaceAddress))
-          .storeAddress(InternalAddress.parse(ownerAddress))
+          .storeUint(BigInt.parse('0x5fcc3d14'), 32) // op code для NFT transfer
+          .storeUint(BigInt.zero, 64) // query_id
+          // .storeAddress(InternalAddress.parse(marketplaceAddress))
+          // .storeAddress(InternalAddress.parse(ownerAddress))
+          .storeUint(BigInt.zero, 1) // нет custom payload
+          .storeCoins(BigInt.parse('200000000')) // forward amount 0.2 TON
           .storeUint(BigInt.zero, 1)
-          .storeCoins(BigInt.parse('200000000'))
-          .storeUint(BigInt.zero, 1)
-          .storeUint(BigInt.parse('0x0fe0ede'), 31)
+          .storeUint(BigInt.parse('0x0fe0ede'), 31) // op code для do_sale
           .storeRef(beginCell()
               .storeAddress(InternalAddress.parse(nftAddress))
               .storeCoins(price)
@@ -396,12 +358,12 @@ class TonWalletService {
               .storeUint(BigInt.from((percentRoyalty * 100).toInt()), 16)
               .endCell())
           .endCell();
-      Logger.e('_lastEventId >>>>>>>>> $_lastEventId');
+
       final transaction = {
         'validUntil': DateTime.now().millisecondsSinceEpoch + 300000,
         'from': ownerAddress,
         'network': '-3',
-        'id': _lastEventId,
+        'id': lastEventId,
         'messages': [
           {
             'address': marketplaceAddress,
@@ -411,23 +373,16 @@ class TonWalletService {
         ]
       };
 
-      Logger.i('Transaction data: $transaction');
-      _transactionStreamController.add(TransactionStatus.pending);
-      final response = await _connector.sendTransaction(transaction);
-      Logger.i('Got response from sendTransaction: $response');
-
-      // Если получили таймаут или успешный ответ - открываем Tonkeeper
-      if (response['status'] == 'timeout' || response['status'] == 'success') {
-        final uri = Uri.parse(tonkeeperUrl);
-        if (await canLaunchUrl(uri)) {
-          return await launchUrl(
-            uri,
-            mode: LaunchMode.externalApplication,
-          );
-        }
+      final result = await _connector.sendTransaction(transaction);
+      Logger.i('Transaction result: $result');
+      final uri = Uri.parse(tonkeeperUrl);
+      if (await canLaunchUrl(uri)) {
+        return await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
       }
-
-      return false;
+      return true;
     } catch (e) {
       Logger.e('Error in createNFTSale: $e');
       _transactionStreamController.add(TransactionStatus.failed);
@@ -437,9 +392,4 @@ class TonWalletService {
 }
 
 // Добавьте enum для статусов транзакции
-enum TransactionStatus {
-  success, // успешная транзакция
-  failed, // ошибка транзакции
-  pending, // ожидание подтверждения
-  cancelled // отмена пользователем
-}
+enum TransactionStatus { success, failed, pending, cancelled }

@@ -38,9 +38,8 @@ class BridgeProvider extends BaseProvider {
     final sessionCrypto = SessionCrypto();
 
     String bridgeUrl = _wallet?.bridgeUrl ?? '';
-    String universalUrl =
-        _wallet?.universalUrl ?? BridgeProvider.standartUniversalUrl;
-
+    String universalUrl = _wallet?.universalUrl ?? BridgeProvider.standartUniversalUrl;
+    
     _gateway = BridgeGateway(
       _storage,
       bridgeUrl,
