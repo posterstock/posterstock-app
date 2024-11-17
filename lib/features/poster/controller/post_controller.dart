@@ -5,6 +5,7 @@ import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/list/repository/list_repository.dart';
+import 'package:poster_stock/features/poster/controller/convert_adress_ton.dart';
 import 'package:poster_stock/features/poster/repository/post_repository.dart';
 import 'package:poster_stock/features/poster/state_holder/comments_state_holder.dart';
 import 'package:poster_stock/features/poster/state_holder/my_lists_state_holder.dart';
@@ -12,7 +13,6 @@ import 'package:poster_stock/features/poster/state_holder/poster_state_holder.da
 import 'package:poster_stock/features/profile/repository/profile_repository.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:http/http.dart' as http;
-import 'package:tonutils/tonutils.dart' as ton;
 
 final postControllerProvider = Provider<PostController>(
   (ref) => PostController(
@@ -102,23 +102,41 @@ class PostController {
     double serviceFee = 0;
     double royalty = 0;
     String nftAddress = '';
+    String creatorAddress = '';
+    Map<String, dynamic>? sale;
 
     if (resultNFTs.isNotEmpty) {
+      nftAddress = resultNft.nft.nftAddress;
       Map<String, dynamic> result = resultNFTs.first;
-
-      for (var item in resultNFTs) {
-        if (item['sale'] != null) {
-          result = item;
-          break;
+      final isMyPoster = myProfileInfoStateHolder.currentState?.id != null &&
+          myProfileInfoStateHolder.currentState!.id == resultNft.author.id;
+      final nftAddressConverted =
+          TonAddressConverter.friendlyToRaw(resultNft.nft.nftAddress);
+      if (isMyPoster) {
+        for (var item in resultNFTs) {
+          if (nftAddressConverted == item['address']) {
+            result = item;
+            break;
+          }
         }
+      } else {
+        for (var item in resultNFTs) {
+          if (item['sale'] != null) {
+            result = item;
+            break;
+          }
+        }
+      }
+      if (result['collection'] != null &&
+          result['collection']['address'] != null) {
+        creatorAddress = result['collection']['address'];
       }
       allCount = resultNFTs.length;
       index = result['index'];
-      Logger.e('result >>>>>>>>> $result');
-      Map<String, dynamic>? sale = result['sale'];
-      nftAddress = result['address'];
+      sale = result['sale'];
+
       if (sale != null) {
-        Logger.i('sale >>>>>>>>> $sale');
+        nftAddress = result['address'];
         address = sale['address'];
         int temp = int.parse(sale['price']['value']);
         price = temp / pow(10, 9);
@@ -172,6 +190,8 @@ class PostController {
       serviceFee: serviceFee,
       royalty: royalty,
       nftAddress: nftAddress,
+      isForSale: sale == null,
+      creatorAddress: creatorAddress,
     ));
     cachedPostRepository.cachePost(id, resultNft);
     cachedPostRepository.cachePost(id, resultNft);

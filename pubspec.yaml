@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 publish_to: "none"
 
-version: 1.2.12+52
+version: 1.2.12+53
 
 # Variant: release
 # Config: release
@@ -64,12 +64,14 @@ dependencies:
   collection: ^1.18.0 
   qr_flutter: ^4.1.0 #https://pub.dev/packages/qr_flutter 
   qr_code_scanner: ^1.0.1 #https://pub.dev/packages/qr_code_scanner  
-  tonutils: ^0.5.6 #https://pub.dev/packages/tonutils
+  tonutils: ^0.5.7 #https://pub.dev/packages/tonutils
   js: ^0.6.3  #https://pub.dev/packages/js
   webview_flutter: ^4.9.0 #https://pub.dev/packages/webview_flutter
   gradient_borders: ^1.0.1 #https://pub.dev/packages/gradient_borders
-  darttonconnect: ^1.0.3 #https://pub.dev/packages/darttonconnect
-  
+  # darttonconnect: ^1.0.3 #https://pub.dev/packages/darttonconnect
+  darttonconnect:
+    path: packages/darttonconnect
+    
 
 dev_dependencies:
   flutter_test:

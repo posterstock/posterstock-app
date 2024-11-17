@@ -80,18 +80,27 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
       setState(() {
         switch (status) {
           case TransactionStatus.success:
-            scaffoldMessengerKey.currentState?.showSnackBar(
-              SnackBars.build(context, null, "Транзакция успешно выполнена"),
-            );
+            setState(() => isLoading = false);
+            widget.onClose();
             Navigator.pop(context);
+            scaffoldMessengerKey.currentState?.showSnackBar(
+              SnackBars.build(context, null, "NFT куплен"),
+            );
             break;
           case TransactionStatus.failed:
+            setState(() => isLoading = false);
             scaffoldMessengerKey.currentState?.showSnackBar(
-              SnackBars.build(
-                  context, null, "Ошибка при выполнении транзакции"),
+              SnackBars.build(context, null, "Ошибка при покупке NFT"),
+            );
+            break;
+          case TransactionStatus.cancelled:
+            setState(() => isLoading = false);
+            scaffoldMessengerKey.currentState?.showSnackBar(
+              SnackBars.build(context, null, "Транзакция отменена"),
             );
             break;
           case TransactionStatus.pending:
+            setState(() => isLoading = true);
             break;
         }
       });
@@ -149,19 +158,27 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
         setState(() {
           switch (status) {
             case TransactionStatus.success:
-              scaffoldMessengerKey.currentState?.showSnackBar(
-                SnackBars.build(context, null, "Транзакция успешно выполнена"),
-              );
+              setState(() => isLoading = false);
+              widget.onClose();
               Navigator.pop(context);
+              scaffoldMessengerKey.currentState?.showSnackBar(
+                SnackBars.build(context, null, "NFT куплен"),
+              );
               break;
             case TransactionStatus.failed:
+              setState(() => isLoading = false);
               scaffoldMessengerKey.currentState?.showSnackBar(
-                SnackBars.build(
-                    context, null, "Ошибка при выполнении транзакции"),
+                SnackBars.build(context, null, "Ошибка при покупке NFT"),
+              );
+              break;
+            case TransactionStatus.cancelled:
+              setState(() => isLoading = false);
+              scaffoldMessengerKey.currentState?.showSnackBar(
+                SnackBars.build(context, null, "Транзакция отменена"),
               );
               break;
             case TransactionStatus.pending:
-              // Показать индикатор загрузки
+              setState(() => isLoading = true);
               break;
           }
         });

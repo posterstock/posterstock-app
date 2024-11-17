@@ -2,10 +2,10 @@
 class NftForPoster {
   final String chain;
 
-  ///  токен
+  ///  название коллекции
   final String collection;
 
-  /// название коллекции
+  /// адресс нфт
   final String nft;
 
   ///  название
@@ -26,7 +26,7 @@ class NftForPoster {
   /// в чем прайс
   final String blocChain;
 
-  /// адрес коллекции
+  /// адрес контракта
   final String contractAdress;
 
   /// адрес нфт
@@ -37,6 +37,15 @@ class NftForPoster {
 
   /// роялти
   final double royalty;
+
+  /// является ли одиночным нфт
+  final bool isOneNft;
+
+  /// на продаже ли
+  final bool isForSale;
+
+  /// адрес создателя NFT для роялти
+  final String creatorAddress;
 
   NftForPoster({
     required this.chain,
@@ -52,17 +61,24 @@ class NftForPoster {
     required this.serviceFee,
     required this.royalty,
     required this.nftAddress,
+    required this.isOneNft,
+    required this.isForSale,
+    required this.creatorAddress,
   });
 
   factory NftForPoster.fromJson(Map<String, dynamic> json) {
-    // Logger.i('json $json');
     // for (var item in json.entries) {
     //   print('-----------------------------------------------------');
     //   print(
     //       'item >>>>>>>>>>>>>>>>>> ${item.key} ==== ${item.value.runtimeType} === ${item.value}');
     //   print('-----------------------------------------------------');
     // }
-
+    bool isNft = false;
+    String nftAdress = json['nft_address'] ?? '';
+    if (json['nft'] != null && json['nft'] != '') {
+      isNft = true;
+      nftAdress = json['nft'];
+    }
     return NftForPoster(
       chain: json['chain'] ?? '',
       collection: json['collection'] ?? '',
@@ -76,7 +92,10 @@ class NftForPoster {
       contractAdress: json['address'] ?? '',
       serviceFee: json['serviceFee'] ?? 0,
       royalty: json['royalty'] ?? 0,
-      nftAddress: json['nft_address'] ?? '',
+      nftAddress: nftAdress,
+      isOneNft: isNft,
+      isForSale: json['sale'] != null,
+      creatorAddress: json['creatorAddress'] ?? '',
     );
   }
   factory NftForPoster.fromChain(String chain) {
@@ -94,6 +113,9 @@ class NftForPoster {
       serviceFee: 0,
       royalty: 0,
       nftAddress: '',
+      isOneNft: false,
+      isForSale: false,
+      creatorAddress: '',
     );
   }
 
@@ -112,6 +134,9 @@ class NftForPoster {
       'serviceFee': serviceFee,
       'royalty': royalty,
       'nft_address': nftAddress,
+      'isNft': isOneNft,
+      'sale': isForSale,
+      'creatorAddress': creatorAddress,
     };
   }
 
@@ -129,6 +154,10 @@ class NftForPoster {
     double? serviceFee,
     double? royalty,
     String? nftAddress,
+    String? contractAdress,
+    bool? isNft,
+    bool? isForSale,
+    String? creatorAddress,
   }) {
     return NftForPoster(
       chain: chain ?? this.chain,
@@ -140,10 +169,13 @@ class NftForPoster {
       priceReal: priceReal ?? this.priceReal,
       fee: fee ?? this.fee,
       blocChain: blocChain ?? this.blocChain,
-      contractAdress: address ?? this.contractAdress,
+      contractAdress: contractAdress ?? this.contractAdress,
       serviceFee: serviceFee ?? this.serviceFee,
       royalty: royalty ?? this.royalty,
       nftAddress: nftAddress ?? this.nftAddress,
+      isOneNft: isNft ?? this.isOneNft,
+      isForSale: isForSale ?? this.isForSale,
+      creatorAddress: creatorAddress ?? this.creatorAddress,
     );
   }
 
@@ -162,6 +194,9 @@ class NftForPoster {
       serviceFee: 0,
       royalty: 0,
       nftAddress: '',
+      isOneNft: false,
+      isForSale: false,
+      creatorAddress: '',
     );
   }
 }

@@ -35,19 +35,48 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
   bool isLoading = false;
   final TextEditingController priceController = TextEditingController();
   double fee = 0.1;
-  int percentCreator = 0;
-  int percentService = 0;
+  double percentCreator = 10;
+  double percentService = 2.5;
   StreamSubscription? walletSubscription;
+  StreamSubscription? transactionSubscription;
   bool isTonWalletConnected = true;
+  bool isForSale = false;
 
   @override
   void initState() {
     super.initState();
     start();
-    percentCreator = (widget.nft.royalty * 100).toInt();
-    percentService = (widget.nft.serviceFee * 100).toInt();
     priceController.addListener(() {
       setState(() {});
+    });
+    isForSale = widget.nft.isForSale;
+    transactionSubscription = tonWallet.transactionStream.listen((status) {
+      switch (status) {
+        case TransactionStatus.success:
+          setState(() => isLoading = false);
+          widget.onClose();
+          Navigator.pop(context);
+          scaffoldMessengerKey.currentState?.showSnackBar(
+            SnackBars.build(context, null, "NFT выставлен на продажу"),
+          );
+          break;
+        case TransactionStatus.failed:
+          setState(() => isLoading = false);
+          scaffoldMessengerKey.currentState?.showSnackBar(
+            SnackBars.build(
+                context, null, "Ошибка при выставлении NFT на продажу"),
+          );
+          break;
+        case TransactionStatus.cancelled:
+          setState(() => isLoading = false);
+          scaffoldMessengerKey.currentState?.showSnackBar(
+            SnackBars.build(context, null, "Транзакция отменена"),
+          );
+          break;
+        case TransactionStatus.pending:
+          setState(() => isLoading = true);
+          break;
+      }
     });
   }
 
@@ -60,8 +89,6 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
     }
     // TODO: добавить fee из nft
     // fee = widget.nft.fee;
-    percentCreator = (widget.nft.royalty * 100).toInt();
-    percentService = (widget.nft.serviceFee * 100).toInt();
     isTonWalletConnected = tonWallet.isConnected;
     setState(() => isLoading = false);
     // Подписываемся на статус транзакции
@@ -102,6 +129,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
 
   @override
   void dispose() {
+    transactionSubscription?.cancel();
     priceController.removeListener(() {});
     priceController.dispose();
     super.dispose();
@@ -111,8 +139,23 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
     try {
       setState(() => isLoading = true);
 
-      // TODO: Implement sell NFT logic here
-      // await tonWallet.sellNFT(...);
+      final price = double.parse(priceController.text);
+      final priceInNano = BigInt.from(price * 1e9);
+      const GETGEMS_TESTNET_MARKETPLACE =
+          "0:584ee61b2dff08371176d0fcb5078d93964bcbe9c05fd6a141b1bf663e2a45be";
+      const GETGEMS_TESTNET_FEE =
+          "0:a393586177beb75a613d6d182e164021800be638f7c63fd274b8f5ab141a9f";
+      await tonWallet.createNFTSale(
+        nftAddress: widget.nft.nftAddress,
+        ownerAddress: tonWallet.getWalletAddress(),
+        marketplaceAddress: GETGEMS_TESTNET_MARKETPLACE,
+        marketplaceFeeAddress: GETGEMS_TESTNET_FEE,
+        royaltyAddress: widget.nft.creatorAddress,
+        price: priceInNano,
+        amount: BigInt.from(0.1 * 1e9),
+        percentMarketplace: percentService,
+        percentRoyalty: percentCreator,
+      );
 
       setState(() => isLoading = false);
       widget.onClose();
@@ -157,19 +200,22 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
               ),
               const Gap(22),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: !isForSale
+                    ? MainAxisAlignment.spaceBetween
+                    : MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Gap(12),
                   Text(
-                    'Sell NFT',
+                    isForSale ? 'Sell NFT' : 'Manage NFT',
                     style: context.textStyles.headline,
                   ),
-                  SvgPicture.asset(
-                    'assets/icons/ic_price_off.svg',
-                    width: 22,
-                    height: 22,
-                  ),
+                  if (!isForSale)
+                    SvgPicture.asset(
+                      'assets/icons/ic_price_off.svg',
+                      width: 22,
+                      height: 22,
+                    ),
                 ],
               ),
               const Gap(18),
@@ -222,11 +268,12 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
               ),
               const Gap(20),
               PaymentButton(
-                text: 'Put on Sale',
+                text: isForSale ? 'Put on Sale' : 'Save price',
                 isLoading: isLoading,
                 paymentAmount: double.tryParse(priceController.text) ?? 0,
                 onTap: handleSellNft,
                 isTon: false,
+                isTonConnect: priceController.text.isEmpty,
               ),
             ],
           ),
@@ -237,9 +284,9 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
 
   double calculateReceiveAmount() {
     double price = double.tryParse(priceController.text) ?? 0;
-    return price -
-        (price * widget.nft.royalty) -
-        (price * widget.nft.serviceFee);
+    double priceEnd =
+        price - (price * percentCreator / 100) - (price * percentService / 100);
+    return priceEnd;
   }
 
   Widget lineText(

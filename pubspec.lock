@@ -284,10 +284,9 @@ packages:
   darttonconnect:
     dependency: "direct main"
     description:
-      name: darttonconnect
-      sha256: "9058b08e9ca2e7a24581ccbd15fa73ff3e2c051bc41f10228cd142eda534d73b"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/darttonconnect"
+      relative: true
+    source: path
     version: "1.0.3"
   dbus:
     dependency: transitive
@@ -1470,10 +1469,10 @@ packages:
     dependency: "direct main"
     description:
       name: tonutils
-      sha256: "0fd821a8955262c4e6ceecb0d4125d36e804eaf6291b6d38501786bbe854cbe4"
+      sha256: ee1a92dcf2969a16d9d2ce3b2d888fbf609431d0dd482debb6efe568d2d27532
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.6"
+    version: "0.5.7"
   transparent_image:
     dependency: "direct main"
     description:

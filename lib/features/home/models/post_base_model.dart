@@ -29,8 +29,9 @@ abstract class PostBaseModel {
   });
 
   bool get isNft => nft.chain.isNotEmpty;
+  bool get isOneNft => nft.isOneNft;
   bool get isSale => nft.price != 0.0;
-
+  bool get isForSale => nft.isForSale;
   get time => creationTime == null
       ? ''
       : _getTimeString(

@@ -811,10 +811,10 @@ class _PosterPageState extends ConsumerState<PosterPage>
           },
         ),
         MenuTitle(context.txt.poster),
-        if (isSell)
+        if (isSell && myPoster?.id == post.author.id)
           MenuItem(
             'assets/icons/ic_price.svg',
-            'Sell NFT',
+            post.isForSale ? 'Sell NFT' : 'Manage NFT',
             () async {
               await showModalBottomSheet(
                 context: context,
