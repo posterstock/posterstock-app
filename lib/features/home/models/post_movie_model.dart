@@ -62,8 +62,6 @@ class PostMovieModel extends PostBaseModel {
       nft = NftForPoster.fromChain(json['chain']);
     }
 
-
-
     const List<Color> avatar = [
       Color(0xfff09a90),
       Color(0xfff3d376),

@@ -105,18 +105,17 @@ class TonConnect {
     if (!connected) {
       throw WalletNotConnectedError(null);
     }
-    print('transaction >>>>>>>>> $transaction');
+
     Map<String, dynamic> options = {
       'required_messages_number': transaction['messages']?.length ?? 0
     };
     _checkSendTransactionSupport(wallet!.device!.features, options);
-    print('options >>>>>>>>> $options');
+
     Map<String, dynamic> request = {
       'valid_until': transaction['validUntil'],
       'from': transaction['from'] ?? wallet!.account!.address,
       'network': transaction['network'] ?? wallet!.account!.chain.value,
-      'messages': transaction['messages'] ?? [],
-      'id': transaction['id'] ?? 0,
+      'messages': transaction['messages'] ?? []
     };
 
     Map<String, dynamic> response = await provider!

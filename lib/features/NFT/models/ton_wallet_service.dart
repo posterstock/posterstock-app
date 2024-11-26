@@ -4,6 +4,7 @@ import 'package:darttonconnect/parsers/connect_event.dart';
 import 'package:darttonconnect/provider/bridge_provider.dart';
 import 'package:darttonconnect/ton_connect.dart';
 import 'package:darttonconnect/models/wallet_app.dart';
+import 'package:poster_stock/common/constants/nft_adress.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:http/http.dart' as http;
@@ -328,46 +329,52 @@ class TonWalletService {
   Future<bool> createNFTSale({
     required String nftAddress,
     required String ownerAddress,
-    required String marketplaceAddress,
-    required String marketplaceFeeAddress,
     required String royaltyAddress,
     required BigInt price,
     required BigInt amount,
     required double percentMarketplace,
     required double percentRoyalty,
+    required String destination,
   }) async {
     const tonkeeperUrl = 'https://app.tonkeeper.com/';
     int lastEventId = 0;
 
+
+
     try {
+      final stateInitCell = beginCell()
+          .storeUint(BigInt.zero, 1) // No code
+          .storeUint(BigInt.zero, 1) // No data
+          .endCell();
+
+      // Создаем saleBody
+      final saleBody = beginCell()
+          .storeUint(price, 64) // Цена продажи
+          .storeAddress(InternalAddress.parse(royaltyAddress))
+          .storeUint(BigInt.from(percentRoyalty * 100), 16)
+          .storeUint(BigInt.from(percentMarketplace * 100), 16)
+          .endCell();
       final payload = beginCell()
-          .storeUint(BigInt.parse('0x5fcc3d14'), 32) // op code для NFT transfer
-          .storeUint(BigInt.zero, 64) // query_id
-          // .storeAddress(InternalAddress.parse(marketplaceAddress))
-          // .storeAddress(InternalAddress.parse(ownerAddress))
-          .storeUint(BigInt.zero, 1) // нет custom payload
-          .storeCoins(BigInt.parse('200000000')) // forward amount 0.2 TON
-          .storeUint(BigInt.zero, 1)
-          .storeUint(BigInt.parse('0x0fe0ede'), 31) // op code для do_sale
-          .storeRef(beginCell()
-              .storeAddress(InternalAddress.parse(nftAddress))
-              .storeCoins(price)
-              .storeAddress(InternalAddress.parse(marketplaceFeeAddress))
-              .storeUint(BigInt.from((percentMarketplace * 100).toInt()), 16)
-              .storeAddress(InternalAddress.parse(royaltyAddress))
-              .storeUint(BigInt.from((percentRoyalty * 100).toInt()), 16)
-              .endCell())
+          .storeUint(BigInt.parse('0x5fcc3d14'), 32)
+          .storeUint(BigInt.zero, 64)
+          .storeAddress(InternalAddress.parse(destinationAddress))
+          .storeAddress(InternalAddress.parse(_connector.account?.address))
+          .storeBit(0)
+          .storeCoins(BigInt.parse('200000000'))
+          .storeBit(0)
+          .storeUint(BigInt.parse('0x0fe0ede'), 31)
+          .storeRef(stateInitCell)
+          .storeRef(saleBody)
           .endCell();
 
       final transaction = {
         'validUntil': DateTime.now().millisecondsSinceEpoch + 300000,
-        'from': ownerAddress,
-        'network': '-3',
+        'network': -3,
         'id': lastEventId,
         'messages': [
           {
-            'address': marketplaceAddress,
-            'amount': amount.toString(),
+            'address': nftAddress,
+            'amount': '300000000', // 0.3 TON для газа
             'payload': base64Encode(payload.toBoc()),
           }
         ]
@@ -375,6 +382,7 @@ class TonWalletService {
 
       final result = await _connector.sendTransaction(transaction);
       Logger.i('Transaction result: $result');
+      await Future.delayed(const Duration(seconds: 2));
       final uri = Uri.parse(tonkeeperUrl);
       if (await canLaunchUrl(uri)) {
         return await launchUrl(

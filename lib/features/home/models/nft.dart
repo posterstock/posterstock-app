@@ -47,6 +47,9 @@ class NftForPoster {
   /// адрес создателя NFT для роялти
   final String creatorAddress;
 
+  /// куда отправляем роялти
+  final String destination;
+
   NftForPoster({
     required this.chain,
     required this.collection,
@@ -64,6 +67,7 @@ class NftForPoster {
     required this.isOneNft,
     required this.isForSale,
     required this.creatorAddress,
+    required this.destination,
   });
 
   factory NftForPoster.fromJson(Map<String, dynamic> json) {
@@ -96,6 +100,7 @@ class NftForPoster {
       isOneNft: isNft,
       isForSale: json['sale'] != null,
       creatorAddress: json['creatorAddress'] ?? '',
+      destination: json['destination'] ?? '',
     );
   }
   factory NftForPoster.fromChain(String chain) {
@@ -116,6 +121,7 @@ class NftForPoster {
       isOneNft: false,
       isForSale: false,
       creatorAddress: '',
+      destination: '',
     );
   }
 
@@ -137,6 +143,7 @@ class NftForPoster {
       'isNft': isOneNft,
       'sale': isForSale,
       'creatorAddress': creatorAddress,
+      'destination': destination,
     };
   }
 
@@ -158,6 +165,7 @@ class NftForPoster {
     bool? isNft,
     bool? isForSale,
     String? creatorAddress,
+    String? destination,
   }) {
     return NftForPoster(
       chain: chain ?? this.chain,
@@ -176,6 +184,7 @@ class NftForPoster {
       isOneNft: isNft ?? this.isOneNft,
       isForSale: isForSale ?? this.isForSale,
       creatorAddress: creatorAddress ?? this.creatorAddress,
+      destination: destination ?? this.destination,
     );
   }
 
@@ -197,6 +206,7 @@ class NftForPoster {
       isOneNft: false,
       isForSale: false,
       creatorAddress: '',
+      destination: '',
     );
   }
 }

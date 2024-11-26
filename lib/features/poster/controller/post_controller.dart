@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:poster_stock/common/constants/nft_adress.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/list/repository/list_repository.dart';
 import 'package:poster_stock/features/poster/controller/convert_adress_ton.dart';
@@ -103,8 +104,8 @@ class PostController {
     double royalty = 0;
     String nftAddress = '';
     String creatorAddress = '';
+    String destination = '';
     Map<String, dynamic>? sale;
-
     if (resultNFTs.isNotEmpty) {
       nftAddress = resultNft.nft.nftAddress;
       Map<String, dynamic> result = resultNFTs.first;
@@ -127,6 +128,7 @@ class PostController {
           }
         }
       }
+
       if (result['collection'] != null &&
           result['collection']['address'] != null) {
         creatorAddress = result['collection']['address'];
@@ -134,13 +136,13 @@ class PostController {
       allCount = resultNFTs.length;
       index = result['index'];
       sale = result['sale'];
-
       if (sale != null) {
         nftAddress = result['address'];
         address = sale['address'];
         int temp = int.parse(sale['price']['value']);
         price = temp / pow(10, 9);
         blocChain = sale['price']['token_name'];
+
         final response = await http.get(
             Uri.parse('https://tonapi.io/v2/rates?tokens=ton&currencies=usd'));
         if (response.statusCode == 200) {
@@ -153,9 +155,9 @@ class PostController {
 
         try {
           // Получаем serviceFee и royalty через GraphQL запрос
-          final tonApiEndpoint = Uri.parse(
-              'https://testnet.tonapi.io/v2/blockchain/accounts/$address/methods/get_sale_data');
-
+          final tonApiEndpoint =
+              Uri.parse('$blockChainUrl$address/methods/get_sale_data');
+          Logger.e('tonApiEndpoint >>>>>>>>> $tonApiEndpoint');
           final response = await http.get(
             tonApiEndpoint,
             headers: {
@@ -178,21 +180,46 @@ class PostController {
           Logger.e('Ошибка при получении serviceFee и royalty: $e');
         }
       }
+      try {
+        // Получаем serviceFee и royalty через GraphQL запрос
+        final tonApiEndpointRoyaltyParams = Uri.parse(
+            '$blockChainUrl${resultNft.nft.collection}/methods/royalty_params');
+        Logger.e(
+            'tonApiEndpointRoyaltyParams >>>>>>>>> $tonApiEndpointRoyaltyParams');
+        final response = await http.get(
+          tonApiEndpointRoyaltyParams,
+          headers: {
+            'Accept': 'application/json',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          final decoded = data['decoded'];
+          // Вычисляем royalty из numerator/denominator
+          royalty = decoded['numerator'] / decoded['denominator'];
+          destination = decoded['destination'];
+          Logger.e('Royalty: $royalty, Destination: $destination');
+        }
+      } catch (e) {
+        Logger.e(
+            'Ошибка royalty_params при получении serviceFee и royalty: $e');
+      }
     }
     resultNft = resultNft.copyWith(
         nft: resultNft.nft.copyWith(
-      allCount: allCount,
-      number: ++index,
-      price: price,
-      blocChain: blocChain,
-      priceReal: priceReal,
-      address: address,
-      serviceFee: serviceFee,
-      royalty: royalty,
-      nftAddress: nftAddress,
-      isForSale: sale == null,
-      creatorAddress: creatorAddress,
-    ));
+            allCount: allCount,
+            number: ++index,
+            price: price,
+            blocChain: blocChain,
+            priceReal: priceReal,
+            address: address,
+            serviceFee: serviceFee,
+            royalty: royalty,
+            nftAddress: nftAddress,
+            isForSale: sale == null,
+            creatorAddress: creatorAddress,
+            destination: destination));
     cachedPostRepository.cachePost(id, resultNft);
     cachedPostRepository.cachePost(id, resultNft);
     resultNft = await _prepareData(resultNft);

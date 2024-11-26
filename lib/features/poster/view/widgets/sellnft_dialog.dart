@@ -141,20 +141,15 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
 
       final price = double.parse(priceController.text);
       final priceInNano = BigInt.from(price * 1e9);
-      const GETGEMS_TESTNET_MARKETPLACE =
-          "0:584ee61b2dff08371176d0fcb5078d93964bcbe9c05fd6a141b1bf663e2a45be";
-      const GETGEMS_TESTNET_FEE =
-          "0:a393586177beb75a613d6d182e164021800be638f7c63fd274b8f5ab141a9f";
       await tonWallet.createNFTSale(
         nftAddress: widget.nft.nftAddress,
         ownerAddress: tonWallet.getWalletAddress(),
-        marketplaceAddress: GETGEMS_TESTNET_MARKETPLACE,
-        marketplaceFeeAddress: GETGEMS_TESTNET_FEE,
         royaltyAddress: widget.nft.creatorAddress,
         price: priceInNano,
         amount: BigInt.from(0.1 * 1e9),
         percentMarketplace: percentService,
         percentRoyalty: percentCreator,
+        destination: widget.nft.destination,
       );
 
       setState(() => isLoading = false);
