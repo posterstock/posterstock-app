@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poster_stock/common/constants/durations.dart';
@@ -74,12 +75,14 @@ class PostBase extends ConsumerWidget {
       child: CustomInkWell(
         onTap: () {
           if (post != null) {
+            Logger.i('PostBase >>> ${user?.isArtist}');
             ref.watch(router)!.push(
                   PosterRoute(
                     postId: post[pageHolder.page].id,
                     likes: post[pageHolder.page].likes,
                     liked: post[pageHolder.page].liked,
                     comments: post[pageHolder.page].comments,
+                    isArtist: user?.isArtist ?? false,
                   ),
                 );
           }
@@ -190,6 +193,10 @@ class UserInfoTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (isArtistWb) {
+      Logger.i(
+          'UserInfoTile >>> $isArtist $isArtistWb ${user?.name} ${user?.username}');
+    }
     return ShimmerLoader(
       loaded: !loading,
       child: InkWell(
@@ -256,13 +263,13 @@ class UserInfoTile extends ConsumerWidget {
                                     (!(user?.followed ?? true)),
                                 child: NameWithArtistPoster(
                                   name: user?.name ?? '',
-                                  isArtist: user?.isArtist ?? false,
+                                  isArtist: isArtist,
                                   darkBackground: darkBackground,
                                   emptyWidth: 146,
                                   emptyHeight: 17,
                                   overflow: TextOverflow.ellipsis,
                                   isFlexible: true,
-                                  isArtistWb: true,
+                                  isArtistWb: isArtistWb,
                                 ),
                               ),
                               const SizedBox(

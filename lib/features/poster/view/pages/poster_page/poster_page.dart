@@ -48,6 +48,7 @@ class PosterPage extends ConsumerStatefulWidget {
     @PathParam('username') this.username = 'profile',
     Key? key,
     this.likes = 0,
+    required this.isArtist,
     this.liked = false,
     this.comments = 0,
   }) : super(key: key);
@@ -57,6 +58,7 @@ class PosterPage extends ConsumerStatefulWidget {
   final int comments;
   final bool liked;
   final String username;
+  final bool isArtist;
 
   @override
   ConsumerState<PosterPage> createState() => _PosterPageState();
@@ -344,8 +346,9 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                               showFollowButton: false,
                                               user: comments[index].model,
                                               controller: scrollController,
-                                              isArtist: post?.author.isArtist ??
-                                                  false,
+                                              isArtist: comments[index]
+                                                  .model
+                                                  .isArtist,
                                               isArtistWb: true,
                                               time: comments[index].time,
                                               behavior:
@@ -621,7 +624,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                               darkBackground: true,
                               showSettings: false,
                               showFollowButton: false,
-                              isArtist: true,
+                              isArtist: widget.isArtist,
                               isArtistWb: true,
                             ),
                     ),

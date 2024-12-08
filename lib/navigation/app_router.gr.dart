@@ -171,6 +171,7 @@ abstract class $AppRouter extends _i19.RootStackRouter {
           likes: args.likes,
           liked: args.liked,
           comments: args.comments,
+          isArtist: args.isArtist,
         ),
       );
     },
@@ -564,6 +565,7 @@ class PosterRoute extends _i19.PageRouteInfo<PosterRouteArgs> {
     int likes = 0,
     bool liked = false,
     int comments = 0,
+    bool isArtist = false,
     List<_i19.PageRouteInfo>? children,
   }) : super(
           PosterRoute.name,
@@ -574,6 +576,7 @@ class PosterRoute extends _i19.PageRouteInfo<PosterRouteArgs> {
             likes: likes,
             liked: liked,
             comments: comments,
+            isArtist: isArtist,
           ),
           rawPathParams: {
             'id': postId,
@@ -596,6 +599,7 @@ class PosterRouteArgs {
     this.likes = 0,
     this.liked = false,
     this.comments = 0,
+    this.isArtist = false,
   });
 
   final int postId;
@@ -609,6 +613,8 @@ class PosterRouteArgs {
   final bool liked;
 
   final int comments;
+
+  final bool isArtist;
 
   @override
   String toString() {
