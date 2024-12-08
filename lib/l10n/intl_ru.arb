@@ -310,7 +310,7 @@
   "settings_connect_wallet": "Подключить",
   "@settings_connect_wallet": {},
   "settings_ton_wallet": "TON кошелек",
-  "@settings_ton_wallet": {}, 
+  "@settings_ton_wallet": {},
   "settings_wallet_ok": "Кошелек успешно добавлен",
   "@settings_wallet_ok": {},
   "add": "Добавить",
