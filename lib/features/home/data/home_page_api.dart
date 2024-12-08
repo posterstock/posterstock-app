@@ -57,7 +57,8 @@ class HomePageApi implements IHomePageApi {
       if (!getNewPosts) postsCursor = response.data['next_cursor'] as String?;
       return (response.data as Map<String, dynamic>?, loadedAll);
     } on DioError catch (e) {
-      Logger.e('Ошибка при получении постов $e');
+      Logger.e(
+          'Ошибка при получении постов ${e.response?.requestOptions.uri} $e');
       rethrow;
     }
   }

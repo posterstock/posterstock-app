@@ -283,7 +283,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                       isLoading ? null : handleWalletConnection,
                                   text: connectedWallet.isNotEmpty
                                       ? '${connectedWallet.substring(2, 8)}...${connectedWallet.substring(connectedWallet.length - 4)}'
-                                      : context.txt.connect,
+                                      : context.txt.nft_connect,
                                 ),
                               ),
                             ),

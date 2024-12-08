@@ -166,7 +166,7 @@ class PostService {
           },
         ),
       );
-      Logger.i('getPost $response');
+      Logger.i('api ${'api/posters/$id/'}  ${response.data}');
       return response.data;
     } on DioError catch (e) {
       Logger.e('Ошибка при получении постера $e');
@@ -222,8 +222,8 @@ class PostService {
     }
   }
 
-  Future nftSell(String id) async {
-    Logger.i('id >>>>>>>>> $id');
+  Future nftSell(
+      {required String nftAddress, required String buyerAddress}) async {
     try {
       final response = await _dio.post(
         'api/posters/onchain/sell',
@@ -235,8 +235,9 @@ class PostService {
           },
         ),
         data: jsonEncode({
-          'tx_id': id,
+          'buyer_address': buyerAddress,
           'lang': 'en-US',
+          'nft': nftAddress,
         }),
       );
       Logger.i('nftSell ${response.data}');

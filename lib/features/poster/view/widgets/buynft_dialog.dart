@@ -193,7 +193,9 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
       await Future.delayed(const Duration(seconds: 20), () async {
         try {
           final postService = PostService();
-          await postService.nftSell(widget.nft.nftAddress);
+          await postService.nftSell(
+              nftAddress: widget.nft.nftAddress,
+              buyerAddress: tonWallet.addressWallet);
         } catch (e) {
           Logger.e('Error postService.nftSell: $e');
         }
@@ -239,7 +241,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
               ),
               const Gap(18),
               Text(
-                context.txt.buy,
+                context.txt.nft_buy,
                 style: context.textStyles.headline,
               ),
               const Gap(18),
@@ -300,7 +302,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
               PaymentButton(
                 text: isTonWalletConnected
                     ? 'Pay ${paymentAmount.toStringAsFixed(2)}'
-                    : context.txt.connect,
+                    : context.txt.nft_connect,
                 isLoading: isLoading,
                 paymentAmount: paymentAmount,
                 onTap: (isLoading || !isTonWalletConnected)

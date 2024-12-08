@@ -811,7 +811,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
           },
         ),
         MenuTitle(context.txt.poster),
-        if (isSell && myPoster?.id == post.author.id)
+        if (isSell && myPoster?.id == post.author.id && post.nft.number != 0)
           MenuItem(
             'assets/icons/ic_price.svg',
             post.isForSale ? 'Sell NFT' : 'Manage NFT',

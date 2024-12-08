@@ -94,7 +94,7 @@ class PostController {
     final List<Map<String, dynamic>> resultNFTs =
         await postRepository.getNFT(resultNft.nft.collection);
 
-    int index = 1;
+    int index = 0;
     int allCount = 1;
     double price = 0;
     double priceReal = 0;
@@ -116,12 +116,14 @@ class PostController {
       if (isMyPoster) {
         for (var item in resultNFTs) {
           if (nftAddressConverted == item['address']) {
+            Logger.e('result = item ');
             result = item;
             break;
           }
         }
       } else {
         for (var item in resultNFTs) {
+          Logger.e('item >>>>>>>>> ${item['sale']}');
           if (item['sale'] != null) {
             result = item;
             break;
@@ -137,6 +139,7 @@ class PostController {
       index = result['index'];
       sale = result['sale'];
       if (sale != null) {
+        Logger.e('sale >>>>>>>>> $sale');
         nftAddress = result['address'];
         address = sale['address'];
         int temp = int.parse(sale['price']['value']);
@@ -209,7 +212,7 @@ class PostController {
     resultNft = resultNft.copyWith(
         nft: resultNft.nft.copyWith(
             allCount: allCount,
-            number: ++index,
+            number: index > 0 ? ++index : index,
             price: price,
             blocChain: blocChain,
             priceReal: priceReal,
@@ -219,6 +222,7 @@ class PostController {
             nftAddress: nftAddress,
             isForSale: sale == null,
             creatorAddress: creatorAddress,
+            contractAdress: address,
             destination: destination));
     cachedPostRepository.cachePost(id, resultNft);
     cachedPostRepository.cachePost(id, resultNft);

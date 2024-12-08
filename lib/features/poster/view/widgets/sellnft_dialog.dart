@@ -50,6 +50,9 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
       setState(() {});
     });
     isForSale = widget.nft.isForSale;
+    if (!isForSale) {
+      priceController.text = widget.nft.price.toString();
+    }
     transactionSubscription = tonWallet.transactionStream.listen((status) {
       switch (status) {
         case TransactionStatus.success:
@@ -168,6 +171,80 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
     }
   }
 
+  Future<void> showRemoveFromSaleDialog() async {
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (BuildContext context) {
+        return Padding(
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16.0),
+            child: Container(
+              height: 182,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.0),
+                color: context.colors.backgroundsPrimary,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Gap(12),
+                  Container(
+                    height: 4,
+                    width: 36,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(2.0),
+                      color: context.colors.fieldsDefault,
+                    ),
+                  ),
+                  const Gap(22),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      context.txt.nft_remove_quest,
+                      style: context.textStyles.callout,
+                    ),
+                  ),
+                  const Gap(20),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(
+                          context, true); // Возвращаем true при нажатии
+                    },
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, color: context.colors.textsError),
+                        const Gap(8),
+                        Text(
+                          context.txt.nft_remove,
+                          style: context.textStyles.callout!
+                              .copyWith(color: context.colors.textsError),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (result == true) {
+      await tonWallet.createNFTUnSale(
+        nftAddressContract: widget.nft.contractAdress,
+      );
+      widget.onClose();
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -176,7 +253,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16.0),
         child: Container(
-          height: 440,
+          height: 390 + (isForSale ? 50 : 0),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16.0),
@@ -206,10 +283,13 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
                     style: context.textStyles.headline,
                   ),
                   if (!isForSale)
-                    SvgPicture.asset(
-                      'assets/icons/ic_price_off.svg',
-                      width: 22,
-                      height: 22,
+                    GestureDetector(
+                      onTap: showRemoveFromSaleDialog,
+                      child: SvgPicture.asset(
+                        'assets/icons/ic_price_off.svg',
+                        width: 22,
+                        height: 22,
+                      ),
                     ),
                 ],
               ),
@@ -236,6 +316,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
                               FilteringTextInputFormatter.allow(
                                   RegExp(r'[0-9.]')),
                             ],
+                            enabled: isForSale,
                             decoration: const InputDecoration(
                               hintText: 'Item price',
                               border: InputBorder.none,
@@ -254,22 +335,24 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
                     lineText('Creator Fee', '$percentCreator%'),
                     lineText('Service Fee', '$percentService%'),
                     lineText(
-                      'You Receive',
+                      context.txt.nft_receive,
                       calculateReceiveAmount().toStringAsFixed(2),
                       isIcon: true,
                     ),
                   ],
                 ),
               ),
-              const Gap(20),
-              PaymentButton(
-                text: isForSale ? 'Put on Sale' : 'Save price',
-                isLoading: isLoading,
-                paymentAmount: double.tryParse(priceController.text) ?? 0,
-                onTap: handleSellNft,
-                isTon: false,
-                isTonConnect: priceController.text.isEmpty,
-              ),
+              if (isForSale) ...[
+                const Gap(20),
+                PaymentButton(
+                  text: isForSale ? 'Put on Sale' : 'Save price',
+                  isLoading: isLoading,
+                  paymentAmount: double.tryParse(priceController.text) ?? 0,
+                  onTap: handleSellNft,
+                  isTon: false,
+                  isTonConnect: priceController.text.isEmpty,
+                ),
+              ],
             ],
           ),
         ),

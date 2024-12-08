@@ -201,7 +201,7 @@ class BuyNftFieldState extends ConsumerState<BuyNftField> {
                 );
                 return;
               },
-              text: context.txt.buy,
+              text: context.txt.nft_buy,
             ),
           ],
         ),

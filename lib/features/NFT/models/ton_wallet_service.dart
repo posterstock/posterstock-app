@@ -16,6 +16,7 @@ class TonWalletService {
   factory TonWalletService() => _instance;
   final _connectionStreamController = StreamController<String>.broadcast();
   Stream<String> get connectionStream => _connectionStreamController.stream;
+  String get addressWallet => _connector.account?.address;
 
   late TonConnect _connector;
   bool get isConnected => _connector.connected;
@@ -322,6 +323,46 @@ class TonWalletService {
       Logger.e('Ошибка получения баланса: $e');
       Logger.e('Стек ошибки: $stackTrace');
       return 0;
+    }
+  }
+
+  /// Создание транзакции для снятия с продажи NFT
+  Future<bool> createNFTUnSale({
+    required String nftAddressContract,
+  }) async {
+    try {
+      // Создаем тело транзакции для снятия с продажи
+      final unsaleBody = beginCell()
+          .storeUint(BigInt.from(3), 32)
+          .storeUint(BigInt.zero, 64)
+          .endCell();
+
+      final transaction = {
+        'validUntil': DateTime.now().millisecondsSinceEpoch + 300000,
+        'network': -3,
+        'messages': [
+          {
+            'address': nftAddressContract,
+            'amount': '100000000', // 0.1 TON для газа
+            'payload': base64Encode(unsaleBody.toBoc()),
+          }
+        ]
+      };
+
+      final result = await _connector.sendTransaction(transaction);
+      Logger.i('Transaction result: $result');
+      await Future.delayed(const Duration(seconds: 2));
+      final uri = Uri.parse(tonkeeperUrl);
+      if (await canLaunchUrl(uri)) {
+        return await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+      }
+      return true;
+    } catch (e) {
+      Logger.e('Ошибка в createNFTUnSale: $e');
+      return false;
     }
   }
 
