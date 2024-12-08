@@ -70,7 +70,7 @@ class CreatePosterService {
           },
         ),
       );
-    
+
       return response.data;
     } on DioError catch (e) {
       Logger.e('Ошибка при создании постера $e');
@@ -137,12 +137,12 @@ class CreatePosterService {
       response.data.forEach((key, value) {
         print('Ключ first: $key, =====  $value');
       });
-      Map<String, dynamic> myMap = response.data['posters'];
-      myMap.forEach((key, value) {
-        print('Ключ second: $key, ===== : $value');
+      List<dynamic> postersList = response.data['posters'];
+      postersList.forEach((value) {
+        print('Постер: $value');
       });
-      Logger.i('getMediaPosters >>> ${myMap}');
-      return myMap;
+      Logger.i('getMediaPosters >>> $postersList');
+      return {'posters': postersList};
     } on DioError catch (e) {
       Logger.e('Ошибка при получении постеров $e');
       Logger.e(e.response);

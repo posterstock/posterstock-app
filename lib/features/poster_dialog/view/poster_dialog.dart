@@ -570,7 +570,7 @@ class _CreatePosterDialogState extends ConsumerState<PosterDialog>
                   //   padding: EdgeInsets.symmetric(vertical: 10),
                   //   child: Text('тут НФТ'),
                   // ),
-                  if (chosenMovie != null) _imagesList(images, chosenMovie),
+                  // if (chosenMovie != null) _imagesList(images, chosenMovie),
                   // if (nftPosters.isNotEmpty) ...[
                   //   const Gap(40),
                   //   Text('NFT >>>>>>>>>>>>>>>>',
