@@ -51,7 +51,7 @@ dependencies:
   flutter_local_notifications: ^17.2.1+2
   transparent_image: ^2.0.1
   async: ^2.11.0
-  image: ^4.0.17
+  image: ^4.0.1
   cached_network_image: ^3.2.3
   firebase_crashlytics: ^4.0.2
   path_provider: ^2.1.1
