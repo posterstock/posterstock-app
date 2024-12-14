@@ -34,7 +34,7 @@ use_frameworks!
 target 'Runner' do
   use_modular_headers!
 
-  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__)) # Исправлено на __FILE__
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 
 end
 
