@@ -314,6 +314,8 @@
   "@settings_ton_wallet": {},
   "settings_wallet_ok": "Wallet erfolgreich hinzugefügt",
   "@settings_wallet_ok": {},
+  "settings_wallet_error": "Fehler beim Verbinden des Wallets",
+  "@settings_wallet_error": {},
   "add": "Hinzufügen",
   "@add": {},
   "nft_buy": "Kaufen",

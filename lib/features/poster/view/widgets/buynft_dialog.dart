@@ -272,8 +272,8 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
                   children: [
                     Text(
                       isBalanceEnough
-                          ? 'Не хватает средств на вашем счету'
-                          : 'Ваш баланс',
+                          ? context.txt.nft_insufficient
+                          : context.txt.nft_balance,
                       style: context.textStyles.caption1!
                           .copyWith(color: context.colors.textsPrimary),
                     ),

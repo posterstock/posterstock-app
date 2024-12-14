@@ -50,6 +50,12 @@ class NftForPoster {
   /// куда отправляем роялти
   final String destination;
 
+  /// адрес владельца коллекции
+  final String ownerAddressCollection;
+
+  /// является ли владелец продавцом
+  final bool isOwnerSale;
+
   NftForPoster({
     required this.chain,
     required this.collection,
@@ -68,6 +74,8 @@ class NftForPoster {
     required this.isForSale,
     required this.creatorAddress,
     required this.destination,
+    required this.ownerAddressCollection,
+    required this.isOwnerSale,
   });
 
   factory NftForPoster.fromJson(Map<String, dynamic> json) {
@@ -101,6 +109,8 @@ class NftForPoster {
       isForSale: json['sale'] != null,
       creatorAddress: json['creatorAddress'] ?? '',
       destination: json['destination'] ?? '',
+      ownerAddressCollection: json['ownerAddressCollection'] ?? '',
+      isOwnerSale: json['isOwnerSale'] ?? false,
     );
   }
   factory NftForPoster.fromChain(String chain) {
@@ -122,6 +132,8 @@ class NftForPoster {
       isForSale: false,
       creatorAddress: '',
       destination: '',
+      ownerAddressCollection: '',
+      isOwnerSale: false,
     );
   }
 
@@ -144,6 +156,8 @@ class NftForPoster {
       'sale': isForSale,
       'creatorAddress': creatorAddress,
       'destination': destination,
+      'ownerAddressCollection': ownerAddressCollection,
+      'isOwnerSale': isOwnerSale,
     };
   }
 
@@ -166,6 +180,8 @@ class NftForPoster {
     bool? isForSale,
     String? creatorAddress,
     String? destination,
+    String? ownerAddressCollection,
+    bool? isOwnerSale,
   }) {
     return NftForPoster(
       chain: chain ?? this.chain,
@@ -185,6 +201,9 @@ class NftForPoster {
       isForSale: isForSale ?? this.isForSale,
       creatorAddress: creatorAddress ?? this.creatorAddress,
       destination: destination ?? this.destination,
+      ownerAddressCollection:
+          ownerAddressCollection ?? this.ownerAddressCollection,
+      isOwnerSale: isOwnerSale ?? this.isOwnerSale,
     );
   }
 
@@ -207,6 +226,8 @@ class NftForPoster {
       isForSale: false,
       creatorAddress: '',
       destination: '',
+      ownerAddressCollection: '',
+      isOwnerSale: false,
     );
   }
 }

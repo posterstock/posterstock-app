@@ -75,7 +75,7 @@ class PostBase extends ConsumerWidget {
       child: CustomInkWell(
         onTap: () {
           if (post != null) {
-            Logger.i('PostBase >>> ${user?.isArtist}');
+            Logger.e('PostBase >>> ${user?.isArtist}');
             ref.watch(router)!.push(
                   PosterRoute(
                     postId: post[pageHolder.page].id,

@@ -53,24 +53,27 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   void initState() {
     super.initState();
     ref.read(changeWalletStateHolderProvider.notifier).loadFromLocal();
-    isTonWalletConnected = tonWallet.isConnected;
-    if (!isTonWalletConnected) {
-      restoreTonWalletConnection();
-    }
 
-    setState(() {});
     subscribeToWallet();
   }
 
   Future<void> restoreTonWalletConnection() async {
-    bool restored = await tonWallet.restoreConnection();
-    if (restored) {
+    isTonWalletConnected = tonWallet.isConnected;
+
+    isLoading = true;
+    setState(() {});
+    await tonWallet.restoreConnection();
+    isTonWalletConnected = tonWallet.isConnected;
+    if (isTonWalletConnected) {
       connectedWallet = tonWallet.getWalletAddress();
     }
-    setState(() {});
+    setState(() {
+      isLoading = false;
+    });
   }
 
-  void subscribeToWallet() {
+  Future<void> subscribeToWallet() async {
+    await restoreTonWalletConnection();
     walletSubscription = tonWallet.connectionStream.listen((address) {
       setState(() {
         isLoading = false;
@@ -82,7 +85,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           SnackBars.build(
             context,
             null,
-            "Кошелек успешно подключен",
+            context.txt.settings_wallet_ok,
           ),
         );
       } else {
@@ -91,13 +94,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           SnackBars.build(
             context,
             null,
-            "Ошибка подключения кошелька",
+            context.txt.settings_wallet_error,
           ),
         );
       }
       Logger.e('Кошелек: $address');
       setState(() {});
     });
+    setState(() {});
   }
 
   @override

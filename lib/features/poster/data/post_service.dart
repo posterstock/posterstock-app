@@ -251,7 +251,7 @@ class PostService {
     }
   }
 
-  /// получение nft по адресу
+  /// получение nfts по адресу
   Future<List<Map<String, dynamic>>> getNFT(String address) async {
     try {
       // Формирование URL для запроса
@@ -274,5 +274,29 @@ class PostService {
       return [];
     }
     return [];
+  }
+
+  /// получение коллекций по адресу
+  Future<Map<String, dynamic>> getCollections(String address) async {
+    try {
+      final url =
+          Uri.parse('https://testnet.tonapi.io/v2/nfts/collections/$address');
+      // Отправка HTTP GET запроса
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        // for (var key in data.keys) {
+        //   print('key >>>>>>>>> $key == ${data[key]}');
+        // }
+        return data;
+      } else {
+        throw Exception(
+            'Failed to load getCollections: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching getCollections: $e');
+      return {};
+    }
   }
 }

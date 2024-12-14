@@ -330,6 +330,8 @@
   "@nft_network_fee": {},
   "nft_rest": "The rest will be returned to your wallet",
   "@nft_rest": {},
+  "settings_wallet_error": "Error connecting wallet",
+  "@settings_wallet_error": {},
   "nft_connect": "Connect Wallet",
   "@nft_connect": {},
   "nft_insufficient": "Insufficient Funds",

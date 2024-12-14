@@ -300,6 +300,8 @@
   "@watchlist_menu_whereToWatch": {},
   "watchlist_title": "İzleme Listesi: Topluluk Posterleri",
   "@watchlist_title": {},
+  "yes": "Evet",
+  "@yes": {},
   "system_theme": "Sistem teması",
   "@system_theme": {},
   "system_theme_dark": "Koyu tema",
@@ -336,8 +338,10 @@
   "@nft_balance": {},
   "nft_pay": "Öde",
   "@nft_pay": {},
+  "settings_wallet_error": "Cüzdan bağlantı hatası",
+  "@settings_wallet_error": {},
   "nft_receive": "Alacaksınız",
-  "@nft_recive": {},
+  "@nft_receive": {},
   "nft_put": "Satışa Çıkar",
   "@nft_put": {},
   "nft_menu_sell": "NFT Poster Sat",
@@ -346,4 +350,4 @@
   "@nft_remove": {},
   "nft_remove_quest": "Bu NFT'yi satıştan kaldırmak istediğinizden emin misiniz?",
   "@nft_remove_quest": {}
-}
+    }

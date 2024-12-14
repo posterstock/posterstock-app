@@ -697,14 +697,16 @@ class CollectionInfoWidget extends ConsumerWidget {
                     liked: false,
                     description: post!.posters[index].description,
                     hasBookmarked: false,
-                    isArtist: post!.isArtist,
+                    isArtist: post!.author.isArtist,
                     nft: post!.nft,
                   ),
                   customOnItemTap: (post, index) {
+                    Logger.e('PostBase >>> ${post.author.isArtist}');
                     AutoRouter.of(context).push(
                       PosterRoute(
                         postId: post.id,
                         username: post.author.username,
+                        isArtist: post.author.isArtist,
                       ),
                     );
                   },

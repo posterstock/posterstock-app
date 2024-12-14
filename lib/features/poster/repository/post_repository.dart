@@ -35,6 +35,11 @@ class PostRepository {
     return await service.getNFT(address);
   }
 
+  /// получение коллекций по адресу
+  Future<Map<String, dynamic>> getCollections(String address) async {
+    return await service.getCollections(address);
+  }
+
   Future<bool> getInCollection(int id) async {
     return await service.getInCollection(id);
   }

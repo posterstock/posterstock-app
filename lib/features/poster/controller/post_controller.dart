@@ -93,7 +93,9 @@ class PostController {
     resultNft = await postRepository.getPost(id);
     final List<Map<String, dynamic>> resultNFTs =
         await postRepository.getNFT(resultNft.nft.collection);
-
+    final Map<String, dynamic> resultCollections =
+        await postRepository.getCollections(resultNft.nft.collection);
+    String ownerAddressCollection = resultCollections['owner']['address'];
     int index = 0;
     int allCount = 1;
     double price = 0;
@@ -105,6 +107,7 @@ class PostController {
     String nftAddress = '';
     String creatorAddress = '';
     String destination = '';
+    bool isOwnerSale = false;
     Map<String, dynamic>? sale;
     if (resultNFTs.isNotEmpty) {
       nftAddress = resultNft.nft.nftAddress;
@@ -113,6 +116,7 @@ class PostController {
           myProfileInfoStateHolder.currentState!.id == resultNft.author.id;
       final nftAddressConverted =
           TonAddressConverter.friendlyToRaw(resultNft.nft.nftAddress);
+
       if (isMyPoster) {
         for (var item in resultNFTs) {
           if (nftAddressConverted == item['address']) {
@@ -122,24 +126,32 @@ class PostController {
           }
         }
       } else {
-        for (var item in resultNFTs) {
-          Logger.e('item >>>>>>>>> ${item['sale']}');
-          if (item['sale'] != null) {
-            result = item;
+        for (int i = 0; i < resultNFTs.length; i++) {
+          Logger.e('$i >>>>>>>>> sale == ${resultNFTs[i]['sale']}');
+          if (resultNFTs[i]['sale'] != null &&
+              resultNFTs[i]['sale']['owner']['address'] ==
+                  ownerAddressCollection) {
+            result = resultNFTs[i];
+            index = i + 1;
+            isOwnerSale = true;
             break;
           }
         }
       }
+      Logger.e('sale $index >>>>>>>>> ${result['sale']}');
 
       if (result['collection'] != null &&
           result['collection']['address'] != null) {
         creatorAddress = result['collection']['address'];
       }
+
       allCount = resultNFTs.length;
-      index = result['index'];
+      Logger.e('index >>> <<<<<< ${result['index']}');
+      if (result['index'] != null) {
+        index = result['index'] + 1;
+      }
       sale = result['sale'];
       if (sale != null) {
-        Logger.e('sale >>>>>>>>> $sale');
         nftAddress = result['address'];
         address = sale['address'];
         int temp = int.parse(sale['price']['value']);
@@ -182,6 +194,8 @@ class PostController {
         } catch (e) {
           Logger.e('Ошибка при получении serviceFee и royalty: $e');
         }
+      } else {
+        index = 0;
       }
       try {
         // Получаем serviceFee и royalty через GraphQL запрос
@@ -209,21 +223,26 @@ class PostController {
             'Ошибка royalty_params при получении serviceFee и royalty: $e');
       }
     }
+    Logger.e(
+        '$isOwnerSale $index >>>>>>>>> $ownerAddressCollection $creatorAddress');
     resultNft = resultNft.copyWith(
         nft: resultNft.nft.copyWith(
-            allCount: allCount,
-            number: index > 0 ? ++index : index,
-            price: price,
-            blocChain: blocChain,
-            priceReal: priceReal,
-            address: address,
-            serviceFee: serviceFee,
-            royalty: royalty,
-            nftAddress: nftAddress,
-            isForSale: sale == null,
-            creatorAddress: creatorAddress,
-            contractAdress: address,
-            destination: destination));
+      allCount: allCount,
+      number: index,
+      price: price,
+      blocChain: blocChain,
+      priceReal: priceReal,
+      address: address,
+      serviceFee: serviceFee,
+      royalty: royalty,
+      nftAddress: nftAddress,
+      isForSale: (sale != null && index != 0),
+      creatorAddress: creatorAddress,
+      contractAdress: address,
+      ownerAddressCollection: ownerAddressCollection,
+      destination: destination,
+      isOwnerSale: isOwnerSale,
+    ));
     cachedPostRepository.cachePost(id, resultNft);
     cachedPostRepository.cachePost(id, resultNft);
     resultNft = await _prepareData(resultNft);
