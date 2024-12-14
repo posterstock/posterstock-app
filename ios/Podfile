@@ -1,11 +1,13 @@
 # Uncomment this line to define a global platform for your project
 platform :ios, '14.0'
 
-# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+# Убедитесь, что версии библиотек совместимы
+pod 'FirebaseCore', '10.27.0', :modular_headers => true
 pod 'FirebaseMessaging', '10.27.0', :modular_headers => true
 pod 'FirebaseCrashlytics', '10.27.0', :modular_headers => true
-pod 'FirebaseCore',  :modular_headers => true
+
 project 'Runner', {
   'Debug' => :debug,
   'Profile' => :release,
@@ -30,6 +32,13 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 flutter_ios_podfile_setup
 
 use_frameworks!
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+  pod 'FirebaseFirestore', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git', :tag => '8.7.0'
+  flutter_install_all_ios_pods File.dirname(File.realpath(FILE))
+end
 
 target 'Runner' do
   use_modular_headers!
