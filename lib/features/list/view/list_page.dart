@@ -19,7 +19,9 @@ import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
 import 'package:poster_stock/features/create_list/view/create_list_dialog.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
 import 'package:poster_stock/features/home/models/multiple_post_model.dart';
+import 'package:poster_stock/features/home/models/nft.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
+import 'package:poster_stock/features/home/models/user_model.dart';
 import 'package:poster_stock/features/home/view/widgets/movie_card.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/home/view/widgets/reaction_button.dart';
@@ -40,9 +42,11 @@ import 'package:share_plus/share_plus.dart';
 class ListPage extends ConsumerStatefulWidget {
   final int id;
   final ListType? type;
+  final bool isArtist;
 
   ListPage({
     @PathParam('id') required this.id,
+    @PathParam('isArtist') required this.isArtist,
     @PathParam('type') int type = -1,
     Key? key,
   })  : type = ListType.findByIndex(type),
@@ -248,6 +252,7 @@ class _ListPageState extends ConsumerState<ListPage>
                               return CollectionInfoWidget(
                                 shimmer: shimmer,
                                 post: posts,
+                                isArtist: widget.isArtist,
                               );
                             }
                             if (index == (comments.length) + 1) {
@@ -586,13 +591,16 @@ class CollectionInfoWidget extends ConsumerWidget {
     Key? key,
     this.post,
     required this.shimmer,
+    required this.isArtist,
   }) : super(key: key);
 
   final MultiplePostModel? post;
   final Widget shimmer;
+  final bool isArtist;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    Logger.e('widget.isArtist >>> $isArtist ');
     final commentsBegin = ref.watch(commentsStateHolderProvider);
     final comments = commentsBegin ?? [];
     return Padding(
@@ -608,7 +616,7 @@ class CollectionInfoWidget extends ConsumerWidget {
             showSettings: false,
             showFollowButton: false,
             time: post?.time,
-            isArtist: false,
+            isArtist: isArtist,
             isArtistWb: false,
           ),
           const SizedBox(height: 16),
@@ -619,7 +627,7 @@ class CollectionInfoWidget extends ConsumerWidget {
           const SizedBox(height: 20),
           Text(
             (post?.description ?? '').length > 140
-                ? post!.description!.substring(0, 140)
+                ? post?.description?.substring(0, 140) ?? ''
                 : (post?.description ?? ''),
             style: context.textStyles.subheadline,
           ),
@@ -686,19 +694,19 @@ class CollectionInfoWidget extends ConsumerWidget {
                   shimmer: shimmer,
                   index: index,
                   post: PostMovieModel(
-                    startYear: post!.posters[index].startYear,
-                    endYear: post!.posters[index].endYear ?? 0,
-                    imagePath: post!.posters[index].image,
-                    id: post!.posters[index].id,
+                    startYear: post?.posters[index].startYear ?? 0,
+                    endYear: post?.posters[index].endYear ?? 0,
+                    imagePath: post?.posters[index].image ?? '',
+                    id: post?.posters[index].id ?? -1,
                     type: 'list',
-                    name: post!.posters[index].title,
-                    author: post!.author,
-                    creationTime: post!.creationTime,
+                    name: post?.posters[index].title ?? '',
+                    author: post?.author ?? UserModel.init(),
+                    creationTime: post?.creationTime ?? 0,
                     liked: false,
-                    description: post!.posters[index].description,
+                    description: post?.posters[index].description ?? '',
                     hasBookmarked: false,
-                    isArtist: post!.author.isArtist,
-                    nft: post!.nft,
+                    isArtist: post?.author.isArtist ?? false,
+                    nft: post?.nft ?? NftForPoster.init(),
                   ),
                   customOnItemTap: (post, index) {
                     Logger.e('PostBase >>> ${post.author.isArtist}');
@@ -706,7 +714,7 @@ class CollectionInfoWidget extends ConsumerWidget {
                       PosterRoute(
                         postId: post.id,
                         username: post.author.username,
-                        isArtist: post.author.isArtist,
+                        isArtist: isArtist,
                       ),
                     );
                   },

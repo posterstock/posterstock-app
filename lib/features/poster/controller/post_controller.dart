@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter_easylogger/flutter_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:poster_stock/common/constants/nft_adress.dart';
+import 'package:poster_stock/features/NFT/models/ton_wallet_service.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/list/repository/list_repository.dart';
 import 'package:poster_stock/features/poster/controller/convert_adress_ton.dart';
@@ -107,6 +108,7 @@ class PostController {
     String nftAddress = '';
     String creatorAddress = '';
     String destination = '';
+    String ownerNftAddress = '';
     bool isOwnerSale = false;
     Map<String, dynamic>? sale;
     if (resultNFTs.isNotEmpty) {
@@ -127,13 +129,12 @@ class PostController {
         }
       } else {
         for (int i = 0; i < resultNFTs.length; i++) {
-          Logger.e('$i >>>>>>>>> sale == ${resultNFTs[i]['sale']}');
+          ownerNftAddress = resultNFTs[i]['owner']['address'];
           if (resultNFTs[i]['sale'] != null &&
-              resultNFTs[i]['sale']['owner']['address'] ==
-                  ownerAddressCollection) {
+              ownerNftAddress == ownerAddressCollection) {
             result = resultNFTs[i];
             index = i + 1;
-            isOwnerSale = true;
+
             break;
           }
         }
@@ -223,8 +224,18 @@ class PostController {
             'Ошибка royalty_params при получении serviceFee и royalty: $e');
       }
     }
+    final tonWallet = TonWalletService();
+    String ourAdress = '';
+    if (tonWallet.isConnected) {
+      ourAdress = tonWallet.addressWallet;
+    } else {
+      await tonWallet.restoreConnection();
+      ourAdress = tonWallet.addressWallet;
+    }
+
+    isOwnerSale = ourAdress.isNotEmpty && ownerNftAddress == ourAdress;
     Logger.e(
-        '$isOwnerSale $index >>>>>>>>> $ownerAddressCollection $creatorAddress');
+        'isOwnerSale >>> $isOwnerSale >>>>>>>>> $ownerNftAddress $ourAdress');
     resultNft = resultNft.copyWith(
         nft: resultNft.nft.copyWith(
       allCount: allCount,

@@ -34,7 +34,7 @@ class AppRouter extends $AppRouter {
         AutoRoute(page: EditProfileRoute.page, path: '/edit_profile'),
         AutoRoute(page: BookmarksRoute.page, path: '/bookmarks'),
         AutoRoute(page: UsersListRoute.page, path: '/users_list'),
-        AutoRoute(page: ListRoute.page, path: '/lists/:id'),
+        AutoRoute(page: ListRoute.page, path: '/lists/:id/'),
         RedirectRoute(path: '/list/:id', redirectTo: '/lists/:id'),
         AutoRoute(page: UserRoute.page),
         AutoRoute(path: '/users/:id', page: UserRouteId.page),

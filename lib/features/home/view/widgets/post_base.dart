@@ -87,7 +87,10 @@ class PostBase extends ConsumerWidget {
                 );
           }
           if (multPost != null) {
-            ref.watch(router)!.push(ListRoute(id: multPost.id));
+            ref.watch(router)!.push(ListRoute(
+                  id: multPost.id,
+                  isArtist: user?.isArtist ?? false,
+                ));
           }
         },
         child: ShimmerLoader(

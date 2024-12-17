@@ -119,6 +119,10 @@ abstract class $AppRouter extends _i19.RootStackRouter {
                   'type',
                   -1,
                 ),
+                isArtist: pathParams.getBool(
+                  'isArtist',
+                  false,
+                ),
               ));
       return _i19.AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -126,6 +130,7 @@ abstract class $AppRouter extends _i19.RootStackRouter {
           id: args.id,
           type: args.type,
           key: args.key,
+          isArtist: args.isArtist,
         ),
       );
     },
@@ -458,6 +463,7 @@ class ListRoute extends _i19.PageRouteInfo<ListRouteArgs> {
     required int id,
     int type = -1,
     _i22.Key? key,
+    bool isArtist = false,
     List<_i19.PageRouteInfo>? children,
   }) : super(
           ListRoute.name,
@@ -465,6 +471,7 @@ class ListRoute extends _i19.PageRouteInfo<ListRouteArgs> {
             id: id,
             type: type,
             key: key,
+            isArtist: isArtist,
           ),
           rawPathParams: {
             'id': id,
@@ -484,17 +491,20 @@ class ListRouteArgs {
     required this.id,
     this.type = -1,
     this.key,
+    this.isArtist = false,
   });
 
   final int id;
 
   final int type;
 
+  final bool isArtist;
+
   final _i22.Key? key;
 
   @override
   String toString() {
-    return 'ListRouteArgs{id: $id, type: $type, key: $key}';
+    return 'ListRouteArgs{id: $id, type: $type, key: $key, isArtist: $isArtist}';
   }
 }
 
