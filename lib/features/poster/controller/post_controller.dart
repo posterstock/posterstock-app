@@ -83,20 +83,25 @@ class PostController {
 
   Future<void> getPost(final int id) async {
     if (loadingPost) return;
+
     loadingPost = true;
     var resultNft = await cachedPostRepository.getPost(id);
+
     if (resultNft != null) {
       resultNft = await _prepareData(resultNft, cached: true);
       await posterStateHolder.updateState(resultNft);
       loadingPost = false;
     }
-
     resultNft = await postRepository.getPost(id);
     final List<Map<String, dynamic>> resultNFTs =
         await postRepository.getNFT(resultNft.nft.collection);
     final Map<String, dynamic> resultCollections =
         await postRepository.getCollections(resultNft.nft.collection);
-    String ownerAddressCollection = resultCollections['owner']['address'];
+    String ownerAddressCollection = '';
+    if (resultCollections['owner'] != null &&
+        resultCollections['owner']['address'] != null) {
+      ownerAddressCollection = resultCollections['owner']['address'];
+    }
     int index = 0;
     int allCount = 1;
     double price = 0;

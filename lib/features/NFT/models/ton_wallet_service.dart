@@ -16,7 +16,7 @@ class TonWalletService {
   factory TonWalletService() => _instance;
   final _connectionStreamController = StreamController<String>.broadcast();
   Stream<String> get connectionStream => _connectionStreamController.stream;
-  String get addressWallet => _connector.account?.address;
+  String get addressWallet => _connector.account?.address ?? '';
 
   late TonConnect _connector;
   bool get isConnected => _connector.connected;
