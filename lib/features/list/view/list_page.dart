@@ -600,7 +600,6 @@ class CollectionInfoWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Logger.e('widget.isArtist >>> $isArtist ');
     final commentsBegin = ref.watch(commentsStateHolderProvider);
     final comments = commentsBegin ?? [];
     return Padding(

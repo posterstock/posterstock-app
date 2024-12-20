@@ -196,10 +196,6 @@ class UserInfoTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (isArtistWb) {
-      Logger.i(
-          'UserInfoTile >>> $isArtist $isArtistWb ${user?.name} ${user?.username}');
-    }
     return ShimmerLoader(
       loaded: !loading,
       child: InkWell(

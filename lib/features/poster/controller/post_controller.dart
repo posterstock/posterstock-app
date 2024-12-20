@@ -97,6 +97,7 @@ class PostController {
         await postRepository.getNFT(resultNft.nft.collection);
     final Map<String, dynamic> resultCollections =
         await postRepository.getCollections(resultNft.nft.collection);
+    Logger.e('resultCollections ${resultCollections['owner']}');
     String ownerAddressCollection = '';
     if (resultCollections['owner'] != null &&
         resultCollections['owner']['address'] != null) {
@@ -118,12 +119,11 @@ class PostController {
     Map<String, dynamic>? sale;
     if (resultNFTs.isNotEmpty) {
       nftAddress = resultNft.nft.nftAddress;
-      Map<String, dynamic> result = resultNFTs.first;
+      Map<String, dynamic>? result;
       final isMyPoster = myProfileInfoStateHolder.currentState?.id != null &&
           myProfileInfoStateHolder.currentState!.id == resultNft.author.id;
       final nftAddressConverted =
           TonAddressConverter.friendlyToRaw(resultNft.nft.nftAddress);
-
       if (isMyPoster) {
         for (var item in resultNFTs) {
           if (nftAddressConverted == item['address']) {
@@ -135,70 +135,80 @@ class PostController {
       } else {
         for (int i = 0; i < resultNFTs.length; i++) {
           ownerNftAddress = resultNFTs[i]['owner']['address'];
+          // Logger.e('ownerNftAddress ${resultNFTs[i]} ');
+          print(
+              '-------------------------- Порядковый номер нфт ${resultNFTs[i]['collection']['name']} = ${resultNFTs[i]['index']} ------------------- ');
+          print('ownerNftAddress $i $ownerNftAddress ');
+          print('ownerAddressCollection $ownerAddressCollection');
+          print(
+              'равны ли ownerNftAddress и  ownerAddressCollection  ${ownerNftAddress == ownerAddressCollection} ');
+          print('есть ли продажа ${resultNFTs[i]['sale'] != null} ');
+          print('-------------------------- стоп секция -------------------');
+
           if (resultNFTs[i]['sale'] != null &&
               ownerNftAddress == ownerAddressCollection) {
             result = resultNFTs[i];
             index = i + 1;
-
             break;
           }
         }
       }
-      Logger.e('sale $index >>>>>>>>> ${result['sale']}');
 
-      if (result['collection'] != null &&
+      if (result != null &&
+          result['collection'] != null &&
           result['collection']['address'] != null) {
+        Logger.e('sale $index >>>>>>>>> ${result['sale']}');
         creatorAddress = result['collection']['address'];
       }
-
       allCount = resultNFTs.length;
-      Logger.e('index >>> <<<<<< ${result['index']}');
-      if (result['index'] != null) {
+      if (result != null && result['index'] != null) {
         index = result['index'] + 1;
       }
-      sale = result['sale'];
-      if (sale != null) {
-        nftAddress = result['address'];
-        address = sale['address'];
-        int temp = int.parse(sale['price']['value']);
-        price = temp / pow(10, 9);
-        blocChain = sale['price']['token_name'];
+      if (result != null && result['sale'] != null) {
+        sale = result['sale'];
+        if (sale != null) {
+          nftAddress = result['address'];
+          address = sale['address'];
+          int temp = int.parse(sale['price']['value']);
+          price = temp / pow(10, 9);
+          blocChain = sale['price']['token_name'];
 
-        final response = await http.get(
-            Uri.parse('https://tonapi.io/v2/rates?tokens=ton&currencies=usd'));
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          double usdRate = data['rates']['TON']['prices']['USD'];
-          priceReal = price * usdRate; // Применяем курс к цене
-        } else {
-          Logger.e('Ошибка при получении курса: ${response.statusCode}');
-        }
-
-        try {
-          // Получаем serviceFee и royalty через GraphQL запрос
-          final tonApiEndpoint =
-              Uri.parse('$blockChainUrl$address/methods/get_sale_data');
-          Logger.e('tonApiEndpoint >>>>>>>>> $tonApiEndpoint');
-          final response = await http.get(
-            tonApiEndpoint,
-            headers: {
-              'Accept': 'application/json',
-            },
-          );
-
+          final response = await http.get(Uri.parse(
+              'https://tonapi.io/v2/rates?tokens=ton&currencies=usd'));
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
-            final marketFee = data['decoded']['market_fee'];
-            final digits = marketFee.toString().length;
-            serviceFee = marketFee / pow(10, digits + 1);
-            royalty = data['decoded']['royalty_amount'] / pow(10, 11);
-            Logger.e('serviceFee >>>>>>>>> $serviceFee $royalty');
+            double usdRate = data['rates']['TON']['prices']['USD'];
+            priceReal = price * usdRate; // Применяем курс к цене
           } else {
-            Logger.e(
-                'Ошибка при получении данных из TON API: ${response.statusCode}');
+            Logger.e('Ошибка при получении курса: ${response.statusCode}');
           }
-        } catch (e) {
-          Logger.e('Ошибка при получении serviceFee и royalty: $e');
+
+          try {
+            // Получаем serviceFee и royalty через GraphQL запрос
+            final tonApiEndpoint =
+                Uri.parse('$blockChainUrl$address/methods/get_sale_data');
+            Logger.e('tonApiEndpoint >>>>>>>>> $tonApiEndpoint');
+            final response = await http.get(
+              tonApiEndpoint,
+              headers: {
+                'Accept': 'application/json',
+              },
+            );
+
+            if (response.statusCode == 200) {
+              final data = jsonDecode(response.body);
+              final marketFee = data['decoded']['market_fee'];
+              final digits = marketFee.toString().length;
+              serviceFee = marketFee / pow(10, digits + 1);
+              royalty = data['decoded']['royalty_amount'] / pow(10, 11);
+              Logger.e('serviceFee >>>>>>>>> $serviceFee $royalty');
+            } else {
+              Logger.e(
+                  'Ошибка при получении данных из TON API: ${response.statusCode}');
+            }
+          } catch (e) {
+            Logger.e('Ошибка при получении serviceFee и royalty: $e');
+          }
         }
       } else {
         index = 0;
