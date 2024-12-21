@@ -119,7 +119,6 @@ class TonWalletService {
   Future<bool> restoreConnection() async {
     try {
       final restored = await _connector.restoreConnection();
-
       if (_connector.connected && _connector.account != null) {
         Logger.i('Адрес кошелька: ${_connector.account?.address}');
 
@@ -183,16 +182,17 @@ class TonWalletService {
         final provider = _connector.provider;
         if (provider is BridgeProvider) {
           provider.listen((message) {
-            Logger.i('message >>>>>>>>> $message');
             if (message['event'] == 'connect') {
               // Успешное подключение
               final address = _connector.account?.address ?? '';
               _connectionStreamController.add(address);
+              return true;
             } else if (message['event'] == 'connect_error') {
               // Ошибка подключения
               final errorMessage = message['payload']['message'] as String?;
               Logger.e('Ошибка подключения: $errorMessage');
               _connectionStreamController.add('');
+              return false;
             }
           });
         }
@@ -254,7 +254,6 @@ class TonWalletService {
         final provider = _connector.provider;
         if (provider is BridgeProvider) {
           provider.listen((message) {
-            Logger.i('Transaction message >>>>>>>>> $message');
             if (message['event'] == 'transaction') {
               try {
                 _transactionStreamController.add(TransactionStatus.success);

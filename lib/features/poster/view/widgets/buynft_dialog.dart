@@ -38,7 +38,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
   int percentCreator = 0;
   int percentService = 0;
   StreamSubscription? walletSubscription;
-  bool isTonWalletConnected = true;
+  bool isTonWalletConnected = false;
   double balance = 0;
   bool isBalanceEnough = false;
 
@@ -58,6 +58,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
     setState(() => isLoading = true);
     await tonWallet.restoreConnection();
     isTonWalletConnected = tonWallet.isConnected;
+    setState(() => isLoading = false);
     if (!isTonWalletConnected) {
       return;
     }
@@ -107,27 +108,26 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
     });
   }
 
+  /// прослушивание подключения кошелька
   void subscribeToWallet() {
     walletSubscription = tonWallet.connectionStream.listen((address) {
-      setState(() {
-        isLoading = false;
-      });
       if (address.isNotEmpty) {
         isTonWalletConnected = true;
         scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBars.build(
             context,
             null,
-            "Ошибка подключения кошелька",
+            "TonWallet connected",
           ),
         );
+        start();
       } else {
         isTonWalletConnected = false;
         scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBars.build(
             context,
             null,
-            "Ошибка подключения кошелька",
+            "Error connection TonWallet",
           ),
         );
       }
@@ -135,9 +135,22 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
     });
   }
 
+  /// ручное подключение кошелька
   Future<void> handleWalletConnection() async {
-    setState(() => isLoading = true);
-    await tonWallet.connect();
+    bool isConnected = await tonWallet.connect();
+    Logger.d('handleWalletConnection == $isConnected');
+    if (!isConnected) {
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBars.build(
+          context,
+          null,
+          "Error connection TonWallet",
+        ),
+      );
+      return;
+    } else {
+      subscribeToWallet();
+    }
   }
 
   Future<void> handleBuyNft() async {

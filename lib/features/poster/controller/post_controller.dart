@@ -142,11 +142,13 @@ class PostController {
           print('ownerAddressCollection $ownerAddressCollection');
           print(
               'равны ли ownerNftAddress и  ownerAddressCollection  ${ownerNftAddress == ownerAddressCollection} ');
+          print('sale ${resultNFTs[i]['sale']} ');
           print('есть ли продажа ${resultNFTs[i]['sale'] != null} ');
           print('-------------------------- стоп секция -------------------');
 
           if (resultNFTs[i]['sale'] != null &&
-              ownerNftAddress == ownerAddressCollection) {
+              resultNFTs[i]['sale']['owner']['address'] ==
+                  ownerAddressCollection) {
             result = resultNFTs[i];
             index = i + 1;
             break;
