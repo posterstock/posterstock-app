@@ -41,6 +41,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
   bool isTonWalletConnected = false;
   double balance = 0;
   bool isBalanceEnough = false;
+  bool isDark = false;
 
   @override
   void initState() {
@@ -59,9 +60,6 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
     await tonWallet.restoreConnection();
     isTonWalletConnected = tonWallet.isConnected;
     setState(() => isLoading = false);
-    if (!isTonWalletConnected) {
-      return;
-    }
     price = widget.nft.price;
     // TODO: добавить fee из nft
     // fee = widget.nft.fee;
@@ -227,11 +225,13 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
 
   @override
   Widget build(BuildContext context) {
-    double height = isTonWalletConnected ? 500 : 440;
+    double height = isTonWalletConnected ? 475 : 440;
+    final brightness = MediaQuery.of(context).platformBrightness;
+    isDark = brightness == Brightness.dark;
 
     return Padding(
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: const EdgeInsets.only(bottom: 0),
+      // EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16.0),
         child: Container(
@@ -378,7 +378,13 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
               if (isIcon)
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
-                  child: SvgPicture.asset('assets/icons/ton_bw.svg'),
+                  child: SvgPicture.asset(
+                    'assets/icons/ton_bw.svg',
+                    colorFilter: ColorFilter.mode(
+                      isDark ? Colors.white : Colors.black,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                 ),
             ],
           ),

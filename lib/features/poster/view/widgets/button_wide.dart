@@ -31,7 +31,7 @@ class PaymentButton extends StatelessWidget {
         width: double.infinity,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isLoading || isTonConnect
+          color: isLoading
               ? context.colors.buttonsPrimary?.withOpacity(0.4)
               : context.colors.buttonsPrimary,
           borderRadius: BorderRadius.circular(16),
