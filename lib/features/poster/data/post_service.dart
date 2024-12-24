@@ -166,7 +166,8 @@ class PostService {
           },
         ),
       );
-      Logger.i('api ${'api/posters/$id/'}  ${response.data}');
+      Logger.i(
+          'api getPost >>>>>> ${'api/posters/$id/'}  ${response.data['user']}');
       return response.data;
     } on DioError catch (e) {
       Logger.e('Ошибка при получении постера $e');

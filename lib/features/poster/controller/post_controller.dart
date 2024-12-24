@@ -86,7 +86,6 @@ class PostController {
 
     loadingPost = true;
     var resultNft = await cachedPostRepository.getPost(id);
-
     if (resultNft != null) {
       resultNft = await _prepareData(resultNft, cached: true);
       await posterStateHolder.updateState(resultNft);
@@ -120,14 +119,14 @@ class PostController {
     if (resultNFTs.isNotEmpty) {
       nftAddress = resultNft.nft.nftAddress;
       Map<String, dynamic>? result;
-      final isMyPoster = myProfileInfoStateHolder.currentState?.id != null &&
-          myProfileInfoStateHolder.currentState!.id == resultNft.author.id;
       final nftAddressConverted =
           TonAddressConverter.friendlyToRaw(resultNft.nft.nftAddress);
-      if (isMyPoster) {
+      if (resultNft.nft.nftAddress.isNotEmpty) {
+        Logger.e('nft.nftAddress.isNotEmpty');
         for (var item in resultNFTs) {
           if (nftAddressConverted == item['address']) {
             Logger.e('result = item ');
+            ownerNftAddress = item['owner']['address'];
             result = item;
             break;
           }
@@ -169,6 +168,8 @@ class PostController {
       if (result != null && result['sale'] != null) {
         sale = result['sale'];
         if (sale != null) {
+          ownerNftAddress = sale['owner']['address'];
+          Logger.e('sale >>>>>>>>> $sale');
           nftAddress = result['address'];
           address = sale['address'];
           int temp = int.parse(sale['price']['value']);
@@ -252,7 +253,7 @@ class PostController {
 
     isOwnerSale = ourAdress.isNotEmpty && ownerNftAddress == ourAdress;
     Logger.e(
-        'isOwnerSale >>> $isOwnerSale >>>>>>>>> $ownerNftAddress $ourAdress');
+        'isOwnerSale >>> $isOwnerSale >>>>>>>>> >$ownerNftAddress< >$ourAdress<');
     resultNft = resultNft.copyWith(
         nft: resultNft.nft.copyWith(
       allCount: allCount,

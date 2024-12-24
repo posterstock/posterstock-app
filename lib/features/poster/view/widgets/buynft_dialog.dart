@@ -228,7 +228,6 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
     double height = isTonWalletConnected ? 475 : 440;
     final brightness = MediaQuery.of(context).platformBrightness;
     isDark = brightness == Brightness.dark;
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 0),
       // EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),

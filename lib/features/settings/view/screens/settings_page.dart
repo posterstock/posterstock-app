@@ -576,6 +576,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                   ref.watch(router)!.pushAndPopUntil(
                                       AuthRoute(),
                                       predicate: (value) => false);
+                                  TonWalletService().disconnect();
                                   if (Navigator.canPop(context)) {
                                     Navigator.pop(context);
                                   }
