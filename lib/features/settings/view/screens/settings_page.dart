@@ -229,8 +229,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                               SnackBars.build(
                                 context,
                                 null,
-                                //TODO: localize
-                                "Сhanging the email is currently not possible. Please contact support.",
+                                context.txt.settings_changeEmail_error,
                               ),
                             );
                           },

@@ -115,7 +115,8 @@ class TonConnect {
       'valid_until': transaction['validUntil'],
       'from': transaction['from'] ?? wallet!.account!.address,
       'network': transaction['network'] ?? wallet!.account!.chain.value,
-      'messages': transaction['messages'] ?? []
+      'messages': transaction['messages'] ?? [],
+      'id': transaction['id'] ?? 0,
     };
 
     Map<String, dynamic> response = await provider!

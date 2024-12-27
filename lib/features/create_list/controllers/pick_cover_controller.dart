@@ -18,6 +18,7 @@ import 'package:poster_stock/features/create_list/state_holders/pick_cover_galle
 import 'package:poster_stock/features/profile/controllers/profile_controller.dart';
 import 'package:poster_stock/features/profile/state_holders/my_profile_info_state_holder.dart';
 import 'package:poster_stock/main.dart';
+import 'package:poster_stock/themes/build_context_extension.dart';
 import 'package:screenshot/screenshot.dart';
 
 final pickCoverControllerProvider = Provider.autoDispose<PickCoverController>(
@@ -103,7 +104,7 @@ class PickCoverController {
           SnackBars.build(
             context,
             null,
-            'List not created',
+            context.txt.list_not_created,
           ),
         );
       }
@@ -112,7 +113,7 @@ class PickCoverController {
         SnackBars.build(
           context,
           null,
-          'Loading cover error. Default cover will be used.',
+          context.txt.load_error_cover,
         ),
       );
     }
@@ -151,7 +152,7 @@ class PickCoverController {
           SnackBars.build(
             context,
             null,
-            'Loading cover error. Default cover will be used.',
+            context.txt.load_error_cover,
           ),
         );
         return null;

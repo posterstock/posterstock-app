@@ -807,8 +807,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
               SnackBars.build(
                 context,
                 null,
-                //TODO: localize
-                "Not available yet",
+                context.txt.not_available,
               ),
             );
           },
@@ -897,8 +896,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                 SnackBars.build(
                   context,
                   null,
-                  //TODO: loclize
-                  "Not available yet",
+                  context.txt.not_available,
                 ),
               );
             } else {
@@ -913,8 +911,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                   SnackBars.build(
                     context,
                     null,
-                    //TODO: localize
-                    "Deleted successfully",
+                    context.txt.poster_delete_success,
                   ),
                 );
                 AutoRouter.of(context).pop();
@@ -924,8 +921,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                   SnackBars.build(
                     context,
                     null,
-                    //TODO: localize
-                    'Could not delete post',
+                    context.txt.poster_delete_error,
                   ),
                 );
               }

@@ -184,8 +184,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
               SnackBars.build(
                 context,
                 null,
-                //TODO: localize
-                "Not available yet",
+                context.txt.nft_sell_not_available,
               ),
             );
           },

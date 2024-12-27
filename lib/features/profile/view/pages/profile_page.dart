@@ -410,8 +410,7 @@ class OtherProfileDialog extends ConsumerWidget {
                                 SnackBars.build(
                                   context,
                                   null,
-                                  //TODO: localize
-                                  "Not available yet",
+                                  context.txt.not_available,
                                 ),
                               );
                             },
@@ -459,8 +458,7 @@ class OtherProfileDialog extends ConsumerWidget {
                                   SnackBars.build(
                                     context,
                                     null,
-                                    //TODO: localize
-                                    "An error occured",
+                                    context.txt.error_occured,
                                   ),
                                 );
                                 return;

@@ -55,7 +55,7 @@ class NavigationPage extends ConsumerWidget {
           '/auth',
         );
         scaffoldMessengerKey.currentState?.showSnackBar(
-            SnackBars.build(context, null, "Authentication error"));
+            SnackBars.build(context, null, context.txt.auth_error));
       }
     });
     final pageTransitionController =

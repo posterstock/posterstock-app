@@ -38,8 +38,9 @@ class BridgeProvider extends BaseProvider {
     final sessionCrypto = SessionCrypto();
 
     String bridgeUrl = _wallet?.bridgeUrl ?? '';
-    String universalUrl = _wallet?.universalUrl ?? BridgeProvider.standartUniversalUrl;
-    
+    String universalUrl =
+        _wallet?.universalUrl ?? BridgeProvider.standartUniversalUrl;
+
     _gateway = BridgeGateway(
       _storage,
       bridgeUrl,
@@ -134,10 +135,13 @@ class BridgeProvider extends BaseProvider {
     final keyConnection =
         await _storage.getItem(key: IStorage.keyConnection, defaultValue: '{}');
     var connection = jsonDecode(keyConnection!) as Map<String, dynamic>;
-    var id = connection['next_rpc_request_id'] != null
-        ? connection['next_rpc_request_id'].toString()
-        : '0';
+    Map<String, dynamic> decodedParams = jsonDecode(request['params'][0]);
+    var id = decodedParams['id'];
 
+    // connection['next_rpc_request_id'] != null
+    //     ? connection['next_rpc_request_id'].toString()
+    //     : '0';
+    print('id: 2222>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> $id');
     connection['next_rpc_request_id'] = (int.parse(id) + 1).toString();
     await _storage.setItem(
         key: IStorage.keyConnection, value: jsonEncode(connection));

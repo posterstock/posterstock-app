@@ -516,7 +516,7 @@ class _ListPageState extends ConsumerState<ListPage>
                 SnackBars.build(
                   context,
                   null,
-                  'Not available yet',
+                  context.txt.not_available,
                 ),
               );
             } else {
@@ -531,7 +531,7 @@ class _ListPageState extends ConsumerState<ListPage>
                   SnackBars.build(
                     context,
                     null,
-                    "List deleted successfully",
+                    context.txt.list_delete_success,
                   ),
                 );
               } catch (_) {
@@ -540,7 +540,7 @@ class _ListPageState extends ConsumerState<ListPage>
                   SnackBars.build(
                     context,
                     null,
-                    "Could not delete list",
+                    context.txt.list_delete_error,
                   ),
                 );
               }

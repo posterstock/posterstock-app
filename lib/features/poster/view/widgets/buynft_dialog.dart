@@ -83,19 +83,19 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
             widget.onClose();
             Navigator.pop(context);
             scaffoldMessengerKey.currentState?.showSnackBar(
-              SnackBars.build(context, null, "NFT куплен"),
+              SnackBars.build(context, null, context.txt.nft_buy_success),
             );
             break;
           case TransactionStatus.failed:
             setState(() => isLoading = false);
             scaffoldMessengerKey.currentState?.showSnackBar(
-              SnackBars.build(context, null, "Ошибка при покупке NFT"),
+              SnackBars.build(context, null, context.txt.nft_buy_error),
             );
             break;
           case TransactionStatus.cancelled:
             setState(() => isLoading = false);
             scaffoldMessengerKey.currentState?.showSnackBar(
-              SnackBars.build(context, null, "Транзакция отменена"),
+              SnackBars.build(context, null, context.txt.nft_buy_cancelled),
             );
             break;
           case TransactionStatus.pending:
@@ -115,7 +115,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
           SnackBars.build(
             context,
             null,
-            "TonWallet connected",
+            context.txt.wallet_connected,
           ),
         );
         start();
@@ -125,7 +125,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
           SnackBars.build(
             context,
             null,
-            "Error connection TonWallet",
+            context.txt.wallet_error,
           ),
         );
       }
@@ -142,7 +142,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
         SnackBars.build(
           context,
           null,
-          "Error connection TonWallet",
+          context.txt.wallet_error,
         ),
       );
       return;
@@ -173,19 +173,19 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
               widget.onClose();
               Navigator.pop(context);
               scaffoldMessengerKey.currentState?.showSnackBar(
-                SnackBars.build(context, null, "NFT куплен"),
+                SnackBars.build(context, null, context.txt.nft_buy_success),
               );
               break;
             case TransactionStatus.failed:
               setState(() => isLoading = false);
               scaffoldMessengerKey.currentState?.showSnackBar(
-                SnackBars.build(context, null, "Ошибка при покупке NFT"),
+                SnackBars.build(context, null, context.txt.nft_buy_error),
               );
               break;
             case TransactionStatus.cancelled:
               setState(() => isLoading = false);
               scaffoldMessengerKey.currentState?.showSnackBar(
-                SnackBars.build(context, null, "Транзакция отменена"),
+                SnackBars.build(context, null, context.txt.nft_buy_cancelled),
               );
               break;
             case TransactionStatus.pending:

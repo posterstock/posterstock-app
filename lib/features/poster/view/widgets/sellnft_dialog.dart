@@ -63,20 +63,31 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
           widget.onClose();
           Navigator.pop(context);
           scaffoldMessengerKey.currentState?.showSnackBar(
-            SnackBars.build(context, null, "NFT выставлен на продажу"),
+            SnackBars.build(
+              context,
+              null,
+              context.txt.nft_sell_success,
+            ),
           );
           break;
         case TransactionStatus.failed:
           setState(() => isLoading = false);
           scaffoldMessengerKey.currentState?.showSnackBar(
             SnackBars.build(
-                context, null, "Ошибка при выставлении NFT на продажу"),
+              context,
+              null,
+              context.txt.nft_sell_error,
+            ),
           );
           break;
         case TransactionStatus.cancelled:
           setState(() => isLoading = false);
           scaffoldMessengerKey.currentState?.showSnackBar(
-            SnackBars.build(context, null, "Транзакция отменена"),
+            SnackBars.build(
+              context,
+              null,
+              context.txt.nft_sell_cancelled,
+            ),
           );
           break;
         case TransactionStatus.pending:
@@ -115,7 +126,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
           SnackBars.build(
             context,
             null,
-            "TonWallet connected",
+            context.txt.nft_connect,
           ),
         );
         start();
@@ -125,7 +136,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
           SnackBars.build(
             context,
             null,
-            "Error connection TonWallet",
+            context.txt.nft_connect_error,
           ),
         );
       }
@@ -142,7 +153,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
         SnackBars.build(
           context,
           null,
-          "Error connection TonWallet",
+          context.txt.nft_connect_error,
         ),
       );
       return;
@@ -160,9 +171,14 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
   }
 
   Future<void> handleSellNft() async {
+    if (priceController.text.isEmpty) {
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBars.build(context, null, context.txt.nft_price_empty),
+      );
+      return;
+    }
     try {
       setState(() => isLoading = true);
-
       final price = double.parse(priceController.text);
       final priceInNano = BigInt.from(price * 1e9);
       await tonWallet.createNFTSale(
@@ -180,13 +196,21 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
       widget.onClose();
       Navigator.pop(context);
       scaffoldMessengerKey.currentState?.showSnackBar(
-        SnackBars.build(context, null, "NFT выставлен на продажу"),
+        SnackBars.build(
+          context,
+          null,
+          context.txt.nft_sell_success,
+        ),
       );
     } catch (e) {
       Logger.e('Error handleSellNft: $e');
       setState(() => isLoading = false);
       scaffoldMessengerKey.currentState?.showSnackBar(
-        SnackBars.build(context, null, "Ошибка при выставлении NFT на продажу"),
+        SnackBars.build(
+          context,
+          null,
+          context.txt.nft_sell_error,
+        ),
       );
     }
   }

@@ -653,8 +653,8 @@ class ProfilePhotoDialog extends ConsumerWidget {
                               } catch (e) {
                                 Logger.e('Ошибка при выборе из галереи $e');
                                 scaffoldMessengerKey.currentState?.showSnackBar(
-                                  SnackBars.build(
-                                      context, null, "Could not pick image"),
+                                  SnackBars.build(context, null,
+                                      context.txt.pick_image_error),
                                 );
                                 return;
                               }
@@ -687,7 +687,10 @@ class ProfilePhotoDialog extends ConsumerWidget {
                               } else {
                                 scaffoldMessengerKey.currentState?.showSnackBar(
                                   SnackBars.build(
-                                      context, null, "Could not pick image"),
+                                    context,
+                                    null,
+                                    context.txt.pick_image_error,
+                                  ),
                                 );
                               }
                             },
