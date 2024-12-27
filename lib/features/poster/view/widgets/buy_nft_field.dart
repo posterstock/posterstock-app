@@ -200,6 +200,7 @@ class BuyNftFieldState extends ConsumerState<BuyNftField> {
                         onClose: () => ref
                             .read(postControllerProvider)
                             .getPost(widget.post.id),
+                        isManage: false,
                       );
                     } else {
                       return BuyNftDialog(

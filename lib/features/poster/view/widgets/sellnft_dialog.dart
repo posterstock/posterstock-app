@@ -19,11 +19,13 @@ import 'package:poster_stock/themes/build_context_extension.dart';
 class SellNftDialog extends ConsumerStatefulWidget {
   final NftForPoster nft;
   final VoidCallback onClose;
+  final bool isManage;
 
   const SellNftDialog({
     Key? key,
     required this.nft,
     required this.onClose,
+    required this.isManage,
   }) : super(key: key);
 
   @override
@@ -49,7 +51,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
     priceController.addListener(() {
       setState(() {});
     });
-    isForSale = widget.nft.isForSale;
+    isForSale = widget.isManage;
     if (!isForSale) {
       priceController.text = widget.nft.price.toString();
     }
@@ -289,6 +291,10 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
                         'assets/icons/ic_price_off.svg',
                         width: 22,
                         height: 22,
+                        colorFilter: ColorFilter.mode(
+                          context.colors.textsPrimary!,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                 ],
@@ -321,12 +327,16 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
                               hintText: 'Item price',
                               border: InputBorder.none,
                             ),
+                            style: TextStyle(
+                              color: context.colors
+                                  .textsPrimary, // Установите основной цвет текста
+                            ),
                           ),
                         ),
                         SvgPicture.asset(
                           'assets/icons/ton_bw.svg',
                           colorFilter: ColorFilter.mode(
-                            context.colors.textsDisabled!,
+                            context.colors.textsPrimary!,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -419,7 +429,13 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
               if (isIcon)
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
-                  child: SvgPicture.asset('assets/icons/ton_bw.svg'),
+                  child: SvgPicture.asset(
+                    'assets/icons/ton_bw.svg',
+                    colorFilter: ColorFilter.mode(
+                      context.colors.textsPrimary!,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                 ),
             ],
           ),

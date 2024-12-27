@@ -817,7 +817,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
         if (isSell && myPoster?.id == post.author.id && post.nft.number != 0)
           MenuItem(
             'assets/icons/ic_price.svg',
-            post.isForSale ? 'Sell NFT' : 'Manage NFT',
+            !post.nft.isForSale ? 'Sell NFT' : 'Manage NFT',
             () async {
               await showModalBottomSheet(
                 context: context,
@@ -828,6 +828,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                   nft: post.nft,
                   onClose: () =>
                       ref.read(postControllerProvider).getPost(post.id),
+                  isManage: !post.nft.isOwnerSale,
                 ),
               );
               return;

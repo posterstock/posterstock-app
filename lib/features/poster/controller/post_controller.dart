@@ -122,11 +122,12 @@ class PostController {
       final nftAddressConverted =
           TonAddressConverter.friendlyToRaw(resultNft.nft.nftAddress);
       if (resultNft.nft.nftAddress.isNotEmpty) {
-        Logger.e('nft.nftAddress.isNotEmpty');
         for (var item in resultNFTs) {
           if (nftAddressConverted == item['address']) {
-            Logger.e('result = item ');
+            Logger.e('result = $item ');
+            Logger.i('sale  = ${item['sale']} ');
             ownerNftAddress = item['owner']['address'];
+            index = item['index'] + 1;
             result = item;
             break;
           }
@@ -164,6 +165,7 @@ class PostController {
       allCount = resultNFTs.length;
       if (result != null && result['index'] != null) {
         index = result['index'] + 1;
+        Logger.e('index >>>>>>>>>>>>>>>>>>>>>>>>>> $index');
       }
       if (result != null && result['sale'] != null) {
         sale = result['sale'];
@@ -214,7 +216,7 @@ class PostController {
           }
         }
       } else {
-        index = 0;
+        isOwnerSale = false;
       }
       try {
         // Получаем serviceFee и royalty через GraphQL запрос
@@ -251,7 +253,6 @@ class PostController {
       ourAdress = tonWallet.addressWallet;
     }
 
-    isOwnerSale = ourAdress.isNotEmpty && ownerNftAddress == ourAdress;
     Logger.e(
         'isOwnerSale >>> $isOwnerSale >>>>>>>>> >$ownerNftAddress< >$ourAdress<');
     resultNft = resultNft.copyWith(
@@ -272,7 +273,6 @@ class PostController {
       destination: destination,
       isOwnerSale: isOwnerSale,
     ));
-    cachedPostRepository.cachePost(id, resultNft);
     cachedPostRepository.cachePost(id, resultNft);
     resultNft = await _prepareData(resultNft);
     await posterStateHolder.updateState(resultNft);
