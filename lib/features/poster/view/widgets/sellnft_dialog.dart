@@ -56,6 +56,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
       priceController.text = widget.nft.price.toString();
     }
     transactionSubscription = tonWallet.transactionStream.listen((status) {
+      Logger.e('status: $status');
       switch (status) {
         case TransactionStatus.success:
           setState(() => isLoading = false);
@@ -87,39 +88,44 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
 
   Future start() async {
     setState(() => isLoading = true);
-    await tonWallet.restoreConnection();
-    isTonWalletConnected = tonWallet.isConnected;
-    if (!isTonWalletConnected) {
-      return;
+    try {
+      await tonWallet.restoreConnection();
+      isTonWalletConnected = tonWallet.isConnected;
+      Logger.d('isTonWalletConnected: $isTonWalletConnected');
+      if (!isTonWalletConnected) {
+        setState(() => isLoading = false);
+        return;
+      }
+      // TODO: добавить fee из nft
+      // fee = widget.nft.fee;
+      isTonWalletConnected = tonWallet.isConnected;
+      setState(() => isLoading = false);
+    } catch (e) {
+      setState(() => isLoading = false);
+      Logger.e('Error restoreConnection: $e');
     }
-    // TODO: добавить fee из nft
-    // fee = widget.nft.fee;
-    isTonWalletConnected = tonWallet.isConnected;
-    setState(() => isLoading = false);
-    // Подписываемся на статус транзакции
   }
 
+  /// прослушивание подключения кошелька
   void subscribeToWallet() {
     walletSubscription = tonWallet.connectionStream.listen((address) {
-      setState(() {
-        isLoading = false;
-      });
       if (address.isNotEmpty) {
         isTonWalletConnected = true;
         scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBars.build(
             context,
             null,
-            "Ошибка подключения кошелька",
+            "TonWallet connected",
           ),
         );
+        start();
       } else {
         isTonWalletConnected = false;
         scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBars.build(
             context,
             null,
-            "Ошибка подключения кошелька",
+            "Error connection TonWallet",
           ),
         );
       }
@@ -127,9 +133,22 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
     });
   }
 
+  /// ручное подключение кошелька
   Future<void> handleWalletConnection() async {
-    setState(() => isLoading = true);
-    await tonWallet.connect();
+    bool isConnected = await tonWallet.connect();
+    Logger.d('handleWalletConnection == $isConnected');
+    if (!isConnected) {
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBars.build(
+          context,
+          null,
+          "Error connection TonWallet",
+        ),
+      );
+      return;
+    } else {
+      subscribeToWallet();
+    }
   }
 
   @override
@@ -160,7 +179,6 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
       setState(() => isLoading = false);
       widget.onClose();
       Navigator.pop(context);
-
       scaffoldMessengerKey.currentState?.showSnackBar(
         SnackBars.build(context, null, "NFT выставлен на продажу"),
       );
@@ -352,7 +370,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
                   ],
                 ),
               ),
-              if (isForSale) ...[
+              if (isForSale && isTonWalletConnected) ...[
                 const Gap(20),
                 PaymentButton(
                   text: isForSale ? 'Put on Sale' : 'Save price',
@@ -361,6 +379,17 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
                   onTap: handleSellNft,
                   isTon: false,
                   isTonConnect: priceController.text.isEmpty,
+                ),
+              ],
+              if (!isTonWalletConnected) ...[
+                const Gap(20),
+                PaymentButton(
+                  text: context.txt.nft_connect,
+                  isLoading: isLoading,
+                  paymentAmount: 0,
+                  onTap: handleWalletConnection,
+                  isTon: isTonWalletConnected,
+                  isTonConnect: true,
                 ),
               ],
             ],
