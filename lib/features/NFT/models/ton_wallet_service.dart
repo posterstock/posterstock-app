@@ -329,6 +329,14 @@ class TonWalletService {
   Future<bool> createNFTUnSale({
     required String nftAddressContract,
   }) async {
+    String lastEventId = '0';
+    try {
+      final temp = await _connector.storage.getItem(key: 'last_event_id');
+      Logger.i('temp: $temp');
+      lastEventId = temp ?? '0';
+    } catch (e) {
+      Logger.e('Ошибка в getItem: $e');
+    }
     try {
       // Создаем тело транзакции для снятия с продажи
       final unsaleBody = beginCell()
@@ -339,6 +347,7 @@ class TonWalletService {
       final transaction = {
         'validUntil': DateTime.now().millisecondsSinceEpoch + 300000,
         'network': -3,
+        'id': lastEventId,
         'messages': [
           {
             'address': nftAddressContract,

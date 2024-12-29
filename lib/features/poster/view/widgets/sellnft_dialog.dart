@@ -279,7 +279,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
         );
       },
     );
-
+    Logger.e('result: $result');
     if (result == true) {
       await tonWallet.createNFTUnSale(
         nftAddressContract: widget.nft.contractAdress,
@@ -297,7 +297,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16.0),
         child: Container(
-          height: 390 + (isForSale ? 50 : 0),
+          height: 390 + (isForSale || !isTonWalletConnected ? 50 : 0),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16.0),
@@ -316,7 +316,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
               ),
               const Gap(22),
               Row(
-                mainAxisAlignment: !isForSale
+                mainAxisAlignment: !isForSale && isTonWalletConnected
                     ? MainAxisAlignment.spaceBetween
                     : MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -326,7 +326,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
                     isForSale ? 'Sell NFT' : 'Manage NFT',
                     style: context.textStyles.headline,
                   ),
-                  if (!isForSale)
+                  if (!isForSale && isTonWalletConnected)
                     GestureDetector(
                       onTap: showRemoveFromSaleDialog,
                       child: SvgPicture.asset(

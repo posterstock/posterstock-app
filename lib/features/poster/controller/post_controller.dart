@@ -129,7 +129,9 @@ class PostController {
             ownerNftAddress = item['owner']['address'];
             index = item['index'] + 1;
             result = item;
-            break;
+            if (item['sale'] != null) {
+              isOwnerSale = true;
+            }
           }
         }
       } else {

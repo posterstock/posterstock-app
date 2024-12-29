@@ -141,7 +141,6 @@ class BridgeProvider extends BaseProvider {
     // connection['next_rpc_request_id'] != null
     //     ? connection['next_rpc_request_id'].toString()
     //     : '0';
-    print('id: 2222>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> $id');
     connection['next_rpc_request_id'] = (int.parse(id) + 1).toString();
     await _storage.setItem(
         key: IStorage.keyConnection, value: jsonEncode(connection));

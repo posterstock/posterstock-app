@@ -81,11 +81,15 @@ class _PosterPageState extends ConsumerState<PosterPage>
   double velocity = 0;
   int disabled = 1;
   bool popped = false;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     Future(() async {
+      setState(() {
+        isLoading = true;
+      });
       ref.read(postControllerProvider).clear();
       if (ref.read(pageTransitionControllerStateHolder)?.value == 1) {
         ref.read(pageTransitionControllerStateHolder)!.animateTo(
@@ -169,12 +173,21 @@ class _PosterPageState extends ConsumerState<PosterPage>
           el = null;
         }
         if (el == null) return;
-        ref.read(postControllerProvider).getPost(el.pathParams.getInt('id'));
-        ref
+        setState(() {
+          isLoading = true;
+        });
+        await ref
+            .read(postControllerProvider)
+            .getPost(el.pathParams.getInt('id'));
+        setState(() {
+          isLoading = false;
+        });
+        await ref
             .read(postControllerProvider)
             .updateComments(el.pathParams.getInt('id'));
       });
     }
+
     if (posterController == null) {
       imageHeight = MediaQuery.of(context).size.height * 0.66;
       posterController = AnimationController(
@@ -716,7 +729,11 @@ class _PosterPageState extends ConsumerState<PosterPage>
                         left: 0,
                         right: 0,
                         child: CommentTextField(id: post.id),
-                      )
+                      ),
+                    if (isLoading)
+                      const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      ),
                   ],
                 ),
               ),
