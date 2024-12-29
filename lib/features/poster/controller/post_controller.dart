@@ -116,11 +116,21 @@ class PostController {
     String ownerNftAddress = '';
     bool isOwnerSale = false;
     Map<String, dynamic>? sale;
+    final tonWallet = TonWalletService();
+    String ourAdress = '';
+    if (tonWallet.isConnected) {
+      ourAdress = tonWallet.addressWallet;
+    } else {
+      await tonWallet.restoreConnection();
+      ourAdress = tonWallet.addressWallet;
+    }
+
     if (resultNFTs.isNotEmpty) {
       nftAddress = resultNft.nft.nftAddress;
       Map<String, dynamic>? result;
       final nftAddressConverted =
           TonAddressConverter.friendlyToRaw(resultNft.nft.nftAddress);
+
       if (resultNft.nft.nftAddress.isNotEmpty) {
         for (var item in resultNFTs) {
           if (nftAddressConverted == item['address']) {
@@ -129,7 +139,10 @@ class PostController {
             ownerNftAddress = item['owner']['address'];
             index = item['index'] + 1;
             result = item;
-            if (item['sale'] != null) {
+            Logger.e(
+                'ourAdress $ourAdress == ${item['sale']['owner']['address']}');
+            if (item['sale'] != null &&
+                item['sale']['owner']['address'] == ourAdress) {
               isOwnerSale = true;
             }
           }
@@ -245,14 +258,6 @@ class PostController {
         Logger.e(
             'Ошибка royalty_params при получении serviceFee и royalty: $e');
       }
-    }
-    final tonWallet = TonWalletService();
-    String ourAdress = '';
-    if (tonWallet.isConnected) {
-      ourAdress = tonWallet.addressWallet;
-    } else {
-      await tonWallet.restoreConnection();
-      ourAdress = tonWallet.addressWallet;
     }
 
     Logger.e(
