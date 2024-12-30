@@ -10,6 +10,7 @@ class PaymentButton extends StatelessWidget {
   final Function()? onTap; // Добавлен final
   final bool isTon;
   final bool isTonConnect;
+  final bool isEnable;
 
   const PaymentButton({
     // теперь const конструктор возможен
@@ -20,12 +21,13 @@ class PaymentButton extends StatelessWidget {
     required this.text,
     this.isTon = true,
     this.isTonConnect = false,
+    this.isEnable = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: isLoading ? null : onTap,
+      onTap: isLoading || !isEnable ? null : onTap,
       child: Container(
         height: 51,
         width: double.infinity,
@@ -36,7 +38,7 @@ class PaymentButton extends StatelessWidget {
               : context.colors.buttonsPrimary,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: isLoading
+        child: isLoading || !isEnable
             ? CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(
                     context.colors.textsBackground!),

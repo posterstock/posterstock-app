@@ -162,7 +162,7 @@ class PosterInfo extends ConsumerWidget {
             ),
           ],
         ),
-        if (post != null && post.isForSale) BuyNftField(post: post),
+        if (post != null && post.nft.isForSale) BuyNftField(post: post),
       ],
     );
   }

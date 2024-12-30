@@ -403,6 +403,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
                   onTap: handleSellNft,
                   isTon: false,
                   isTonConnect: priceController.text.isEmpty,
+                  isEnable: priceController.text.isNotEmpty,
                 ),
               ],
               if (!isTonWalletConnected) ...[

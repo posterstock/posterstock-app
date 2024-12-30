@@ -321,7 +321,8 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
                     ? handleWalletConnection
                     : handleBuyNft,
                 isTon: isTonWalletConnected,
-                isTonConnect: !isTonWalletConnected || isBalanceEnough,
+                isTonConnect: !isTonWalletConnected,
+                isEnable: !isBalanceEnough,
               ),
             ],
           ),

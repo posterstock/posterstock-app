@@ -139,10 +139,10 @@ class PostController {
             ownerNftAddress = item['owner']['address'];
             index = item['index'] + 1;
             result = item;
-            Logger.e(
-                'ourAdress $ourAdress == ${item['sale']['owner']['address']}');
             if (item['sale'] != null &&
+                item['sale']['owner'] != null &&
                 item['sale']['owner']['address'] == ourAdress) {
+              Logger.e('isOwnerSale = true');
               isOwnerSale = true;
             }
           }
