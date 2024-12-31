@@ -204,6 +204,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
       await Future.delayed(const Duration(seconds: 20), () async {
         try {
           final postService = PostService();
+          Logger.e('nftAddress ${widget.nft.nftAddress}');
           await postService.nftSell(
               nftAddress: widget.nft.nftAddress,
               buyerAddress: tonWallet.addressWallet);

@@ -259,9 +259,12 @@ class PostController {
             'Ошибка royalty_params при получении serviceFee и royalty: $e');
       }
     }
-
     Logger.e(
-        'isOwnerSale >>> $isOwnerSale >>>>>>>>> >$ownerNftAddress< >$ourAdress<');
+        'isOwnerSale >>>  $nftAddress >>> $isOwnerSale >>>>>>>>> >$ownerNftAddress< >$ourAdress<');
+    String mashineNftAddress = nftAddress;
+    if (!nftAddress.contains('0:')) {
+      mashineNftAddress = TonAddressConverter.friendlyToRaw(nftAddress);
+    }
     resultNft = resultNft.copyWith(
         nft: resultNft.nft.copyWith(
       allCount: allCount,
@@ -272,7 +275,7 @@ class PostController {
       address: address,
       serviceFee: serviceFee,
       royalty: royalty,
-      nftAddress: nftAddress,
+      nftAddress: mashineNftAddress,
       isForSale: (sale != null && index != 0),
       creatorAddress: creatorAddress,
       contractAdress: address,
