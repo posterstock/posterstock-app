@@ -144,6 +144,14 @@ class _PosterPageState extends ConsumerState<PosterPage>
     });
   }
 
+  Future<void> onCloseNft() async {
+    setState(() => isLoading = true);
+    Logger.e('onCloseNft');
+    await ref.read(postControllerProvider).clear();
+    await ref.read(postControllerProvider).getPost(post!.id);
+    setState(() => isLoading = false);
+  }
+
   void jumpToEnd({bool? up}) {
     if (scrollController.offset == 0 ||
         scrollController.offset == imageHeight! - 18) return;
@@ -321,6 +329,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
                                           likes: widget.likes,
                                           comments: widget.comments,
                                           liked: widget.liked,
+                                          onClose: onCloseNft,
                                         );
                                       },
                                     ),
@@ -842,12 +851,10 @@ class _PosterPageState extends ConsumerState<PosterPage>
                 useSafeArea: true,
                 builder: (context) => SellNftDialog(
                   nft: post.nft,
-                  onClose: () =>
-                      ref.read(postControllerProvider).getPost(post.id),
+                  onClose: onCloseNft,
                   isManage: !post.nft.isOwnerSale,
                 ),
               );
-              return;
             },
           ),
         if (myPoster?.id != post.author.id)

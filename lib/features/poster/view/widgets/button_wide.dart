@@ -33,12 +33,12 @@ class PaymentButton extends StatelessWidget {
         width: double.infinity,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isLoading
+          color: isLoading || !isEnable
               ? context.colors.buttonsPrimary?.withOpacity(0.4)
               : context.colors.buttonsPrimary,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: isLoading || !isEnable
+        child: isLoading
             ? CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(
                     context.colors.textsBackground!),

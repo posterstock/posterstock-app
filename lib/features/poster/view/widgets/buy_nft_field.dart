@@ -20,10 +20,12 @@ import 'package:poster_stock/themes/build_context_extension.dart';
 
 class BuyNftField extends ConsumerStatefulWidget {
   final PostMovieModel post;
+  final Function()? onClose;
 
   const BuyNftField({
     super.key,
     required this.post,
+    this.onClose,
   });
 
   @override
@@ -212,6 +214,7 @@ class BuyNftFieldState extends ConsumerState<BuyNftField> {
                     }
                   },
                 );
+                widget.onClose?.call();
                 return;
               },
               text: widget.post.nft.isOwnerSale

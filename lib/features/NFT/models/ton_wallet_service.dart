@@ -121,7 +121,7 @@ class TonWalletService {
       final restored = await _connector.restoreConnection();
       if (_connector.connected && _connector.account != null) {
         Logger.i('Адрес кошелька: ${_connector.account?.address}');
-
+        await Future.delayed(const Duration(seconds: 2));
         // Получаем баланс
         balance = await getWalletBalance();
         Logger.i('Баланс кошелька: $balance TON');
@@ -378,7 +378,7 @@ class TonWalletService {
   Future<bool> createNFTSale({
     required String nftAddress,
     required String ownerAddress,
-    required String royaltyAddress,
+    required String creatorAddress,
     required BigInt price,
     required BigInt amount,
     required double percentMarketplace,
@@ -401,10 +401,13 @@ class TonWalletService {
       final kNftFixPriceSaleV3R3CodeCell =
           Cell.fromBoc(base64Decode(kNftFixPriceSaleV3R3CodeBoc))[0];
 
+      final Address royaltyAddress = InternalAddress.parse(
+          '0QCA_mh61MASkQMJUYgq11SQB1YkxAPIdPwgfbrPsCqOJLYF');
+
       final feesData = beginCell()
-          .storeAddress(InternalAddress.parse(royaltyAddress))
+          .storeAddress(royaltyAddress)
           .storeCoins(price ~/ BigInt.from(100) * BigInt.from(5))
-          .storeAddress(InternalAddress.parse(royaltyAddress))
+          .storeAddress(InternalAddress.parse(creatorAddress))
           .storeCoins(price ~/ BigInt.from(100) * BigInt.from(5))
           .endCell();
       final saleData = beginCell()
@@ -433,7 +436,7 @@ class TonWalletService {
       // Создаем saleBody
       final saleBody = beginCell()
           .storeUint(price, 64) // Цена продажи
-          .storeAddress(InternalAddress.parse(royaltyAddress))
+          .storeAddress(royaltyAddress)
           .storeUint(BigInt.from(percentRoyalty * 100), 16)
           .storeUint(BigInt.from(percentMarketplace * 100), 16)
           .endCell();

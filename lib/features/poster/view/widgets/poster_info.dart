@@ -78,11 +78,13 @@ class PosterInfo extends ConsumerWidget {
     required this.likes,
     required this.comments,
     required this.liked,
+    this.onClose,
   });
 
   final int likes;
   final int comments;
   final bool liked;
+  final Function()? onClose;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -162,7 +164,11 @@ class PosterInfo extends ConsumerWidget {
             ),
           ],
         ),
-        if (post != null && post.nft.isForSale) BuyNftField(post: post),
+        if (post != null && post.nft.isForSale)
+          BuyNftField(
+            post: post,
+            onClose: onClose,
+          ),
       ],
     );
   }

@@ -40,7 +40,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
   StreamSubscription? walletSubscription;
   bool isTonWalletConnected = false;
   double balance = 0;
-  bool isBalanceEnough = false;
+  bool isBalanceEnough = true;
   bool isDark = false;
 
   @override
@@ -59,7 +59,7 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
     setState(() => isLoading = true);
     await tonWallet.restoreConnection();
     isTonWalletConnected = tonWallet.isConnected;
-    setState(() => isLoading = false);
+
     price = widget.nft.price;
     // TODO: добавить fee из nft
     // fee = widget.nft.fee;
@@ -71,6 +71,8 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
         fee;
     balance = tonWallet.getBalance;
     isBalanceEnough = balance < paymentAmount;
+    Logger.e(
+        'balance $balance paymentAmount $paymentAmount isBalanceEnough $isBalanceEnough');
     isTonWalletConnected = tonWallet.isConnected;
     setState(() => isLoading = false);
     // Подписываемся на статус транзакции
@@ -147,6 +149,9 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
       );
       return;
     } else {
+      setState(() => isBalanceEnough = false);
+      await Future.delayed(const Duration(seconds: 2));
+      await start();
       subscribeToWallet();
     }
   }
@@ -318,12 +323,12 @@ class _CreatePosterDialogState extends ConsumerState<BuyNftDialog> {
                     : context.txt.nft_connect,
                 isLoading: isLoading,
                 paymentAmount: paymentAmount,
-                onTap: (isLoading || !isTonWalletConnected)
+                onTap: (!isTonWalletConnected)
                     ? handleWalletConnection
                     : handleBuyNft,
                 isTon: isTonWalletConnected,
                 isTonConnect: !isTonWalletConnected,
-                isEnable: !isBalanceEnough,
+                isEnable: !isBalanceEnough || !isTonWalletConnected,
               ),
             ],
           ),

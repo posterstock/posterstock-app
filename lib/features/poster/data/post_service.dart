@@ -177,6 +177,34 @@ class PostService {
     }
   }
 
+  Future<Map<String, dynamic>> onChainSell(
+      String buyerAddress, String nftAddress) async {
+    try {
+      final response = await _dio.post(
+        'api/posters/onchain/sell',
+        options: Options(
+          contentType: 'application/json',
+          headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+        ),
+        data: jsonEncode({
+          'buyer_address': buyerAddress,
+          'nft': nftAddress,
+        }),
+      );
+      Logger.i(
+          'api onChainSell >>>>>> ${'api/posters/onchain/sell'}  ${response.data}');
+      return response.data;
+    } on DioError catch (e) {
+      Logger.e('Ошибка при получении постера $e');
+      Logger.e(e.response?.headers);
+
+      rethrow;
+    }
+  }
+
   Future<void> deletePost(int id) async {
     try {
       final response = await _dio.delete(

@@ -12,6 +12,7 @@ import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/features/NFT/models/ton_wallet_service.dart';
 import 'package:poster_stock/features/home/models/nft.dart';
 import 'package:poster_stock/features/home/view/widgets/text_or_container.dart';
+import 'package:poster_stock/features/poster/data/post_service.dart';
 import 'package:poster_stock/features/poster/view/widgets/button_wide.dart';
 import 'package:poster_stock/main.dart';
 import 'package:poster_stock/themes/build_context_extension.dart';
@@ -43,6 +44,7 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
   StreamSubscription? transactionSubscription;
   bool isTonWalletConnected = true;
   bool isForSale = false;
+  final service = PostService();
 
   @override
   void initState() {
@@ -181,10 +183,15 @@ class _SellNftDialogState extends ConsumerState<SellNftDialog> {
       setState(() => isLoading = true);
       final price = double.parse(priceController.text);
       final priceInNano = BigInt.from(price * 1e9);
+      final buyerAddress = tonWallet.getWalletAddress();
+      final nftAddress = widget.nft.nftAddress;
+      final result = await service.onChainSell(buyerAddress, nftAddress);
+      Logger.e('result onChainSell $result');
+      setState(() => isLoading = false);
       await tonWallet.createNFTSale(
         nftAddress: widget.nft.nftAddress,
         ownerAddress: tonWallet.getWalletAddress(),
-        royaltyAddress: widget.nft.creatorAddress,
+        creatorAddress: widget.nft.creatorAddress,
         price: priceInNano,
         amount: BigInt.from(0.1 * 1e9),
         percentMarketplace: percentService,
