@@ -191,8 +191,6 @@ class TonWalletService {
   }
 
   Future<bool> connect() async {
-    testUrlOpen();
-    return true;
     try {
       Logger.i('Начало подключения к кошельку');
 
@@ -213,22 +211,10 @@ class TonWalletService {
         Logger.i('URL может быть запущен');
 
         try {
-          // Сначала пробуем запустить через обычный браузер
-          Logger.i('Пробуем запустить через обычный браузер');
           bool launched = await launchUrl(
             uri,
-            mode: LaunchMode.externalApplication,
+            mode: LaunchMode.platformDefault,
           );
-
-          if (!launched) {
-            Logger.e(
-                'Не удалось запустить через браузер, пробуем другой способ');
-            // Пробуем альтернативный способ запуска
-            launched = await launchUrl(
-              uri,
-              mode: LaunchMode.platformDefault,
-            );
-          }
 
           if (!launched) {
             Logger.e('launchUrl вернул false для URI: $uri');
