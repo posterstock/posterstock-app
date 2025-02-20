@@ -178,10 +178,22 @@ class TonWalletService {
         Logger.i('URL может быть запущен');
 
         try {
+          // Сначала пробуем запустить через обычный браузер
+          Logger.i('Пробуем запустить через обычный браузер');
           bool launched = await launchUrl(
             uri,
-            mode: LaunchMode.externalNonBrowserApplication,
+            mode: LaunchMode.externalApplication,
           );
+
+          if (!launched) {
+            Logger.e(
+                'Не удалось запустить через браузер, пробуем другой способ');
+            // Пробуем альтернативный способ запуска
+            launched = await launchUrl(
+              uri,
+              mode: LaunchMode.platformDefault,
+            );
+          }
 
           if (!launched) {
             Logger.e('launchUrl вернул false для URI: $uri');
@@ -191,8 +203,18 @@ class TonWalletService {
 
           Logger.i('URL успешно запущен');
 
-          // Ожидаем подключения и получаем адрес
-          await Future.delayed(const Duration(seconds: 1));
+          // Увеличиваем задержку перед проверкой подключения
+          await Future.delayed(const Duration(seconds: 2));
+
+          // Добавляем дополнительные проверки
+          int attempts = 0;
+          while (attempts < 3 &&
+              (!_connector.connected || _connector.account == null)) {
+            Logger.i('Попытка ${attempts + 1} получения адреса кошелька');
+            await Future.delayed(const Duration(seconds: 1));
+            attempts++;
+          }
+
           if (_connector.connected && _connector.account != null) {
             final walletAddress = _connector.account?.address;
             Logger.i('Получен адрес кошелька: $walletAddress');
@@ -208,18 +230,8 @@ class TonWalletService {
           return false;
         } catch (launchError) {
           Logger.e('Ошибка при запуске URL: $launchError');
-          // Попытка запуска через обычный браузер как запасной вариант
-          try {
-            Logger.i('Пробуем запустить через обычный браузер');
-            return await launchUrl(
-              uri,
-              mode: LaunchMode.externalApplication,
-            );
-          } catch (fallbackError) {
-            Logger.e('Ошибка при запуске через браузер: $fallbackError');
-            _connectionStreamController.add('');
-            return false;
-          }
+          _connectionStreamController.add('');
+          return false;
         }
       } else {
         Logger.e('URL не может быть запущен: $uri');
