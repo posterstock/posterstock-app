@@ -157,7 +157,42 @@ class TonWalletService {
     }
   }
 
+  Future<void> testUrlOpen() async {
+    final Uri uri = Uri.parse('https://google.com');
+
+    Logger.i('Тест 1: LaunchMode.platformDefault');
+    try {
+      final result = await launchUrl(uri, mode: LaunchMode.platformDefault);
+      Logger.i('Результат platformDefault: $result');
+    } catch (e) {
+      Logger.e('Ошибка platformDefault: $e');
+    }
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    Logger.i('Тест 2: LaunchMode.externalApplication');
+    try {
+      final result = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      Logger.i('Результат externalApplication: $result');
+    } catch (e) {
+      Logger.e('Ошибка externalApplication: $e');
+    }
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    Logger.i('Тест 3: LaunchMode.externalNonBrowserApplication');
+    try {
+      final result =
+          await launchUrl(uri, mode: LaunchMode.externalNonBrowserApplication);
+      Logger.i('Результат externalNonBrowserApplication: $result');
+    } catch (e) {
+      Logger.e('Ошибка externalNonBrowserApplication: $e');
+    }
+  }
+
   Future<bool> connect() async {
+    testUrlOpen();
+    return true;
     try {
       Logger.i('Начало подключения к кошельку');
 
