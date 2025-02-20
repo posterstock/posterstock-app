@@ -159,51 +159,76 @@ class TonWalletService {
 
   Future<bool> connect() async {
     try {
+      Logger.i('Начало подключения к кошельку');
+
       if (isConnected) {
+        Logger.i('Кошелек уже подключен, адрес: ${getWalletAddress()}');
         _connectionStreamController.add(getWalletAddress());
         return true;
       }
 
+      Logger.i('Создание universal link через коннектор');
       final universalLink = await _connector.connect(tonkeeperWallet);
-      Logger.i('Universal Link: $universalLink');
+      Logger.i('Получен Universal Link: $universalLink');
 
       final Uri uri = Uri.parse(universalLink);
+      Logger.i('Парсинг URI: $uri');
+
       if (await canLaunchUrl(uri)) {
-        bool launched = await launchUrl(
-          uri,
-          mode: LaunchMode.externalApplication,
-        );
-        if (!launched) {
-          Logger.e('Не удалось запустить $universalLink');
+        Logger.i('URL может быть запущен');
+
+        try {
+          bool launched = await launchUrl(
+            uri,
+            mode: LaunchMode.externalNonBrowserApplication,
+          );
+
+          if (!launched) {
+            Logger.e('launchUrl вернул false для URI: $uri');
+            _connectionStreamController.add('');
+            return false;
+          }
+
+          Logger.i('URL успешно запущен');
+
+          // Ожидаем подключения и получаем адрес
+          await Future.delayed(const Duration(seconds: 1));
+          if (_connector.connected && _connector.account != null) {
+            final walletAddress = _connector.account?.address;
+            Logger.i('Получен адрес кошелька: $walletAddress');
+
+            if (walletAddress != null) {
+              _connectionStreamController.add(walletAddress);
+              return true;
+            }
+          }
+
+          Logger.e('Не удалось получить адрес кошелька');
           _connectionStreamController.add('');
           return false;
+        } catch (launchError) {
+          Logger.e('Ошибка при запуске URL: $launchError');
+          // Попытка запуска через обычный браузер как запасной вариант
+          try {
+            Logger.i('Пробуем запустить через обычный браузер');
+            return await launchUrl(
+              uri,
+              mode: LaunchMode.externalApplication,
+            );
+          } catch (fallbackError) {
+            Logger.e('Ошибка при запуске через браузер: $fallbackError');
+            _connectionStreamController.add('');
+            return false;
+          }
         }
-        // Добавляем слушатель событий перед подключением
-        final provider = _connector.provider;
-        if (provider is BridgeProvider) {
-          provider.listen((message) {
-            if (message['event'] == 'connect') {
-              // Успешное подключение
-              final address = _connector.account?.address ?? '';
-              _connectionStreamController.add(address);
-              return true;
-            } else if (message['event'] == 'connect_error') {
-              // Ошибка подключения
-              final errorMessage = message['payload']['message'] as String?;
-              Logger.e('Ошибка подключения: $errorMessage');
-              _connectionStreamController.add('');
-              return false;
-            }
-          });
-        }
-        return true;
       } else {
-        Logger.e('Не удалось запустить $universalLink');
+        Logger.e('URL не может быть запущен: $uri');
         _connectionStreamController.add('');
         return false;
       }
-    } catch (e) {
-      Logger.e('Ошибка подключения к кошельку: $e');
+    } catch (e, stackTrace) {
+      Logger.e('Общая ошибка в методе connect: $e');
+      Logger.e('Stack trace: $stackTrace');
       _connectionStreamController.add('');
       return false;
     }
