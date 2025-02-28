@@ -5,4 +5,6 @@ abstract class IHomePageApi {
   Future<void> setLike(int id, bool like);
 
   Future<void> setLikeList(int id, bool like);
+
+  Future<void> getPostersOwners(String addressNft);
 }

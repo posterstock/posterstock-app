@@ -111,15 +111,22 @@ class HomePagePostsStateHolder
   }
 
   Future<void> setFollow(int id, bool follow) async {
-    for (int i = 0; i < (state?.length ?? 0); i++) {
-      for (int j = 0; j < (state?[i].length ?? 0); j++) {
-        if (state![i][j].author.id == id) {
-          if (!follow) {
-            state?.removeAt(i);
-            i--;
-          } else {
-            state![i][j] = state![i][j].copyWith(
-              author: state![i][j].author.copyWith(
+    if (state == null) return;
+
+    List<List<PostBaseModel>> newState = [...state!];
+
+    for (int i = newState.length - 1; i >= 0; i--) {
+      if (!follow) {
+        // Если отписываемся - удаляем всю группу постов автора
+        if (newState[i].any((post) => post.author.id == id)) {
+          newState.removeAt(i);
+        }
+      } else {
+        // Если подписываемся - обновляем статус followed
+        for (int j = 0; j < newState[i].length; j++) {
+          if (newState[i][j].author.id == id) {
+            newState[i][j] = newState[i][j].copyWith(
+              author: newState[i][j].author.copyWith(
                     followed: true,
                   ),
             );
@@ -127,7 +134,8 @@ class HomePagePostsStateHolder
         }
       }
     }
-    state = [...?state];
+
+    state = newState;
   }
 
   Future<void> addComment(int id) async {

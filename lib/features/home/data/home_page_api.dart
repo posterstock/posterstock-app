@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_easylogger/flutter_logger.dart';
+import 'package:poster_stock/features/NFT/models/nft_owners.dart';
 import 'package:poster_stock/features/home/data/i_home_page_api.dart';
 import 'package:supertokens_flutter/dio.dart';
 import 'package:supertokens_flutter/supertokens.dart';
@@ -35,6 +36,21 @@ class HomePageApi implements IHomePageApi {
         },
       ),
     );
+  }
+
+  /// получаем список владельцев NFT
+  @override
+  Future<PosterOwner?> getPostersOwners(String addressNft) async {
+    String url = 'api/posters/onchain/$addressNft/owners';
+    Logger.i('getPostersOwners $url');
+    try {
+      final response = await _dio.get(url);
+      Logger.i('getPostersOwners ${response.data}');
+      return PosterOwner.fromJson(response.data);
+    } on DioError catch (e) {
+      Logger.e('Ошибка при получении постов $e');
+      return null;
+    }
   }
 
   @override

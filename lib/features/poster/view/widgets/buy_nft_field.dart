@@ -132,7 +132,6 @@ class BuyNftFieldState extends ConsumerState<BuyNftField> {
   Widget build(BuildContext context) {
     // WalletState wallet = ref.watch(changeWalletStateHolderProvider);
 
-    Logger.i('post ${widget.post.nft.toJson()}');
     return Column(
       children: [
         const Gap(15),

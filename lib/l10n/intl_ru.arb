@@ -397,5 +397,9 @@
   "wallet_error": "Ошибка подключения кошелька",
   "@wallet_error": {},
   "error_occured": "Произошла ошибка",
-  "@error_occured": {}
+  "@error_occured": {},
+  "poster_owners": "Владелец постера",
+  "@poster_owners": {},
+  "poster_owners_empty": "Никто еще не купил этот постер",
+  "@poster_owners_empty": {}
 }

@@ -14,9 +14,11 @@ import 'package:poster_stock/common/services/text_info_service.dart';
 import 'package:poster_stock/common/state_holders/router_state_holder.dart';
 import 'package:poster_stock/common/widgets/app_snack_bar.dart';
 import 'package:poster_stock/common/widgets/comment_text_field.dart';
+import 'package:poster_stock/features/NFT/models/nft_owners.dart';
 import 'package:poster_stock/features/account/notifiers/posters_notifier.dart';
 import 'package:poster_stock/features/auth/view/widgets/custom_app_bar.dart';
 import 'package:poster_stock/features/home/controller/home_page_posts_controller.dart';
+import 'package:poster_stock/features/home/data/home_page_api.dart';
 import 'package:poster_stock/features/home/models/post_movie_model.dart';
 import 'package:poster_stock/features/home/view/widgets/post_base.dart';
 import 'package:poster_stock/features/home/view/widgets/shimmer_loader.dart';
@@ -29,6 +31,7 @@ import 'package:poster_stock/features/poster/view/widgets/add_to_list_dialog.dar
 import 'package:poster_stock/features/poster/view/widgets/image_dialog.dart';
 import 'package:poster_stock/features/poster/view/widgets/poster_actions.dart';
 import 'package:poster_stock/features/poster/view/widgets/poster_info.dart';
+import 'package:poster_stock/features/poster/view/widgets/posters_owners.dart';
 import 'package:poster_stock/features/poster/view/widgets/sellnft_dialog.dart';
 import 'package:poster_stock/features/poster_dialog/controller/create_poster_controller.dart';
 import 'package:poster_stock/features/poster_dialog/view/poster_dialog.dart';
@@ -798,7 +801,7 @@ class _PosterPageState extends ConsumerState<PosterPage>
   ) {
     final myPoster = ref.watch(myProfileInfoStateHolderProvider);
     final post = ref.watch(posterStateHolderProvider)!;
-
+    Logger.i('post show menu ${post.nft.toJson()}');
     MenuDialog.showBottom(
       context,
       MenuState(null, [
@@ -853,6 +856,32 @@ class _PosterPageState extends ConsumerState<PosterPage>
                   nft: post.nft,
                   onClose: onCloseNft,
                   isManage: !post.nft.isOwnerSale,
+                ),
+              );
+            },
+          ),
+        if (post.nft.ownerAddressCollection.isNotEmpty)
+          MenuItem(
+            'assets/icons/ic_owners.svg',
+            context.txt.poster_owners,
+            () async {
+              /// TODO: add owners list
+              setState(() => isLoading = true);
+              PosterOwner? posterOwner =
+                  await HomePageApi().getPostersOwners(post.nft.nftAddress);
+              if (posterOwner == null) return;
+
+              setState(() => isLoading = false);
+              await showModalBottomSheet(
+                context: context,
+                backgroundColor: Colors.transparent,
+                useRootNavigator: true,
+                isScrollControlled: true,
+                enableDrag: false,
+                isDismissible: false,
+                useSafeArea: true,
+                builder: (context) => PostersOwnersModal(
+                  owner: posterOwner,
                 ),
               );
             },

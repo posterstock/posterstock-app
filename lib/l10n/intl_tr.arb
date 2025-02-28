@@ -397,5 +397,9 @@
   "wallet_error": "Cüzdan bağlantı hatası",
   "@wallet_error": {},
   "error_occured": "Bir hata oluştu",
-  "@error_occured": {}
-      }
+  "@error_occured": {},
+  "poster_owners": "Poster Sahipleri",
+  "@poster_owners": {},
+  "poster_owners_empty": "Henüz bu posteri satın alan yok",
+  "@poster_owners_empty": {}
+}

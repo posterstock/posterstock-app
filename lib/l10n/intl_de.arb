@@ -397,5 +397,9 @@
   "wallet_error": "Fehler beim Verbinden des Wallets",
   "@wallet_error": {},
   "error_occured": "Ein Fehler ist aufgetreten",
-  "@error_occured": {}
+  "@error_occured": {},
+  "poster_owners": "Posterbesitzer",
+  "@poster_owners": {},
+  "poster_owners_empty": "Noch kein Poster gekauft",
+  "@poster_owners_empty": {}
 }

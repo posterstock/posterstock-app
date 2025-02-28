@@ -397,6 +397,9 @@
   "wallet_error": "Erreur de connexion du portefeuille",
   "@wallet_error": {},
   "error_occured": "Une erreur est survenue",
-  "@error_occured": {}
-
+  "@error_occured": {},
+  "poster_owners": "Propriétaire du poster",
+  "@poster_owners": {},
+  "poster_owners_empty": "Aucun propriétaire de poster trouvé",
+  "@poster_owners_empty": {}
 }

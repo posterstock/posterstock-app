@@ -397,5 +397,9 @@
   "wallet_error": "Error connecting wallet",
   "@wallet_error": {},
   "error_occured": "An error occurred",
-  "@error_occured": {}
+  "@error_occured": {},
+  "poster_owners": "Poster Owners",
+  "@poster_owners": {},
+  "poster_owners_empty": "No one has bought this poster yet",
+  "@poster_owners_empty": {}
   }
